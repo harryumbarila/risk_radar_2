@@ -1,0 +1,167 @@
+.container-fluid.team-view {
+    color: #fff;
+}
+
+.team-view .meet-team-text {
+    padding-top: 25px;
+}
+
+.team-view .meet-team-text p {
+    font-size: 2.5rem;
+    font-weight: 200;
+}
+
+.team-view .oval-image {
+    width: 100%;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+}
+
+.team-view .team-member-info {
+    padding: 20px;
+}
+
+.team-view .team-member-info .individual-member {
+    padding: 30px;
+}
+
+.team-view .team-member-info .individual-member .member-name {
+    padding-top: 20px;
+    font-size: 1.56rem;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.team-view .team-member-info .individual-member .member-role {
+    font-size: 0.95rem;
+    font-weight: 300;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.team-view .team-member-info .individual-member .member-staff {
+    visibility: hidden;
+}
+.team-view .team-member-info .individual-member .member-title {
+    font-size: 0.95rem;
+    font-weight: 300;
+    letter-spacing: 1px;
+    opacity: 0.5;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.team-view .team-member-info .individual-member span.social a {
+    font-size: 24px;
+    color: #fff;
+    text-decoration: none;
+}
+
+.team-view .team-member-info .individual-member span.social a:hover {
+    text-decoration: none;
+}
+
+.team-view .team-member-info .individual-member span.social a .fa-envelope {
+    padding-left: 20px;
+}
+
+.team-view .team-member-info .individual-member span.social {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    display: inline;
+}
+
+.team-view .team-member-info .individual-member img.social-icon {
+    font-size: 24px;
+}
+
+button:focus {
+    outline: none !important;
+}
+
+@media (min-width: 320px) {
+    div#navbarNav {
+        background: lightgray;
+        z-index: 1;
+    }
+    .team-view .oval-image {
+        width: 75%;
+    }
+    .container-fluid.team-view {
+        color: #fff;
+        height: 100% !important;
+    }
+    .team-view .team-member-info {
+        padding: 0px;
+    }
+    .team-view .team-member-info .individual-member {
+        padding: 15px;
+    }
+}
+
+@media (min-width: 600px) {
+    .team-view .oval-image {
+        width: 40%;
+    }
+}
+
+@media (min-width: 992px) {
+    div#navbarNav {
+        background: none;
+    }
+    .team-view .oval-image {
+        width: 70%;
+    }
+}
+
+@media (min-width: 1200px) {
+    .team-view .oval-image {
+        width: 100%;
+        height: 173px;
+    }
+    .team-view .meet-team-text {
+        padding-top: 20px;
+    }
+    .team-view .meet-team-text p {
+        font-size: 3.5rem;
+    }
+    .team-view .team-member-info {
+        padding: 20px;
+    }
+    .team-view .team-member-info .individual-member {
+        padding: 20px;
+    }
+}
+
+@media (min-width: 1400px) {
+    .team-view .oval-image {
+        height: 193px;
+    }
+}
+
+@media (min-width: 1600px) {
+    .team-view .oval-image {
+        height: 232px;
+    }
+}
+
+@media (min-width: 1920px) {
+    .team-view .oval-image {
+        height: 262px;
+    }
+}
+
+
+@media (min-width: 2500px) {
+    .team-view .oval-image {
+        width: 70%;
+        height: 252px;
+    }
+    .team-view .meet-team-text {
+        padding-top: 50px;
+    }
+    .team-view .team-member-info {
+        padding: 20px;
+    }
+    .team-view .team-member-info .individual-member {
+        padding: 30px;
+    }
+}
