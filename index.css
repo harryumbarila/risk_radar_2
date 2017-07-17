@@ -173,10 +173,20 @@ button:focus {
 
 /* Mobile - Potrait mode */
 @media (min-width: 320px) and (min-height: 500px) {
-    div#navbarNav {
-        padding-top: 20px;
-        background: lightgray;
+    .home-layout .home-page .navbar-nav .nav-item {
+        padding-right: 40px;
+        font-size: 0.8rem;
+    }
+    .home-layout .home-page .navbar-nav .nav-item.dashboard-item {
+        display: none;
+    }
+    .home-layout .home-page .nav-header div#navbarNav {
+        padding-top: 35px;
         z-index: 1;
+    }
+    div#navbarNav ul {
+        flex-direction: row;
+        padding-right: 0px;
     }
     .home-layout .heading h2 {
         font-size: 1.75rem;
@@ -255,6 +265,15 @@ button:focus {
 }
 
 @media (min-width: 360px) and (min-height: 640px) {
+    .home-layout .home-page .nav-header div#navbarNav {
+        padding-left: 15px;
+        padding-top: 35px;
+        z-index: 1;
+    }
+    .home-layout .home-page .navbar-nav .nav-item {
+        padding-right: 45px;
+        font-size: 0.8rem;
+    }
     .home-layout .heading h2 {
         font-size: 1.75rem;
     }
@@ -471,6 +490,14 @@ button:focus {
 }
 
 @media (min-width: 992px) {
+    .home-layout .home-page .navbar-nav .nav-item.dashboard-item {
+        display: inline;
+    }
+    .home-layout .home-page .navbar-nav .nav-item {
+        padding-right: 35px;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+    }
     div#navbarNav {
         background: none;
     }
@@ -478,7 +505,7 @@ button:focus {
 
 /* 1200 set */
 @media (min-width: 1280px) and (min-height: 350px) {
-    .home-layout .home-page .nav-header #navbarNav{
+    .home-layout .home-page .nav-header div#navbarNav{
         display: inline-block;
     }
     .home-layout .heading {

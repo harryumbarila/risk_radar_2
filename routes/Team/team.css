@@ -33,6 +33,7 @@
 }
 
 .team-view .team-member-info .individual-member .member-role {
+    opacity: 0.5;
     font-size: 0.95rem;
     font-weight: 300;
     letter-spacing: 1px;
@@ -78,9 +79,9 @@ button:focus {
 }
 
 @media (min-width: 320px) {
-    div#navbarNav {
-        background: lightgray;
-        z-index: 1;
+    div#navbarNav ul {
+        flex-direction: row;
+        padding-right: 0px;
     }
     .team-view .oval-image {
         width: 75%;
