@@ -39,12 +39,6 @@
     }
 }
 
-@media (min-width: 992px) {
-    div#navbarNav {
-        background: none;
-    }
-}
-
 @media (min-width: 1200px) {
     .careers-view .hire-text p {
         font-size: 2rem;

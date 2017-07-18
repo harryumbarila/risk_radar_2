@@ -16,13 +16,13 @@
     <div class='page-layout row'>
         <section class='nav-header col-12'>
             <nav class='navbar navbar-toggleable-md navbar-light bg-faded'>
-                <button id="button-img" class="navbar-toggler navbar-toggler-right" type="button" onclick="onClickHandler()" data-toggle="navbar-collapse collapse" data-target="#navbarNav-1" aria-controls="navbarNav-1" aria-expanded="false" aria-label="Toggle navigation">
+                <button id="button-img" class="navbar-toggler navbar-toggler-right" type="button" onclick="onClickHandler()" data-toggle="navbar-collapse collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <a class='navbar-brand col-2 offset-md-1 col-md-2 offset-lg-1 col-lg-2 offset-xl-1 col-xl-2' href='../../index.html'>Jobox.ai</a>
                 <div class='collapse navbar-collapse col-12 offset-md-1 col-md-11 offset-lg-4 col-lg-5 offset-xl-4 col-xl-5' id='navbarNav'>
                     <ul class='navbar-nav'>
-                        <li class='nav-item active'>
+                        <li class='nav-item hidden-xs hidden-sm hidden-md active'>
                             <a class='nav-link' href='./login.html'>DASHBOARD <span class='sr-only'>(current)</span></a>
                         </li>
                         <li class='nav-item'>
@@ -45,7 +45,7 @@
                     <p class='col-12 details-text'>ENTER YOUR DETAILS BELOW</p>
                 </div>
                 <div class='login-form row'>
-                    <form class='form-main col-12 offset-md-4 col-md-4 offset-xl-3 col-xl-6 text-center' onSubmit={this.handleSubmit}>
+                    <form class='form-main col-12 offset-md-4 col-md-4 offset-xl-3 col-xl-6 text-center'>
                         <div class='form-group transparent-input'>
                             <label htmlFor='input-email credentials-group'>Email Address</label>
                             <input name='email'
