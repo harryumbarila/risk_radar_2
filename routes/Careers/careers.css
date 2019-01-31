@@ -1,0 +1,116 @@
+.careers-view .hire-text p {
+    font-size: 1.5rem;
+    color: #fff;
+    text-align: left;
+}
+
+.careers-view p.feel-text {
+    color: #fff;
+    opacity: 0.5;
+    letter-spacing: 1px;
+    font-size: 0.8rem;
+}
+
+.careers-view span {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    display: inline-flex;
+}
+
+.careers-view span a {
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+@media (min-width: 320px) {
+    .careers-view span {
+        padding-bottom: 5px;
+    }
+    .careers-view .email-content {
+        border: solid 0.5px rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+    }
+    .careers-view .email-content .email-id {
+        font-size: 1.25rem;
+    }
+    .careers-view div.row.email span.email-content i.material-icons {
+        font-size: 24px !important;
+        color: #fff;
+    }
+}
+
+@media (min-width: 1200px) {
+    .careers-view .hire-text p {
+        font-size: 2rem;
+        color: #fff;
+        text-align: left;
+        padding-top: 30px;
+    }
+    .careers-view span {
+        padding-bottom: 15px;
+    }
+    .careers-view div.email {
+        width: 100%;
+    }
+    .careers-view .email-content {
+        border: solid 0.5px rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+    }
+    .careers-view .email-content .email-id {
+        font-size: 1.25rem;
+    }
+    .careers-view span {
+        display: inline-flex;
+    }
+    .careers-view span a {
+        color: #fff;
+        letter-spacing: 1px;
+    }
+    .careers-view div.row.email {
+        padding-top: 50px;
+        padding-left: 15px;
+    }
+    .careers-view div.row.email span.email-content i.material-icons {
+        font-size: 36px !important;
+        padding-top: 20px;
+        color: #fff;
+    }
+}
+
+
+@media (min-width: 2100px) {
+    .careers-view .hire-text p {
+        font-size: 3rem;
+        color: #fff;
+        text-align: left;
+        padding-top: 100px;
+    }
+    .careers-view div.email {
+        width: 65%;
+    }
+    .careers-view .email-content {
+        border: solid 0.5px rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+    }
+    .careers-view .email-content .email-id {
+        font-size: 1.25rem;
+    }
+    .careers-view span {
+        padding-top: 15px;
+        padding-bottom: 15px;
+        display: inline-flex;
+    }
+    .careers-view span a {
+        color: #fff;
+        letter-spacing: 1px;
+    }
+    .careers-view div.row.email {
+        padding-top: 50px;
+        padding-left: 15px;
+    }
+    .careers-view div.row.email span.email-content i.material-icons {
+        font-size: 36px !important;
+        padding-top: 20px;
+        color: #fff;
+    }
+}
