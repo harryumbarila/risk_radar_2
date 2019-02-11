@@ -8,5 +8,5 @@ function onClickHandler() {
 }
 
 function onSubmitHandler() {
-    window.location.href = 'http://www.jobox.ai/routes/Careers/careers.html'
+    window.location.href = 'https://www.jobox.ai/routes/Careers/jobs.html'
 }
