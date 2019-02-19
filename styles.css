@@ -13,6 +13,10 @@
   letter-spacing: 0.3px;
 }
 
+.home-page .home-page-content {
+  max-width: 800px;
+}
+
 .btn.btn-join-us {
   background-color: #ffffff;
   border-radius: 3px;

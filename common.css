@@ -75,7 +75,7 @@ body {
   }
 
   .page-layout .nav-header {
-    height: 13rem;
+    height: 9rem;
     padding-top: 25px;
   }
 
@@ -92,6 +92,10 @@ body {
 }
 
 @media (min-width: 992px) {
+  .page-layout .nav-header {
+    height: 11rem;
+  }
+
   .page-layout .navbar-nav .nav-item {
     padding-left: 35px;
     font-size: 0.8rem;
@@ -112,7 +116,7 @@ body {
 
 @media (min-width: 1200px) {
   .page-layout .nav-header {
-    height: 16rem;
+    height: 15rem;
     padding-top: 25px;
   }
 }

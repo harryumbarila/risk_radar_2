@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jobox.ai - A stealth mode AI startup</title>
 
-  <link rel="stylesheet" href="common.css?ver=4">
+  <link rel="stylesheet" href="common.css?ver=5">
   <link rel="stylesheet" href="styles.css?ver=4">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.0/css/bootstrap.min.css" integrity="sha384-PDle/QlgIONtM1aqA2Qemk5gPOE7wFq8+Em+G/hmo5Iq0CCmYZLv3fVRDJ4MMwEA" crossorigin="anonymous">
 
@@ -47,8 +47,8 @@
         </div>
       </nav>
     </section>
-    <section class="col-12 offset-sm-1 col-sm-8 offset-md-2 col-xl-6 page-layout-body">
-      <div class="container-fluid">
+    <section class="col-12 offset-sm-1 col-sm-8 offset-md-2 col-md-8 col-lg-6 page-layout-body">
+      <div class="home-page-content">
         <div class="heading">
           <h1 class="mb-5">A stealth-mode AI startup empowering skilled professionals.</h2>
         </div>
@@ -67,6 +67,13 @@
     gtag('js', new Date());
 
     gtag('config', 'UA-123162521-3');
+  </script>
+  <script>
+    document.addEventListener('load', function() {
+      var scale = 1 / (window.devicePixelRatio || 1);
+      var content = 'width=device-width, initial-scale=' + scale;
+      document.querySelector('meta[name="viewport"]').setAttribute('content', content);
+    }, false);
   </script>
 </body>
 </html>
