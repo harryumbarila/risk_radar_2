@@ -1,36 +1,46 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat:300,400|Open+Sans');
+@import url('https://fonts.googleapis.com/css?family=Lato:200,300,400,700|Open+Sans');
+
+body {
+  font-family: 'Lato';
+}
+
 #logo {
 	float: left;
 	margin-top: 20px;
 	margin-right: 20px;
-	display:none;
+	display: none;
 }
+
 #main2 {
 	background-color: #fff;
--webkit-box-shadow: 0px 0px 5px 4px rgba(0,0,0,0.31);
--moz-box-shadow: 0px 0px 5px 4px rgba(0,0,0,0.31);
-box-shadow: 0px 0px 5px 4px rgba(0,0,0,0.31);
- 
-	margin-bottom:100px;
-	margin-top:8px;
+  box-shadow: 0px 0px 5px 4px rgba(0,0,0,0.31);
+	margin-bottom: 100px;
+	margin-top: 8px;
 }
- 
-p{text-align:center;}
-*{font-family: Montserrat!important; }
-#wrapper{text-align:center; }
-#main{padding-top:0px!important}
 
- 
+p {
+  text-align: center;
+}
+
+#wrapper {
+  text-align: center;
+}
+#main {
+  padding-top: 0px !important;
+}
+
 .opening {
- -webkit-transition: all 0.3s ;transition:all 0.3s;
+  -webkit-transition: all 0.3s ;transition:all 0.3s;
 	border: 1px solid #ffffff;
 	border-radius: 15px;
 	/*padding: 30px 0px 30px 25px;*/
 	float: left;
 	width: 45%;
 	margin-right: 10px;
-	text-align:left;
+	text-align: left;
 }
+
 h2 {
 	display: block !important;
 	clear: both;
@@ -38,22 +48,35 @@ h2 {
 	padding-bottom: 20px;
 	border-bottom: 1px solid #b7b5b3;
 }
-.opening a{font-size:17px;}
+
+.opening a{
+  font-size:17px;
+}
 
 .location {
-  
 	opacity: 0.6 !important;
 }
+
 #header {
-	 padding-top:10px;
+  padding-top: 10px;
 	text-align: left;
 	border-bottom: 1px solid #ffffff;
 }
-#application{text-align: left;}
-#content{text-align:left}
-#content p{text-align:left!important}
+
+#application {
+  text-align: left;
+}
+
+#content {
+  text-align: left;
+}
+
+#content p {
+  text-align: left!important;
+}
 
 @media (max-width: 850px) {
-.opening {width:90%}
-
+  .opening {
+    width: 90%;
+  }
 }
