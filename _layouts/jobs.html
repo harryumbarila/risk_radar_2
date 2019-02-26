@@ -4,8 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
   <title>Jobox.ai - A stealth mode AI startup</title>
-  <link rel="stylesheet" href="/common.css?ver=5">
-  <link rel="stylesheet" href="/routes/Careers/jobs.css">
+  <link rel="stylesheet" href="/css/common.css?ver={% bust_cache %}">
+  {% for style in page.styles %}
+    <link rel="stylesheet" test="test" href="{{ style }}?ver={% bust_cache %}">
+  {% endfor %}
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.0/css/bootstrap.min.css" integrity="sha384-PDle/QlgIONtM1aqA2Qemk5gPOE7wFq8+Em+G/hmo5Iq0CCmYZLv3fVRDJ4MMwEA" crossorigin="anonymous">
   <link rel='shortcut icon' type='image/x-icon' href='/assets/favicon.ico' />
 </head>
@@ -14,22 +16,13 @@
     <section class="nav-header col-12">
       <nav class="navbar">
         <a class="navbar-brand col-2 offset-md-1 col-md-2 offset-lg-1 col-lg-2" href="/">
-          <img class="d-sm-none" src="/assets/logo-icon-blue.svg" />
-          <img class="d-none d-sm-block" src="/assets/logo-icon-jobox-blue.svg" />
+          <img src="/assets/logo-icon-jobox-blue.svg" />
         </a>
       </nav>
     </section>
     <div id="grnhse_app"></div>
   </div>
-  <script src="https://boards.greenhouse.io/embed/job_board/js?for=jobox"></script>
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-123162521-3"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'UA-123162521-3');
-  </script>
+  {{ content }}
+  {% include ga.html %}
 </body>
 </html>
