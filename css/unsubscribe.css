@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:300,400,600|Open+Sans');
+@import url('https://fonts.googleapis.com/css?family=Lato:200,300,400,700|Open+Sans');
+
+body {
+  font-family: Lato;
+}
+
+h1 {
+  font-family: Montserrat;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.text {
+  max-width: 342px;
+}
+
+.subtext {
+  font-size: 12px;
+  max-width: 300px;
+}
+
+.unsubscribe-page {
+  margin-top: 80px;
+  max-width: 768px;
+}
+
+.unsubscribe-image {
+  max-width: 390px;
+  padding: 0 20px 0 20px;
+  width: 100%;
+}
+
+@media (min-width: 576px) {
+  .unsubscribe-page {
+    margin-top: 130px;
+  }
+}
+
+
+/* NAVBAR
+----------------------*/
+
+#joboxlogo{
+  max-height:18px!important
+}
+
+.nav-menu {
+  padding: 1rem 0;
+  transition: all 0.3s ease;
+}
+
+/* .nav-menu.is-scrolling,
+.nav-menu.menu-is-open { */
+.nav-menu {
+  background: rgb(5,120,255); /* Old browsers */
+  background: -moz-linear-gradient(-45deg,  rgba(5,120,255,1) 0%, rgba(35,199,245,1) 61%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(-45deg,  rgba(5,120,255,1) 0%,rgba(35,199,245,1) 61%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(135deg,  rgba(5,120,255,1) 0%,rgba(35,199,245,1) 61%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0578ff', endColorstr='#23c7f5',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
+  -webkit-box-shadow: 0px 5px 23px 0px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0px 5px 23px 0px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 5px 23px 0px rgba(0, 0, 0, 0.1);
+
+  padding: 0;
+}
+
+/* .nav-menu.is-scrolling {
+  padding: 0;
+} */
+
+.navbar-nav .nav-link {
+  position: relative;
+}
+
+@media (min-width: 992px) {
+  .navbar-expand-lg .navbar-nav .nav-link {
+    padding-right: 1rem;
+    padding-left: 1rem;
+    font-size: 14px;
+  }
+  .navbar-nav>.nav-item>.nav-link.active:after {
+    content: "";
+    border-bottom: 2px solid #f59c22;
+    left: 1rem;
+    right: 1rem;
+    bottom: 5px;
+    height: 1px;
+    position: absolute;
+  }
+}
+
+@media (max-width:991px) {
+  .navbar-nav.is-scrolling {
+    padding-bottom: 1rem;
+  }
+  .navbar-nav .nav-item {
+    text-align: center;
+  }
+}

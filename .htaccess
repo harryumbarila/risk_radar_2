@@ -4,5 +4,5 @@ ErrorDocument 404 http://jobox.ai
 
 RewriteCond %{SERVER_PORT} 80
 RewriteRule ^(.*)$ https://www.jobox.ai/$1 [R,L]
-RewriteRule ^careers$ /jobs.html [L]
+RewriteRule ^careers$ /careers.html [L]
 RewriteRule ^contact$ /contact.html [L]
