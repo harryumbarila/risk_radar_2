@@ -2,19 +2,78 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jobox.ai - A stealth mode AI startup</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Jobox - The new way to manage your on demand jobs.</title>
+  <link rel="shortcut icon" href="http://getjobox.com/images/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="http://getjobox.com/images/favicon.ico" type="image/x-icon">
 
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.0/css/bootstrap.min.css" integrity="sha384-PDle/QlgIONtM1aqA2Qemk5gPOE7wFq8+Em+G/hmo5Iq0CCmYZLv3fVRDJ4MMwEA" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="/css/unsubscribe.css">
 </head>
 <body>
-  <section class="col-12 offset-sm-1 col-sm-8 offset-md-2 col-md-8 col-lg-6">
-    <div class="heading" style="margin-top: 70px">
-      <h1 class="mb-5">Reports are only sent by user’s request from the Jobox app.</h2>
+  <div class="nav-menu fixed-top">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <nav class="navbar navbar-dark navbar-expand-lg">
+            <a class="navbar-brand" href="http://getjobox.com/"><img id="joboxlogo" src="http://getjobox.com/images/logo.png" class="img-fluid" alt="jobox"></a> <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button>
+            <div class="collapse navbar-collapse" id="navbar">
+              <ul class="navbar-nav ml-auto">
+                <li class="nav-item"> <a class="nav-link active" href="http://getjobox.com/#home">HOME <span class="sr-only">(current)</span></a> </li>
+                <li class="nav-item"> <a class="nav-link" href="http://getjobox.com/#features">FEATURES</a> </li>
+                <li class="nav-item"> <a class="nav-link" href="http://getjobox.com/#gallery">GALLERY</a> </li>
+                <li class="nav-item"> <a class="nav-link" href="http://getjobox.com/#pricing">PRICING</a> </li>
+                <li class="nav-item"> <a class="nav-link" href="http://getjobox.com/#contact">CONTACT</a> </li>
+                <li class="nav-item"><a href="http://getjobox.com/#contact" class="btn btn-outline-light my-3 my-sm-0 ml-lg-3">SIGN UP</a></li>
+              </ul>
+            </div>
+          </nav>
+        </div>
+      </div>
     </div>
-    <p class="text pr-1 pl-1 mb-5">
-      Not sure why you got this email? Contact us at <a href="mailto:hello@getjobox.com">hello@getjobox.com</a>
-    </p>
-  </section>
+  </div>
+  <div class="mr-3 ml-3">
+    <section class="unsubscribe-page text-center mx-auto">
+      <h1 class="mx-auto mb-3">Reports are only sent by user’s request from the Jobox app.</h2>
+      <p class="text mx-auto">
+        Not sure why you got this email? Contact us by clicking the chat icon at the bottom of this page.
+      </p>
+      <hr />
+      <p class="subtext mx-auto mb-5">
+        FYI: You can update your email in the Jobox app in <strong>Account > Account Information.</strong>
+      </p>
+      <img class="unsubscribe-image" src="/assets/Unsubscribe/img-unsub.jpg" alt="ubnsubscribe" />
+    </section>
+  </div>
+  <script>
+    window.intercomSettings = {
+      app_id: "z4d8mmii"
+    };
+  </script>
+  <script>(function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reattach_activator');ic('update',w.intercomSettings);}else{var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.Intercom=i;var l=function(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://widget.intercom.io/widget/z4d8mmii';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);};if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})();</script>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E=" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script>
+    $(function() {
+      "use strict";
+      /*-----------------------------------
+      * NAVBAR CLOSE ON CLICK
+      *-----------------------------------*/
+
+      $('.navbar-nav > li:not(.dropdown) > a').on('click', function() {
+          $('.navbar-collapse').collapse('hide');
+      });
+      /*
+      * NAVBAR TOGGLE BG
+      *-----------------*/
+      var siteNav = $('#navbar');
+      siteNav.on('show.bs.collapse', function(e) {
+          $(this).parents('.nav-menu').addClass('menu-is-open');
+      })
+      siteNav.on('hide.bs.collapse', function(e) {
+          $(this).parents('.nav-menu').removeClass('menu-is-open');
+      })
+    }); /* End Fn */
+  </script>
 </body>
 </html>
