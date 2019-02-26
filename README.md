@@ -1,12 +1,26 @@
 # Jobox.ai web site
 
-## Running locally
+## Local development
 
-Run following command to run web site locally on 8000 port
+If you don't have [Jekyll](https://jekyllrb.com/) installed - use next command to install it:
 
 ``` bash
-$ python der-server.py
+$ gem install jekyll bundler
 ```
 
-## TODO
- * Consider using static site generator like [Jekyll](https://jekyllrb.com/)
+Then build site and run it locally:
+
+``` bash
+$ bundle exec jekyll serve
+```
+
+Now browse to http://localhost:4000
+
+## Deploying to production:
+
+To build production version run:
+``` bash
+$ JEKYLL_ENV=production bundle exec jekyll build
+```
+
+Then copy content of the `_site` folder to the `ftp.jobox.ai`
