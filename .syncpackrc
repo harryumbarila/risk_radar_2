@@ -1,0 +1,23 @@
+{
+  "dependencyTypes": [
+    "dev",
+    "overrides",
+    "peer",
+    "pnpmOverrides",
+    "prod",
+    "resolutions"
+  ],
+  "sortFirst": [
+    "name",
+    "description",
+    "version",
+    "author",
+    "private",
+    "workspaces",
+    "main",
+    "types",
+    "bin",
+    "files",
+    "scripts"
+  ]
+}
