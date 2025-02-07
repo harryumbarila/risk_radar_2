@@ -1,0 +1,104 @@
+import { useState } from "react";
+
+const dashboards = [
+  { id: 1, name: 'Dashboard Kili', url: 'https://dashboard.jobox.ai' },
+  { id: 2, name: 'Dashboard Taluspay', url: 'https://dashboard.taluspay.com' },
+  { id: 3, name: 'Dashboard Legacy RiskRadar', url: 'https://dashboard.taluspay.com' },
+];
+
+const dashboardsStaging = [
+  { id: 1, name: 'Dashboard Kili', url: 'https://dashboard-staging.joboxserver.com' },
+  { id: 2, name: 'Dashboard Taluspay', url: 'https://dashboard.taluspay-staging.com' },
+  { id: 3, name: 'Dashboard Legacy RiskRadar', url: 'https://dashboard.taluspay-staging.com' },
+];
+
+// @ts-ignore
+const AppsIcon = ({dashboardEnv}) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const internalDashboards = dashboardEnv == 'staging' ? dashboardsStaging : dashboardsStaging;
+
+  // Toggle dropdown visibility
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
+  return (
+    <div className="google-apps-icon-container" style={{ position: 'relative' }}>
+      {/* Google Apps Icon */}
+      <div
+        onClick={toggleDropdown}
+        role="button"
+        tabIndex={0}
+        style={{
+          width: '30px',
+          height: '30px',
+          display: 'grid',
+          gridTemplateRows: 'repeat(3, 1fr)',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          cursor: 'pointer',
+        }}
+      >
+        {[...Array(9)].map((_, index) => (
+          <div
+            key={index}
+            style={{
+              width: '2px',
+              height: '2px',
+              backgroundColor: '#8c8c8c',
+              margin: '1px',
+              borderRadius: '50%',
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Dropdown Menu */}
+      {isOpen && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '40px',
+            right: '0',
+            backgroundColor: '#fff',
+            border: '1px solid #ccc',
+            boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+            zIndex: 1000,
+            padding: '10px',
+            minWidth: '200px',
+          }}
+        >
+          <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+            {internalDashboards.map((dashboard) => (
+              <li
+                key={dashboard.id}
+                style={{
+                  marginBottom: '8px',
+                }}
+              >
+                <a
+                  href={dashboard.url}
+                  style={{
+                    textDecoration: 'none',
+                    color: '#007bff',
+                    fontSize: '14px',
+                    display: 'block', // Ensure hover applies to the entire block
+                    padding: '8px', // Add padding for better clickability
+                    borderRadius: '4px', // Rounded corners
+                    transition: 'background-color 0.3s ease', // Smooth transition
+                  }}
+                  onMouseEnter={(e) => ((e.target as HTMLElement).style.backgroundColor = '#f0f8ff')} // Hover background color
+                  onMouseLeave={(e) => ((e.target as HTMLElement).style.backgroundColor = '')} // Reset background
+                >
+                  {dashboard.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default AppsIcon;
