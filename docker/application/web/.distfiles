@@ -1,0 +1,9 @@
+# Makefile style list of prerequisites
+
+packages/
+apps/
+.lintstagedrc.cjs
+package.json
+.syncpackrc
+turbo.json
+yarn.lock
