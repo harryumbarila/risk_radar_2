@@ -1,33 +1,20 @@
 "use client";
 import React from "react";
-import AppsIcon from '@/components/AppsIcon/AppsIcon';
+import AppsIcon from "@/components/AppsIcon/AppsIcon";
 
 export default function NoAuthLayout({
-                                       children,
-                                     }: {
+  children,
+}: {
   children: React.ReactNode;
 }) {
   return (
-    <>
-      {/* ===== Page Wrapper Start ===== */}
-      <div className="flex">
-        {/* ===== Content Area Start ===== */}
-        <div className="relative flex flex-1 flex-col lg:ml-72.5">
-          {/* AppsIcon positioned in the top right corner */}
-          <div className="absolute top-4 right-4">
-            <AppsIcon dashboardEnv="staging" />
-          </div>
-          {/* ===== Main Content Start ===== */}
-          <main>
-            <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
-              {children}
-            </div>
-          </main>
-          {/* ===== Main Content End ===== */}
-        </div>
-        {/* ===== Content Area End ===== */}
+    <div className="relative min-h-screen">
+      <div className="absolute right-4 top-4">
+        <AppsIcon dashboardEnv="staging" />
       </div>
-      {/* ===== Page Wrapper End ===== */}
-    </>
+      <div className="flex min-h-screen items-center justify-center">
+        {children}
+      </div>
+    </div>
   );
 }

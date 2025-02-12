@@ -25,7 +25,7 @@ const config: Config = {
         transparent: "transparent",
         white: "#FFFFFF",
         black: {
-          // ...colors.black,
+          ...colors.black,
           DEFAULT: "#1C2434",
           2: "#010101",
         },

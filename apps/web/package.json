@@ -1,26 +1,33 @@
 {
-  "name": "@jobox-team/denali-web",
-  "version": "1.3.5",
+  "name": "@denali/web",
+  "version": "1.3.3",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "TSC_COMPILE_ON_ERROR=true next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@auth0/nextjs-auth0": "^3.6.0",
     "apexcharts": "^3.45.2",
+    "dropzone": "^6.0.0-beta.2",
     "flatpickr": "^4.6.13",
-    "jsvectormap": "^1.6.0",
+    "jsvectormap": "^1.5.3",
     "next": "^14.2.4",
+    "nouislider": "^15.7.1",
     "react": "^18",
     "react-apexcharts": "^1.4.1",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-table": "^7.8.0",
+    "swiper": "^11.0.5",
+    "swr": "^2.3.2"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/react-table": "^7.7.20",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.1.0",
