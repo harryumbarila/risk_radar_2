@@ -8,6 +8,7 @@ import {
   Column,
 } from "react-table";
 import { RiskRadarResponseDto } from "@/hooks/risk-radar/response/riskRadarResponseDto";
+import Link from "next/link";
 
 interface RiskRadarTableProps {
   data: RiskRadarResponseDto[];
@@ -20,6 +21,14 @@ const RiskRadarTable: React.FC<RiskRadarTableProps> = ({ data }) => {
       {
         Header: "DBA",
         accessor: "dba",
+        Cell: ({ row }) => (
+          <Link
+            href={`/risk-radar/merchants/${row.original.dba}`}
+            className="text-primary hover:underline"
+          >
+            {row.original.dba}
+          </Link>
+        ),
       },
       {
         Header: "Net Deposit",

@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import ProFormLayout from "@/app/forms/pro-form-layout/page";
+import RiskRadar from "@/app/risk-radar/page";
 
 export const metadata: Metadata = {
   title: "Taluspay Dashboard",
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <>
-      <ProFormLayout />
+      <RiskRadar />
     </>
   );
 }

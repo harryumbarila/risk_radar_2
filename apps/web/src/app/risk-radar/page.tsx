@@ -3,13 +3,13 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import React from "react";
-import RiskRadarTableComponent from "../../../components/RiskRadar/RiskRadarTable";
+import RiskRadarTableComponent from "../../components/RiskRadar/RiskRadarTable";
 import KpiTable from "@/components/RiskRadar/Kpi/KpiTable";
 import { useKPIData } from "@/hooks/risk-radar/useKPIData";
 import Loader from "@/components/common/Loader";
 import { useRiskRadarData } from "@/hooks/risk-radar/useRiskRadarData";
 
-const ProFormLayout = () => {
+const RiskRadar = () => {
   const { data, error, isLoading } = useKPIData();
   const {
     data: riskRadarData,
@@ -255,4 +255,4 @@ const ProFormLayout = () => {
   );
 };
 
-export default ProFormLayout;
+export default RiskRadar;
