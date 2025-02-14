@@ -22,4 +22,4 @@ RUN apk add --no-cache curl
 COPY --from=builder-web /var/www/html/ /var/www/html/
 EXPOSE 3000
 
-CMD [ "yarn", "run", "dev"]
+CMD [ "yarn", "start:web"]

@@ -1,12 +1,6 @@
-"use client";
-
 import { ApexOptions } from "apexcharts";
-import React from "react";
-import dynamic from "next/dynamic";
-
-const ReactApexChart = dynamic(() => import("react-apexcharts"), {
-  ssr: false,
-});
+import React, { useState } from "react";
+import ReactApexChart from "react-apexcharts";
 
 const options: ApexOptions = {
   colors: ["#3C50E0", "#80CAEE"],
@@ -58,10 +52,6 @@ const options: ApexOptions = {
     fontFamily: "Satoshi",
     fontWeight: 500,
     fontSize: "14px",
-
-    markers: {
-      radius: 99,
-    },
   },
   fill: {
     opacity: 1,
@@ -76,16 +66,25 @@ interface ChartTwoState {
 }
 
 const ChartTwo: React.FC = () => {
-  const series = [
-    {
-      name: "Sales",
-      data: [44, 55, 41, 67, 22, 43, 65],
-    },
-    {
-      name: "Revenue",
-      data: [13, 23, 20, 8, 13, 27, 15],
-    },
-  ];
+  const [state, setState] = useState<ChartTwoState>({
+    series: [
+      {
+        name: "Sales",
+        data: [44, 55, 41, 67, 22, 43, 65],
+      },
+      {
+        name: "Revenue",
+        data: [13, 23, 20, 8, 13, 27, 15],
+      },
+    ],
+  });
+
+  const handleReset = () => {
+    setState((prevState) => ({
+      ...prevState,
+    }));
+  };
+  handleReset;
 
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white p-7.5 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-4">
@@ -137,10 +136,9 @@ const ChartTwo: React.FC = () => {
         <div id="chartTwo" className="-mb-9 -ml-5">
           <ReactApexChart
             options={options}
-            series={series}
+            series={state.series}
             type="bar"
             height={350}
-            width={"100%"}
           />
         </div>
       </div>

@@ -42,10 +42,10 @@ const MapOne: React.FC = () => {
 
     return () => {
       const map = document.getElementById("mapOne");
+      console.log(map)
       if (map) {
         map.innerHTML = "";
       }
-      // mapOne.destroy();
     };
   }, []);
 

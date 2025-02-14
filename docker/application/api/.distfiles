@@ -1,12 +1,9 @@
 # Makefile style list of prerequisites
 
-version.json
-db/
-src/
-nest-cli.json
+packages/
+apps/
+.lintstagedrc.cjs
 package.json
-package-lock.json
-pm2.json
-tsconfig.build.json
-tsconfig.json
-data-source.ts
+.syncpackrc
+turbo.json
+yarn.lock

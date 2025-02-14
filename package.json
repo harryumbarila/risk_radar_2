@@ -12,7 +12,9 @@
     "lint": "turbo lint",
     "prepare": "husky",
     "test": "echo Not implemented",
-    "type-check": "turbo run type-check"
+    "type-check": "turbo run type-check",
+    "start:web": "turbo run start --filter=@denali/web",
+    "start:api": "turbo run start --filter=@denali/api"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.4.4",
