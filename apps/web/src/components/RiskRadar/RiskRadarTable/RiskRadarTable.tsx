@@ -7,47 +7,41 @@ import {
   usePagination,
   Column,
 } from "react-table";
-import { RiskRadarResponseDto } from "@/hooks/risk-radar/response/riskRadarResponseDto";
-import Link from "next/link";
+import {
+  RiskRadarData,
+  RiskRadarResponseDto,
+} from "@/hooks/risk-radar/response/riskRadarResponseDto";
 
 interface RiskRadarTableProps {
-  data: RiskRadarResponseDto[];
+  data: RiskRadarResponseDto;
 }
 
 // @ts-ignore
 const RiskRadarTable: React.FC<RiskRadarTableProps> = ({ data }) => {
-  const columns = useMemo<Column<RiskRadarResponseDto>[]>(
+  const columns = useMemo<Column<RiskRadarData>[]>(
     () => [
       {
         Header: "DBA",
         accessor: "dba",
-        Cell: ({ row }) => (
-          <Link
-            href={`/risk-radar/merchants/${row.original.dba}`}
-            className="text-primary hover:underline"
-          >
-            {row.original.dba}
-          </Link>
-        ),
       },
       {
         Header: "Net Deposit",
-        accessor: "netDeposit",
+        accessor: "net_dep_amt",
         Cell: ({ value }) => `${value.toLocaleString()}`,
       },
       {
         Header: "FSP Approved Auth",
-        accessor: "fspApprovedAuthAmount",
+        accessor: "fsp_appr_auth_tot_amt",
         Cell: ({ value }) => `${value.toLocaleString()}`,
       },
       {
         Header: "Auth Decline",
-        accessor: "authDeclineAmount",
+        accessor: "auth_decline_amt",
         Cell: ({ value }) => `${value.toLocaleString()}`,
       },
       {
         Header: "Activation Date",
-        accessor: "activationDate",
+        accessor: "activation_datetime",
         Cell: ({ value }) => new Date(value).toLocaleDateString(),
       },
       {
@@ -60,29 +54,152 @@ const RiskRadarTable: React.FC<RiskRadarTableProps> = ({ data }) => {
       },
       {
         Header: "Risk Watch",
-        accessor: "riskWatch",
+        accessor: "risk_watch",
         Cell: ({ value }) => (value ? "Yes" : "No"),
       },
       {
         Header: "New Account",
-        accessor: "newAccount",
+        accessor: "new_account",
         Cell: ({ value }) => (value ? "Yes" : "No"),
       },
       {
         Header: "Auto Approved",
-        accessor: "autoApproved",
-        Cell: ({ value }) => (value ? "Yes" : "No"),
+        accessor: "Auto_Approved_date",
       },
       {
         Header: "Keyed %",
-        accessor: "keyedPercentage",
+        accessor: "keyed_perc_score",
         Cell: ({ value }) => (value ? `${value}%` : "N/A"),
+      },
+      {
+        Header: "Average Ticket Score",
+        accessor: "avg_ticket_score",
+        Cell: ({ value }) => Number(value).toFixed(2),
+      },
+      {
+        Header: "High Ticket Score",
+        accessor: "high_ticket_score",
+        Cell: ({ value }) => Number(value).toFixed(2),
+      },
+      {
+        Header: "Credit Score",
+        accessor: "credit_score",
+        Cell: ({ value }) => Number(value).toFixed(2),
+      },
+      {
+        Header: "Channel Score",
+        accessor: "channel_score",
+        Cell: ({ value }) => Number(value).toFixed(2),
+      },
+      {
+        Header: "Monthly Volume Score",
+        accessor: "monthly_vol_score",
+        Cell: ({ value }) => Number(value).toFixed(2),
+      },
+      {
+        Header: "Average Batch Score",
+        accessor: "avg_batch_score",
+        Cell: ({ value }) => Number(value).toFixed(2),
+      },
+      {
+        Header: "Duplicate Card Score",
+        accessor: "dup_card_score",
+        Cell: ({ value }) => Number(value).toFixed(2),
+      },
+      {
+        Header: "Duplicate BIN Score",
+        accessor: "dup_bin_score",
+        Cell: ({ value }) => Number(value).toFixed(2),
+      },
+      {
+        Header: "Late Post Score",
+        accessor: "late_post_score",
+        Cell: ({ value }) => Number(value).toFixed(2),
+      },
+      {
+        Header: "Foreign Keyed Score",
+        accessor: "foreign_keyed_score",
+        Cell: ({ value }) => Number(value).toFixed(2),
+      },
+      {
+        Header: "Chargeback Return Request Score",
+        accessor: "chbk_ret_req_score",
+        Cell: ({ value }) => Number(value).toFixed(2),
+      },
+      {
+        Header: "Next Day Funding",
+        accessor: "next_day_funding",
+        Cell: ({ value }) => (value === "Y" ? "Yes" : "No"),
+      },
+      {
+        Header: "Divert",
+        accessor: "divert",
+        Cell: ({ value }) => (value === "Y" ? "Yes" : "No"),
+      },
+      {
+        Header: "Divert Balance Amount",
+        accessor: "divert_balance_amt",
+        Cell: ({ value }) => `${Number(value).toLocaleString()}`,
+      },
+      {
+        Header: "Amex OptBlue",
+        accessor: "amex_opt_blue",
+        Cell: ({ value }) => (value === "Y" ? "Yes" : "No"),
+      },
+      {
+        Header: "MOTO AVS Score",
+        accessor: "moto_avs_score",
+        Cell: ({ value }) => Number(value).toFixed(2),
+      },
+      {
+        Header: "Settle 30% More Than Auth Score",
+        accessor: "settle_30perc_more_than_auth_score",
+        Cell: ({ value }) => Number(value).toFixed(2),
+      },
+      {
+        Header: "No Auth Score",
+        accessor: "no_auth_score",
+        Cell: ({ value }) => Number(value).toFixed(2),
+      },
+      {
+        Header: "Auth Decline Score",
+        accessor: "auth_decline_score",
+        Cell: ({ value }) => Number(value).toFixed(2),
+      },
+      {
+        Header: "Negative Batch Score",
+        accessor: "neg_batch_score",
+        Cell: ({ value }) => Number(value).toFixed(2),
+      },
+      {
+        Header: "Auto Hold Score",
+        accessor: "auto_hold_score",
+        Cell: ({ value }) => Number(value).toFixed(2),
+      },
+      {
+        Header: "Funding Exception Score",
+        accessor: "funding_exception_score",
+        Cell: ({ value }) => Number(value).toFixed(2),
+      },
+      {
+        Header: "User Reviewed",
+        accessor: "user_reviewed",
+        Cell: ({ value }) => (value === "Y" ? "Yes" : "No"),
+      },
+      {
+        Header: "Exception Created",
+        accessor: "exception_created_datetime",
+        Cell: ({ value }) =>
+          value ? new Date(value).toLocaleDateString() : "N/A",
+      },
+      {
+        Header: "Exception ID",
+        accessor: "exception_id",
       },
     ],
     [],
   );
-
-  const tableData = useMemo(() => data, data);
+  const tableData = useMemo(() => data.DATA, [data]);
 
   const {
     getTableProps,
@@ -141,71 +258,73 @@ const RiskRadarTable: React.FC<RiskRadarTableProps> = ({ data }) => {
         </div>
       </div>
 
-      <table
-        {...getTableProps()}
-        className="datatable-table w-full table-auto !border-collapse overflow-hidden break-words px-4 md:table-fixed md:overflow-auto md:px-8"
-      >
-        <thead>
-          {headerGroups.map((headerGroup, key) => (
-            <tr {...headerGroup.getHeaderGroupProps()} key={key}>
-              {headerGroup.headers.map((column, key) => (
-                <th
-                  {...column.getHeaderProps(column.getSortByToggleProps())}
-                  key={key}
-                >
-                  <div className="flex items-center">
-                    <span> {column.render("Header") as React.ReactNode}</span>
+      <div className="overflow-x-auto">
+        <table
+          {...getTableProps()}
+          className="datatable-table w-full table-auto !border-collapse break-words px-4 md:px-8"
+        >
+          <thead>
+            {headerGroups.map((headerGroup, key) => (
+              <tr {...headerGroup.getHeaderGroupProps()} key={key}>
+                {headerGroup.headers.map((column, key) => (
+                  <th
+                    {...column.getHeaderProps(column.getSortByToggleProps())}
+                    key={key}
+                  >
+                    <div className="flex items-center">
+                      <span> {column.render("Header") as React.ReactNode}</span>
 
-                    <div className="ml-2 inline-flex flex-col space-y-[2px]">
-                      <span className="inline-block">
-                        <svg
-                          className="fill-current"
-                          width="10"
-                          height="5"
-                          viewBox="0 0 10 5"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path d="M5 0L0 5H10L5 0Z" fill="" />
-                        </svg>
-                      </span>
-                      <span className="inline-block">
-                        <svg
-                          className="fill-current"
-                          width="10"
-                          height="5"
-                          viewBox="0 0 10 5"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M5 5L10 0L-4.37114e-07 8.74228e-07L5 5Z"
-                            fill=""
-                          />
-                        </svg>
-                      </span>
+                      <div className="ml-2 inline-flex flex-col space-y-[2px]">
+                        <span className="inline-block">
+                          <svg
+                            className="fill-current"
+                            width="10"
+                            height="5"
+                            viewBox="0 0 10 5"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path d="M5 0L0 5H10L5 0Z" fill="" />
+                          </svg>
+                        </span>
+                        <span className="inline-block">
+                          <svg
+                            className="fill-current"
+                            width="10"
+                            height="5"
+                            viewBox="0 0 10 5"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M5 5L10 0L-4.37114e-07 8.74228e-07L5 5Z"
+                              fill=""
+                            />
+                          </svg>
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {page.map((row, key) => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()} key={key}>
-                {row.cells.map((cell, key) => (
-                  <td {...cell.getCellProps()} key={key}>
-                    {cell.render("Cell") as React.ReactNode}
-                  </td>
+                  </th>
                 ))}
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            ))}
+          </thead>
+          <tbody {...getTableBodyProps()}>
+            {page.map((row, key) => {
+              prepareRow(row);
+              return (
+                <tr {...row.getRowProps()} key={key}>
+                  {row.cells.map((cell, key) => (
+                    <td {...cell.getCellProps()} key={key}>
+                      {cell.render("Cell") as React.ReactNode}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
       <div className="flex justify-between border-t border-stroke px-8 pt-5 dark:border-strokedark">
         <p className="font-medium">

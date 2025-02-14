@@ -4,7 +4,7 @@ import RiskRadarTable from "@/components/RiskRadar/RiskRadarTable/RiskRadarTable
 import { RiskRadarResponseDto } from "@/hooks/risk-radar/response/riskRadarResponseDto";
 
 export interface RiskRadarTableComponentProps {
-  data: RiskRadarResponseDto[];
+  data: RiskRadarResponseDto;
 }
 
 const RiskRadarTableComponent: React.FC<RiskRadarTableComponentProps> = (
