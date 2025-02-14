@@ -2,6 +2,7 @@
 
 docker/application/web/dist.tgz
 docker/application/api/dist.tgz
+version.json
 
 .idea
 

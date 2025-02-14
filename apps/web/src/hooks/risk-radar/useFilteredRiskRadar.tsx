@@ -32,7 +32,7 @@ export const useFilteredRiskRadar = () => {
 
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<Error | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
@@ -63,7 +63,7 @@ export const useFilteredRiskRadar = () => {
         setData(result);
         setIsInitialized(true);
       } catch (err) {
-        setError(err);
+        setError(err as Error);
       } finally {
         setIsLoading(false);
       }
