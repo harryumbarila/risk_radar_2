@@ -14,15 +14,40 @@ const AttributionUrl: React.FC = () => {
   const [generatedLink, setGeneratedLink] = useState("");
 
   const handleGenerateLink = () => {
-    const link = `https://www.taluspay.com/attr?irisUser=${encodeURIComponent(
-      irisUser,
-    )}&channel=${encodeURIComponent(channel)}&rsl=${encodeURIComponent(
-      rsl,
-    )}&resellerPartner=${encodeURIComponent(
-      resellerPartner,
-    )}&referralPartner=${encodeURIComponent(referralPartner)}`;
+    // 1. Validation
+    if (!irisUser || !channel || !rsl) {
+      showNotification({
+        title: "Validation Error",
+        message: "IRIS User, Channel and RSL are required fields",
+        type: "error",
+        bgColor: "#FF0000",
+      });
+      return;
+    }
+
+    // 2. Construct the attribution object
+    const attributionData = {
+      user_id: irisUser,
+      channel_id: channel,
+      rsl_user_id: rsl,
+      reseller_partner_user_id: resellerPartner || "",
+      referral_partner_user_id: referralPartner || "",
+    };
+
+    // 3. Convert to Base64
+    const encodedData = btoa(JSON.stringify(attributionData));
+
+    // 4. Construct the final URL
+    const link = `https://apply.taluspay.com/attr/${encodedData}`;
 
     setGeneratedLink(link);
+
+    showNotification({
+      title: "Success",
+      message: "Attribution link generated successfully",
+      type: "success",
+      bgColor: "#4CAF50",
+    });
   };
 
   const handleCopyLink = () => {
