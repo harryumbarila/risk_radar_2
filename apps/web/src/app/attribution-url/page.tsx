@@ -4,8 +4,15 @@ import React, { useState } from "react";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import { showNotification } from "@/components/Notifications/NotificationContent";
+import { useUsersData } from "@/hooks/attribution-url/useUsersData";
 
 const AttributionUrl: React.FC = () => {
+  const {
+    data: usersData,
+    error: usersError,
+    isLoading: usersLoading,
+  } = useUsersData();
+
   const [irisUser, setIrisUser] = useState("");
   const [channel, setChannel] = useState("");
   const [rsl, setRsl] = useState("");
@@ -62,6 +69,17 @@ const AttributionUrl: React.FC = () => {
     }
   };
 
+  const handleIrisUserChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = e.target.value;
+    setIrisUser(selectedValue);
+
+    // Find the selected user and get their RSL
+    const selectedUser = usersData?.data?.find(
+      (user) => user.value === parseInt(selectedValue),
+    );
+    setRsl(selectedUser?.rsl || "No Supervisor");
+  };
+
   return (
     <DefaultLayout>
       <Breadcrumb pageName="Attribution URL Generator" />
@@ -80,12 +98,15 @@ const AttributionUrl: React.FC = () => {
             <div className="relative z-20 bg-transparent dark:bg-form-input">
               <select
                 value={irisUser}
-                onChange={(e) => setIrisUser(e.target.value)}
+                onChange={handleIrisUserChange}
                 className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
               >
                 <option value="">Select IRIS User</option>
-                <option value="Yossi Shemesh">Yossi Shemesh</option>
-                <option value="Another User">Another User</option>
+                {usersData?.data?.map((user) => (
+                  <option key={user.value} value={user.value}>
+                    {user.label}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -114,15 +135,12 @@ const AttributionUrl: React.FC = () => {
               RSL
             </label>
             <div className="relative z-20 bg-transparent dark:bg-form-input">
-              <select
+              <input
+                type="text"
                 value={rsl}
-                onChange={(e) => setRsl(e.target.value)}
-                className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-              >
-                <option value="">Select RSL</option>
-                <option value="Lisa Dorian">Lisa Dorian</option>
-                <option value="Another RSL">Another RSL</option>
-              </select>
+                readOnly
+                className="pointer-events-none relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none dark:border-form-strokedark dark:bg-form-input"
+              />
             </div>
           </div>
 
