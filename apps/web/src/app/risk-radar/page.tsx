@@ -4,8 +4,6 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import React, { useEffect, useState } from "react";
 import RiskRadarTableComponent from "../../components/RiskRadar/RiskRadarTable";
-import KpiTable from "@/components/RiskRadar/Kpi/KpiTable";
-import { useKPIData } from "@/hooks/risk-radar/useKPIData";
 import Loader from "@/components/common/Loader";
 import { useExceptionData } from "@/hooks/risk-radar/useExceptionData";
 import { useFilteredRiskRadar } from "@/hooks/risk-radar/useFilteredRiskRadar";
@@ -15,7 +13,7 @@ const RiskRadar = () => {
   const router = useRouter();
 
   const [selectedStatus, setSelectedStatus] = useState<string>("");
-  // const { data, error, isLoading } = useKPIData();
+
   const {
     data: exceptionData,
     error: exceptionError,
@@ -54,32 +52,9 @@ const RiskRadar = () => {
     }
   };
 
-  // Update your form inputs with onChange handlers:
   return (
     <DefaultLayout>
       <Breadcrumb pageName="Risk Radar" />
-
-      {/*<div className="mb-4 grid grid-cols-1 gap-9 sm:grid-cols-1">*/}
-      {/*  <div className="flex flex-col gap-9">*/}
-      {/*    <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">*/}
-      {/*      <div className="p-6.5">*/}
-      {/*        {isLoading ? (*/}
-      {/*          <Loader />*/}
-      {/*        ) : error ? (*/}
-      {/*          <div className="flex h-56 items-center justify-center">*/}
-      {/*            <p className="text-red-500">*/}
-      {/*              Error fetching data: {error.message}*/}
-      {/*            </p>*/}
-      {/*          </div>*/}
-      {/*        ) : data ? (*/}
-      {/*          <KpiTable data={data} />*/}
-      {/*        ) : (*/}
-      {/*          <div>No data available</div>*/}
-      {/*        )}*/}
-      {/*      </div>*/}
-      {/*    </div>*/}
-      {/*  </div>*/}
-      {/*</div>*/}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="flex flex-col gap-9">
@@ -104,6 +79,12 @@ const RiskRadar = () => {
                           id={`source-${source.pk}`}
                           value={source.pk}
                           className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
+                          onChange={(e) =>
+                            setFilters((prev) => ({
+                              ...prev,
+                              source_type: e.target.value,
+                            }))
+                          }
                         />
                         <label
                           htmlFor={`source-${source.pk}`}

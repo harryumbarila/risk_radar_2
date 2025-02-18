@@ -28,7 +28,7 @@ export class LegacyDashboardProxyClient {
     this.client.interceptors.request.use(
       (config) => {
         this.logger.debug(
-          `Request: ${config.method?.toUpperCase()} ${config.url}`,
+          `Request: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`,
           {
             headers: config.headers,
             params: config.params,
