@@ -26,7 +26,7 @@ export class IrisClient {
     this.client.interceptors.request.use(
       (config) => {
         this.logger.debug(
-          `Request: ${config.method?.toUpperCase()} ${config.url}`,
+          `Request: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`,
           {
             headers: config.headers,
             params: config.params,
@@ -64,6 +64,7 @@ export class IrisClient {
   async getUsers(): Promise<IrisUsersResponseDto> {
     const response = await this.get<IrisUsersResponseDto>('/api/v1/users', {
       headers: {
+        'Content-Type': 'application/json',
         'X-API-KEY': this.apiKey,
       },
     });
