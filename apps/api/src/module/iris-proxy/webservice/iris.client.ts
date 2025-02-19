@@ -63,12 +63,15 @@ export class IrisClient {
   }
 
   async getUsers(): Promise<IrisUsersResponseDto> {
-    const response = await this.get<IrisUsersResponseDto>('/api/v1/users', {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-KEY': this.apiKey,
+    const response = await this.get<IrisUsersResponseDto>(
+      '/api/v1/users/list?group=152%3Fper_page%3D100&page=0',
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-KEY': this.apiKey,
+        },
       },
-    });
+    );
     return response.data;
   }
 
