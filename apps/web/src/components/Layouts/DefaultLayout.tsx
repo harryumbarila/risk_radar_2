@@ -2,6 +2,7 @@
 import React, { useState, ReactNode } from "react";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
+import { NotificationsContainer } from "@/components/Notifications/NotificationContent";
 
 export default function DefaultLayout({
   children,
@@ -11,6 +12,7 @@ export default function DefaultLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <>
+      <NotificationsContainer />
       {/* <!-- ===== Page Wrapper Start ===== --> */}
       <div className="flex h-screen overflow-hidden">
         {/* <!-- ===== Sidebar Start ===== --> */}
