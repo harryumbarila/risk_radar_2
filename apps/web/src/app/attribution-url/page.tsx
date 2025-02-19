@@ -5,6 +5,8 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import { showNotification } from "@/components/Notifications/NotificationContent";
 import { useUsersData } from "@/hooks/attribution-url/useUsersData";
+import { useChannels } from "@/hooks/attribution-url/useChannels";
+import { usePartners } from "@/hooks/attribution-url/usePartners";
 
 const AttributionUrl: React.FC = () => {
   const {
@@ -13,10 +15,21 @@ const AttributionUrl: React.FC = () => {
     isLoading: usersLoading,
   } = useUsersData();
 
+  const {
+    data: channels,
+    error: channelsError,
+    isLoading: channelsLoading,
+  } = useChannels();
+
+  const {
+    data: partners,
+    error: partnersError,
+    isLoading: partnersLoading,
+  } = usePartners();
+
   const [irisUser, setIrisUser] = useState("");
   const [channel, setChannel] = useState("");
   const [rsl, setRsl] = useState("");
-  const [resellerPartner, setResellerPartner] = useState("");
   const [referralPartner, setReferralPartner] = useState("");
   const [generatedLink, setGeneratedLink] = useState("");
 
@@ -37,7 +50,6 @@ const AttributionUrl: React.FC = () => {
       user_id: irisUser,
       channel_id: channel,
       rsl_user_id: rsl,
-      reseller_partner_user_id: resellerPartner || "",
       referral_partner_user_id: referralPartner || "",
     };
 
@@ -123,8 +135,11 @@ const AttributionUrl: React.FC = () => {
                 className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
               >
                 <option value="">Select Channel</option>
-                <option value="Direct">Direct</option>
-                <option value="Indirect">Indirect</option>
+                {channels?.data?.map((channel) => (
+                  <option key={channel.id} value={channel.id}>
+                    {channel.name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -144,24 +159,6 @@ const AttributionUrl: React.FC = () => {
             </div>
           </div>
 
-          {/* Reseller Partner */}
-          <div className="mb-4.5">
-            <label className="mb-2.5 block text-black dark:text-white">
-              Reseller Partner
-            </label>
-            <div className="relative z-20 bg-transparent dark:bg-form-input">
-              <select
-                value={resellerPartner}
-                onChange={(e) => setResellerPartner(e.target.value)}
-                className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-              >
-                <option value="">Select Reseller Partner</option>
-                <option value="Partner1">Partner1</option>
-                <option value="Partner2">Partner2</option>
-              </select>
-            </div>
-          </div>
-
           {/* Referral Partner */}
           <div className="mb-4.5">
             <label className="mb-2.5 block text-black dark:text-white">
@@ -174,8 +171,11 @@ const AttributionUrl: React.FC = () => {
                 className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
               >
                 <option value="">Select Referral Partner</option>
-                <option value="Referral1">Referral1</option>
-                <option value="Referral2">Referral2</option>
+                {partners?.data?.map((partner) => (
+                  <option key={partner.id} value={partner.id}>
+                    {partner.name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>

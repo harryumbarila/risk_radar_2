@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { IrisUsersResponseDto } from '../response/iris-users.response.dto';
+import { IrisChannelsResponseDto } from '@denali/web/src/hooks/attribution-url/response/iris-channels.response.dto';
 
 export interface IrisClientConfig {
   IRIS_URL: string;
@@ -68,6 +69,19 @@ export class IrisClient {
         'X-API-KEY': this.apiKey,
       },
     });
+    return response.data;
+  }
+
+  async getChannels(): Promise<IrisChannelsResponseDto> {
+    const response = await this.get<IrisChannelsResponseDto>(
+      '/api/v1/users/groups',
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-KEY': this.apiKey,
+        },
+      },
+    );
     return response.data;
   }
 

@@ -103,6 +103,12 @@ const RiskRadar = () => {
                       type="checkbox"
                       id="viewAll"
                       className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                      onChange={(e) => {
+                        setFilters((prev) => ({
+                          ...prev,
+                          view_all_exceptions: e.target.checked,
+                        }));
+                      }}
                     />
                     <label
                       htmlFor="viewAll"
@@ -206,7 +212,13 @@ const RiskRadar = () => {
                   </label>
                   <select
                     className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    onChange={(e) => setSelectedStatus(e.target.value)}
+                    onChange={(e) => {
+                      setSelectedStatus(e.target.value);
+                      setFilters((prev) => ({
+                        ...prev,
+                        status: e.target.value,
+                      }));
+                    }}
                   >
                     <option value="">Select Status</option>
                     {exceptionData?.status.map((status) => (
@@ -225,7 +237,15 @@ const RiskRadar = () => {
                     <label className="mb-3 block text-sm font-medium text-black dark:text-white">
                       Assign To User
                     </label>
-                    <select className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary">
+                    <select
+                      className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      onChange={(e) => {
+                        setFilters((prev) => ({
+                          ...prev,
+                          assigned_to: e.target.value,
+                        }));
+                      }}
+                    >
                       <option value="">Select User</option>
                       {exceptionData?.risk_user
                         .filter((user) => !user.bHidden)

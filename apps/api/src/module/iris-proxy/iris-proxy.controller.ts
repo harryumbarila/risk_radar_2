@@ -1,13 +1,23 @@
 import { Controller, Get } from '@nestjs/common';
 import { IrisClient } from './webservice/iris.client';
 import { IrisFilteredUsersResponseDto } from './response/iris-filtered-users.response.dto';
+import { IrisChannelsResponseDto } from '@denali/shared/response/iris-channels.response.dto';
+import { IrisPartnersResponseDto } from '@denali/shared/response/iris-partners.response.dto';
+import { ConfigService } from '@nestjs/config';
+
+export interface IrisProxyControllerConfig {
+  IRIS_ENV: string;
+}
 
 @Controller('/v1/iris_proxy')
 export class IrisProxyController {
-  constructor(private readonly client: IrisClient) {}
+  constructor(
+    private readonly client: IrisClient,
+    private readonly configService: ConfigService<IrisProxyControllerConfig>,
+  ) {}
 
   @Get('users')
-  async getUsers(): Promise<IrisFilteredUsersResponseDto> {
+  async users(): Promise<IrisFilteredUsersResponseDto> {
     const data = await this.client.getUsers();
 
     const filteredUsers = data.data
@@ -27,5 +37,33 @@ export class IrisProxyController {
       }));
 
     return { data: filteredUsers };
+  }
+
+  @Get('channels')
+  async channels(): Promise<IrisChannelsResponseDto> {
+    return this.client.getChannels();
+  }
+
+  @Get('partners')
+  partners(): IrisPartnersResponseDto {
+    if (this.configService.get('IRIS_ENV') === 'staging') {
+      return {
+        data: [
+          {
+            id: 41,
+            name: 'Default Referral Partner',
+          },
+        ],
+      };
+    }
+
+    return {
+      data: [
+        {
+          id: 71,
+          name: 'Default Referral Partner',
+        },
+      ],
+    };
   }
 }
