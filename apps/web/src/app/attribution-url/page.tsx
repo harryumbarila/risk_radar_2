@@ -57,7 +57,7 @@ const AttributionUrl: React.FC = () => {
     const encodedData = btoa(JSON.stringify(attributionData));
 
     // 4. Construct the final URL
-    const link = `https://apply.taluspay.com/attr/${encodedData}`;
+    const link = `${process.env.NEXT_PUBLIC_MERCHANT_BASE_URL}/attr/${encodedData}`;
 
     setGeneratedLink(link);
 
