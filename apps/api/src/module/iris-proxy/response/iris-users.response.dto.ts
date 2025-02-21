@@ -1,5 +1,16 @@
 export interface IrisUsersResponseDto {
   data: UserData[];
+  meta: Meta;
+}
+
+interface Meta {
+  current_page: number;
+  from: number;
+  last_page: number;
+  path: string;
+  per_page: number;
+  to: number;
+  total: number;
 }
 
 interface UserData {
@@ -8,6 +19,7 @@ interface UserData {
   class: UserClass;
   groups: UserGroup[];
   reports_to: UserReport[];
+  manages: UserManage[];
 }
 
 interface UserClass {
@@ -22,5 +34,10 @@ interface UserGroup {
 
 interface UserReport {
   user_id: number;
-  full_name: string;
+  username: string;
+}
+
+interface UserManage {
+  user_id: number;
+  username: string;
 }

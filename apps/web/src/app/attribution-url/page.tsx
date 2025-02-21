@@ -15,23 +15,22 @@ const AttributionUrl: React.FC = () => {
     isLoading: usersLoading,
   } = useUsersData();
 
-  const {
-    data: channels,
-    error: channelsError,
-    isLoading: channelsLoading,
-  } = useChannels();
-
-  const {
-    data: partners,
-    error: partnersError,
-    isLoading: partnersLoading,
-  } = usePartners();
-
   const [irisUser, setIrisUser] = useState("");
   const [channel, setChannel] = useState("");
   const [rsl, setRsl] = useState("");
   const [referralPartner, setReferralPartner] = useState("");
   const [generatedLink, setGeneratedLink] = useState("");
+
+  // New state variables for dropdown options
+  const [channels, setChannels] = useState<
+    Array<{ user_id: number; username: string }>
+  >([]);
+  const [rslOptions, setRslOptions] = useState<
+    Array<{ id: number; name: string }>
+  >([]);
+  const [partnerOptions, setPartnerOptions] = useState<
+    Array<{ user_id: number; username: string }>
+  >([]);
 
   const handleGenerateLink = () => {
     // 1. Validation
@@ -85,13 +84,25 @@ const AttributionUrl: React.FC = () => {
     const selectedValue = e.target.value;
     setIrisUser(selectedValue);
 
-    // Find the selected user and get their RSL
+    // Find the selected user
     const selectedUser = usersData?.data?.find(
       (user) => user.value === parseInt(selectedValue),
     );
-    setRsl(selectedUser?.rsl || "No Supervisor");
-  };
 
+    if (selectedUser) {
+      // Set groups/channels
+      const channels = selectedUser.channels || [];
+      setChannels(channels);
+
+      // Set RSL users
+      const rslUsers = selectedUser.rsl || [];
+      setRslOptions(rslUsers);
+
+      // Set referral partners
+      const managedUsers = selectedUser.manages || [];
+      setPartnerOptions(managedUsers);
+    }
+  };
   return (
     <DefaultLayout>
       <Breadcrumb pageName="Attribution URL Generator" />
@@ -108,21 +119,26 @@ const AttributionUrl: React.FC = () => {
               Choose IRIS User
             </label>
             <div className="relative z-20 bg-transparent dark:bg-form-input">
-              <select
-                value={irisUser}
-                onChange={handleIrisUserChange}
-                className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-              >
-                <option value="">Select IRIS User</option>
-                {usersData?.data?.map((user) => (
-                  <option key={user.value} value={user.value}>
-                    {user.label}
-                  </option>
-                ))}
-              </select>
+              {usersLoading ? (
+                <div className="flex items-center justify-center py-3">
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+                </div>
+              ) : (
+                <select
+                  value={irisUser}
+                  onChange={handleIrisUserChange}
+                  className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                >
+                  <option value="">Select IRIS User</option>
+                  {usersData?.data?.map((user) => (
+                    <option key={user.value} value={user.value}>
+                      {user.label}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
           </div>
-
           {/* Channel */}
           <div className="mb-4.5">
             <label className="mb-2.5 block text-black dark:text-white">
@@ -135,9 +151,9 @@ const AttributionUrl: React.FC = () => {
                 className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
               >
                 <option value="">Select Channel</option>
-                {channels?.data?.map((channel) => (
-                  <option key={channel.id} value={channel.id}>
-                    {channel.name}
+                {channels.map((group) => (
+                  <option key={group.user_id} value={group.user_id}>
+                    {group.username}
                   </option>
                 ))}
               </select>
@@ -150,12 +166,18 @@ const AttributionUrl: React.FC = () => {
               RSL
             </label>
             <div className="relative z-20 bg-transparent dark:bg-form-input">
-              <input
-                type="text"
+              <select
                 value={rsl}
-                readOnly
-                className="pointer-events-none relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none dark:border-form-strokedark dark:bg-form-input"
-              />
+                onChange={(e) => setRsl(e.target.value)}
+                className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+              >
+                <option value="">Select RSL</option>
+                {rslOptions.map((rslUser) => (
+                  <option key={rslUser.id} value={rslUser.id}>
+                    {rslUser.name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
@@ -171,15 +193,14 @@ const AttributionUrl: React.FC = () => {
                 className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
               >
                 <option value="">Select Referral Partner</option>
-                {partners?.data?.map((partner) => (
-                  <option key={partner.id} value={partner.id}>
-                    {partner.name}
+                {partnerOptions.map((partner) => (
+                  <option key={partner.user_id} value={partner.user_id}>
+                    {partner.username}
                   </option>
                 ))}
               </select>
             </div>
           </div>
-
           <button
             onClick={handleGenerateLink}
             className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90"

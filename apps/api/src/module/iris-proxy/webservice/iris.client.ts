@@ -9,6 +9,12 @@ export interface IrisClientConfig {
   IRIS_API_KEY: string;
 }
 
+const enum UserClassId {
+  INT_SSC = 42,
+  INT_SC = 43,
+  INT_ISC = 66,
+}
+
 @Injectable()
 export class IrisClient {
   private readonly logger = new Logger(IrisClient.name);
@@ -63,18 +69,61 @@ export class IrisClient {
   }
 
   async getUsers(): Promise<IrisUsersResponseDto> {
-    const response = await this.get<IrisUsersResponseDto>(
-      '/api/v1/users/list?group=152%3Fper_page%3D100&page=0',
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-KEY': this.apiKey,
-        },
-      },
-    );
-    return response.data;
-  }
+    const classIds = [
+      UserClassId.INT_SSC,
+      UserClassId.INT_SC,
+      UserClassId.INT_ISC,
+    ];
 
+    const combinedResponse: IrisUsersResponseDto = {
+      data: [],
+      meta: {
+        current_page: 1,
+        from: 1,
+        last_page: 1,
+        path: '',
+        per_page: 100,
+        to: 0,
+        total: 0,
+      },
+    };
+
+    for (const classId of classIds) {
+      let currentPage = 1;
+      let hasNextPage = true;
+
+      while (hasNextPage) {
+        try {
+          const response = await this.get<IrisUsersResponseDto>(
+            `/api/v1/users/list?page=${currentPage}&per_page=100&sort_by=name&sort_dir=asc&class=${classId}&active=Yes`,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'X-API-KEY': this.apiKey,
+              },
+            },
+          );
+
+          combinedResponse.data = [
+            ...combinedResponse.data,
+            ...response.data.data,
+          ];
+          combinedResponse.meta.total += response.data.meta.total;
+          combinedResponse.meta.to = combinedResponse.data.length;
+
+          hasNextPage =
+            response.data.meta.current_page < response.data.meta.last_page;
+        } catch (e) {
+          hasNextPage = false;
+          this.logger.error(e);
+        } finally {
+          currentPage++;
+        }
+      }
+    }
+
+    return combinedResponse;
+  }
   async getChannels(): Promise<IrisChannelsResponseDto> {
     const response = await this.get<IrisChannelsResponseDto>(
       '/api/v1/users/groups',

@@ -1,8 +1,18 @@
 export interface IrisFilteredUserData {
   label: string; // User's full name to display
   value: number; // User ID
-  rsl: string; // Supervisor's full name (or "No Supervisor")
-  rsl_id: number; // Supervisor's user ID (or null)
+  rsl: {
+    id: number;
+    name: string;
+  }[];
+  channels: {
+    user_id: number;
+    username: string;
+  }[];
+  manages: {
+    user_id: number;
+    username: string;
+  }[];
 }
 
 export interface IrisFilteredUsersResponseDto {
