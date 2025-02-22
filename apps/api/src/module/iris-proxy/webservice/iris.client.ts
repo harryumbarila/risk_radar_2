@@ -122,6 +122,13 @@ export class IrisClient {
       }
     }
 
+    // Sort the combined data by first name
+    combinedResponse.data.sort((a, b) => {
+      const aFirstName = a.full_name.split(' ')[0] || a.full_name;
+      const bFirstName = b.full_name.split(' ')[0] || b.full_name;
+      return aFirstName.localeCompare(bFirstName);
+    });
+
     return combinedResponse;
   }
   async getChannels(): Promise<IrisChannelsResponseDto> {
