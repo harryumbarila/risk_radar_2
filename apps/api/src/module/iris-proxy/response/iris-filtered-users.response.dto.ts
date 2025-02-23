@@ -37,7 +37,7 @@ export class FilteredUsersFactory {
   private static createReportsTo(reports: any[]) {
     return reports.map((report) => ({
       id: report.user_id,
-      name: report.username,
+      name: report.full_name,
     }));
   }
 
@@ -51,7 +51,7 @@ export class FilteredUsersFactory {
   private static createManages(manages: any[]) {
     return manages.map((manage) => ({
       user_id: manage.user_id,
-      username: manage.username,
+      username: manage.full_name,
     }));
   }
 }

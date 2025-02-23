@@ -104,6 +104,17 @@ export class IrisClient {
             },
           );
 
+          const responseData = response.data.data.map(user => {
+            // For class 66 (INT_ISC), clear the reports_to array
+            if (classId === UserClassId.INT_ISC) {
+              return {
+                ...user,
+                reports_to: []
+              };
+            }
+            return user;
+          });
+
           combinedResponse.data = [
             ...combinedResponse.data,
             ...response.data.data,
@@ -121,6 +132,13 @@ export class IrisClient {
         }
       }
     }
+
+    // Sort the combined data by first name
+    combinedResponse.data.sort((a, b) => {
+      const aFirstName = a.full_name.split(' ')[0] || a.full_name;
+      const bFirstName = b.full_name.split(' ')[0] || b.full_name;
+      return aFirstName.localeCompare(bFirstName);
+    });
 
     return combinedResponse;
   }
