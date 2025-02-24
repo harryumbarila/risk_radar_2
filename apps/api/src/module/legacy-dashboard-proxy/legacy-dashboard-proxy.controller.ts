@@ -11,6 +11,7 @@ import {
   IsString,
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
+import { MerchantResponseDto } from './response/merchant.response.dto';
 
 export class ExceptionFiltersDto {
   @IsString()
@@ -72,6 +73,11 @@ export class LegacyDashboardProxyController {
   @Get('exception_data')
   async getExceptionData(): Promise<ExceptionDataResponseDto> {
     return this.client.getExceptionData();
+  }
+
+  @Get('merchant')
+  async merchant(@Query('mid') mid: string): Promise<MerchantResponseDto> {
+    return this.client.getMerchant(mid);
   }
 
   @Get('risk_radar')

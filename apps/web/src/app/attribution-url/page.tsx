@@ -34,10 +34,10 @@ const AttributionUrl: React.FC = () => {
 
   const handleGenerateLink = () => {
     // 1. Validation
-    if (!irisUser || !channel || !rsl) {
+    if (!irisUser || !channel) {
       showNotification({
         title: "Validation Error",
-        message: "IRIS User, Channel and RSL are required fields",
+        message: "IRIS User, Channel are required fields",
         type: "error",
         bgColor: "#FF0000",
       });
@@ -45,12 +45,18 @@ const AttributionUrl: React.FC = () => {
     }
 
     // 2. Construct the attribution object
-    const attributionData = {
+    const attributionData: Record<string, string> = {
       user_id: irisUser,
       channel_id: channel,
-      rsl_user_id: rsl,
-      referral_partner_user_id: referralPartner || "",
     };
+
+    if (rsl) {
+      attributionData.rsl_user_id = rsl;
+    }
+
+    if (referralPartner) {
+      attributionData.referral_partner_user_id = referralPartner;
+    }
 
     // 3. Convert to Base64
     const encodedData = btoa(JSON.stringify(attributionData));
@@ -83,6 +89,12 @@ const AttributionUrl: React.FC = () => {
   const handleIrisUserChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = e.target.value;
     setIrisUser(selectedValue);
+
+    // Clear dependent fields
+    setChannel("");
+    setRsl("");
+    setReferralPartner("");
+    setGeneratedLink("");
 
     // Find the selected user
     const selectedUser = usersData?.data?.find(
