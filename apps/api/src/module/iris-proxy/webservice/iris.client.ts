@@ -104,12 +104,12 @@ export class IrisClient {
             },
           );
 
-          const responseData = response.data.data.map(user => {
+          const clearedResponseData = response.data.data.map((user) => {
             // For class 66 (INT_ISC), clear the reports_to array
             if (classId === UserClassId.INT_ISC) {
               return {
                 ...user,
-                reports_to: []
+                reports_to: [],
               };
             }
             return user;
@@ -117,7 +117,7 @@ export class IrisClient {
 
           combinedResponse.data = [
             ...combinedResponse.data,
-            ...response.data.data,
+            ...clearedResponseData,
           ];
           combinedResponse.meta.total += response.data.meta.total;
           combinedResponse.meta.to = combinedResponse.data.length;

@@ -8,6 +8,7 @@ import {
 import { RiskRadarResponseDto } from '../response/risk-radar.response.dto';
 import { ExceptionDataResponseDto } from '../response/exception-data.response.dto';
 import { ExceptionFiltersDto } from '../legacy-dashboard-proxy.controller';
+import { MerchantResponseDto } from '../response/merchant.response.dto';
 
 export interface LegacyDashboardProxyClientConfig {
   LEGACY_DASHBOARD_URL: string;
@@ -72,6 +73,124 @@ export class LegacyDashboardProxyClient {
       '/api/v1/dashboard/riskradar/exception-information',
     );
     return response.data;
+  }
+
+  async getMerchant(mid: string): Promise<MerchantResponseDto> {
+    // const response = await this.get<MerchantResponseDto>(
+    //   `/api/v1/dashboard/riskradar/merchant-data-path?mid=${mid}`,
+    // );
+    // return response.data;
+
+    return {
+      merchant_profile: [
+        {
+          pk: 5,
+          sMId: '5611000000126910',
+          sDBAName: 'Volcano inn',
+          sDBAAddress: '19 390 old volcano',
+          sDBACity: 'volcano',
+          sDBAState: 'HI',
+          sDBAZip: '695663',
+          sOwnershipType: 'LLC (TSYS AND FD)',
+          sSIC: '7011',
+          sSICDesc: 'Lodging - Hotels',
+          sSelfgen: 'No',
+          sMerchantType: 'Lodging',
+          sActivationDate: '1/8/2024',
+          iMV$: 3360,
+          iAT$: 320,
+          iSwipeVolPerc: 0,
+          iCB: 0,
+          iRR: 0,
+          bDivert: false,
+          sCashAdvEnrolled: '0',
+          bRiskWatch: false,
+          dNetSettlementBal: 0.0,
+          iSwipedPercBasedOnTransCntCurrMonth: null,
+          sChannel: 'Direct channel',
+          sReseller: '200',
+          sReferralPartner: '100',
+          sISA: '300',
+          iUWApprMV: 500,
+          iUWApprAT: 0,
+          iUWApprSwipeVolPerc: 200,
+          bAutoHoldWhiteLabel: true,
+          iUWApprHT: 100,
+          dtCreated: '2025-02-18T07:15:37.277',
+          dtLastUpdated: '2025-02-18T07:15:37.277',
+        },
+        {
+          pk: 7,
+          sMId: '5611000000126910',
+          sDBAName: 'Volcano inn',
+          sDBAAddress: '19 390 old volcano',
+          sDBACity: 'volcano',
+          sDBAState: 'HI',
+          sDBAZip: '695663',
+          sOwnershipType: 'LLC (TSYS AND FD)',
+          sSIC: '7011',
+          sSICDesc: 'Lodging - Hotels',
+          sSelfgen: 'No',
+          sMerchantType: 'Lodging',
+          sActivationDate: '1/8/2024',
+          iMV$: 3360,
+          iAT$: 320,
+          iSwipeVolPerc: 0,
+          iCB: 0,
+          iRR: 0,
+          bDivert: false,
+          sCashAdvEnrolled: '0',
+          bRiskWatch: false,
+          dNetSettlementBal: 0.0,
+          iSwipedPercBasedOnTransCntCurrMonth: null,
+          sChannel: 'Direct channel',
+          sReseller: '200',
+          sReferralPartner: '100',
+          sISA: '300',
+          iUWApprMV: 500,
+          iUWApprAT: 0,
+          iUWApprSwipeVolPerc: 200,
+          bAutoHoldWhiteLabel: true,
+          iUWApprHT: 100,
+          dtCreated: '2025-02-18T07:18:43.013',
+          dtLastUpdated: '2025-02-18T07:18:43.013',
+        },
+      ],
+      volume: [
+        {
+          pk: 1,
+          sMId: '5611000000126910',
+          iYear: 2025,
+          iMonth: 2,
+          sMonth: 'Feb',
+          dVol: 1333144.45,
+          dAvgTkt: 454.84,
+          dSwipedPercBasedOnTransCnt: 0.0,
+          dHighestTkt: 13978.1,
+          dTotCB: 2476.61,
+          dVCBPerc: 4.67,
+          dMCCBPerc: 95.33,
+          dDCBPerc: 0.0,
+          dACBPerc: 0.0,
+        },
+        {
+          pk: 5,
+          sMId: '5611000000126910',
+          iYear: 2025,
+          iMonth: 1,
+          sMonth: 'Jan',
+          dVol: 2714367.34,
+          dAvgTkt: 442.84,
+          dSwipedPercBasedOnTransCnt: 0.0,
+          dHighestTkt: 20554.27,
+          dTotCB: 7194.2,
+          dVCBPerc: 0.0,
+          dMCCBPerc: 10.1,
+          dDCBPerc: 0.0,
+          dACBPerc: 0.0,
+        },
+      ],
+    };
   }
 
   async riskRadar(filters: ExceptionFiltersDto): Promise<RiskRadarResponseDto> {
