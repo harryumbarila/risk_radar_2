@@ -6,8 +6,8 @@ export interface IrisFilteredUserData {
     name: string;
   }[];
   channels: {
-    user_id: number;
-    username: string;
+    id: number;
+    name: string;
   }[];
   manages: {
     user_id: number;
