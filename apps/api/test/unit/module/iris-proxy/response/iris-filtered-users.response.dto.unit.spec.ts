@@ -19,10 +19,6 @@ describe('FilteredUsersFactory', () => {
                 id: 201,
                 name: 'Sales',
               },
-              {
-                id: 202,
-                name: 'Marketing',
-              },
             ],
             reports_to: [
               {
@@ -57,18 +53,13 @@ describe('FilteredUsersFactory', () => {
             label: 'John Doe',
             value: 1,
             rsl: [{ id: 2, name: 'jane.smith' }],
-            channels: [
-              { user_id: 201, username: 'Sales' },
-              { user_id: 202, username: 'Marketing' },
-            ],
+            channels: [{ user_id: 201, username: 'Sales' }],
             manages: [{ user_id: 3, username: 'bob.johnson' }],
           },
         ],
       };
 
       const result = FilteredUsersFactory.create(input);
-
-      console.log(expectedOutput);
 
       expect(result).toEqual(expectedOutput);
     });
