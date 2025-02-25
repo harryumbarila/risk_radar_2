@@ -1,0 +1,109 @@
+name: HAYES CD (Deploy Staging)
+
+on:
+  workflow_run:
+    workflows: ["HAYES CI"]
+    branches: develop
+    types:
+      - completed
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
+
+jobs:
+  deploy-staging:
+    name: Deploy Hayes to Staging
+    runs-on: ubuntu-latest
+    environment: Staging
+
+    # These permissions are needed to interact with GitHub's OIDC Token endpoint.
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+    
+    steps:
+    - name: Check out the code
+      uses: actions/checkout@v4
+      with:
+        ref: 'develop'
+        fetch-depth: '0'
+
+    - name: Create version number
+      id: version
+      env:
+        RUN_NUMBER: ${{github.run_number}}
+      run: |
+        echo "Checking count"
+        current_commit_count=$(git rev-list HEAD --count)
+        if [ -z "${RUN_NUMBER}" ]; then
+          echo "Github.run_number is empty!"
+          exit 1
+        fi
+        
+        next_version=${RUN_NUMBER}-rc-$current_commit_count
+        
+        echo "::set-output name=build_number::$next_version"
+
+    - name: Configure AWS credentials from Staging account
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::257498453293:role/jobox-github-action-staging-hayes
+        aws-region: us-west-2
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build docker image, and Push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: hayes/staging/api
+        IMAGE_TAG: ${{ steps.version.outputs.build_number }}
+      run: |
+        cd docker/application/api
+        make VERSION=$IMAGE_TAG build
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+    - name: Generate Release Notes from Git Commits
+      id: release_notes
+      run: |
+        # Fetch all pre-release tags (tags containing '-rc-')
+        PRE_RELEASE_TAGS=$(git tag --list "v*-rc-*")
+        
+        if [[ -z "$PRE_RELEASE_TAGS" ]]; then
+          echo "No previous pre-release tag found. Marking this as the first pre-release."
+          echo "### First Pre-Release Version" > release_body.md
+          echo "This is the first pre-release version. Future releases will include commit changes." >> release_body.md
+        else
+          # Get the latest pre-release tag (sorted by version)
+          LAST_TAG=$(git tag --list "v*-rc-*" | sort -V | tail -n 1)
+          echo "Fetching commits since last pre-release tag: $LAST_TAG"
+        
+          COMMIT_LOG=$(git log "$LAST_TAG"..HEAD --pretty=format:"- %h %s" --no-merges)
+        
+          echo "### Changes in this release:" > release_body.md
+          echo "$COMMIT_LOG" >> release_body.md
+        fi
+
+        echo "::set-output name=body::$(cat release_body.md)"
+
+    - name: Create a GitHub Pre-Release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        IMAGE_TAG: ${{ steps.version.outputs.build_number }}
+      run: |
+        gh release create "v${IMAGE_TAG}" \
+          --title "Release v${IMAGE_TAG}" \
+          --notes-file release_body.md \
+          --prerelease
+
+    - name: Deploy image to staging
+      run: |
+        aws ssm send-command --document-name "AWS-RunShellScript" --document-version "1" --targets '[{"Key":"InstanceIds","Values":["i-0ae446fcf2afda16f"]}]' --parameters '{"commands":["runuser -l ec2-user -c /opt/webapps/scripts/pull_and_restart_api.sh"],"workingDirectory":[""],"executionTimeout":["3600"]}' --timeout-seconds 600 --max-concurrency "50" --max-errors "0" --cloud-watch-output-config '{"CloudWatchLogGroupName":"stg-hayes-api-deployment","CloudWatchOutputEnabled":true}' --region us-west-2
+
+    - name: Deploy image to sandbox
+      run: |
+        aws ssm send-command --document-name "AWS-RunShellScript" --document-version "1" --targets '[{"Key":"InstanceIds","Values":["i-006d9fe45e403122f"]}]' --parameters '{"commands":["runuser -l ec2-user -c /opt/webapps/scripts/pull_and_restart_api.sh"],"workingDirectory":[""],"executionTimeout":["3600"]}' --timeout-seconds 600 --max-concurrency "50" --max-errors "0" --cloud-watch-output-config '{"CloudWatchLogGroupName":"sandbox-hayes-api-deployment","CloudWatchOutputEnabled":true}' --region us-west-2
