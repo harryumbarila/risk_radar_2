@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import SidebarLinkGroup from "./SidebarLinkGroup";
+import { useUser } from "@auth0/nextjs-auth0/client";
+import { roles } from "@/types/roles";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -13,6 +15,8 @@ interface SidebarProps {
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const pathname = usePathname();
+  const { user } = useUser();
+  const { isSales } = roles(user);
 
   const trigger = useRef<any>(null);
   const sidebar = useRef<any>(null);
@@ -185,16 +189,18 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         }`}
                       >
                         <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
-                          <li>
-                            <Link
-                              href="/"
-                              className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                pathname === "/" && "text-white"
-                              }`}
-                            >
-                              Risk Radar
-                            </Link>
-                          </li>
+                          {!isSales() && (
+                            <li>
+                              <Link
+                                href="/"
+                                className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                  pathname === "/" && "text-white"
+                                }`}
+                              >
+                                Risk Radar
+                              </Link>
+                            </li>
+                          )}
                           <li>
                             <Link
                               href="/attribution-url"

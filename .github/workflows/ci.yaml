@@ -1,4 +1,4 @@
-name: HAYES CI
+name: DENALI CI
 
 on:
     push:
@@ -8,65 +8,12 @@ on:
 
 jobs:
     container-job:
-        name: HAYES CI
+        name: DENALI CI
         runs-on: ubuntu-latest
-        container: node:20.13.1-slim
+        container: node:22.14.0-slim
 
         services:
-            postgres:
-                image: postgres:13-alpine
-                env:
-                    POSTGRES_USER: hayesuser
-                    POSTGRES_PASSWORD: password
-                    POSTGRES_DB: test
-                options: >-
-                    --health-cmd pg_isready
-                    --health-interval 10s
-                    --health-timeout 5s
-                    --health-retries 5
-            redis:
-              image: redis
 
         steps:
             - name: Check out code
               uses: actions/checkout@v4
-
-            - name: Install dependencies
-              run: npm ci
-
-            - name: Build
-              run: npm run build
-# TODO fix
-#            - name: Lint
-#              run: npm run lint
-
-            - name: Tests unit
-              run: npm run test:unit
-
-            - name: Tests e2e
-              run: npm run test:e2e
-              env:
-                DATABASE_CONNECTION: postgres
-                DATABASE_HOST: postgres
-                DATABASE_PORT: 5432
-                DATABASE_USERNAME: hayesuser
-                DATABASE_PASSWORD: password
-                DATABASE_NAME: test
-                REDIS_QUEUE_HOST: redis
-                # App required
-                TWILIO_ACCOUNT_SID: ACxxx
-                TWILIO_AUTH_TOKEN: xxx
-                TWILIO_VERIFY_SERVICE_TOKEN: VAxxx
-                JWT_SECRET_KEY: asd
-                ACCOUNT_PUBLIC_API_KEY_PREFIX: pb
-                ACCOUNT_SECRET_API_KEY_PREFIX: sk
-
-
-            - name: Install prod dependencies
-              run: npm ci --production
-
-            - name: Install globally nestjs cli
-              run: npm install -g @nestjs/cli
-
-            - name: Build production
-              run: npm run build

@@ -1,15 +1,12 @@
-import { Metadata } from "next";
+"use client";
 import RiskRadar from "@/app/risk-radar/page";
-
-export const metadata: Metadata = {
-  title: "Taluspay Dashboard",
-  description: "Taluspay Dashboard",
-};
+import { useUser } from "@auth0/nextjs-auth0/client";
+import { roles } from "@/types/roles";
+import AttributionUrl from "@/app/attribution-url/page";
 
 export default function Home() {
-  return (
-    <>
-      <RiskRadar />
-    </>
-  );
+  const { user } = useUser();
+  const { isSales } = roles(user);
+
+  return <>{!isSales() ? <RiskRadar /> : <AttributionUrl />}</>;
 }
