@@ -12,8 +12,6 @@ jobs:
         runs-on: ubuntu-latest
         container: node:22.14.0-slim
 
-        services:
-
         steps:
             - name: Check out code
               uses: actions/checkout@v4
