@@ -23,7 +23,7 @@ const AttributionUrl: React.FC = () => {
 
   // New state variables for dropdown options
   const [channels, setChannels] = useState<
-    Array<{ user_id: number; username: string }>
+    Array<{ id: number; name: string }>
   >([]);
   const [rslOptions, setRslOptions] = useState<
     Array<{ id: number; name: string }>
@@ -164,8 +164,8 @@ const AttributionUrl: React.FC = () => {
               >
                 <option value="">Select Channel</option>
                 {channels.map((group) => (
-                  <option key={group.user_id} value={group.user_id}>
-                    {group.username}
+                  <option key={group.id} value={group.id}>
+                    {group.name}
                   </option>
                 ))}
               </select>

@@ -8,8 +8,8 @@ export interface IrisFilteredUserData {
     name: string;
   }[];
   channels: {
-    user_id: number;
-    username: string;
+    id: number;
+    name: string;
   }[];
   manages: {
     user_id: number;
@@ -43,8 +43,8 @@ export class FilteredUsersFactory {
 
   private static createChannels(groups: any[]) {
     return groups.map((group) => ({
-      user_id: group.id,
-      username: group.name,
+      id: group.id,
+      name: group.name,
     }));
   }
 
