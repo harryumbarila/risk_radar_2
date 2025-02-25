@@ -15,3 +15,14 @@ jobs:
         steps:
             - name: Check out code
               uses: actions/checkout@v4
+
+            - name: Install dependencies
+              run: yarn install
+
+            - name: Run API tests unit
+              run: yarn run test:unit
+              working-directory: apps/api
+
+            - name: Run API tests e2e
+              run: yarn run test:e2e
+              working-directory: apps/api
