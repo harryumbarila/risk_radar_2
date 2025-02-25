@@ -95,8 +95,8 @@ describe('IrisProxyController (e2e)', () => {
       expect(user).toEqual([
         {
           channels: [
-            { user_id: 201, username: 'Sales' },
-            { user_id: 202, username: 'Marketing' },
+            { id: 201, name: 'Sales' },
+            { id: 202, name: 'Marketing' },
           ],
           label: 'John Doe',
           manages: [{ user_id: 3, username: 'Bob Johnson' }],

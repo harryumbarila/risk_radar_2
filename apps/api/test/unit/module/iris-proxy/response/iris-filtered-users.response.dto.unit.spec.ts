@@ -53,7 +53,7 @@ describe('FilteredUsersFactory', () => {
             label: 'John Doe',
             value: 1,
             rsl: [{ id: 2, name: 'jane.smith' }],
-            channels: [{ user_id: 201, username: 'Sales' }],
+            channels: [{ id: 201, name: 'Sales' }],
             manages: [{ user_id: 3, username: 'bob.johnson' }],
           },
         ],
