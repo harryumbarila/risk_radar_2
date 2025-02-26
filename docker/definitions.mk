@@ -1,4 +1,4 @@
-REGISTRY := 257498453293.dkr.ecr.us-west-2.amazonaws.com/deneli
+REGISTRY := 257498453293.dkr.ecr.us-west-2.amazonaws.com/denali
 VENDOR := $(notdir $(abspath $(CURDIR)/..))
 REPOSITORY := $(notdir $(CURDIR))
 VERSION := snapshot
