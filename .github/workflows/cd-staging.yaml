@@ -115,4 +115,4 @@ jobs:
 
     - name: Deploy image to staging
       run: |
-        aws ssm send-command --document-name "AWS-RunShellScript" --document-version "1" --targets '[{"Key":"InstanceIds","Values":["i-0ae446fcf2afda16f"]}]' --parameters '{"commands":["runuser -l ec2-user -c /opt/webapps/scripts/pull_and_restart_api.sh"],"workingDirectory":[""],"executionTimeout":["3600"]}' --timeout-seconds 600 --max-concurrency "50" --max-errors "0" --cloud-watch-output-config '{"CloudWatchLogGroupName":"stg-denali-api-deployment","CloudWatchOutputEnabled":true}' --region us-west-2
+        aws ssm send-command --document-name "AWS-RunShellScript" --document-version "1" --targets '[{"Key":"InstanceIds","Values":["i-022feced8398583f3"]}]' --parameters '{"commands":["runuser -l ec2-user -c /opt/webapps/scripts/pull_and_restart_api.sh"],"workingDirectory":[""],"executionTimeout":["3600"]}' --timeout-seconds 600 --max-concurrency "50" --max-errors "0" --cloud-watch-output-config '{"CloudWatchLogGroupName":"stg-denali-api-deployment","CloudWatchOutputEnabled":true}' --region us-west-2
