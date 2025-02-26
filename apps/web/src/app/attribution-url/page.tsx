@@ -7,6 +7,21 @@ import { showNotification } from "@/components/Notifications/NotificationContent
 import { useUsersData } from "@/hooks/attribution-url/useUsersData";
 import { useChannels } from "@/hooks/attribution-url/useChannels";
 import { usePartners } from "@/hooks/attribution-url/usePartners";
+import { useLeadSources } from "@/hooks/attribution-url/useLeadSources";
+
+// example 
+// source name: "Referral Partner - Lisa Dunmire"
+// partner name: "Lisa Dunmire"
+const findMatchingSourceNameForReferralPartner = (
+  partnerName: string,
+  sources: { id: number; name: string }[] = []
+) => {
+  return sources.find((source) => {
+    const sourceName = source.name.toLowerCase();
+    const referralPartnerName = partnerName.toLowerCase();
+    return sourceName.includes('referral partner') && sourceName.includes(referralPartnerName);
+  });
+};
 
 const AttributionUrl: React.FC = () => {
   const {
@@ -20,6 +35,9 @@ const AttributionUrl: React.FC = () => {
   const [rsl, setRsl] = useState("");
   const [referralPartner, setReferralPartner] = useState("");
   const [generatedLink, setGeneratedLink] = useState("");
+
+  const { data: leadSourcesData } = useLeadSources();
+  const [selectedPartnerName, setSelectedPartnerName] = useState<string>("");
 
   // New state variables for dropdown options
   const [channels, setChannels] = useState<
@@ -56,6 +74,16 @@ const AttributionUrl: React.FC = () => {
 
     if (referralPartner) {
       attributionData.referral_partner_user_id = referralPartner;
+
+      // find correct source id by checking source name with selected partner name
+      const selectedSource = findMatchingSourceNameForReferralPartner(
+        selectedPartnerName,
+        leadSourcesData?.data
+      );
+
+      if (selectedSource) {
+        attributionData.source_id = selectedSource.id.toString();
+      }
     }
 
     // 3. Convert to Base64
@@ -83,6 +111,21 @@ const AttributionUrl: React.FC = () => {
         type: "success",
         bgColor: "#4CAF50",
       });
+    }
+  };
+
+  const handlePartnerChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = e.target.value;
+    setReferralPartner(selectedValue);
+    // Clear dependent fields
+    setGeneratedLink("");
+    // Find the selected partner
+    const selectedPartner = partnerOptions.find(
+      (partner) => partner.user_id.toString() === selectedValue,
+    );
+    if (selectedPartner) {
+      // Set the selected partner name
+      setSelectedPartnerName(selectedPartner.username);
     }
   };
 
@@ -201,7 +244,7 @@ const AttributionUrl: React.FC = () => {
             <div className="relative z-20 bg-transparent dark:bg-form-input">
               <select
                 value={referralPartner}
-                onChange={(e) => setReferralPartner(e.target.value)}
+                onChange={(e) => handlePartnerChange(e)}
                 className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
               >
                 <option value="">Select Referral Partner</option>
