@@ -8,22 +8,13 @@ import { useUsersData } from "@/hooks/attribution-url/useUsersData";
 import { useChannels } from "@/hooks/attribution-url/useChannels";
 import { usePartners } from "@/hooks/attribution-url/usePartners";
 import { useLeadSources } from "@/hooks/attribution-url/useLeadSources";
+import { useSourceMatcher } from "@/hooks/attribution-url/useSourceMatcher";
 
-// example 
-// source name: "Referral Partner - Lisa Dunmire"
-// partner name: "Lisa Dunmire"
-const findMatchingSourceNameForReferralPartner = (
-  partnerName: string,
-  sources: { id: number; name: string }[] = []
-) => {
-  return sources.find((source) => {
-    const sourceName = source.name.toLowerCase();
-    const referralPartnerName = partnerName.toLowerCase();
-    return sourceName.includes('referral partner') && sourceName.includes(referralPartnerName);
-  });
-};
 
 const AttributionUrl: React.FC = () => {
+  // Add hook
+  const { findMatchingSourceNameForReferralPartner } = useSourceMatcher();
+
   const {
     data: usersData,
     error: usersError,
