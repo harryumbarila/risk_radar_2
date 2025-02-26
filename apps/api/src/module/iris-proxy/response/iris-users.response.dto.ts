@@ -35,9 +35,11 @@ interface UserGroup {
 interface UserReport {
   user_id: number;
   username: string;
+  full_name: string;
 }
 
 interface UserManage {
   user_id: number;
   username: string;
+  full_name: string;
 }
