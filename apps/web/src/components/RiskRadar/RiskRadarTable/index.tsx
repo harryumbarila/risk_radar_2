@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import RiskRadarTable from "@/components/RiskRadar/RiskRadarTable/RiskRadarTable";
-import { RiskRadarResponseDto } from "@/hooks/risk-radar/response/riskRadarResponseDto";
+import { RiskRadarResponseDto } from "@/shared/response/legacy-dashboard-proxy";
 
 export interface RiskRadarTableComponentProps {
   data: RiskRadarResponseDto;

@@ -1,4 +1,4 @@
-import { IrisLeadSourcesResponseDto } from "./response/iris-sources.response.dto";
+import { IrisLeadSourcesResponseDto } from "@/shared/response/iris-proxy";
 
 // example 
 // source name: "Referral Partner - Lisa Dunmire"

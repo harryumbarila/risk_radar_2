@@ -1,5 +1,5 @@
 import React from "react";
-import { KpiStatisticsResponseDto } from "@/hooks/risk-radar/response/kpiStatisticsResponseDto";
+import { KpiStatisticsResponseDto } from "@/shared/response/legacy-dashboard-proxy";
 
 interface KpiTableProps {
   data: KpiStatisticsResponseDto;

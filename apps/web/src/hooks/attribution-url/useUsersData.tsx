@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { IrisFilteredUsersResponseDto } from "@/hooks/attribution-url/response/irisUsersResponseDto";
+import { IrisFilteredUsersResponseDto } from "@/shared/response/iris-proxy";
 import { baseApi } from "@/hooks/baseApi";
 
 export const useUsersData = () => {

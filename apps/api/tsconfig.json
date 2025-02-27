@@ -12,6 +12,7 @@
     "baseUrl": "./",
     "paths": {
       "@/api": ["src/*"],
+      "@/shared/*": ["../../packages/shared/src/*"]
     },
     "incremental": true,
     "skipLibCheck": true,

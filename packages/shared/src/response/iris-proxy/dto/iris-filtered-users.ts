@@ -1,16 +1,24 @@
-import { IrisUsersResponseDto } from './iris-users.response.dto';
+import type { IrisUsersResponseDto } from './iris-users';
 
+type BaseObject = {
+  id: number;
+  name: string;
+};
+
+type ReportsAndManagesType = {
+  user_id: number;
+  full_name: string;
+};
+
+type GroupType = {
+  id: number;
+  name: string;
+};
 export interface IrisFilteredUserData {
   label: string; // User's full name to display
   value: number; // User ID
-  rsl: {
-    id: number;
-    name: string;
-  }[];
-  channels: {
-    id: number;
-    name: string;
-  }[];
+  rsl: BaseObject[];
+  channels: BaseObject[];
   manages: {
     user_id: number;
     username: string;
@@ -34,21 +42,25 @@ export class FilteredUsersFactory {
     return { data: filteredUsers };
   }
 
-  private static createReportsTo(reports: any[]) {
+  private static createReportsTo(
+    reports: ReportsAndManagesType[]
+  ): BaseObject[] {
     return reports.map((report) => ({
       id: report.user_id,
       name: report.full_name,
     }));
   }
 
-  private static createChannels(groups: any[]) {
+  private static createChannels(groups: GroupType[]): BaseObject[] {
     return groups.map((group) => ({
       id: group.id,
       name: group.name,
     }));
   }
 
-  private static createManages(manages: any[]) {
+  private static createManages(
+    manages: ReportsAndManagesType[]
+  ): IrisFilteredUserData['manages'] {
     return manages.map((manage) => ({
       user_id: manage.user_id,
       username: manage.full_name,
