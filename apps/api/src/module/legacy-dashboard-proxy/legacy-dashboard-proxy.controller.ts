@@ -1,8 +1,11 @@
-import { Controller, Get, Post, Query } from '@nestjs/common';
-import { LegacyDashboardProxyClient } from './webservice/legacy-dashboard-proxy.client';
-import { KpiStatisticsResponseDto } from './response/kpi-statistics.response.dto';
-import { RiskRadarResponseDto } from './response/risk-radar.response.dto';
-import { ExceptionDataResponseDto } from './response/exception-data.response.dto';
+import {
+  ExceptionDataResponseDto,
+  KpiStatisticsResponseDto,
+  MerchantResponseDto,
+  RiskRadarResponseDto,
+} from '@/shared/response/legacy-dashboard-proxy';
+import { Controller, Get, Query } from '@nestjs/common';
+import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
@@ -10,8 +13,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
-import { MerchantResponseDto } from './response/merchant.response.dto';
+import { LegacyDashboardProxyClient } from './webservice/legacy-dashboard-proxy.client';
 
 export class ExceptionFiltersDto {
   @IsString()

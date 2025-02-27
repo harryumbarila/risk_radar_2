@@ -2,7 +2,7 @@ export interface KpiData {
   id: string;
   metric: string;
   value: number;
-  trend: "up" | "down" | "neutral";
+  trend: 'up' | 'down' | 'neutral';
   changePercentage: number;
 }
 

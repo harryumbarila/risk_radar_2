@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { KpiStatisticsResponseDto } from "@/hooks/risk-radar/response/kpiStatisticsResponseDto";
+import { KpiStatisticsResponseDto } from "@/shared/response/legacy-dashboard-proxy";
 import { riskRadarApi } from "@/hooks/risk-radar/riskRadarApi";
 
 export const useKPIData = () => {

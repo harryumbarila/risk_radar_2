@@ -1,6 +1,6 @@
 import useSWR from "swr";
 import { riskRadarApi } from "@/hooks/risk-radar/riskRadarApi";
-import { ExceptionDataResponseDto } from "@/hooks/risk-radar/response/exceptionDataResponseDto";
+import { ExceptionDataResponseDto } from "@/shared/response/legacy-dashboard-proxy";
 
 export const useExceptionData = () => {
   const { data, error, isLoading } = useSWR<ExceptionDataResponseDto>(

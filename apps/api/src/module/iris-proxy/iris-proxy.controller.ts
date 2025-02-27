@@ -1,13 +1,14 @@
-import { Controller, Get } from '@nestjs/common';
-import { IrisClient } from './webservice/iris.client';
 import {
   FilteredUsersFactory,
+  IrisChannelsResponseDto,
   IrisFilteredUsersResponseDto,
-} from './response/iris-filtered-users.response.dto';
-import { IrisChannelsResponseDto } from '@denali/shared/response/iris-channels.response.dto';
-import { IrisPartnersResponseDto } from '@denali/shared/response/iris-partners.response.dto';
+  IrisLeadSourcesResponseDto,
+  IrisPartnersResponseDto,
+} from '@/shared/response/iris-proxy';
+import { Controller, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { IrisLeadSourcesResponseDto } from './response/iris-lead-sources.response.dto';
+
+import { IrisClient } from './webservice/iris.client';
 
 export interface IrisProxyControllerConfig {
   IRIS_ENV: string;

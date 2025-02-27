@@ -1,6 +1,8 @@
-import { IrisFilteredUsersResponseDto } from '@denali/web/src/hooks/attribution-url/response/irisUsersResponseDto';
-import { IrisUsersResponseDto } from '../../../../../src/module/iris-proxy/response/iris-users.response.dto';
-import { FilteredUsersFactory } from '../../../../../src/module/iris-proxy/response/iris-filtered-users.response.dto';
+import {
+  FilteredUsersFactory,
+  IrisFilteredUsersResponseDto,
+  IrisUsersResponseDto,
+} from '../../../../../../../packages/shared/src/response/iris-proxy';
 
 describe('FilteredUsersFactory', () => {
   describe('create', () => {

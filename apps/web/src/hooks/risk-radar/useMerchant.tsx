@@ -1,6 +1,6 @@
 import useSWR from "swr";
 import { riskRadarApi } from "@/hooks/risk-radar/riskRadarApi";
-import { MerchantResponseDto } from "@/hooks/risk-radar/response/merchantResponseDto";
+import { MerchantResponseDto } from "@/shared/response/legacy-dashboard-proxy";
 
 export const useMerchant = (mid: string) => {
   const { data, error, isLoading } = useSWR<MerchantResponseDto>(

@@ -10,7 +10,7 @@ import {
 import {
   RiskRadarData,
   RiskRadarResponseDto,
-} from "@/hooks/risk-radar/response/riskRadarResponseDto";
+} from "@/shared/response/legacy-dashboard-proxy";
 
 interface RiskRadarTableProps {
   data: RiskRadarResponseDto;

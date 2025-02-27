@@ -1,6 +1,6 @@
 import useSWR from "swr";
 import { baseApi } from "@/hooks/baseApi";
-import { IrisLeadSourcesResponseDto } from "./response/iris-sources.response.dto";
+import { IrisLeadSourcesResponseDto } from "@/shared/response/iris-proxy";
 
 export const useLeadSources = () => {
     const { data, error, isLoading } = useSWR<IrisLeadSourcesResponseDto>(

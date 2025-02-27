@@ -1,14 +1,28 @@
 {
   "name": "@denali/shared",
   "version": "1.0.0",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "description": "Shared types",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc -w"
+    "lint": "eslint --ext .ts --max-warnings=0 .",
+    "type-check": "tsc --noEmit"
   },
-  "dependencies": {
-    "typescript": "^5.0.0"
+  "devDependencies": {
+    "@denali/eslint-config": "*",
+    "@denali/typescript-config": "*",
+    "@typescript-eslint/eslint-plugin": "^6.2.0",
+    "@typescript-eslint/parser": "^6.2.0",
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^17.1.0",
+    "eslint-config-prettier": "^8.9.0",
+    "eslint-import-resolver-typescript": "^3.5.5",
+    "eslint-plugin-import": "^2.28.0",
+    "eslint-plugin-jest": "^27.2.3",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
+    "typescript": "^5.2.2"
   },
-  "private": "true"
+  "private": true
 }

@@ -1,9 +1,12 @@
+import { IrisChannelsResponseDto } from '@/shared/response';
+
+import {
+  IrisLeadSourcesResponseDto,
+  IrisUsersResponseDto,
+} from '@/shared/response/iris-proxy';
 import { Injectable, Logger } from '@nestjs/common';
-import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { ConfigService } from '@nestjs/config';
-import { IrisUsersResponseDto } from '../response/iris-users.response.dto';
-import { IrisChannelsResponseDto } from '@denali/web/src/hooks/attribution-url/response/iris-channels.response.dto';
-import { IrisLeadSourcesResponseDto } from '@denali/web/src/hooks/attribution-url/response/iris-sources.response.dto'; 
+import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 
 export interface IrisClientConfig {
   IRIS_URL: string;

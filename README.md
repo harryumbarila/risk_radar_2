@@ -150,6 +150,66 @@ the main app from the utilitarian collection of components.
 This package is basically the web application in which we developed and
 customized as needed due requirements.
 
+### `shared`
+
+The `shared` package contains TypeScript types that are shared across multiple
+apps or other packages within the project. It follows the TypeScript module
+structure to ensure consistency and reusability across the codebase.
+
+#### Example Directory Structure:
+
+```text
+shared/
+│── src/
+│   ├── data/
+│   │   ├── user.ts
+│   │   ├── product.ts
+│   │   ├── index.ts
+│   ├── index.ts
+│── package.json
+│── tsconfig.json
+```
+
+#### Example Usage:
+
+**`shared/src/data/user.ts`**
+
+```ts
+export type User = {
+  id: string;
+  name: string;
+  email: string;
+};
+```
+
+**`shared/src/data/index.ts`**
+
+```ts
+export * from './user';
+export * from './product';
+```
+
+**`shared/src/index.ts`**
+
+```ts
+export * from './data';
+```
+
+**Usage in Another Package:**
+
+```ts
+import { User } from '@denali/shared';
+
+const newUser: User = {
+  id: '123',
+  name: 'John Doe',
+  email: 'john@example.com',
+};
+```
+
+This structure helps keep type definitions centralized, making it easier to
+maintain and scale your project. 🚀
+
 ## Project Scripts
 
 In the project directory, you can run using the alternative node package manager

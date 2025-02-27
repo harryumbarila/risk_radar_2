@@ -1,14 +1,14 @@
-import { Injectable, Logger } from '@nestjs/common';
-import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
-import { ConfigService } from '@nestjs/config';
 import {
+  ExceptionDataResponseDto,
   kpiStatisticsResponseDto,
   KpiStatisticsResponseDto,
-} from '../response/kpi-statistics.response.dto';
-import { RiskRadarResponseDto } from '../response/risk-radar.response.dto';
-import { ExceptionDataResponseDto } from '../response/exception-data.response.dto';
+  MerchantResponseDto,
+  RiskRadarResponseDto,
+} from '@/shared/response/legacy-dashboard-proxy';
+import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import { ExceptionFiltersDto } from '../legacy-dashboard-proxy.controller';
-import { MerchantResponseDto } from '../response/merchant.response.dto';
 
 export interface LegacyDashboardProxyClientConfig {
   LEGACY_DASHBOARD_URL: string;

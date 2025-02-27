@@ -1,6 +1,6 @@
 import useSWR from "swr";
 import { baseApi } from "@/hooks/baseApi";
-import { IrisChannelsResponseDto } from "@/hooks/attribution-url/response/iris-channels.response.dto";
+import { IrisChannelsResponseDto } from "@/shared/response/iris-proxy";
 
 export const useChannels = () => {
   const { data, error, isLoading } = useSWR<IrisChannelsResponseDto>(
