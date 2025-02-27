@@ -16,8 +16,8 @@
     "test": "jest",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:unit": "jest --config jest-unit.json",
-    "test:e2e": "jest --config jest-e2e.json --runInBand --detectOpenHandles --forceExit",
+    "test:unit": "jest --config jest-unit.ts",
+    "test:e2e": "jest --config jest-e2e.ts --runInBand --detectOpenHandles --forceExit",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
