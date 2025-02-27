@@ -1,9 +1,9 @@
-/** @type {import("eslint").Linter.Config} */
 module.exports = {
   extends: ['plugin:import/recommended', 'plugin:prettier/recommended'],
   plugins: ['import', 'simple-import-sort', 'prettier'],
   rules: {
     // imports
+    curly: 'error',
     'no-restricted-imports': [
       'error',
       {
@@ -16,31 +16,19 @@ module.exports = {
         ],
       },
     ],
+
+    'import/no-default-export': 'error',
     'import/prefer-default-export': 'off',
+    'import/order': 'off',
+
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
   },
   overrides: [
     {
-      env: {
-        jest: true,
-      },
-      files: [
-        'jest.setup.[jt]s',
-        '**/__tests__/**/*.[jt]s?(x)',
-        '**/?(*.)+(spec|test).[jt]s?(x)',
-      ],
-      extends: ['plugin:jest/recommended'],
+      files: ['jest.config.ts', 'tailwind.config.ts'],
       rules: {
-        'import/no-extraneous-dependencies': [
-          'off',
-          {
-            devDependencies: [
-              'jest.setup.[jt]s',
-              '**/?(*.)+(spec|test).[jt]s?(x)',
-            ],
-          },
-        ],
+        'import/no-default-export': 'off',
       },
     },
   ],

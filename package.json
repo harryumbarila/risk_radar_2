@@ -11,17 +11,19 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo lint",
     "prepare": "husky",
-    "test": "echo Not implemented",
-    "type-check": "turbo run type-check",
+    "start:api": "turbo run start --filter=@denali/api",
     "start:web": "turbo run start --filter=@denali/web",
-    "start:api": "turbo run start --filter=@denali/api"
+    "sync-packages": "syncpack fix-mismatches",
+    "test:e2e": "turbo run test:e2e",
+    "test:unit": "turbo run test:unit",
+    "type-check": "turbo run type-check"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.4.4",
     "@commitlint/config-conventional": "^17.4.4",
     "@denali/eslint-config": "*",
-    "@denali/typescript-config": "*",
     "@denali/shared": "*",
+    "@denali/typescript-config": "*",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",

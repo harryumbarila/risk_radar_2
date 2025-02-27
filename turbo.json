@@ -20,6 +20,12 @@
     "start": {
       "dependsOn": ["build"],
       "cache": false
+    },
+    "test:unit": {
+      "cache": true
+    },
+    "test:e2e": {
+      "cache": true
     }
   }
 }
