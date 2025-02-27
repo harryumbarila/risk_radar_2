@@ -7,6 +7,7 @@ import {
 import { IrisChannelsResponseDto } from '@denali/shared/response/iris-channels.response.dto';
 import { IrisPartnersResponseDto } from '@denali/shared/response/iris-partners.response.dto';
 import { ConfigService } from '@nestjs/config';
+import { IrisLeadSourcesResponseDto } from './response/iris-lead-sources.response.dto';
 
 export interface IrisProxyControllerConfig {
   IRIS_ENV: string;
@@ -23,6 +24,11 @@ export class IrisProxyController {
   async users(): Promise<IrisFilteredUsersResponseDto> {
     const data = await this.client.getUsers();
     return FilteredUsersFactory.create(data);
+  }
+
+  @Get('lead-sources')
+  async leadSources(): Promise<IrisLeadSourcesResponseDto> {
+    return this.client.getLeadSources();
   }
 
   /**
