@@ -11,7 +11,7 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "paths": {
-      "@/api": ["src/*"],
+      "@/api/*": ["./src/*"],
       "@/shared/*": ["../../packages/shared/src/*"]
     },
     "incremental": true,

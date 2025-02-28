@@ -1,8 +1,8 @@
-import {
-  FilteredUsersFactory,
+import type {
   IrisFilteredUsersResponseDto,
   IrisUsersResponseDto,
-} from '../../../../../../../packages/shared/src/response/iris-proxy';
+} from '@/shared/response/iris-proxy';
+import { FilteredUsersFactory } from '@/shared/response/iris-proxy';
 
 describe('FilteredUsersFactory', () => {
   describe('create', () => {

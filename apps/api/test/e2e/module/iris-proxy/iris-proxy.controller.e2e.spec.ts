@@ -1,9 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
+import type { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { IrisClient } from '../../../../src/module/iris-proxy/webservice/iris.client';
-import { IrisProxyController } from '../../../../src/module/iris-proxy/iris-proxy.controller';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
+import * as request from 'supertest';
+
+import { IrisProxyController } from '@/api/module/iris-proxy/iris-proxy.controller';
+import { IrisClient } from '@/api/module/iris-proxy/webservice/iris.client';
 
 describe('IrisProxyController (e2e)', () => {
   let app: INestApplication;

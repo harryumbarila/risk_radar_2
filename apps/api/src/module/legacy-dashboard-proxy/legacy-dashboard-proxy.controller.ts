@@ -1,10 +1,5 @@
-import {
-  ExceptionDataResponseDto,
-  KpiStatisticsResponseDto,
-  MerchantResponseDto,
-  RiskRadarResponseDto,
-} from '@/shared/response/legacy-dashboard-proxy';
 import { Controller, Get, Query } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
@@ -13,79 +8,114 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+
+import type { ExceptionDataResponseDto } from '@/shared/response/legacy-dashboard-proxy';
+import {
+  KpiStatisticsResponseDto,
+  MerchantResponseDto,
+  RiskRadarResponseDto,
+} from '@/shared/response/legacy-dashboard-proxy';
+
 import { LegacyDashboardProxyClient } from './webservice/legacy-dashboard-proxy.client';
 
 export class ExceptionFiltersDto {
   @IsString()
   @IsOptional()
-  from_date?: string;
+  public from_date?: string;
 
   @IsString()
   @IsOptional()
-  to_date?: string;
+  public to_date?: string;
 
   @IsString()
   @IsOptional()
-  status?: string;
+  public status?: string;
 
   @IsString()
   @IsOptional()
-  assigned_to?: string;
+  public assigned_to?: string;
 
   @IsString()
   @IsOptional()
-  @Transform(({ value }) => (value === 'null' ? null : value))
-  MID?: string | null;
+  @Transform(({ value }: { value: string }) =>
+    value === 'null' ? null : value,
+  )
+  public MID?: string | null;
 
   @IsString()
   @IsOptional()
-  @Transform(({ value }) => (value === 'null' ? null : value))
-  dba_or_sic?: string | null;
+  @Transform(({ value }: { value: string }) =>
+    value === 'null' ? null : value,
+  )
+  public dba_or_sic?: string | null;
 
   @IsArray()
-  @Transform(({ value }) => value.split(', '))
-  exception_type: string[];
+  @Transform(({ value }: { value: string }) => value.split(', '))
+  public exception_type: string[];
 
   @IsBoolean()
   @Transform(({ value }) => value === '1')
-  view_all_exceptions: boolean;
+  public view_all_exceptions: boolean;
 
   @IsString()
   @IsOptional()
-  source_type?: string;
+  public source_type?: string;
 
   @IsNumber()
   @Type(() => Number)
-  current_page: number;
+  public current_page: number;
 
   @IsNumber()
   @Type(() => Number)
-  records_per_page: number;
+  public records_per_page: number;
 }
-
+@ApiTags('Legacy dashboard proxy')
 @Controller('/v1/legacy_dashboard_proxy')
 export class LegacyDashboardProxyController {
-  constructor(private readonly client: LegacyDashboardProxyClient) {}
+  public constructor(private readonly client: LegacyDashboardProxyClient) {}
 
+  @ApiResponse({
+    status: 200,
+    description: 'The KPI statistics response.',
+  })
+  @ApiOperation({ operationId: 'kpi', summary: 'Get KPI statistics' })
   @Get('kpi')
-  getKPI(): KpiStatisticsResponseDto {
+  public getKPI(): KpiStatisticsResponseDto {
     return this.client.getKPI();
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'The exception data response.',
+  })
+  @ApiOperation({
+    operationId: 'exception_data',
+    summary: 'Get exception data',
+  })
   @Get('exception_data')
-  async getExceptionData(): Promise<ExceptionDataResponseDto> {
+  public async getExceptionData(): Promise<ExceptionDataResponseDto> {
     return this.client.getExceptionData();
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'The merchant response.',
+  })
+  @ApiOperation({ operationId: 'merchant', summary: 'Get merchant' })
   @Get('merchant')
-  async merchant(@Query('mid') mid: string): Promise<MerchantResponseDto> {
+  public merchant(@Query('mid') mid: string): MerchantResponseDto {
     return this.client.getMerchant(mid);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'The risk radar response.',
+  })
+  @ApiOperation({ operationId: 'risk_radar', summary: 'Get risk radar' })
   @Get('risk_radar')
-  async riskRadar(
+  public riskRadar(
     @Query() filters: ExceptionFiltersDto,
-  ): Promise<RiskRadarResponseDto> {
+  ): RiskRadarResponseDto {
     return this.client.riskRadar(filters);
   }
 }
