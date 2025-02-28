@@ -30,7 +30,9 @@ export interface IrisFilteredUsersResponseDto {
 }
 
 export class FilteredUsersFactory {
-  static create(data: IrisUsersResponseDto): IrisFilteredUsersResponseDto {
+  public static create(
+    data: IrisUsersResponseDto
+  ): IrisFilteredUsersResponseDto {
     const filteredUsers = data.data.map((user) => ({
       label: user.full_name,
       value: user.id,
