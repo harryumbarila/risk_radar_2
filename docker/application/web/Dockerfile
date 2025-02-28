@@ -9,6 +9,9 @@ ENV NPM_CONFIG_LOGLEVEL warn
 
 RUN node -v
 RUN yarn --frozen-lockfile
+
+ENV CI true 
+
 RUN yarn turbo run build --filter=@denali/web
 
 RUN rm -rv /var/www/html/apps/web/.env || true
