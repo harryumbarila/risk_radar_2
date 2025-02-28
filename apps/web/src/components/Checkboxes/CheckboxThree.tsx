@@ -1,6 +1,7 @@
-import { useState } from "react";
+import type { FC } from 'react';
+import { useState } from 'react';
 
-const CheckboxThree = () => {
+export const CheckboxThree: FC = () => {
   const [isChecked, setIsChecked] = useState<boolean>(false);
 
   return (
@@ -19,17 +20,17 @@ const CheckboxThree = () => {
             }}
           />
           <div
-            className={`box mr-4 flex h-5 w-5 items-center justify-center rounded border ${
-              isChecked && "border-primary bg-gray dark:bg-transparent"
+            className={`box mr-4 flex size-5 items-center justify-center rounded border ${
+              isChecked && 'border-primary bg-gray dark:bg-transparent'
             }`}
           >
             <span
               className={`text-primary opacity-0 ${
-                isChecked && "!opacity-100"
+                isChecked && '!opacity-100'
               }`}
             >
               <svg
-                className="h-3.5 w-3.5 stroke-current"
+                className="size-3.5 stroke-current"
                 fill="none"
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
@@ -39,7 +40,7 @@ const CheckboxThree = () => {
                   strokeLinejoin="round"
                   strokeWidth="2"
                   d="M6 18L18 6M6 6l12 12"
-                ></path>
+                />
               </svg>
             </span>
           </div>
@@ -49,5 +50,3 @@ const CheckboxThree = () => {
     </div>
   );
 };
-
-export default CheckboxThree;

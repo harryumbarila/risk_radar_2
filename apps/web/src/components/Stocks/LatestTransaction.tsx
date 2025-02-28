@@ -1,75 +1,75 @@
-import React from "react";
-import Image from "next/image";
+import Image from 'next/image';
+import React from 'react';
 
-interface Stocks {
+type Stocks = {
   image: string;
   name: string;
   interestRate: number;
   returnRate: number;
   price: number;
   date: string;
-}
+};
 
 const stocksItems: Stocks[] = [
   {
-    image: "/images/brand/brand-15.svg",
-    name: "Apple Inc.",
+    image: '/images/brand/brand-15.svg',
+    name: 'Apple Inc.',
     interestRate: 3.8,
     returnRate: +3.69,
     price: 9346.0,
-    date: "20 Sep, 27",
+    date: '20 Sep, 27',
   },
   {
-    image: "/images/brand/brand-17.svg",
-    name: "Amazon",
+    image: '/images/brand/brand-17.svg',
+    name: 'Amazon',
     interestRate: 2.7,
     returnRate: +3.69,
     price: 6879.0,
-    date: "20 Sep, 27",
+    date: '20 Sep, 27',
   },
   {
-    image: "/images/brand/brand-14.svg",
-    name: "Netflix",
+    image: '/images/brand/brand-14.svg',
+    name: 'Netflix',
     interestRate: 2.5,
     returnRate: -3.69,
     price: 1439.0,
-    date: "20 Sep, 27",
+    date: '20 Sep, 27',
   },
   {
-    image: "/images/brand/brand-18.svg",
-    name: "IBM",
+    image: '/images/brand/brand-18.svg',
+    name: 'IBM',
     interestRate: 1.8,
     returnRate: -3.69,
     price: 2329.0,
-    date: "20 Sep, 27",
+    date: '20 Sep, 27',
   },
   {
-    image: "/images/brand/brand-16.svg",
-    name: "Meta",
+    image: '/images/brand/brand-16.svg',
+    name: 'Meta',
     interestRate: 3.7,
     returnRate: +3.69,
     price: 1026.0,
-    date: "20 Sep, 27",
+    date: '20 Sep, 27',
   },
   {
-    image: "/images/brand/brand-19.svg",
-    name: "Microsoft",
+    image: '/images/brand/brand-19.svg',
+    name: 'Microsoft',
     interestRate: 3.7,
     returnRate: +3.69,
     price: 3226.0,
-    date: "20 Sep, 27",
+    date: '20 Sep, 27',
   },
   {
-    image: "/images/brand/brand-20.svg",
-    name: "Tesla",
+    image: '/images/brand/brand-20.svg',
+    name: 'Tesla',
     interestRate: 3.7,
     returnRate: -1.24,
     price: 6426.0,
-    date: "20 Sep, 27",
+    date: '20 Sep, 27',
   },
 ];
 
-const LatestTransaction: React.FC = () => {
+export const LatestTransaction: React.FC = () => {
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white p-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:p-7.5 xl:col-span-7">
       <div className="mb-10 flex flex-wrap items-center justify-between gap-2">
@@ -105,21 +105,21 @@ const LatestTransaction: React.FC = () => {
       </div>
 
       <div className="flex flex-col gap-[25px]">
-        {stocksItems.map((item, key) => (
+        {stocksItems.map((item) => (
           <div
-            key={key}
+            key={item.name}
             className="grid grid-cols-2 items-center gap-5 xsm:grid-cols-3 sm:grid-cols-8"
           >
             <div className="flex items-center gap-4.5 sm:col-span-3 2xl:col-span-2">
-              <div className="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-[#EEF2F8]">
+              <div className="flex size-11.5 items-center justify-center rounded-full bg-[#EEF2F8]">
                 <Image
                   src={item.image}
                   alt="brand"
                   width={46}
                   height={46}
                   style={{
-                    width: "auto",
-                    height: "auto",
+                    width: 'auto',
+                    height: 'auto',
                   }}
                 />
               </div>
@@ -142,7 +142,7 @@ const LatestTransaction: React.FC = () => {
             <div className="hidden xsm:block sm:col-span-1 2xl:col-span-2">
               <p
                 className={`mb-0.5 flex items-center gap-[5px] text-sm font-bold leading-6 ${
-                  item.returnRate >= 0 ? "text-meta-3" : "text-red"
+                  item.returnRate >= 0 ? 'text-meta-3' : 'text-red'
                 }`}
               >
                 {item.returnRate >= 0 ? (
@@ -181,7 +181,7 @@ const LatestTransaction: React.FC = () => {
 
             <div className="text-right sm:col-span-2">
               <h5 className="font-bold text-black dark:text-white">
-                {item.returnRate >= 0 ? "+" : "-"} ${item.price}
+                {item.returnRate >= 0 ? '+' : '-'} ${item.price}
               </h5>
               <p className="text-xs font-medium">{item.date}</p>
             </div>
@@ -191,5 +191,3 @@ const LatestTransaction: React.FC = () => {
     </div>
   );
 };
-
-export default LatestTransaction;

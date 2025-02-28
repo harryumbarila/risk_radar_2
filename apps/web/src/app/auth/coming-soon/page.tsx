@@ -1,7 +1,8 @@
-import React from "react";
-import CountDownTimer from "@/components/CountDownTimer";
-import Link from "next/link";
-import Image from "next/image";
+import Image from 'next/image';
+import Link from 'next/link';
+import React from 'react';
+
+import { CountDownTimer } from '@/components/CountDownTimer';
 
 const ComingSoon: React.FC = () => {
   return (
@@ -14,7 +15,7 @@ const ComingSoon: React.FC = () => {
                 <Image
                   width={176}
                   height={32}
-                  src={"/images/logo/logo-dark.svg"}
+                  src="/images/logo/logo-dark.svg"
                   alt="Logo"
                   priority
                   className="dark:hidden"
@@ -22,7 +23,7 @@ const ComingSoon: React.FC = () => {
                 <Image
                   width={176}
                   height={32}
-                  src={"/images/logo/logo.svg"}
+                  src="/images/logo/logo.svg"
                   alt="Logo"
                   priority
                   className="hidden dark:block"
@@ -76,7 +77,7 @@ const ComingSoon: React.FC = () => {
 
             <div className="flex items-center justify-center gap-4">
               <Link
-                href="#"
+                href="/"
                 className="flex size-10 items-center justify-center rounded-full border border-[#DFE4EA] hover:border-primary hover:bg-primary hover:text-white dark:border-strokedark dark:hover:border-primary"
               >
                 <svg
@@ -95,7 +96,7 @@ const ComingSoon: React.FC = () => {
               </Link>
 
               <Link
-                href="#"
+                href="/"
                 className="flex size-10 items-center justify-center rounded-full border border-[#DFE4EA] hover:border-primary hover:bg-primary hover:text-white dark:border-strokedark dark:hover:border-primary"
               >
                 <svg
@@ -126,7 +127,7 @@ const ComingSoon: React.FC = () => {
               </Link>
 
               <Link
-                href="#"
+                href="/"
                 className="flex size-10 items-center justify-center rounded-full border border-[#DFE4EA] hover:border-primary hover:bg-primary hover:text-white dark:border-strokedark dark:hover:border-primary"
               >
                 <svg
@@ -157,7 +158,7 @@ const ComingSoon: React.FC = () => {
               </Link>
 
               <Link
-                href="#"
+                href="/"
                 className="flex size-10 items-center justify-center rounded-full border border-[#DFE4EA] hover:border-primary hover:bg-primary hover:text-white dark:border-strokedark dark:hover:border-primary"
               >
                 <svg
@@ -183,25 +184,25 @@ const ComingSoon: React.FC = () => {
       <div className="absolute left-0 top-0 -z-10 flex h-screen w-full items-center justify-around">
         <div className="flex h-full gap-20">
           <span className="block h-full w-0.5 animate-line1">
-            <span className="block h-55 w-0.5 bg-bodydark1 dark:bg-strokedark"></span>
+            <span className="block h-55 w-0.5 bg-bodydark1 dark:bg-strokedark" />
           </span>
           <span className="block h-full w-0.5 animate-line2">
-            <span className="block h-36 w-0.5 bg-bodydark1 dark:bg-strokedark"></span>
+            <span className="block h-36 w-0.5 bg-bodydark1 dark:bg-strokedark" />
           </span>
           <span className="ml-10 block h-full w-0.5 animate-line3">
-            <span className="block h-40 w-0.5 bg-bodydark1 dark:bg-strokedark"></span>
+            <span className="block h-40 w-0.5 bg-bodydark1 dark:bg-strokedark" />
           </span>
         </div>
 
         <div className="flex h-full gap-20">
           <span className="mr-10 block h-full w-0.5 animate-line1">
-            <span className="block h-55 w-0.5 bg-bodydark1 dark:bg-strokedark"></span>
+            <span className="block h-55 w-0.5 bg-bodydark1 dark:bg-strokedark" />
           </span>
           <span className="block h-full w-0.5 animate-line2">
-            <span className="block h-36 w-0.5 bg-bodydark1 dark:bg-strokedark"></span>
+            <span className="block h-36 w-0.5 bg-bodydark1 dark:bg-strokedark" />
           </span>
           <span className="block h-full w-0.5 animate-line3">
-            <span className="block h-40 w-0.5 bg-bodydark1 dark:bg-strokedark"></span>
+            <span className="block h-40 w-0.5 bg-bodydark1 dark:bg-strokedark" />
           </span>
         </div>
       </div>

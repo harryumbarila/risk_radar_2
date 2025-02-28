@@ -1,20 +1,23 @@
-"use client";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import CheckboxFive from "@/components/Checkboxes/CheckboxFive";
-import CheckboxFour from "@/components/Checkboxes/CheckboxFour";
-import CheckboxOne from "@/components/Checkboxes/CheckboxOne";
-import CheckboxThree from "@/components/Checkboxes/CheckboxThree";
-import CheckboxTwo from "@/components/Checkboxes/CheckboxTwo";
-import SwitcherFour from "@/components/Switchers/SwitcherFour";
-import SwitcherOne from "@/components/Switchers/SwitcherOne";
-import SwitcherThree from "@/components/Switchers/SwitcherThree";
-import SwitcherTwo from "@/components/Switchers/SwitcherTwo";
-import DatePickerTwo from "@/components/FormElements/DatePicker/DatePickerTwo";
-import DatePickerOne from "@/components/FormElements/DatePicker/DatePickerOne";
-import MultiSelect from "@/components/FormElements/MultiSelect";
-import SelectGroupTwo from "@/components/SelectGroup/SelectGroupTwo";
+'use client';
 
-const FormElements = () => {
+import type { FC } from 'react';
+
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { CheckboxFive } from '@/components/Checkboxes/CheckboxFive';
+import { CheckboxFour } from '@/components/Checkboxes/CheckboxFour';
+import { CheckboxOne } from '@/components/Checkboxes/CheckboxOne';
+import { CheckboxThree } from '@/components/Checkboxes/CheckboxThree';
+import { CheckboxTwo } from '@/components/Checkboxes/CheckboxTwo';
+import { DatePickerOne } from '@/components/FormElements/DatePicker/DatePickerOne';
+import { DatePickerTwo } from '@/components/FormElements/DatePicker/DatePickerTwo';
+import { MultiSelect } from '@/components/FormElements/MultiSelect';
+import { SelectGroupTwo } from '@/components/SelectGroup/SelectGroupTwo';
+import { SwitcherFour } from '@/components/Switchers/SwitcherFour';
+import { SwitcherOne } from '@/components/Switchers/SwitcherOne';
+import { SwitcherThree } from '@/components/Switchers/SwitcherThree';
+import { SwitcherTwo } from '@/components/Switchers/SwitcherTwo';
+
+export const FormElements: FC = () => {
   return (
     <>
       <Breadcrumb pageName="FormElements" />
@@ -30,7 +33,11 @@ const FormElements = () => {
             </div>
             <div className="flex flex-col gap-5.5 p-6.5">
               <div>
-                <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                <label
+                  htmlFor="defaultInput"
+                  className="mb-3 block text-sm font-medium text-black dark:text-white"
+                  aria-label="Default Input"
+                >
                   Default Input
                 </label>
                 <input
@@ -41,7 +48,11 @@ const FormElements = () => {
               </div>
 
               <div>
-                <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                <label
+                  htmlFor="activeInput"
+                  className="mb-3 block text-sm font-medium text-black dark:text-white"
+                  aria-label="Active Input"
+                >
                   Active Input
                 </label>
                 <input
@@ -52,7 +63,11 @@ const FormElements = () => {
               </div>
 
               <div>
-                <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                <label
+                  htmlFor="disabledInput"
+                  className="mb-3 block text-sm font-medium text-black dark:text-white"
+                  aria-label="Disabled Input"
+                >
                   Disabled label
                 </label>
                 <input
@@ -102,7 +117,11 @@ const FormElements = () => {
             </div>
             <div className="flex flex-col gap-5.5 p-6.5">
               <div>
-                <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                <label
+                  className="mb-3 block text-sm font-medium text-black dark:text-white"
+                  htmlFor="file"
+                  aria-label="Attach file"
+                >
                   Attach file
                 </label>
                 <input
@@ -112,7 +131,11 @@ const FormElements = () => {
               </div>
 
               <div>
-                <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                <label
+                  className="mb-3 block text-sm font-medium text-black dark:text-white"
+                  aria-label="Attach file"
+                  htmlFor="file"
+                >
                   Attach file
                 </label>
                 <input
@@ -134,29 +157,41 @@ const FormElements = () => {
             </div>
             <div className="flex flex-col gap-5.5 p-6.5">
               <div>
-                <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                <label
+                  className="mb-3 block text-sm font-medium text-black dark:text-white"
+                  aria-label="Default textarea"
+                  htmlFor="defaultTextarea"
+                >
                   Default textarea
                 </label>
                 <textarea
                   rows={6}
                   placeholder="Default textarea"
                   className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                ></textarea>
+                />
               </div>
 
               <div>
-                <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                <label
+                  className="mb-3 block text-sm font-medium text-black dark:text-white"
+                  htmlFor="activeTextarea"
+                  aria-label="Active textarea"
+                >
                   Active textarea
                 </label>
                 <textarea
                   rows={6}
                   placeholder="Active textarea"
                   className="w-full rounded-lg border-[1.5px] border-primary bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:bg-form-input dark:text-white"
-                ></textarea>
+                />
               </div>
 
               <div>
-                <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                <label
+                  className="mb-3 block text-sm font-medium text-black dark:text-white"
+                  aria-label="Disabled textarea"
+                  htmlFor="disabledTextarea"
+                >
                   Disabled textarea
                 </label>
                 <textarea
@@ -164,7 +199,7 @@ const FormElements = () => {
                   disabled
                   placeholder="Disabled textarea"
                   className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary dark:disabled:bg-black"
-                ></textarea>
+                />
               </div>
             </div>
           </div>
@@ -202,5 +237,3 @@ const FormElements = () => {
     </>
   );
 };
-
-export default FormElements;

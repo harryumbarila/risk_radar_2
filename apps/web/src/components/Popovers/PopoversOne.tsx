@@ -1,13 +1,14 @@
-import React from "react";
-import PopoversBottom from "./PopoversBottom";
-import PopoversRight from "./PopoversRight";
-import PopoversTop from "./PopoversTop";
-import PopoversLeft from "./PopoversLeft";
+import React from 'react';
 
-const PopoversOne: React.FC = () => {
+import { PopoversBottom } from './PopoversBottom';
+import { PopoversLeft } from './PopoversLeft';
+import { PopoversRight } from './PopoversRight';
+import { PopoversTop } from './PopoversTop';
+
+export const PopoversOne: React.FC = () => {
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-      <div className="border-b border-stroke px-4 py-4 dark:border-strokedark sm:px-6 xl:px-7.5">
+      <div className="border-b border-stroke p-4 dark:border-strokedark sm:px-6 xl:px-7.5">
         <h3 className="font-medium text-black dark:text-white">
           Popover in Four directions
         </h3>
@@ -24,5 +25,3 @@ const PopoversOne: React.FC = () => {
     </div>
   );
 };
-
-export default PopoversOne;

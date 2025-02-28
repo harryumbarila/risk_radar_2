@@ -1,5 +1,7 @@
-import { Assert } from 'spok';
+// We allow any type here because we are trying to replicate the spok assert
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { expect } from '@jest/globals';
+import type { Assert } from 'spok';
 
 const createSpokAssert = (): Assert => ({
   equal(actual: any, expected: any, msg?: string) {

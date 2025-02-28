@@ -1,57 +1,60 @@
-import React from "react";
-import Link from "next/link";
+import Link from 'next/link';
+import React from 'react';
 
-interface Product {
+type Product = {
   brand: string;
   description: string;
   quantity: number;
   pricePerUnit: number;
   total: number;
-}
+};
 
 const productList: Product[] = [
   {
-    brand: "Techno",
-    description: "Kemon 24 smart phone",
+    brand: 'Techno',
+    description: 'Kemon 24 smart phone',
     quantity: 1,
     pricePerUnit: 200,
     total: 200,
   },
   {
-    brand: "Vivo",
-    description: "Vivo 32 smart phone",
+    brand: 'Vivo',
+    description: 'Vivo 32 smart phone',
     quantity: 3,
     pricePerUnit: 300,
     total: 900,
   },
   {
-    brand: "Samsung",
-    description: "S23 Ultra",
+    brand: 'Samsung',
+    description: 'S23 Ultra',
     quantity: 1,
     pricePerUnit: 1300,
     total: 1300,
   },
   {
-    brand: "Apple",
-    description: "iPhone 15Pro Max",
+    brand: 'Apple',
+    description: 'iPhone 15Pro Max',
     quantity: 2,
     pricePerUnit: 1200,
     total: 2400,
   },
   {
-    brand: "Oppo",
-    description: "Fold X",
+    brand: 'Oppo',
+    description: 'Fold X',
     quantity: 1,
     pricePerUnit: 900,
     total: 900,
   },
 ];
 
-const InVoiceTwo: React.FC = () => {
+export const InVoiceTwo: React.FC = () => {
   return (
     <div>
       <div className="mb-10 flex flex-wrap items-center justify-end gap-3.5">
-        <button className="inline-flex items-center gap-2.5 rounded bg-meta-3 px-4 py-[7px] font-medium text-white hover:bg-opacity-90">
+        <button
+          className="inline-flex items-center gap-2.5 rounded bg-meta-3 px-4 py-[7px] font-medium text-white hover:bg-opacity-90"
+          type="button"
+        >
           <svg
             className="fill-current"
             width="18"
@@ -80,7 +83,10 @@ const InVoiceTwo: React.FC = () => {
           Print
         </button>
 
-        <button className="inline-flex items-center gap-2.5 rounded bg-primary px-4 py-[7px] font-medium text-white hover:bg-opacity-90">
+        <button
+          className="inline-flex items-center gap-2.5 rounded bg-primary px-4 py-[7px] font-medium text-white hover:bg-opacity-90"
+          type="button"
+        >
           <svg
             className="fill-current"
             width="18"
@@ -122,15 +128,15 @@ const InVoiceTwo: React.FC = () => {
           <h4 className="mb-3 text-xl font-bold text-black dark:text-white">
             Super Technologies
           </h4>
-          <Link href="#" className="block">
+          <Link href="/" className="block">
             <span className="font-medium text-black dark:text-white">
-              Email:{" "}
+              Email:{' '}
             </span>
             contact@example.com
           </Link>
           <span className="mt-1.5 block">
             <span className="font-medium text-black dark:text-white">
-              Address:{" "}
+              Address:{' '}
             </span>
             2972 Westheimer Rd. Santa Ana.
           </span>
@@ -143,15 +149,15 @@ const InVoiceTwo: React.FC = () => {
           <h4 className="mb-3 text-xl font-bold text-black dark:text-white">
             Devid wilium
           </h4>
-          <Link href="#" className="block">
+          <Link href="/" className="block">
             <span className="font-medium text-black dark:text-white">
-              Email:{" "}
+              Email:{' '}
             </span>
             contact@example.com
           </Link>
           <span className="mt-1.5 block">
             <span className="font-medium text-black dark:text-white">
-              Address:{" "}
+              Address:{' '}
             </span>
             New York, USA 2707 Davis Anenue
           </span>
@@ -163,7 +169,7 @@ const InVoiceTwo: React.FC = () => {
           <h5 className="mb-1.5 font-bold text-black dark:text-white">
             Invoice ID :
           </h5>
-          <span className="text-sm font-medium"> #STK83084398239 </span>
+          <span className="text-sm font-medium"> /STK83084398239 </span>
         </div>
 
         <div className="border-b border-stroke px-5 py-4 last:border-r-0 dark:border-strokedark sm:border-b-0 sm:border-r">
@@ -225,9 +231,9 @@ const InVoiceTwo: React.FC = () => {
             </div>
             {/* <!-- table header end --> */}
 
-            {productList.map((item, index) => (
+            {productList.map((item) => (
               <div
-                key={index}
+                key={item.description}
                 className="grid grid-cols-12 border-b border-stroke py-3.5 pl-5 pr-6 dark:border-strokedark"
               >
                 <div className="col-span-3">
@@ -278,8 +284,8 @@ const InVoiceTwo: React.FC = () => {
 
               <p className="flex justify-between font-medium text-black dark:text-white">
                 <span>
-                  {" "}
-                  Vat <span className="text-red">(5%)</span>{" "}
+                  {' '}
+                  Vat <span className="text-red">(5%)</span>{' '}
                 </span>
                 <span> $235 </span>
               </p>
@@ -292,7 +298,10 @@ const InVoiceTwo: React.FC = () => {
               <span className="font-bold text-meta-3"> $4475 </span>
             </p>
 
-            <button className="float-right mt-10 inline-flex items-center gap-2.5 rounded bg-primary px-7.5 py-2.5 font-medium text-white hover:bg-opacity-90">
+            <button
+              className="float-right mt-10 inline-flex items-center gap-2.5 rounded bg-primary px-7.5 py-2.5 font-medium text-white hover:bg-opacity-90"
+              type="button"
+            >
               Download
               <svg
                 className="fill-current"
@@ -302,7 +311,7 @@ const InVoiceTwo: React.FC = () => {
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <g clipPath="url(#clip0_1878_13706)">
+                <g clipPath="url(/clip0_1878_13706)">
                   <path
                     d="M16.8754 12.375C16.5379 12.375 16.2285 12.6562 16.2285 13.0219V15.525C16.2285 15.7781 16.0316 15.975 15.7785 15.975H2.22227C1.96914 15.975 1.77227 15.7781 1.77227 15.525V13.0219C1.77227 12.6562 1.46289 12.375 1.12539 12.375C0.787891 12.375 0.478516 12.6562 0.478516 13.0219V15.525C0.478516 16.4812 1.23789 17.2406 2.19414 17.2406H15.7785C16.7348 17.2406 17.4941 16.4812 17.4941 15.525V13.0219C17.5223 12.6562 17.2129 12.375 16.8754 12.375Z"
                     fill=""
@@ -326,5 +335,3 @@ const InVoiceTwo: React.FC = () => {
     </div>
   );
 };
-
-export default InVoiceTwo;

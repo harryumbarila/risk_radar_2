@@ -1,41 +1,41 @@
-import { ApexOptions } from "apexcharts";
-import React, { useState } from "react";
-import ReactApexChart from "react-apexcharts";
+import type { ApexOptions } from 'apexcharts';
+import React, { useState } from 'react';
+import ReactApexChart from 'react-apexcharts';
 
-interface ChartEightState {
+type ChartEightState = {
   series: number[];
-}
+};
 
-const ChartEight: React.FC = () => {
+export const ChartEight: React.FC = () => {
   const [state, setState] = useState<ChartEightState>({
     series: [70, 20, 10],
   });
 
   // Update the state
-  const updateState = () => {
+  const updateState = (): void => {
     setState((prevState) => ({
       ...prevState,
       // Update the desired properties
     }));
   };
-  updateState;
+  updateState();
 
   const options: ApexOptions = {
     chart: {
-      type: "donut",
+      type: 'donut',
     },
-    colors: ["#0FADCF", "#80CAEE", "#3C50E0"],
-    labels: ["Desktop", "Tablet", "Mobile"],
+    colors: ['#0FADCF', '#80CAEE', '#3C50E0'],
+    labels: ['Desktop', 'Tablet', 'Mobile'],
     legend: {
       show: false,
-      position: "bottom",
+      position: 'bottom',
     },
 
     plotOptions: {
       pie: {
         donut: {
-          size: "75%",
-          background: "transparent",
+          size: '75%',
+          background: 'transparent',
         },
       },
     },
@@ -118,7 +118,7 @@ const ChartEight: React.FC = () => {
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="block h-4 w-4 rounded-full border-4 border-primary"></span>
+            <span className="block size-4 rounded-full border-4 border-primary" />
             <span className="font-medium text-black-2 dark:text-white">
               Mobile
             </span>
@@ -131,7 +131,7 @@ const ChartEight: React.FC = () => {
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="block h-4 w-4 rounded-full border-4 border-secondary"></span>
+            <span className="block size-4 rounded-full border-4 border-secondary" />
             <span className="font-medium text-black-2 dark:text-white">
               Tablet
             </span>
@@ -144,7 +144,7 @@ const ChartEight: React.FC = () => {
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="block h-4 w-4 rounded-full border-4 border-meta-10"></span>
+            <span className="block size-4 rounded-full border-4 border-meta-10" />
             <span className="font-medium text-black-2 dark:text-white">
               Desktop
             </span>
@@ -158,5 +158,3 @@ const ChartEight: React.FC = () => {
     </div>
   );
 };
-
-export default ChartEight;

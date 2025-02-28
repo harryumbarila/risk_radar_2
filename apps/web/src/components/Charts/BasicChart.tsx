@@ -1,10 +1,11 @@
-"use client";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import ChartOne from "@/components/Charts/ChartOne";
-import ChartTwo from "@/components/Charts/ChartTwo";
-import ChartThree from "@/components/Charts/ChartThree";
+'use client';
 
-const BasicChart: React.FC = () => {
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { ChartOne } from '@/components/Charts/ChartOne';
+import { ChartThree } from '@/components/Charts/ChartThree';
+import { ChartTwo } from '@/components/Charts/ChartTwo';
+
+export const BasicChart: React.FC = () => {
   return (
     <>
       <Breadcrumb pageName="Basic Chart" />
@@ -17,5 +18,3 @@ const BasicChart: React.FC = () => {
     </>
   );
 };
-
-export default BasicChart;

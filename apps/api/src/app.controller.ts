@@ -22,13 +22,12 @@ class AppVersionResponseDto {
   @ApiProperty({ description: 'Server time' })
   public current_server_time: string;
 
-  constructor() {
+  public constructor() {
     this.version = '1.0.0';
     this.branch = 'develop';
     this.commit = 'develop';
     this.created_at = '2025-02-01';
-    this.current_server_time =
-      new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString();
+    this.current_server_time = `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
   }
 }
 
@@ -38,7 +37,7 @@ class AppStatusResponseDto {
   @ApiProperty({ description: 'Current app version', enum: ['UP', 'DOWN'] })
   public status: AppStatus;
 
-  constructor(status: AppStatus) {
+  public constructor(status: AppStatus) {
     this.status = status;
   }
 }
@@ -53,7 +52,7 @@ export class AppController {
   })
   @ApiOperation({ operationId: 'Version' })
   @Get()
-  version(): AppVersionResponseDto {
+  public version(): AppVersionResponseDto {
     return new AppVersionResponseDto();
   }
 
@@ -74,7 +73,7 @@ export class AppController {
   })
   @ApiOperation({ operationId: 'Status' })
   @Get('/status')
-  status(): AppStatusResponseDto {
+  public status(): AppStatusResponseDto {
     return new AppStatusResponseDto('UP');
   }
 }

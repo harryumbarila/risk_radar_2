@@ -1,14 +1,15 @@
-"use client";
+'use client';
 
-import React from "react";
-import Link from "next/link";
-import Image from "next/image";
-import NoAuthLayout from "@/components/Layouts/NoAuthLayout";
+import Image from 'next/image';
+import Link from 'next/link';
+import React from 'react';
+
+import { NoAuthLayout } from '@/components/Layouts/NoAuthLayout';
 
 const SignIn: React.FC = () => {
-  const handleClick = (event: React.MouseEvent<HTMLInputElement>) => {
+  const handleClick = (event: React.MouseEvent<HTMLInputElement>): void => {
     event.preventDefault();
-    window.location.assign("/api/auth/login");
+    window.location.assign('/api/auth/login');
   };
 
   return (
@@ -17,14 +18,14 @@ const SignIn: React.FC = () => {
         <Link className="mb-5.5 inline-block" href="/">
           <Image
             className="hidden dark:block"
-            src={"https://apply.taluspay.com/assets/company-logo.svg"}
+            src="https://apply.taluspay.com/assets/company-logo.svg"
             alt="Denali Logo"
             width={176}
             height={32}
           />
           <Image
             className="dark:hidden"
-            src={"https://apply.taluspay.com/assets/company-logo.svg"}
+            src="https://apply.taluspay.com/assets/company-logo.svg"
             alt="Denali Logo"
             width={176}
             height={32}

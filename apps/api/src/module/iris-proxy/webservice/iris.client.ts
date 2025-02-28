@@ -1,17 +1,18 @@
-import { IrisChannelsResponseDto } from '@/shared/response';
+import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import type { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
+import axios from 'axios';
 
-import {
+import type { IrisChannelsResponseDto } from '@/shared/response';
+import type {
   IrisLeadSourcesResponseDto,
   IrisUsersResponseDto,
 } from '@/shared/response/iris-proxy';
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 
-export interface IrisClientConfig {
+export type IrisClientConfig = {
   IRIS_URL: string;
   IRIS_API_KEY: string;
-}
+};
 
 const enum UserClassId {
   INT_SSC = 42,
@@ -22,10 +23,12 @@ const enum UserClassId {
 @Injectable()
 export class IrisClient {
   private readonly logger = new Logger(IrisClient.name);
+
   private readonly client: AxiosInstance;
+
   private readonly apiKey: string;
 
-  constructor(configService: ConfigService<IrisClientConfig>) {
+  public constructor(configService: ConfigService<IrisClientConfig>) {
     this.client = axios.create({
       baseURL: configService.get('IRIS_URL'),
       timeout: 10000,
@@ -40,23 +43,23 @@ export class IrisClient {
           `Request: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`,
           {
             headers: config.headers,
-            params: config.params,
-            data: config.data,
-          },
+            params: config.params as unknown,
+            data: config.data as unknown,
+          }
         );
         return config;
       },
       (error) => {
         this.logger.error('Request Error:', error);
         return Promise.reject(error);
-      },
+      }
     );
 
     // Add response interceptor for logging
     this.client.interceptors.response.use(
       (response: AxiosResponse) => {
         this.logger.debug(`Response: ${response.status}`, {
-          data: response.data,
+          data: response.data as unknown,
           headers: response.headers,
         });
         return response;
@@ -68,11 +71,11 @@ export class IrisClient {
           message: error.message,
         });
         return Promise.reject(error);
-      },
+      }
     );
   }
 
-  async getUsers(): Promise<IrisUsersResponseDto> {
+  public async getUsers(): Promise<IrisUsersResponseDto> {
     const classIds = [
       UserClassId.INT_SSC,
       UserClassId.INT_SC,
@@ -92,12 +95,14 @@ export class IrisClient {
       },
     };
 
+    // eslint-disable-next-line no-restricted-syntax
     for (const classId of classIds) {
       let currentPage = 1;
       let hasNextPage = true;
 
       while (hasNextPage) {
         try {
+          // eslint-disable-next-line no-await-in-loop
           const response = await this.get<IrisUsersResponseDto>(
             `/api/v1/users/list?page=${currentPage}&per_page=100&sort_by=name&sort_dir=asc&class=${classId}&active=Yes`,
             {
@@ -105,7 +110,7 @@ export class IrisClient {
                 'Content-Type': 'application/json',
                 'X-API-KEY': this.apiKey,
               },
-            },
+            }
           );
 
           const clearedResponseData = response.data.data.map((user) => {
@@ -132,7 +137,7 @@ export class IrisClient {
           hasNextPage = false;
           this.logger.error(e);
         } finally {
-          currentPage++;
+          currentPage += 1;
         }
       }
     }
@@ -146,7 +151,8 @@ export class IrisClient {
 
     return combinedResponse;
   }
-  async getChannels(): Promise<IrisChannelsResponseDto> {
+
+  public async getChannels(): Promise<IrisChannelsResponseDto> {
     const response = await this.get<IrisChannelsResponseDto>(
       '/api/v1/users/groups',
       {
@@ -154,12 +160,12 @@ export class IrisClient {
           'Content-Type': 'application/json',
           'X-API-KEY': this.apiKey,
         },
-      },
+      }
     );
     return response.data;
   }
 
-  async getLeadSources(): Promise<IrisLeadSourcesResponseDto> {
+  public async getLeadSources(): Promise<IrisLeadSourcesResponseDto> {
     const response = await this.get<IrisLeadSourcesResponseDto>(
       '/api/v1/leads/sources',
       {
@@ -167,24 +173,24 @@ export class IrisClient {
           'Content-Type': 'application/json',
           'X-API-KEY': this.apiKey,
         },
-      },
+      }
     );
     return response.data;
   }
 
-  async get<T>(url: string, config = {}) {
+  public async get<T>(url: string, config = {}) {
     return this.client.get<T>(url, config);
   }
 
-  async post<T>(url: string, data = {}, config = {}) {
+  public async post<T>(url: string, data = {}, config = {}) {
     return this.client.post<T>(url, data, config);
   }
 
-  async put<T>(url: string, data = {}, config = {}) {
+  public async put<T>(url: string, data = {}, config = {}) {
     return this.client.put<T>(url, data, config);
   }
 
-  async delete<T>(url: string, config = {}) {
+  public async delete<T>(url: string, config = {}) {
     return this.client.delete<T>(url, config);
   }
 }

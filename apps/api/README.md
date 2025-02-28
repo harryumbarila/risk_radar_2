@@ -30,9 +30,7 @@ $ yarn run test:e2e
 $ yarn run test:cov
 ```
 
-
 ### Create new module - feature
-
 
 ```
 cd apps/api

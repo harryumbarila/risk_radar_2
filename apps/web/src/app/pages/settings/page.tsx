@@ -1,15 +1,17 @@
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import Image from "next/image";
-import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import type { Metadata } from 'next';
+import Image from 'next/image';
+import type { FC } from 'react';
+
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
-  title: "Next.js Settings | TailAdmin - Next.js Dashboard Template",
+  title: 'Next.js Settings | TailAdmin - Next.js Dashboard Template',
   description:
-    "This is Next.js Settings page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    'This is Next.js Settings page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
 };
 
-const Settings = () => {
+const Settings: FC = () => {
   return (
     <DefaultLayout>
       <div className="mx-auto max-w-270">
@@ -195,7 +197,7 @@ const Settings = () => {
                         rows={6}
                         placeholder="Write your bio here"
                         defaultValue="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque posuere fermentum urna, eu condimentum mauris tempus ut. Donec fermentum blandit aliquet."
-                      ></textarea>
+                      />
                     </div>
                   </div>
 
@@ -227,9 +229,9 @@ const Settings = () => {
               <div className="p-7">
                 <form action="#">
                   <div className="mb-4 flex items-center gap-3">
-                    <div className="h-14 w-14 rounded-full">
+                    <div className="size-14 rounded-full">
                       <Image
-                        src={"/images/user/user-03.png"}
+                        src="/images/user/user-03.png"
                         width={55}
                         height={55}
                         alt="User"
@@ -240,10 +242,16 @@ const Settings = () => {
                         Edit your photo
                       </span>
                       <span className="flex gap-2.5">
-                        <button className="text-sm hover:text-primary">
+                        <button
+                          className="text-sm hover:text-primary"
+                          type="button"
+                        >
                           Delete
                         </button>
-                        <button className="text-sm hover:text-primary">
+                        <button
+                          className="text-sm hover:text-primary"
+                          type="button"
+                        >
                           Update
                         </button>
                       </span>
@@ -252,15 +260,15 @@ const Settings = () => {
 
                   <div
                     id="FileUpload"
-                    className="relative mb-5.5 block w-full cursor-pointer appearance-none rounded border border-dashed border-primary bg-gray px-4 py-4 dark:bg-meta-4 sm:py-7.5"
+                    className="relative mb-5.5 block w-full cursor-pointer appearance-none rounded border border-dashed border-primary bg-gray p-4 dark:bg-meta-4 sm:py-7.5"
                   >
                     <input
                       type="file"
                       accept="image/*"
-                      className="absolute inset-0 z-50 m-0 h-full w-full cursor-pointer p-0 opacity-0 outline-none"
+                      className="absolute inset-0 z-50 m-0 size-full cursor-pointer p-0 opacity-0 outline-none"
                     />
                     <div className="flex flex-col items-center justify-center space-y-3">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-full border border-stroke bg-white dark:border-strokedark dark:bg-boxdark">
+                      <span className="flex size-10 items-center justify-center rounded-full border border-stroke bg-white dark:border-strokedark dark:bg-boxdark">
                         <svg
                           width="16"
                           height="16"

@@ -1,10 +1,13 @@
-"use client";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import RangeSliderOne from "@/components/ProFormElements/RangeSlider/RangeSliderOne";
-import RangeSliderTwo from "@/components/ProFormElements/RangeSlider/RangeSliderTwo";
-import FileDropZone from "@/components/ProFormElements/FileDropZone";
+'use client';
 
-const ProFormElements = () => {
+import type { FC } from 'react';
+
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { FileDropZone } from '@/components/ProFormElements/FileDropZone';
+import { RangeSliderOne } from '@/components/ProFormElements/RangeSlider/RangeSliderOne';
+import { RangeSliderTwo } from '@/components/ProFormElements/RangeSlider/RangeSliderTwo';
+
+export const ProFormElements: FC = () => {
   return (
     <>
       <Breadcrumb pageName="Pro Form Elements" />
@@ -33,5 +36,3 @@ const ProFormElements = () => {
     </>
   );
 };
-
-export default ProFormElements;

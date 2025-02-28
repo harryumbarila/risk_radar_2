@@ -1,15 +1,16 @@
-import React from "react";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import NotificationsTwo from "@/components/Notifications/NotificationsTwo";
-import NotificationsThree from "@/components/Notifications/NotificationsThree";
-import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import NotificationsFour from "@/components/Notifications/NotificationsFour";
+import type { Metadata } from 'next';
+import React from 'react';
+
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
+import { NotificationsFour } from '@/components/Notifications/NotificationsFour';
+import { NotificationsThree } from '@/components/Notifications/NotificationsThree';
+import { NotificationsTwo } from '@/components/Notifications/NotificationsTwo';
 
 export const metadata: Metadata = {
-  title: "Next.js Notifications | TailAdmin - Next.js Dashboard Template",
+  title: 'Next.js Notifications | TailAdmin - Next.js Dashboard Template',
   description:
-    "This is Next.js Notifications page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    'This is Next.js Notifications page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
 };
 
 const Notifications: React.FC = () => {

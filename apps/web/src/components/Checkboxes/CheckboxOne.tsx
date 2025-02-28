@@ -1,6 +1,7 @@
-import { useState } from "react";
+import type { FC } from 'react';
+import { useState } from 'react';
 
-const CheckboxOne = () => {
+export const CheckboxOne: FC = () => {
   const [isChecked, setIsChecked] = useState<boolean>(false);
 
   return (
@@ -19,13 +20,13 @@ const CheckboxOne = () => {
             }}
           />
           <div
-            className={`mr-4 flex h-5 w-5 items-center justify-center rounded border ${
-              isChecked && "border-primary bg-gray dark:bg-transparent"
+            className={`mr-4 flex size-5 items-center justify-center rounded border ${
+              isChecked && 'border-primary bg-gray dark:bg-transparent'
             }`}
           >
             <span
-              className={`h-2.5 w-2.5 rounded-sm ${isChecked && "bg-primary"}`}
-            ></span>
+              className={`size-2.5 rounded-sm ${isChecked && 'bg-primary'}`}
+            />
           </div>
         </div>
         Checkbox Text
@@ -33,5 +34,3 @@ const CheckboxOne = () => {
     </div>
   );
 };
-
-export default CheckboxOne;

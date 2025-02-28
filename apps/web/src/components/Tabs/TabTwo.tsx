@@ -1,17 +1,17 @@
-import React, { useState } from "react";
-import Link from "next/link";
+import Link from 'next/link';
+import React, { useState } from 'react';
 
-const TabTwo: React.FC = () => {
+export const TabTwo: React.FC = () => {
   const [openTab, setOpenTab] = useState(1);
 
-  const activeClasses = "bg-primary text-white";
-  const inactiveClasses = "bg-gray dark:bg-meta-4 text-black dark:text-white";
+  const activeClasses = 'bg-primary text-white';
+  const inactiveClasses = 'bg-gray dark:bg-meta-4 text-black dark:text-white';
 
   return (
     <div className="rounded-sm border-b border-stroke bg-white p-7.5 shadow-default dark:border-strokedark dark:bg-boxdark">
       <div className="mb-7.5 flex flex-wrap gap-3 border-b border-stroke pb-5 dark:border-strokedark">
         <Link
-          href="#"
+          href="/"
           className={`rounded-md px-4 py-3 text-sm font-medium hover:bg-primary hover:text-white dark:hover:bg-primary md:text-base lg:px-6 ${
             openTab === 1 ? activeClasses : inactiveClasses
           }`}
@@ -20,7 +20,7 @@ const TabTwo: React.FC = () => {
           Home
         </Link>
         <Link
-          href="#"
+          href="/"
           className={`rounded-md px-4 py-3 text-sm font-medium hover:bg-primary hover:text-white dark:hover:bg-primary md:text-base lg:px-6 ${
             openTab === 2 ? activeClasses : inactiveClasses
           }`}
@@ -29,7 +29,7 @@ const TabTwo: React.FC = () => {
           About Us
         </Link>
         <Link
-          href="#"
+          href="/"
           className={`rounded-md px-4 py-3 text-sm font-medium hover:bg-primary hover:text-white dark:hover:bg-primary md:text-base lg:px-6 ${
             openTab === 3 ? activeClasses : inactiveClasses
           }`}
@@ -38,7 +38,7 @@ const TabTwo: React.FC = () => {
           Our Team
         </Link>
         <Link
-          href="#"
+          href="/"
           className={`rounded-md px-4 py-3 text-sm font-medium hover:bg-primary hover:text-white dark:hover:bg-primary md:text-base lg:px-6 ${
             openTab === 4 ? activeClasses : inactiveClasses
           }`}
@@ -50,7 +50,7 @@ const TabTwo: React.FC = () => {
 
       <div>
         <div
-          className={`leading-relaxed ${openTab === 1 ? "block" : "hidden"}`}
+          className={`leading-relaxed ${openTab === 1 ? 'block' : 'hidden'}`}
         >
           Lorem ipsum dolor sit amet, consectetur adipisicing elit. Officia
           nisi, doloribus nulla cumque molestias corporis eaque harum vero! Quas
@@ -58,7 +58,7 @@ const TabTwo: React.FC = () => {
           quod.
         </div>
         <div
-          className={`leading-relaxed ${openTab === 2 ? "block" : "hidden"}`}
+          className={`leading-relaxed ${openTab === 2 ? 'block' : 'hidden'}`}
         >
           Lorem ipsum dolor sit amet, consectetur adipisicing elit. Officia
           nisi, doloribus nulla cumque molestias corporis eaque harum vero! Quas
@@ -68,7 +68,7 @@ const TabTwo: React.FC = () => {
           praesentium nihil veritatis.
         </div>
         <div
-          className={`leading-relaxed ${openTab === 3 ? "block" : "hidden"}`}
+          className={`leading-relaxed ${openTab === 3 ? 'block' : 'hidden'}`}
         >
           Lorem ipsum dolor sit amet, consectetur adipisicing elit. Officia
           nisi, doloribus nulla cumque molestias corporis eaque harum vero! Quas
@@ -81,7 +81,7 @@ const TabTwo: React.FC = () => {
           ducimus recusandae repellat quasi eaque, suscipit praesentium totam?
         </div>
         <div
-          className={`leading-relaxed ${openTab === 4 ? "block" : "hidden"}`}
+          className={`leading-relaxed ${openTab === 4 ? 'block' : 'hidden'}`}
         >
           Lorem ipsum dolor sit amet, consectetur adipisicing elit. Officia
           nisi, doloribus nulla cumque molestias corporis eaque harum vero! Quas
@@ -92,5 +92,3 @@ const TabTwo: React.FC = () => {
     </div>
   );
 };
-
-export default TabTwo;

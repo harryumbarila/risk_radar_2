@@ -1,35 +1,36 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 
-const PopoversTop: React.FC = () => {
+export const PopoversTop: React.FC = () => {
   const [popoversOpen, setPopoversOpen] = useState(false);
 
-  const trigger = useRef<any>(null);
-  const popovers = useRef<any>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const popovers = useRef<HTMLDivElement>(null);
 
   // close on click outside
   useEffect(() => {
-    const clickHandler = ({ target }: MouseEvent) => {
+    const clickHandler = ({ target }: MouseEvent): void => {
       if (!popovers.current) return;
       if (
         !popoversOpen ||
-        popovers.current.contains(target) ||
-        trigger.current.contains(target)
-      )
+        popovers.current.contains(target as Node) ||
+        trigger.current?.contains(target as Node)
+      ) {
         return;
+      }
       setPopoversOpen(false);
     };
-    document.addEventListener("click", clickHandler);
-    return () => document.removeEventListener("click", clickHandler);
+    document.addEventListener('click', clickHandler);
+    return () => document.removeEventListener('click', clickHandler);
   });
 
   // close if the esc key is pressed
   useEffect(() => {
-    const keyHandler = ({ keyCode }: KeyboardEvent) => {
+    const keyHandler = ({ keyCode }: KeyboardEvent): void => {
       if (!popoversOpen || keyCode !== 27) return;
       setPopoversOpen(false);
     };
-    document.addEventListener("keydown", keyHandler);
-    return () => document.removeEventListener("keydown", keyHandler);
+    document.addEventListener('keydown', keyHandler);
+    return () => document.removeEventListener('keydown', keyHandler);
   });
 
   return (
@@ -37,6 +38,7 @@ const PopoversTop: React.FC = () => {
       <div className="mt-10 text-center sm:mb-60">
         <div className="relative inline-block">
           <button
+            type="button"
             ref={trigger}
             onClick={() => setPopoversOpen(!popoversOpen)}
             className="inline-flex rounded-md bg-primary px-5 py-2.5 font-medium text-white"
@@ -48,10 +50,10 @@ const PopoversTop: React.FC = () => {
             onFocus={() => setPopoversOpen(true)}
             onBlur={() => setPopoversOpen(false)}
             className={`absolute bottom-full left-1/2 z-20 mb-3 w-max max-w-[311px] -translate-x-1/2 rounded bg-white drop-shadow-5 dark:bg-meta-4 ${
-              popoversOpen === true ? "block" : "hidden"
+              popoversOpen === true ? 'block' : 'hidden'
             }`}
           >
-            <span className="absolute -bottom-1.5 left-1/2 -z-10 h-4 w-4 -translate-x-1/2 rotate-45 rounded-sm bg-white dark:bg-meta-4"></span>
+            <span className="absolute -bottom-1.5 left-1/2 -z-10 size-4 -translate-x-1/2 rotate-45 rounded-sm bg-white dark:bg-meta-4" />
             <div className="border-b border-stroke p-3 dark:border-strokedark">
               <h4 className="text-center text-title-sm font-semibold text-black dark:text-white">
                 Popover Title
@@ -69,5 +71,3 @@ const PopoversTop: React.FC = () => {
     </div>
   );
 };
-
-export default PopoversTop;

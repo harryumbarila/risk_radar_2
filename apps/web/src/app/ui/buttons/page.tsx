@@ -1,15 +1,17 @@
-import Link from "next/link";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import type { FC } from 'react';
+
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
-  title: "Next.js Buttons | TailAdmin - Next.js Dashboard Template",
+  title: 'Next.js Buttons | TailAdmin - Next.js Dashboard Template',
   description:
-    "This is Next.js Buttons page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    'This is Next.js Buttons page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
 };
 
-const Buttons = () => {
+const Buttons: FC = () => {
   return (
     <DefaultLayout>
       <Breadcrumb pageName="Buttons" />
@@ -25,28 +27,28 @@ const Buttons = () => {
         <div className="p-4 md:p-6 xl:p-9">
           <div className="mb-7.5 flex flex-wrap gap-5 xl:gap-20">
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center bg-primary px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               Button
             </Link>
 
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center rounded-md bg-primary px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               Button
             </Link>
 
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center rounded-full bg-primary px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               Button
             </Link>
 
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center rounded-md border border-primary px-10 py-4 text-center font-medium text-primary hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               Button
@@ -55,28 +57,28 @@ const Buttons = () => {
 
           <div className="mb-7.5 flex flex-wrap gap-5 xl:gap-20">
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center bg-meta-3 px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               Button
             </Link>
 
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center rounded-md bg-meta-3 px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               Button
             </Link>
 
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center rounded-full bg-meta-3 px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               Button
             </Link>
 
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center rounded-md border border-meta-3 px-10 py-4 text-center font-medium text-meta-3 hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               Button
@@ -85,28 +87,28 @@ const Buttons = () => {
 
           <div className="flex flex-wrap gap-5 xl:gap-20">
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center bg-black px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               Button
             </Link>
 
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center rounded-md bg-black px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               Button
             </Link>
 
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center rounded-full bg-black px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               Button
             </Link>
 
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center rounded-md border border-black px-10 py-4 text-center font-medium text-black hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               Button
@@ -126,7 +128,7 @@ const Buttons = () => {
         <div className="p-4 md:p-6 xl:p-9">
           <div className="mb-7.5 flex flex-wrap gap-5 xl:gap-7.5">
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center gap-2.5 bg-primary px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               <span>
@@ -152,7 +154,7 @@ const Buttons = () => {
             </Link>
 
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center gap-2.5 bg-meta-3 px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               <span>
@@ -178,7 +180,7 @@ const Buttons = () => {
             </Link>
 
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center gap-2.5 bg-black px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               <span>
@@ -204,7 +206,7 @@ const Buttons = () => {
             </Link>
 
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center gap-2.5 border border-primary px-10 py-4 text-center font-medium text-primary hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               <span>
@@ -232,7 +234,7 @@ const Buttons = () => {
 
           <div className="mb-7.5 flex flex-wrap gap-5 xl:gap-7.5">
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center gap-2.5 rounded-md bg-primary px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               <span>
@@ -262,7 +264,7 @@ const Buttons = () => {
             </Link>
 
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center gap-2.5 rounded-md bg-meta-3 px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               <span>
@@ -292,7 +294,7 @@ const Buttons = () => {
             </Link>
 
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center gap-2.5 rounded-md bg-black px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               <span>
@@ -322,7 +324,7 @@ const Buttons = () => {
             </Link>
 
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center gap-2.5 rounded-md border border-primary px-10 py-4 text-center font-medium text-primary hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               <span>
@@ -354,7 +356,7 @@ const Buttons = () => {
 
           <div className="flex flex-wrap gap-5 xl:gap-7.5">
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center gap-2.5 rounded-full bg-primary px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               <span>
@@ -383,7 +385,7 @@ const Buttons = () => {
             </Link>
 
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center gap-2.5 rounded-full bg-meta-3 px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               <span>
@@ -412,7 +414,7 @@ const Buttons = () => {
             </Link>
 
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center gap-2.5 rounded-full bg-black px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               <span>
@@ -441,7 +443,7 @@ const Buttons = () => {
             </Link>
 
             <Link
-              href="#"
+              href="/"
               className="inline-flex items-center justify-center gap-2.5 rounded-full border border-primary px-10 py-4 text-center font-medium text-primary hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               <span>

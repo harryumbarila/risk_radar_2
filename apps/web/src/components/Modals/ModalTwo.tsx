@@ -1,40 +1,42 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 
-const ModalTwo: React.FC = () => {
+export const ModalTwo: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
 
-  const trigger = useRef<any>(null);
-  const modal = useRef<any>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const modal = useRef<HTMLDivElement>(null);
 
   // close on click outside
   useEffect(() => {
-    const clickHandler = ({ target }: MouseEvent) => {
+    const clickHandler = ({ target }: MouseEvent): void => {
       if (!modal.current) return;
       if (
         !modalOpen ||
-        modal.current.contains(target) ||
-        trigger.current.contains(target)
-      )
+        modal.current.contains(target as Node) ||
+        trigger.current?.contains(target as Node)
+      ) {
         return;
+      }
       setModalOpen(false);
     };
-    document.addEventListener("click", clickHandler);
-    return () => document.removeEventListener("click", clickHandler);
+    document.addEventListener('click', clickHandler);
+    return () => document.removeEventListener('click', clickHandler);
   });
 
   // close if the esc key is pressed
   useEffect(() => {
-    const keyHandler = ({ keyCode }: KeyboardEvent) => {
+    const keyHandler = ({ keyCode }: KeyboardEvent): void => {
       if (!modalOpen || keyCode !== 27) return;
       setModalOpen(false);
     };
-    document.addEventListener("keydown", keyHandler);
-    return () => document.removeEventListener("keydown", keyHandler);
+    document.addEventListener('keydown', keyHandler);
+    return () => document.removeEventListener('keydown', keyHandler);
   });
 
   return (
     <div>
       <button
+        type="button"
         ref={trigger}
         onClick={() => setModalOpen(!modalOpen)}
         className="rounded-md bg-primary px-9 py-3 font-medium text-white"
@@ -42,8 +44,8 @@ const ModalTwo: React.FC = () => {
         Modal 2
       </button>
       <div
-        className={`fixed left-0 top-0 z-999999 flex h-full min-h-screen w-full items-center justify-center bg-black/90 px-4 py-5 ${
-          modalOpen ? "block" : "hidden"
+        className={`fixed left-0 top-0 z-999999 flex size-full min-h-screen items-center justify-center bg-black/90 px-4 py-5 ${
+          modalOpen ? 'block' : 'hidden'
         }`}
       >
         <div
@@ -86,6 +88,7 @@ const ModalTwo: React.FC = () => {
           <div className="-mx-3 flex flex-wrap gap-y-4">
             <div className="w-full px-3 2xsm:w-1/2">
               <button
+                type="button"
                 onClick={() => setModalOpen(false)}
                 className="block w-full rounded border border-stroke bg-gray p-3 text-center font-medium text-black transition hover:border-meta-1 hover:bg-meta-1 hover:text-white dark:border-strokedark dark:bg-meta-4 dark:text-white dark:hover:border-meta-1 dark:hover:bg-meta-1"
               >
@@ -93,7 +96,10 @@ const ModalTwo: React.FC = () => {
               </button>
             </div>
             <div className="w-full px-3 2xsm:w-1/2">
-              <button className="block w-full rounded border border-meta-1 bg-meta-1 p-3 text-center font-medium text-white transition hover:bg-opacity-90">
+              <button
+                className="block w-full rounded border border-meta-1 bg-meta-1 p-3 text-center font-medium text-white transition hover:bg-opacity-90"
+                type="button"
+              >
                 Deactivate
               </button>
             </div>
@@ -103,5 +109,3 @@ const ModalTwo: React.FC = () => {
     </div>
   );
 };
-
-export default ModalTwo;

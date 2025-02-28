@@ -1,16 +1,20 @@
-import React from "react";
-import Link from "next/link";
-import CheckMark from "../CheckMarks/CheckMark";
-import CloseMark from "../CloseMarks/CloseMark";
+import Link from 'next/link';
+import React from 'react';
 
-const PricingTableTwo: React.FC = () => {
+import { CheckMark } from '@/components/CheckMarks/CheckMark';
+import { CloseMark } from '@/components/CloseMarks/CloseMark';
+
+export const PricingTableTwo: React.FC = () => {
   return (
     <div className="relative z-10 overflow-hidden rounded-sm border border-stroke bg-white p-11 shadow-default dark:border-strokedark dark:bg-boxdark">
       <div className="w-full overflow-x-auto">
         <table className="table-auto">
           <thead>
             <tr>
-              <th className="w-1/4 min-w-[200px] px-5"></th>
+              <th
+                className="w-1/4 min-w-[200px] px-5"
+                aria-label="Empty Header"
+              />
               <th className="w-1/4 min-w-[200px] px-5">
                 <div className="mb-10 text-left">
                   <span className="mb-3.5 block text-xl font-bold text-black dark:text-white">
@@ -26,7 +30,7 @@ const PricingTableTwo: React.FC = () => {
                     Best suited for freelancers who works individually.
                   </p>
                   <Link
-                    href="#"
+                    href="/"
                     className="block w-full rounded-md bg-primary p-3 text-center font-medium text-white transition hover:bg-opacity-90"
                   >
                     Purchase Now
@@ -48,7 +52,7 @@ const PricingTableTwo: React.FC = () => {
                     Best suited for agencies and small business.
                   </p>
                   <Link
-                    href="#"
+                    href="/"
                     className="block w-full rounded-md bg-[#13C296] p-3 text-center font-medium text-white transition hover:bg-opacity-90"
                   >
                     Purchase Now
@@ -70,7 +74,7 @@ const PricingTableTwo: React.FC = () => {
                     Best suited for agencies and large business.
                   </p>
                   <Link
-                    href="#"
+                    href="/"
                     className="block w-full rounded-md bg-primary p-3 text-center font-medium text-white transition hover:bg-opacity-90"
                   >
                     Purchase Now
@@ -450,5 +454,3 @@ const PricingTableTwo: React.FC = () => {
     </div>
   );
 };
-
-export default PricingTableTwo;

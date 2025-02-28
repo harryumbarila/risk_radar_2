@@ -1,13 +1,15 @@
-"use client";
-import React from "react";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import ChartTen from "@/components/Charts/ChartTen";
-import FileDetailsList from "@/components/FileDetailsList";
-import StorageChart from "@/components/Storage/StorageChart";
-import StorageList from "@/components/Storage/StorageList";
-import DownloadList from "@/components/DownloadList";
+'use client';
 
-const FileManager: React.FC = () => {
+import React from 'react';
+
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { ChartTen } from '@/components/Charts/ChartTen';
+import { DownloadList } from '@/components/DownloadList';
+import { FileDetailsList } from '@/components/FileDetailsList';
+import { StorageChart } from '@/components/Storage/StorageChart';
+import { StorageList } from '@/components/Storage/StorageList';
+
+export const FileManager: React.FC = () => {
   return (
     <>
       <Breadcrumb pageName="File Manager" />
@@ -31,5 +33,3 @@ const FileManager: React.FC = () => {
     </>
   );
 };
-
-export default FileManager;

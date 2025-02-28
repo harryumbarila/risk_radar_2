@@ -2,7 +2,7 @@ name: DENALI CD (Deploy Production)
 
 on:
   workflow_run:
-    workflows: ["DENALI CI"]
+    workflows: ['DENALI CI']
     branches: master
     types:
       - completed
@@ -38,10 +38,10 @@ jobs:
             echo "Github.run_number is empty!"
             exit 1
           fi
-          
+
           # Version format: v<run_number>.<commit_count>
           next_version="${RUN_NUMBER}.${current_commit_count}"
-          
+
           echo "::set-output name=build_number::$next_version"
 
       - name: Configure AWS credentials for Production
@@ -53,7 +53,6 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
-
 
       - name: Build docker image, and Push image to Amazon ECR API
         id: build-image-api
@@ -114,4 +113,3 @@ jobs:
       - name: Deploy image to staging
         run: |
           aws ssm send-command --document-name "AWS-RunShellScript" --document-version "1" --targets '[{"Key":"InstanceIds","Values":["i-0de9370e9b06eab16"]}]' --parameters '{"commands":["runuser -l ec2-user -c /opt/webapps/scripts/pull_and_restart_api.sh"],"workingDirectory":[""],"executionTimeout":["3600"]}' --timeout-seconds 600 --max-concurrency "50" --max-errors "0" --cloud-watch-output-config '{"CloudWatchLogGroupName":"prd-denali-api-deployment","CloudWatchOutputEnabled":true}' --region us-west-2
-

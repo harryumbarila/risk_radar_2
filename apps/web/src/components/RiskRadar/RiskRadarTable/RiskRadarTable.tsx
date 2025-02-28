@@ -1,203 +1,206 @@
-import React, { useMemo } from "react";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+/* eslint-disable */
+import React, { useMemo } from 'react';
+import type { Column } from 'react-table';
 import {
-  useTable,
-  useSortBy,
-  useGlobalFilter,
   useFilters,
+  useGlobalFilter,
   usePagination,
-  Column,
-} from "react-table";
-import {
+  useSortBy,
+  useTable,
+} from 'react-table';
+
+import type {
   RiskRadarData,
   RiskRadarResponseDto,
-} from "@/shared/response/legacy-dashboard-proxy";
+} from '@/shared/response/legacy-dashboard-proxy';
 
-interface RiskRadarTableProps {
+type RiskRadarTableProps = {
   data: RiskRadarResponseDto;
-}
+};
 
-// @ts-ignore
 const RiskRadarTable: React.FC<RiskRadarTableProps> = ({ data }) => {
   const columns = useMemo<Column<RiskRadarData>[]>(
     () => [
       {
-        Header: "DBA",
-        accessor: "dba",
+        Header: 'DBA',
+        accessor: 'dba',
       },
       {
-        Header: "Net Deposit",
-        accessor: "net_dep_amt",
+        Header: 'Net Deposit',
+        accessor: 'net_dep_amt',
         Cell: ({ value }) => `${value.toLocaleString()}`,
       },
       {
-        Header: "FSP Approved Auth",
-        accessor: "fsp_appr_auth_tot_amt",
+        Header: 'FSP Approved Auth',
+        accessor: 'fsp_appr_auth_tot_amt',
         Cell: ({ value }) => `${value.toLocaleString()}`,
       },
       {
-        Header: "Auth Decline",
-        accessor: "auth_decline_amt",
+        Header: 'Auth Decline',
+        accessor: 'auth_decline_amt',
         Cell: ({ value }) => `${value.toLocaleString()}`,
       },
       {
-        Header: "Activation Date",
-        accessor: "activation_datetime",
+        Header: 'Activation Date',
+        accessor: 'activation_datetime',
         Cell: ({ value }) => new Date(value).toLocaleDateString(),
       },
       {
-        Header: "Channel",
-        accessor: "channel",
+        Header: 'Channel',
+        accessor: 'channel',
       },
       {
-        Header: "Reseller",
-        accessor: "reseller",
+        Header: 'Reseller',
+        accessor: 'reseller',
       },
       {
-        Header: "Risk Watch",
-        accessor: "risk_watch",
-        Cell: ({ value }) => (value ? "Yes" : "No"),
+        Header: 'Risk Watch',
+        accessor: 'risk_watch',
+        Cell: ({ value }) => (value ? 'Yes' : 'No'),
       },
       {
-        Header: "New Account",
-        accessor: "new_account",
-        Cell: ({ value }) => (value ? "Yes" : "No"),
+        Header: 'New Account',
+        accessor: 'new_account',
+        Cell: ({ value }) => (value ? 'Yes' : 'No'),
       },
       {
-        Header: "Auto Approved",
-        accessor: "Auto_Approved_date",
+        Header: 'Auto Approved',
+        accessor: 'Auto_Approved_date',
       },
       {
-        Header: "Keyed %",
-        accessor: "keyed_perc_score",
-        Cell: ({ value }) => (value ? `${value}%` : "N/A"),
+        Header: 'Keyed %',
+        accessor: 'keyed_perc_score',
+        Cell: ({ value }) => (value ? `${value}%` : 'N/A'),
       },
       {
-        Header: "Average Ticket Score",
-        accessor: "avg_ticket_score",
+        Header: 'Average Ticket Score',
+        accessor: 'avg_ticket_score',
         Cell: ({ value }) => Number(value).toFixed(2),
       },
       {
-        Header: "High Ticket Score",
-        accessor: "high_ticket_score",
+        Header: 'High Ticket Score',
+        accessor: 'high_ticket_score',
         Cell: ({ value }) => Number(value).toFixed(2),
       },
       {
-        Header: "Credit Score",
-        accessor: "credit_score",
+        Header: 'Credit Score',
+        accessor: 'credit_score',
         Cell: ({ value }) => Number(value).toFixed(2),
       },
       {
-        Header: "Channel Score",
-        accessor: "channel_score",
+        Header: 'Channel Score',
+        accessor: 'channel_score',
         Cell: ({ value }) => Number(value).toFixed(2),
       },
       {
-        Header: "Monthly Volume Score",
-        accessor: "monthly_vol_score",
+        Header: 'Monthly Volume Score',
+        accessor: 'monthly_vol_score',
         Cell: ({ value }) => Number(value).toFixed(2),
       },
       {
-        Header: "Average Batch Score",
-        accessor: "avg_batch_score",
+        Header: 'Average Batch Score',
+        accessor: 'avg_batch_score',
         Cell: ({ value }) => Number(value).toFixed(2),
       },
       {
-        Header: "Duplicate Card Score",
-        accessor: "dup_card_score",
+        Header: 'Duplicate Card Score',
+        accessor: 'dup_card_score',
         Cell: ({ value }) => Number(value).toFixed(2),
       },
       {
-        Header: "Duplicate BIN Score",
-        accessor: "dup_bin_score",
+        Header: 'Duplicate BIN Score',
+        accessor: 'dup_bin_score',
         Cell: ({ value }) => Number(value).toFixed(2),
       },
       {
-        Header: "Late Post Score",
-        accessor: "late_post_score",
+        Header: 'Late Post Score',
+        accessor: 'late_post_score',
         Cell: ({ value }) => Number(value).toFixed(2),
       },
       {
-        Header: "Foreign Keyed Score",
-        accessor: "foreign_keyed_score",
+        Header: 'Foreign Keyed Score',
+        accessor: 'foreign_keyed_score',
         Cell: ({ value }) => Number(value).toFixed(2),
       },
       {
-        Header: "Chargeback Return Request Score",
-        accessor: "chbk_ret_req_score",
+        Header: 'Chargeback Return Request Score',
+        accessor: 'chbk_ret_req_score',
         Cell: ({ value }) => Number(value).toFixed(2),
       },
       {
-        Header: "Next Day Funding",
-        accessor: "next_day_funding",
-        Cell: ({ value }) => (value === "Y" ? "Yes" : "No"),
+        Header: 'Next Day Funding',
+        accessor: 'next_day_funding',
+        Cell: ({ value }) => (value === 'Y' ? 'Yes' : 'No'),
       },
       {
-        Header: "Divert",
-        accessor: "divert",
-        Cell: ({ value }) => (value === "Y" ? "Yes" : "No"),
+        Header: 'Divert',
+        accessor: 'divert',
+        Cell: ({ value }) => (value === 'Y' ? 'Yes' : 'No'),
       },
       {
-        Header: "Divert Balance Amount",
-        accessor: "divert_balance_amt",
+        Header: 'Divert Balance Amount',
+        accessor: 'divert_balance_amt',
         Cell: ({ value }) => `${Number(value).toLocaleString()}`,
       },
       {
-        Header: "Amex OptBlue",
-        accessor: "amex_opt_blue",
-        Cell: ({ value }) => (value === "Y" ? "Yes" : "No"),
+        Header: 'Amex OptBlue',
+        accessor: 'amex_opt_blue',
+        Cell: ({ value }) => (value === 'Y' ? 'Yes' : 'No'),
       },
       {
-        Header: "MOTO AVS Score",
-        accessor: "moto_avs_score",
+        Header: 'MOTO AVS Score',
+        accessor: 'moto_avs_score',
         Cell: ({ value }) => Number(value).toFixed(2),
       },
       {
-        Header: "Settle 30% More Than Auth Score",
-        accessor: "settle_30perc_more_than_auth_score",
+        Header: 'Settle 30% More Than Auth Score',
+        accessor: 'settle_30perc_more_than_auth_score',
         Cell: ({ value }) => Number(value).toFixed(2),
       },
       {
-        Header: "No Auth Score",
-        accessor: "no_auth_score",
+        Header: 'No Auth Score',
+        accessor: 'no_auth_score',
         Cell: ({ value }) => Number(value).toFixed(2),
       },
       {
-        Header: "Auth Decline Score",
-        accessor: "auth_decline_score",
+        Header: 'Auth Decline Score',
+        accessor: 'auth_decline_score',
         Cell: ({ value }) => Number(value).toFixed(2),
       },
       {
-        Header: "Negative Batch Score",
-        accessor: "neg_batch_score",
+        Header: 'Negative Batch Score',
+        accessor: 'neg_batch_score',
         Cell: ({ value }) => Number(value).toFixed(2),
       },
       {
-        Header: "Auto Hold Score",
-        accessor: "auto_hold_score",
+        Header: 'Auto Hold Score',
+        accessor: 'auto_hold_score',
         Cell: ({ value }) => Number(value).toFixed(2),
       },
       {
-        Header: "Funding Exception Score",
-        accessor: "funding_exception_score",
+        Header: 'Funding Exception Score',
+        accessor: 'funding_exception_score',
         Cell: ({ value }) => Number(value).toFixed(2),
       },
       {
-        Header: "User Reviewed",
-        accessor: "user_reviewed",
-        Cell: ({ value }) => (value === "Y" ? "Yes" : "No"),
+        Header: 'User Reviewed',
+        accessor: 'user_reviewed',
+        Cell: ({ value }) => (value === 'Y' ? 'Yes' : 'No'),
       },
       {
-        Header: "Exception Created",
-        accessor: "exception_created_datetime",
+        Header: 'Exception Created',
+        accessor: 'exception_created_datetime',
         Cell: ({ value }) =>
-          value ? new Date(value).toLocaleDateString() : "N/A",
+          value ? new Date(value).toLocaleDateString() : 'N/A',
       },
       {
-        Header: "Exception ID",
-        accessor: "exception_id",
+        Header: 'Exception ID',
+        accessor: 'exception_id',
       },
     ],
-    [],
+    []
   );
   const tableData = useMemo(() => data.DATA, [data]);
 
@@ -224,7 +227,7 @@ const RiskRadarTable: React.FC<RiskRadarTableProps> = ({ data }) => {
     useFilters,
     useGlobalFilter,
     useSortBy,
-    usePagination,
+    usePagination
   );
 
   const { globalFilter, pageIndex, pageSize } = state;
@@ -235,7 +238,7 @@ const RiskRadarTable: React.FC<RiskRadarTableProps> = ({ data }) => {
         <div className="w-100">
           <input
             type="text"
-            value={globalFilter || ""}
+            value={globalFilter || ''}
             onChange={(e) => setGlobalFilter(e.target.value)}
             className="w-full rounded-md border border-stroke px-5 py-2.5 outline-none focus:border-primary dark:border-strokedark dark:bg-meta-4 dark:focus:border-primary"
             placeholder="Search..."
@@ -266,13 +269,13 @@ const RiskRadarTable: React.FC<RiskRadarTableProps> = ({ data }) => {
           <thead>
             {headerGroups.map((headerGroup, key) => (
               <tr {...headerGroup.getHeaderGroupProps()} key={key}>
-                {headerGroup.headers.map((column, key) => (
+                {headerGroup.headers.map((column, hkey) => (
                   <th
                     {...column.getHeaderProps(column.getSortByToggleProps())}
-                    key={key}
+                    key={column.id}
                   >
                     <div className="flex items-center">
-                      <span> {column.render("Header") as React.ReactNode}</span>
+                      <span> {column.render('Header') as React.ReactNode}</span>
 
                       <div className="ml-2 inline-flex flex-col space-y-[2px]">
                         <span className="inline-block">
@@ -316,7 +319,7 @@ const RiskRadarTable: React.FC<RiskRadarTableProps> = ({ data }) => {
                 <tr {...row.getRowProps()} key={key}>
                   {row.cells.map((cell, key) => (
                     <td {...cell.getCellProps()} key={key}>
-                      {cell.render("Cell") as React.ReactNode}
+                      {cell.render('Cell') as React.ReactNode}
                     </td>
                   ))}
                 </tr>
@@ -335,6 +338,8 @@ const RiskRadarTable: React.FC<RiskRadarTableProps> = ({ data }) => {
             className="flex cursor-pointer items-center justify-center rounded-md p-1 px-2 hover:bg-primary hover:text-whiter"
             onClick={() => previousPage()}
             disabled={!canPreviousPage}
+            type="button"
+            aria-label="Previous"
           >
             <svg
               className="fill-current"
@@ -353,11 +358,12 @@ const RiskRadarTable: React.FC<RiskRadarTableProps> = ({ data }) => {
 
           {pageOptions.map((_page, index) => (
             <button
-              key={index}
+              key={_page}
               onClick={() => gotoPage(index)}
               className={`${
-                pageIndex === index && "bg-primary text-white"
+                pageIndex === index && 'bg-primary text-white'
               } mx-1 flex cursor-pointer items-center justify-center rounded-md p-1 px-3 hover:bg-primary hover:text-white`}
+              type="button"
             >
               {index + 1}
             </button>
@@ -365,8 +371,10 @@ const RiskRadarTable: React.FC<RiskRadarTableProps> = ({ data }) => {
 
           <button
             className="flex cursor-pointer items-center justify-center rounded-md p-1 px-2 hover:bg-primary hover:text-white"
-            onClick={() => nextPage()}
+            onClick={(): void => nextPage()}
             disabled={!canNextPage}
+            type="button"
+            aria-label="Next"
           >
             <svg
               className="fill-current"

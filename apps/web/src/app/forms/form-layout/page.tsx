@@ -1,17 +1,18 @@
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import type { FC } from 'react';
 
-import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import SelectGroupOne from "@/components/SelectGroup/SelectGroupOne";
-import Link from "next/link";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
+import { SelectGroupOne } from '@/components/SelectGroup/SelectGroupOne';
 
 export const metadata: Metadata = {
-  title: "Next.js Form Layout | TailAdmin - Next.js Dashboard Template",
+  title: 'Next.js Form Layout | TailAdmin - Next.js Dashboard Template',
   description:
-    "This is Next.js Form Layout page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    'This is Next.js Form Layout page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
 };
 
-const FormLayout = () => {
+const FormLayout: FC = () => {
   return (
     <DefaultLayout>
       <Breadcrumb pageName="FormLayout" />
@@ -29,7 +30,10 @@ const FormLayout = () => {
               <div className="p-6.5">
                 <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
                   <div className="w-full xl:w-1/2">
-                    <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                    <label
+                      className="mb-3 block text-sm font-medium text-black dark:text-white"
+                      htmlFor="firstName"
+                    >
                       First name
                     </label>
                     <input
@@ -40,7 +44,10 @@ const FormLayout = () => {
                   </div>
 
                   <div className="w-full xl:w-1/2">
-                    <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                    <label
+                      className="mb-3 block text-sm font-medium text-black dark:text-white"
+                      htmlFor="lastName"
+                    >
                       Last name
                     </label>
                     <input
@@ -52,7 +59,10 @@ const FormLayout = () => {
                 </div>
 
                 <div className="mb-4.5">
-                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                  <label
+                    className="mb-3 block text-sm font-medium text-black dark:text-white"
+                    htmlFor="email"
+                  >
                     Email <span className="text-meta-1">*</span>
                   </label>
                   <input
@@ -63,7 +73,10 @@ const FormLayout = () => {
                 </div>
 
                 <div className="mb-4.5">
-                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                  <label
+                    className="mb-3 block text-sm font-medium text-black dark:text-white"
+                    htmlFor="subject"
+                  >
                     Subject
                   </label>
                   <input
@@ -76,17 +89,23 @@ const FormLayout = () => {
                 <SelectGroupOne />
 
                 <div className="mb-6">
-                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                  <label
+                    className="mb-3 block text-sm font-medium text-black dark:text-white"
+                    htmlFor="message"
+                  >
                     Message
                   </label>
                   <textarea
                     rows={6}
                     placeholder="Type your message"
                     className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                  ></textarea>
+                  />
                 </div>
 
-                <button className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90">
+                <button
+                  className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90"
+                  type="submit"
+                >
                   Send Message
                 </button>
               </div>
@@ -105,7 +124,10 @@ const FormLayout = () => {
             <form action="#">
               <div className="p-6.5">
                 <div className="mb-4.5">
-                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                  <label
+                    className="mb-3 block text-sm font-medium text-black dark:text-white"
+                    htmlFor="email"
+                  >
                     Email
                   </label>
                   <input
@@ -116,7 +138,10 @@ const FormLayout = () => {
                 </div>
 
                 <div>
-                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                  <label
+                    className="mb-3 block text-sm font-medium text-black dark:text-white"
+                    htmlFor="password"
+                  >
                     Password
                   </label>
                   <input
@@ -134,7 +159,7 @@ const FormLayout = () => {
                         id="formCheckbox"
                         className="taskCheckbox sr-only"
                       />
-                      <div className="box mr-3 flex h-5 w-5 items-center justify-center rounded border border-stroke dark:border-strokedark">
+                      <div className="box mr-3 flex size-5 items-center justify-center rounded border border-stroke dark:border-strokedark">
                         <span className="text-white opacity-0">
                           <svg
                             className="fill-current"
@@ -158,14 +183,17 @@ const FormLayout = () => {
                   </label>
 
                   <Link
-                    href="#"
+                    href="/"
                     className="text-sm text-primary hover:underline"
                   >
                     Forget password?
                   </Link>
                 </div>
 
-                <button className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90">
+                <button
+                  className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90"
+                  type="submit"
+                >
                   Sign In
                 </button>
               </div>
@@ -182,7 +210,10 @@ const FormLayout = () => {
             <form action="#">
               <div className="p-6.5">
                 <div className="mb-4.5">
-                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                  <label
+                    className="mb-3 block text-sm font-medium text-black dark:text-white"
+                    htmlFor="fullName"
+                  >
                     Name
                   </label>
                   <input
@@ -193,7 +224,10 @@ const FormLayout = () => {
                 </div>
 
                 <div className="mb-4.5">
-                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                  <label
+                    className="mb-3 block text-sm font-medium text-black dark:text-white"
+                    htmlFor="email"
+                  >
                     Email
                   </label>
                   <input
@@ -204,7 +238,10 @@ const FormLayout = () => {
                 </div>
 
                 <div className="mb-4.5">
-                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                  <label
+                    className="mb-3 block text-sm font-medium text-black dark:text-white"
+                    htmlFor="password"
+                  >
                     Password
                   </label>
                   <input
@@ -215,7 +252,10 @@ const FormLayout = () => {
                 </div>
 
                 <div className="mb-5.5">
-                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                  <label
+                    className="mb-3 block text-sm font-medium text-black dark:text-white"
+                    htmlFor="retypePassword"
+                  >
                     Re-type Password
                   </label>
                   <input
@@ -225,7 +265,10 @@ const FormLayout = () => {
                   />
                 </div>
 
-                <button className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90">
+                <button
+                  className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90"
+                  type="submit"
+                >
                   Sign Up
                 </button>
               </div>

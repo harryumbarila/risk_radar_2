@@ -1,7 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import type { INestApplication } from '@nestjs/common';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
-import { AppController } from '../../src/app.controller';
+
+import { AppController } from '@/api/app.controller';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -35,11 +37,12 @@ describe('AppController (e2e)', () => {
   });
 
   describe('/status (GET)', () => {
-    it('should return UP status', () => {
-      return request(app.getHttpServer())
+    it('should return UP status', async () => {
+      const response = await request(app.getHttpServer())
         .get('/status')
-        .expect(200)
-        .expect({ status: 'UP' });
+        .expect(200);
+
+      expect(response.body).toEqual({ status: 'UP' });
     });
   });
 });

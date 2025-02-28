@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 
-const DownloadList: React.FC = () => {
+export const DownloadList: React.FC = () => {
   return (
     <div className="col-span-12">
       <div className="rounded-sm border border-stroke bg-white py-3 shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -42,7 +42,10 @@ const DownloadList: React.FC = () => {
           </div>
 
           <div className="text-right sm:w-3/12 xl:w-2/12">
-            <button className="inline-flex rounded bg-primary px-3 py-1 font-medium text-white hover:bg-opacity-90 sm:px-6 sm:py-2.5">
+            <button
+              className="inline-flex rounded bg-primary px-3 py-1 font-medium text-white hover:bg-opacity-90 sm:px-6 sm:py-2.5"
+              type="button"
+            >
               Download
             </button>
           </div>
@@ -104,7 +107,10 @@ const DownloadList: React.FC = () => {
           </div>
 
           <div className="text-right sm:w-3/12 xl:w-2/12">
-            <button className="inline-flex rounded bg-primary px-3 py-1 font-medium text-white hover:bg-opacity-90 sm:px-6 sm:py-2.5">
+            <button
+              className="inline-flex rounded bg-primary px-3 py-1 font-medium text-white hover:bg-opacity-90 sm:px-6 sm:py-2.5"
+              type="button"
+            >
               Download
             </button>
           </div>
@@ -148,7 +154,10 @@ const DownloadList: React.FC = () => {
           </div>
 
           <div className="text-right sm:w-3/12 xl:w-2/12">
-            <button className="inline-flex rounded bg-primary px-3 py-1 font-medium text-white hover:bg-opacity-90 sm:px-6 sm:py-2.5">
+            <button
+              className="inline-flex rounded bg-primary px-3 py-1 font-medium text-white hover:bg-opacity-90 sm:px-6 sm:py-2.5"
+              type="button"
+            >
               Download
             </button>
           </div>
@@ -192,7 +201,10 @@ const DownloadList: React.FC = () => {
           </div>
 
           <div className="text-right sm:w-3/12 xl:w-2/12">
-            <button className="inline-flex rounded bg-primary px-3 py-1 font-medium text-white hover:bg-opacity-90 sm:px-6 sm:py-2.5">
+            <button
+              className="inline-flex rounded bg-primary px-3 py-1 font-medium text-white hover:bg-opacity-90 sm:px-6 sm:py-2.5"
+              type="button"
+            >
               Download
             </button>
           </div>
@@ -201,5 +213,3 @@ const DownloadList: React.FC = () => {
     </div>
   );
 };
-
-export default DownloadList;

@@ -1,13 +1,13 @@
-import BasicChart from "@/components/Charts/BasicChart";
-import { Metadata } from "next";
-import FormElements from "@/components/FormElements";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import React from "react";
+import type { Metadata } from 'next';
+import React from 'react';
+
+import { BasicChart } from '@/components/Charts/BasicChart';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
-  title: "Next.js Basic Chart | TailAdmin - Next.js Dashboard Template",
+  title: 'Next.js Basic Chart | TailAdmin - Next.js Dashboard Template',
   description:
-    "This is Next.js Basic Chart page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    'This is Next.js Basic Chart page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
   // other metadata
 };
 

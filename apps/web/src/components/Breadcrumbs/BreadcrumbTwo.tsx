@@ -1,10 +1,10 @@
-import React from "react";
-import Link from "next/link";
+import Link from 'next/link';
+import React from 'react';
 
-const BreadcrumbTwo: React.FC = () => {
+export const BreadcrumbTwo: React.FC = () => {
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-      <div className="border-b border-stroke px-4 py-4 dark:border-strokedark sm:px-6 xl:px-7.5">
+      <div className="border-b border-stroke p-4 dark:border-strokedark sm:px-6 xl:px-7.5">
         <h3 className="font-medium text-black dark:text-white">
           Breadcrumb Style 2
         </h3>
@@ -42,7 +42,7 @@ const BreadcrumbTwo: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link className="flex items-center gap-3 font-medium" href="#">
+                <Link className="flex items-center gap-3 font-medium" href="/">
                   <svg
                     className="fill-current"
                     width="18"
@@ -94,5 +94,3 @@ const BreadcrumbTwo: React.FC = () => {
     </div>
   );
 };
-
-export default BreadcrumbTwo;

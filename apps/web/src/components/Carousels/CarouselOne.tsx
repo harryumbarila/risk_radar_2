@@ -1,14 +1,15 @@
-import React, { useRef } from "react";
-import { Navigation } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css";
-import "swiper/css/navigation";
-import Image from "next/image";
+import 'swiper/css';
+import 'swiper/css/navigation';
 
-const CarouselOne: React.FC = () => {
+import Image from 'next/image';
+import React from 'react';
+import { Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+
+export const CarouselOne: React.FC = () => {
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-      <div className="border-b border-stroke px-4 py-4 dark:border-strokedark sm:px-6 xl:px-7.5">
+      <div className="border-b border-stroke p-4 dark:border-strokedark sm:px-6 xl:px-7.5">
         <h3 className="font-medium text-black dark:text-white">
           Slider With Controls
         </h3>
@@ -19,8 +20,8 @@ const CarouselOne: React.FC = () => {
           className="carouselOne"
           modules={[Navigation]}
           navigation={{
-            nextEl: ".swiper-button-next",
-            prevEl: ".swiper-button-prev",
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
           }}
         >
           <SwiperSlide>
@@ -28,7 +29,7 @@ const CarouselOne: React.FC = () => {
               width={1374}
               height={520}
               priority
-              src={"/images/carousel/carousel-01.jpg"}
+              src="/images/carousel/carousel-01.jpg"
               alt="carousel"
             />
           </SwiperSlide>
@@ -37,7 +38,7 @@ const CarouselOne: React.FC = () => {
               width={1374}
               height={520}
               priority
-              src={"/images/carousel/carousel-02.jpg"}
+              src="/images/carousel/carousel-02.jpg"
               alt="carousel"
             />
           </SwiperSlide>
@@ -46,7 +47,7 @@ const CarouselOne: React.FC = () => {
               width={1374}
               height={520}
               priority
-              src={"/images/carousel/carousel-03.jpg"}
+              src="/images/carousel/carousel-03.jpg"
               alt="carousel"
             />
           </SwiperSlide>
@@ -85,5 +86,3 @@ const CarouselOne: React.FC = () => {
     </div>
   );
 };
-
-export default CarouselOne;

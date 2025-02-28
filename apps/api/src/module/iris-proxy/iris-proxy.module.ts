@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
-import { IrisClient } from './webservice/iris.client';
+
 import { IrisProxyController } from './iris-proxy.controller';
+import { IrisClient } from './webservice/iris.client';
 
 @Module({
   providers: [IrisClient],

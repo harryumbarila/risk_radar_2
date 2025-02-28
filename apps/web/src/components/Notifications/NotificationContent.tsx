@@ -1,20 +1,23 @@
-import React from "react";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import 'react-toastify/dist/ReactToastify.css';
 
-interface NotificationProps {
+import type { FC } from 'react';
+import React from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+
+type NotificationProps = {
   title: string;
   message: string;
-  type?: "success" | "error" | "info" | "warning";
+  type?: 'success' | 'error' | 'info' | 'warning';
   icon?: React.ReactNode;
   bgColor?: string;
-}
+};
 
 const NotificationContent: React.FC<NotificationProps> = ({
   title,
   message,
+  type,
   icon,
-  bgColor = "#1EA779",
+  bgColor = '#1EA779',
 }) => {
   const defaultIcon = (
     <svg
@@ -23,6 +26,7 @@ const NotificationContent: React.FC<NotificationProps> = ({
       viewBox="0 0 20 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      type={type}
     >
       <path
         d="M18.1264 2.27326C17.9391 2.06543 17.6448 2.06543 17.4574 2.27326L7.69058 12.7836C7.61031 12.8726 7.50327 12.8726 7.423 12.7836L2.5797 7.5581C2.39239 7.35027 2.09805 7.35027 1.91074 7.5581C1.72343 7.76593 1.72343 8.09252 1.91074 8.30035L6.75403 13.5258C6.9681 13.7633 7.26245 13.8821 7.53003 13.8821C7.82437 13.8821 8.09196 13.7633 8.30603 13.5258L18.0729 3.01551C18.287 2.80768 18.287 2.48109 18.1264 2.27326Z"
@@ -40,7 +44,7 @@ const NotificationContent: React.FC<NotificationProps> = ({
   return (
     <div className="flex items-center gap-5">
       <div
-        className="flex h-10 w-10 items-center justify-center rounded-full"
+        className="flex size-10 items-center justify-center rounded-full"
         style={{ backgroundColor: bgColor }}
       >
         {icon || defaultIcon}
@@ -58,29 +62,30 @@ const NotificationContent: React.FC<NotificationProps> = ({
 export const showNotification = ({
   title,
   message,
-  type = "success",
+  type = 'success',
   icon,
   bgColor,
-}: NotificationProps) => {
+}: NotificationProps): void => {
   toast(
     <NotificationContent
       title={title}
       message={message}
       icon={icon}
       bgColor={bgColor}
+      type={type}
     />,
     {
-      position: "top-right",
+      position: 'top-right',
       autoClose: 3000,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
       draggable: true,
-    },
+    }
   );
 };
 
-export const NotificationsContainer = () => {
+export const NotificationsContainer: FC = () => {
   return (
     <ToastContainer
       position="top-right"
@@ -96,5 +101,3 @@ export const NotificationsContainer = () => {
     />
   );
 };
-
-export default NotificationContent;

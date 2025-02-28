@@ -1,7 +1,12 @@
-import React, { useRef } from "react";
-import { FaqItem } from "@/types/faqItem";
+import React, { useRef } from 'react';
 
-const AccordionItemOne: React.FC<FaqItem> = ({ active, handleToggle, faq }) => {
+import type { FaqItem } from '@/types/faqItem';
+
+export const AccordionItemOne: React.FC<FaqItem> = ({
+  active,
+  handleToggle,
+  faq,
+}) => {
   const contentEl = useRef<HTMLDivElement>(null);
 
   const { header, id, text } = faq;
@@ -9,15 +14,16 @@ const AccordionItemOne: React.FC<FaqItem> = ({ active, handleToggle, faq }) => {
   return (
     <div className="rounded-md border border-stroke p-4 shadow-9 dark:border-strokedark dark:shadow-none sm:p-6">
       <button
+        type="button"
         className={`flex w-full items-center gap-1.5 sm:gap-3 xl:gap-6 ${
-          active === id ? "active" : ""
+          active === id ? 'active' : ''
         }`}
         onClick={() => handleToggle(Number(id))}
       >
         <div className="flex h-10.5 w-full max-w-10.5 items-center justify-center rounded-md bg-[#F3F5FC] dark:bg-meta-4">
           <svg
             className={`fill-primary stroke-primary duration-200 ease-in-out dark:fill-white dark:stroke-white ${
-              active === id ? "rotate-180" : ""
+              active === id ? 'rotate-180' : ''
             }`}
             width="18"
             height="10"
@@ -43,7 +49,7 @@ const AccordionItemOne: React.FC<FaqItem> = ({ active, handleToggle, faq }) => {
       <div
         ref={contentEl}
         className={`ml-16.5 mt-5 duration-200 ease-in-out ${
-          active === id ? "block" : "hidden"
+          active === id ? 'block' : 'hidden'
         }`}
       >
         <p className="font-medium">{text}</p>
@@ -51,5 +57,3 @@ const AccordionItemOne: React.FC<FaqItem> = ({ active, handleToggle, faq }) => {
     </div>
   );
 };
-
-export default AccordionItemOne;

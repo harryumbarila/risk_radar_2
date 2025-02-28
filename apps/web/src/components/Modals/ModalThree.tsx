@@ -1,40 +1,42 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 
-const ModalThree: React.FC = () => {
+export const ModalThree: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
 
-  const trigger = useRef<any>(null);
-  const modal = useRef<any>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const modal = useRef<HTMLDivElement>(null);
 
   // close on click outside
   useEffect(() => {
-    const clickHandler = ({ target }: MouseEvent) => {
+    const clickHandler = ({ target }: MouseEvent): void => {
       if (!modal.current) return;
       if (
         !modalOpen ||
-        modal.current.contains(target) ||
-        trigger.current.contains(target)
-      )
+        modal.current.contains(target as Node) ||
+        trigger.current?.contains(target as Node)
+      ) {
         return;
+      }
       setModalOpen(false);
     };
-    document.addEventListener("click", clickHandler);
-    return () => document.removeEventListener("click", clickHandler);
+    document.addEventListener('click', clickHandler);
+    return () => document.removeEventListener('click', clickHandler);
   });
 
   // close if the esc key is pressed
   useEffect(() => {
-    const keyHandler = ({ keyCode }: KeyboardEvent) => {
+    const keyHandler = ({ keyCode }: KeyboardEvent): void => {
       if (!modalOpen || keyCode !== 27) return;
       setModalOpen(false);
     };
-    document.addEventListener("keydown", keyHandler);
-    return () => document.removeEventListener("keydown", keyHandler);
+    document.addEventListener('keydown', keyHandler);
+    return () => document.removeEventListener('keydown', keyHandler);
   });
 
   return (
     <div>
       <button
+        type="button"
         ref={trigger}
         onClick={() => setModalOpen(!modalOpen)}
         className="rounded-md bg-primary px-9 py-3 font-medium text-white"
@@ -42,8 +44,8 @@ const ModalThree: React.FC = () => {
         Modal 3
       </button>
       <div
-        className={`fixed left-0 top-0 z-999999 flex h-full min-h-screen w-full items-center justify-center bg-black/90 px-4 py-5 ${
-          modalOpen ? "block" : "hidden"
+        className={`fixed left-0 top-0 z-999999 flex size-full min-h-screen items-center justify-center bg-black/90 px-4 py-5 ${
+          modalOpen ? 'block' : 'hidden'
         }`}
       >
         <div
@@ -82,20 +84,22 @@ const ModalThree: React.FC = () => {
           <h3 className="mt-5.5 pb-2 text-xl font-bold text-white sm:text-4xl">
             Congratulations!
           </h3>
-          <span className="mx-auto mb-6 inline-block h-1 w-22.5 rounded bg-primary"></span>
+          <span className="mx-auto mb-6 inline-block h-1 w-22.5 rounded bg-primary" />
           <p className="mb-7.5 text-white">
             Lorem Ipsum is simply dummy text of the printing and typesetting
             industry Lorem Ipsum been.
           </p>
           <a
-            href="#"
+            href="/"
             className="inline-block rounded border border-white px-12.5 py-3 text-center font-medium text-white transition hover:bg-white hover:text-primary"
           >
             Know More
           </a>
           <button
+            type="button"
             onClick={() => setModalOpen(false)}
-            className="absolute right-6 top-6 flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white hover:text-primary"
+            className="absolute right-6 top-6 flex size-7 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white hover:text-primary"
+            aria-label="Close modal"
           >
             <svg
               width="10"
@@ -115,5 +119,3 @@ const ModalThree: React.FC = () => {
     </div>
   );
 };
-
-export default ModalThree;

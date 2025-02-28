@@ -1,6 +1,8 @@
-import Breadcrumb from "../Breadcrumbs/Breadcrumb";
+import type { FC } from 'react';
 
-const Calendar = () => {
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+
+export const Calendar: FC = () => {
   return (
     <div className="mx-auto max-w-7xl">
       <Breadcrumb pageName="Calendar" />
@@ -47,7 +49,7 @@ const Calendar = () => {
                 <span className="font-medium text-black dark:text-white">
                   1
                 </span>
-                <div className="group h-16 w-full flex-grow cursor-pointer py-1 md:h-30">
+                <div className="group h-16 w-full grow cursor-pointer py-1 md:h-30">
                   <span className="group-hover:text-primary md:hidden">
                     More
                   </span>
@@ -192,7 +194,7 @@ const Calendar = () => {
                 <span className="font-medium text-black dark:text-white">
                   25
                 </span>
-                <div className="group h-16 w-full flex-grow cursor-pointer py-1 md:h-30">
+                <div className="group h-16 w-full grow cursor-pointer py-1 md:h-30">
                   <span className="group-hover:text-primary md:hidden">
                     More
                   </span>
@@ -269,5 +271,3 @@ const Calendar = () => {
     </div>
   );
 };
-
-export default Calendar;

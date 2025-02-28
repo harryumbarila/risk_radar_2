@@ -1,75 +1,76 @@
-"use client";
-import jsVectorMap from "jsvectormap";
-import React, { useEffect } from "react";
-import "jsvectormap/dist/maps/world";
-import "jsvectormap/dist/jsvectormap.css";
-import { Country } from "@/types/country";
-import Image from "next/image";
+'use client';
+
+import 'jsvectormap/dist/jsvectormap.css';
+import 'jsvectormap/dist/maps/world';
+
+import Image from 'next/image';
+import React, { useEffect } from 'react';
+
+import type { Country } from '@/types/country';
 
 const countryData: Country[] = [
   {
-    flag: "/images/country/country-01.svg",
+    flag: '/images/country/country-01.svg',
     percentage: 35,
-    name: "United States",
+    name: 'United States',
   },
   {
-    flag: "/images/country/country-02.svg",
+    flag: '/images/country/country-02.svg',
     percentage: 26,
-    name: "Canada",
+    name: 'Canada',
   },
   {
-    flag: "/images/country/country-03.svg",
+    flag: '/images/country/country-03.svg',
     percentage: 18,
-    name: "France",
+    name: 'France',
   },
   {
-    flag: "/images/country/country-04.svg",
+    flag: '/images/country/country-04.svg',
     percentage: 14,
-    name: "Italy",
+    name: 'Italy',
   },
   {
-    flag: "/images/country/country-05.svg",
+    flag: '/images/country/country-05.svg',
     percentage: 10,
-    name: "Australia",
+    name: 'Australia',
   },
   {
-    flag: "/images/country/country-06.svg",
+    flag: '/images/country/country-06.svg',
     percentage: 7,
-    name: "India",
+    name: 'India',
   },
 ];
 
-const MapTwo: React.FC = () => {
+export const MapTwo: React.FC = () => {
   useEffect(() => {
-    const mapTwo = new jsVectorMap({
-      selector: "#mapTwo",
-      map: "world",
-      zoomButtons: true,
+    // const mapTwo = new jsVectorMap({
+    //   selector: "#mapTwo",
+    //   map: "world",
+    //   zoomButtons: true,
 
-      regionStyle: {
-        initial: {
-          fontFamily: "Satoshi",
-          fill: "#A9BDFF",
-        },
-        hover: {
-          fillOpacity: 1,
-          fill: "#3056D3",
-        },
-      },
+    //   regionStyle: {
+    //     initial: {
+    //       fontFamily: "Satoshi",
+    //       fill: "#A9BDFF",
+    //     },
+    //     hover: {
+    //       fillOpacity: 1,
+    //       fill: "#3056D3",
+    //     },
+    //   },
 
-      onRegionTooltipShow: function (tooltip: any, code: string) {
-        if (code === "EG") {
-          tooltip.selector.innerHTML =
-            tooltip.text() + " <b>(Hello Russia)</b>";
-        }
-      },
-    });
+    //   onRegionTooltipShow(tooltip: any, code: string) {
+    //     if (code === "EG") {
+    //       tooltip.selector.innerHTML = `${tooltip.text()} <b>(Hello Russia)</b>`;
+    //     }
+    //   },
+    // });
 
     return () => {
       // mapTwo.destroy();
-      const map = document.getElementById("mapTwo");
+      const map = document.getElementById('mapTwo');
       if (map) {
-        map.innerHTML = "";
+        map.innerHTML = '';
       }
     };
   }, []);
@@ -121,12 +122,12 @@ const MapTwo: React.FC = () => {
           </div>
         </div>
         <div className="flex h-65 items-center justify-center md:h-95">
-          <div id="mapTwo" className="mapTwo map-btn"></div>
+          <div id="mapTwo" className="mapTwo map-btn" />
         </div>
       </div>
       <div className="space-y-2.5 border-t border-stroke p-4 dark:border-strokedark md:p-6 xl:p-7.5">
-        {countryData.map((country, key) => (
-          <div className="items-center sm:flex" key={key}>
+        {countryData.map((country) => (
+          <div className="items-center sm:flex" key={country.name}>
             <div className="flex w-full max-w-42.5 items-center gap-3.5">
               <Image width={20} height={13} src={country.flag} alt="usa" />
               <p className="font-medium text-black dark:text-white">
@@ -135,9 +136,9 @@ const MapTwo: React.FC = () => {
             </div>
             <div className="relative block h-4.5 w-full rounded bg-meta-9 dark:bg-meta-4">
               <div
-                className={`absolute left-0 top-0 flex h-full items-center justify-center rounded bg-primary text-xs font-medium text-white`}
+                className="absolute left-0 top-0 flex h-full items-center justify-center rounded bg-primary text-xs font-medium text-white"
                 style={{
-                  width: country.percentage + "%",
+                  width: `${country.percentage}%`,
                 }}
               >
                 {country.percentage}%
@@ -149,5 +150,3 @@ const MapTwo: React.FC = () => {
     </div>
   );
 };
-
-export default MapTwo;

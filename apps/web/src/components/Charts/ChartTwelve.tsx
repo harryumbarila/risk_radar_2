@@ -1,20 +1,21 @@
-"use client";
-import { ApexOptions } from "apexcharts";
-import React, { useEffect, useState } from "react";
-import ReactApexChart from "react-apexcharts";
+'use client';
 
-interface ChartTwelveState {
+import type { ApexOptions } from 'apexcharts';
+import React, { useState } from 'react';
+import ReactApexChart from 'react-apexcharts';
+
+type ChartTwelveState = {
   series: {
     name: string;
     data: [number, number][];
   }[];
-}
+};
 
-const ChartTwelve: React.FC = () => {
+export const ChartTwelve: React.FC = () => {
   const [state, setState] = useState<ChartTwelveState>({
     series: [
       {
-        name: "Total Investment",
+        name: 'Total Investment',
         data: [
           [1746153600000, 30.95],
           [1746240000000, 31.34],
@@ -252,22 +253,21 @@ const ChartTwelve: React.FC = () => {
   });
 
   // Update the state
-  const updateState = () => {
+  const updateState = (): void => {
     setState((prevState) => ({
       ...prevState,
       // Update the desired properties
     }));
   };
-
-  updateState;
+  updateState();
 
   const options: ApexOptions = {
-    colors: ["#3C50E0"],
+    colors: ['#3C50E0'],
     chart: {
-      fontFamily: "Satoshi, sans-serif",
+      fontFamily: 'Satoshi, sans-serif',
       height: 310,
-      id: "area-datetime",
-      type: "area",
+      id: 'area-datetime',
+      type: 'area',
       toolbar: {
         show: false,
       },
@@ -275,11 +275,11 @@ const ChartTwelve: React.FC = () => {
 
     legend: {
       show: false,
-      position: "top",
-      horizontalAlign: "left",
+      position: 'top',
+      horizontalAlign: 'left',
     },
     stroke: {
-      curve: "straight",
+      curve: 'straight',
       width: [1, 1],
     },
 
@@ -291,13 +291,13 @@ const ChartTwelve: React.FC = () => {
       size: 0,
     },
 
-    labels: {
-      show: false,
-      position: "top",
-    } as any,
+    // labels: {
+    //   show: false,
+    //   position: "top",
+    // },
 
     xaxis: {
-      type: "datetime",
+      type: 'datetime',
       tickAmount: 10,
       axisBorder: {
         show: false,
@@ -309,16 +309,16 @@ const ChartTwelve: React.FC = () => {
 
     tooltip: {
       x: {
-        format: "dd MMM yyyy",
+        format: 'dd MMM yyyy',
       },
     },
 
     fill: {
       gradient: {
-        enabled: true,
+        // enabled: true,
         opacityFrom: 0.55,
         opacityTo: 0,
-      } as any,
+      },
     },
 
     grid: {
@@ -430,5 +430,3 @@ const ChartTwelve: React.FC = () => {
     </div>
   );
 };
-
-export default ChartTwelve;

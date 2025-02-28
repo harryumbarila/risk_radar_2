@@ -1,46 +1,46 @@
-import React from "react";
-import Image from "next/image";
+import Image from 'next/image';
+import React from 'react';
 
-interface Avatar {
+type Avatar = {
   image: string;
   classes: string;
   size: number;
-}
+};
 
 const avatarItems: Avatar[] = [
   {
-    image: "/images/user/user-03.png",
-    classes: "max-w-6 h-6",
+    image: '/images/user/user-03.png',
+    classes: 'max-w-6 h-6',
     size: 24,
   },
   {
-    image: "/images/user/user-03.png",
-    classes: "max-w-9.5 h-9.5",
+    image: '/images/user/user-03.png',
+    classes: 'max-w-9.5 h-9.5',
     size: 38,
   },
   {
-    image: "/images/user/user-03.png",
-    classes: "max-w-13 h-13",
+    image: '/images/user/user-03.png',
+    classes: 'max-w-13 h-13',
     size: 52,
   },
   {
-    image: "/images/user/user-03.png",
-    classes: "max-w-20 h-20",
+    image: '/images/user/user-03.png',
+    classes: 'max-w-20 h-20',
     size: 80,
   },
 ];
 
-const AvatarOne: React.FC = () => {
+export const AvatarOne: React.FC = () => {
   return (
     <div className="flex items-center gap-6">
-      {avatarItems.map((item, index) => (
-        <div key={index} className={`w-full rounded-full ${item.classes}`}>
+      {avatarItems.map((item) => (
+        <div key={item.image} className={`w-full rounded-full ${item.classes}`}>
           <Image
             width={item.size}
             height={item.size}
             style={{
-              width: "100%",
-              height: "auto",
+              width: '100%',
+              height: 'auto',
             }}
             src={item.image}
             alt="User"
@@ -51,5 +51,3 @@ const AvatarOne: React.FC = () => {
     </div>
   );
 };
-
-export default AvatarOne;

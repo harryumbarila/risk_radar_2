@@ -1,28 +1,28 @@
-import { ApexOptions } from "apexcharts";
-import React, { useState } from "react";
-import ReactApexChart from "react-apexcharts";
+import type { ApexOptions } from 'apexcharts';
+import React, { useState } from 'react';
+import ReactApexChart from 'react-apexcharts';
 
-interface ChartThreeState {
+type ChartThreeState = {
   series: number[];
-}
+};
 
 const options: ApexOptions = {
   chart: {
-    fontFamily: "Satoshi, sans-serif",
-    type: "donut",
+    fontFamily: 'Satoshi, sans-serif',
+    type: 'donut',
   },
-  colors: ["#3C50E0", "#6577F3", "#8FD0EF", "#0FADCF"],
-  labels: ["Desktop", "Tablet", "Mobile", "Unknown"],
+  colors: ['#3C50E0', '#6577F3', '#8FD0EF', '#0FADCF'],
+  labels: ['Desktop', 'Tablet', 'Mobile', 'Unknown'],
   legend: {
     show: false,
-    position: "bottom",
+    position: 'bottom',
   },
 
   plotOptions: {
     pie: {
       donut: {
-        size: "65%",
-        background: "transparent",
+        size: '65%',
+        background: 'transparent',
       },
     },
   },
@@ -49,18 +49,18 @@ const options: ApexOptions = {
   ],
 };
 
-const ChartThree: React.FC = () => {
+export const ChartThree: React.FC = () => {
   const [state, setState] = useState<ChartThreeState>({
     series: [65, 34, 12, 56],
   });
 
-  const handleReset = () => {
+  const handleReset = (): void => {
     setState((prevState) => ({
       ...prevState,
       series: [65, 34, 12, 56],
     }));
   };
-  handleReset;
+  handleReset();
 
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-5">
@@ -121,7 +121,7 @@ const ChartThree: React.FC = () => {
       <div className="-mx-8 flex flex-wrap items-center justify-center gap-y-3">
         <div className="w-full px-8 sm:w-1/2">
           <div className="flex w-full items-center">
-            <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-primary"></span>
+            <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-primary" />
             <p className="flex w-full justify-between text-sm font-medium text-black dark:text-white">
               <span> Desktop </span>
               <span> 65% </span>
@@ -130,7 +130,7 @@ const ChartThree: React.FC = () => {
         </div>
         <div className="w-full px-8 sm:w-1/2">
           <div className="flex w-full items-center">
-            <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-[#6577F3]"></span>
+            <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-[#6577F3]" />
             <p className="flex w-full justify-between text-sm font-medium text-black dark:text-white">
               <span> Tablet </span>
               <span> 34% </span>
@@ -139,7 +139,7 @@ const ChartThree: React.FC = () => {
         </div>
         <div className="w-full px-8 sm:w-1/2">
           <div className="flex w-full items-center">
-            <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-[#8FD0EF]"></span>
+            <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-[#8FD0EF]" />
             <p className="flex w-full justify-between text-sm font-medium text-black dark:text-white">
               <span> Mobile </span>
               <span> 45% </span>
@@ -148,7 +148,7 @@ const ChartThree: React.FC = () => {
         </div>
         <div className="w-full px-8 sm:w-1/2">
           <div className="flex w-full items-center">
-            <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-[#0FADCF]"></span>
+            <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-[#0FADCF]" />
             <p className="flex w-full justify-between text-sm font-medium text-black dark:text-white">
               <span> Unknown </span>
               <span> 12% </span>
@@ -159,5 +159,3 @@ const ChartThree: React.FC = () => {
     </div>
   );
 };
-
-export default ChartThree;

@@ -1,16 +1,17 @@
-import CRM from "@/components/Dashboard/CRM";
+import type { Metadata } from 'next';
+import type { FC } from 'react';
 
-import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import { CRM } from '@/components/Dashboard/CRM';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
-  title: "Next.js CRM Dashboard | TailAdmin - Next.js Dashboard Template",
+  title: 'Next.js CRM Dashboard | TailAdmin - Next.js Dashboard Template',
   description:
-    "This is Next.js CRM Dashboard page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    'This is Next.js CRM Dashboard page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
   // other metadata
 };
 
-const CrmPage = () => {
+const CrmPage: FC = () => {
   return (
     <DefaultLayout>
       <CRM />

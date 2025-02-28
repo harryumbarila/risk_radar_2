@@ -1,46 +1,46 @@
-import { ApexOptions } from "apexcharts";
-import React, { useState } from "react";
-import ReactApexChart from "react-apexcharts";
+import type { ApexOptions } from 'apexcharts';
+import React, { useState } from 'react';
+import ReactApexChart from 'react-apexcharts';
 
-interface ChartTenState {
+type ChartTenState = {
   series: {
     name: string;
     data: number[];
   }[];
-}
+};
 
-const ChartTen: React.FC = () => {
+export const ChartTen: React.FC = () => {
   const [state, setState] = useState<ChartTenState>({
     series: [
       {
-        name: "Media",
+        name: 'Media',
         data: [268, 385, 201, 298, 187, 195, 291],
       },
       {
-        name: "Photos",
+        name: 'Photos',
         data: [345, 160, 291, 187, 195, 298, 201],
       },
       {
-        name: "Docs",
+        name: 'Docs',
         data: [195, 260, 191, 258, 265, 160, 213],
       },
     ],
   });
 
   // Update the state
-  const updateState = () => {
+  const updateState = (): void => {
     setState((prevState) => ({
       ...prevState,
       // Update the desired properties
     }));
   };
-  updateState;
+  updateState();
 
   const options: ApexOptions = {
-    colors: ["#3C50E0", "#13C296", "#F2994A"],
+    colors: ['#3C50E0', '#13C296', '#F2994A'],
     chart: {
-      fontFamily: "Satoshi, sans-serif",
-      type: "bar",
+      fontFamily: 'Satoshi, sans-serif',
+      type: 'bar',
       height: 318,
       toolbar: {
         show: false,
@@ -49,7 +49,7 @@ const ChartTen: React.FC = () => {
     plotOptions: {
       bar: {
         horizontal: false,
-        columnWidth: "35%",
+        columnWidth: '35%',
         // endingShape: 'rounded',
         borderRadius: 1,
       },
@@ -60,10 +60,10 @@ const ChartTen: React.FC = () => {
     stroke: {
       show: true,
       width: 4,
-      colors: ["transparent"],
+      colors: ['transparent'],
     },
     xaxis: {
-      categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
+      categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
       axisBorder: {
         show: false,
       },
@@ -73,10 +73,10 @@ const ChartTen: React.FC = () => {
     },
     legend: {
       show: true,
-      position: "top",
-      horizontalAlign: "left",
-      fontFamily: "Satoshi",
-      fontSize: "16px",
+      position: 'top',
+      horizontalAlign: 'left',
+      fontFamily: 'Satoshi',
+      fontSize: '16px',
       fontWeight: 500,
       offsetY: -5,
 
@@ -167,5 +167,3 @@ const ChartTen: React.FC = () => {
     </div>
   );
 };
-
-export default ChartTen;

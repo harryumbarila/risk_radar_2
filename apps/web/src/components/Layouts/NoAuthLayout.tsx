@@ -1,12 +1,10 @@
-"use client";
-import React from "react";
-import AppsIcon from "@/components/AppsIcon/AppsIcon";
+'use client';
 
-export default function NoAuthLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+import type { FC, PropsWithChildren } from 'react';
+
+import { AppsIcon } from '@/components/AppsIcon/AppsIcon';
+
+export const NoAuthLayout: FC<PropsWithChildren> = ({ children }) => {
   return (
     <div className="relative min-h-screen">
       <div className="absolute right-4 top-4">
@@ -17,4 +15,4 @@ export default function NoAuthLayout({
       </div>
     </div>
   );
-}
+};

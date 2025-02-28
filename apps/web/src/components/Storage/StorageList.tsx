@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
 
-const StorageList: React.FC = () => {
+export const StorageList: React.FC = () => {
   return (
-    <div className="flex-grow rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark md:p-6 xl:p-7.5">
+    <div className="grow rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark md:p-6 xl:p-7.5">
       <div className="flex gap-4">
-        <div className="flex h-11.5 w-11.5 items-center justify-center rounded-md bg-[#F6F6F8] dark:bg-graydark">
+        <div className="flex size-11.5 items-center justify-center rounded-md bg-[#F6F6F8] dark:bg-graydark">
           <svg
             width="24"
             height="25"
@@ -39,7 +39,7 @@ const StorageList: React.FC = () => {
           </svg>
         </div>
 
-        <div className="flex-grow">
+        <div className="grow">
           <div className="mb-3 flex items-center justify-between">
             <span className="font-medium text-black dark:text-white">
               Media
@@ -48,13 +48,13 @@ const StorageList: React.FC = () => {
           </div>
 
           <div className="relative h-1.5 w-full rounded-full bg-stroke dark:bg-strokedark">
-            <span className="absolute left-0 block h-1.5 w-5/6 rounded-full bg-primary"></span>
+            <span className="absolute left-0 block h-1.5 w-5/6 rounded-full bg-primary" />
           </div>
         </div>
       </div>
 
       <div className="mt-5 flex gap-4">
-        <div className="flex h-11.5 w-11.5 items-center justify-center rounded-md bg-[#F6F6F8] dark:bg-graydark">
+        <div className="flex size-11.5 items-center justify-center rounded-md bg-[#F6F6F8] dark:bg-graydark">
           <svg
             width="24"
             height="24"
@@ -81,7 +81,7 @@ const StorageList: React.FC = () => {
           </svg>
         </div>
 
-        <div className="flex-grow">
+        <div className="grow">
           <div className="mb-3 flex items-center justify-between">
             <span className="font-medium text-black dark:text-white">
               Documents
@@ -90,12 +90,10 @@ const StorageList: React.FC = () => {
           </div>
 
           <div className="relative h-1.5 w-full rounded-full bg-stroke dark:bg-strokedark">
-            <span className="absolute left-0 block h-1.5 w-1/2 rounded-full bg-[#F2994A]"></span>
+            <span className="absolute left-0 block h-1.5 w-1/2 rounded-full bg-[#F2994A]" />
           </div>
         </div>
       </div>
     </div>
   );
 };
-
-export default StorageList;

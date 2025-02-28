@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 
-const SpinnerOne: React.FC = () => {
+export const SpinnerOne: React.FC = () => {
   return (
     <div className="flex items-center gap-7.5 xl:gap-17.5">
       <div className="animate-spin">
@@ -47,5 +47,3 @@ const SpinnerOne: React.FC = () => {
     </div>
   );
 };
-
-export default SpinnerOne;

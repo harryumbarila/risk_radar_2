@@ -1,41 +1,52 @@
-import React from "react";
-import DropdownFour from "@/components/Dropdowns/DropdownFour";
+import React from 'react';
 
-interface TableData {
+import { DropdownFour } from '@/components/Dropdowns/DropdownFour';
+
+type TableData = {
   name: string;
   position: string;
   email: string;
   role: string;
-}
+};
 
 const data: TableData[] = [
   {
-    name: "Musharof Chowdhury",
-    position: "Multidisciplinary Web Entrepreneur",
-    email: "musharof@example.com",
-    role: "Owner",
+    name: 'Musharof Chowdhury',
+    position: 'Multidisciplinary Web Entrepreneur',
+    email: 'musharof@example.com',
+    role: 'Owner',
   },
   {
-    name: "Naimur Rahman",
-    position: "Website Front-end Developer",
-    email: "naimurrahman@example.com",
-    role: "Member",
+    name: 'Naimur Rahman',
+    position: 'Website Front-end Developer',
+    email: 'naimurrahman@example.com',
+    role: 'Member',
   },
   {
-    name: "Shafiq Hammad",
-    position: "Regional Paradigm Technician",
-    email: "shafiq.hd@example.com",
-    role: "Moderator",
+    name: 'Shafiq Hammad',
+    position: 'Regional Paradigm Technician',
+    email: 'shafiq.hd@example.com',
+    role: 'Moderator',
   },
   {
-    name: "Alex Semuyel",
-    position: "Applications Engineer",
-    email: "alex.semuel@example.com",
-    role: "Admin",
+    name: 'Alex Semuyel',
+    position: 'Applications Engineer',
+    email: 'alex.semuel@example.com',
+    role: 'Admin',
   },
 ];
 
-const TableSix: React.FC = () => {
+const getDropdownClasses = (index: number): string => {
+  if (index < 2) {
+    return 'top-full mt-1';
+  } else if (index >= data.length - 2) {
+    return 'bottom-full mb-1';
+  } else {
+    return '';
+  }
+};
+
+export const TableSix: React.FC = () => {
   return (
     <div className="max-w-full overflow-x-auto">
       <div className="min-w-[1170px]">
@@ -67,7 +78,7 @@ const TableSix: React.FC = () => {
         <div className="rounded-b-[10px] bg-white dark:bg-boxdark">
           {data.map((item, index) => (
             <div
-              key={index}
+              key={item.name}
               className="grid grid-cols-12 border-t border-[#EEEEEE] px-5 py-4 dark:border-strokedark lg:px-7.5 2xl:px-11"
             >
               <div className="col-span-3">
@@ -90,15 +101,7 @@ const TableSix: React.FC = () => {
                 <p className="text-[#637381] dark:text-bodydark">{item.role}</p>
               </div>
               <div className="relative col-span-1">
-                <DropdownFour
-                  classes={
-                    index < 2
-                      ? "top-full mt-1"
-                      : index >= data.length - 2
-                        ? "bottom-full mb-1"
-                        : ""
-                  }
-                />
+                <DropdownFour classes={getDropdownClasses(index)} />
               </div>
             </div>
           ))}
@@ -108,5 +111,3 @@ const TableSix: React.FC = () => {
     </div>
   );
 };
-
-export default TableSix;

@@ -1,7 +1,8 @@
-import React from "react";
-import Image from "next/image";
-import CountDownTimer from "@/components/CountDownTimer";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
+import React from 'react';
+
+import { CountDownTimer } from '@/components/CountDownTimer';
 
 const UnderMaintenance: React.FC = () => {
   return (
@@ -15,7 +16,7 @@ const UnderMaintenance: React.FC = () => {
                   <Image
                     width={176}
                     height={32}
-                    src={"/images/logo/logo-dark.svg"}
+                    src="/images/logo/logo-dark.svg"
                     alt="Logo"
                     priority
                     className="dark:hidden"
@@ -23,7 +24,7 @@ const UnderMaintenance: React.FC = () => {
                   <Image
                     width={176}
                     height={32}
-                    src={"/images/logo/logo.svg"}
+                    src="/images/logo/logo.svg"
                     alt="Logo"
                     priority
                     className="hidden dark:block"
@@ -53,7 +54,7 @@ const UnderMaintenance: React.FC = () => {
 
                 <div className="flex items-center gap-4">
                   <Link
-                    href="#"
+                    href="/"
                     className="flex size-10 items-center justify-center rounded-full border border-[#DFE4EA] hover:border-primary hover:bg-primary hover:text-white dark:border-strokedark dark:hover:border-primary"
                   >
                     <svg
@@ -72,7 +73,7 @@ const UnderMaintenance: React.FC = () => {
                   </Link>
 
                   <Link
-                    href="#"
+                    href="/"
                     className="flex size-10 items-center justify-center rounded-full border border-[#DFE4EA] hover:border-primary hover:bg-primary hover:text-white dark:border-strokedark dark:hover:border-primary"
                   >
                     <svg
@@ -103,7 +104,7 @@ const UnderMaintenance: React.FC = () => {
                   </Link>
 
                   <Link
-                    href="#"
+                    href="/"
                     className="flex size-10 items-center justify-center rounded-full border border-[#DFE4EA] hover:border-primary hover:bg-primary hover:text-white dark:border-strokedark dark:hover:border-primary"
                   >
                     <svg
@@ -134,7 +135,7 @@ const UnderMaintenance: React.FC = () => {
                   </Link>
 
                   <Link
-                    href="#"
+                    href="/"
                     className="flex size-10 items-center justify-center rounded-full border border-[#DFE4EA] hover:border-primary hover:bg-primary hover:text-white dark:border-strokedark dark:hover:border-primary"
                   >
                     <svg
@@ -163,7 +164,7 @@ const UnderMaintenance: React.FC = () => {
                 <Image
                   width={562}
                   height={562}
-                  src={"/images/illustration/illustration-04.svg"}
+                  src="/images/illustration/illustration-04.svg"
                   alt="illustration"
                 />
               </span>

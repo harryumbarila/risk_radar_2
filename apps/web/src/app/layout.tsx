@@ -1,21 +1,20 @@
-"use client";
-import "jsvectormap/dist/jsvectormap.css";
-import "flatpickr/dist/flatpickr.min.css";
-import "nouislider/dist/nouislider.css";
-import "dropzone/dist/dropzone.css";
-import "@/css/satoshi.css";
-import "@/css/simple-datatables.css";
-import "@/css/style.css";
-import React, { useEffect, useState } from "react";
-import Loader from "@/components/common/Loader";
-import { UserProvider } from "@auth0/nextjs-auth0/client";
+'use client';
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+import '@/css/satoshi.css';
+import '@/css/simple-datatables.css';
+import '@/css/style.css';
+import 'dropzone/dist/dropzone.css';
+import 'flatpickr/dist/flatpickr.min.css';
+import 'jsvectormap/dist/jsvectormap.css';
+import 'nouislider/dist/nouislider.css';
+
+import { UserProvider } from '@auth0/nextjs-auth0/client';
+import type { FC, PropsWithChildren } from 'react';
+import { useEffect, useState } from 'react';
+
+import { Loader } from '@/components/common/Loader';
+
+const RootLayout: FC<PropsWithChildren> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   // const pathname = usePathname();
@@ -26,11 +25,13 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body suppressHydrationWarning={true}>
+      <body suppressHydrationWarning>
         <div className="dark:bg-boxdark-2 dark:text-bodydark">
           {loading ? <Loader /> : <UserProvider>{children}</UserProvider>}
         </div>
       </body>
     </html>
   );
-}
+};
+
+export default RootLayout;

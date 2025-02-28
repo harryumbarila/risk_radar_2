@@ -1,0 +1,5 @@
+yarn syncpack list-mismatches
+yarn lint-staged
+yarn type-check
+yarn test:unit
+yarn test:e2e

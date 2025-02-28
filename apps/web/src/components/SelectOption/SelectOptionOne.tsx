@@ -1,22 +1,23 @@
-"use client";
-import React, { useState } from "react";
+'use client';
 
-interface Option {
+import React, { useState } from 'react';
+
+type Option = {
   id: string;
   label: string;
-}
+};
 
 const options: Option[] = [
-  { id: "Graphics", label: "Graphics Design" },
-  { id: "Web", label: "Web Development" },
-  { id: "Logo", label: "Logo Design" },
-  { id: "Others", label: "Others" },
+  { id: 'Graphics', label: 'Graphics Design' },
+  { id: 'Web', label: 'Web Development' },
+  { id: 'Logo', label: 'Logo Design' },
+  { id: 'Others', label: 'Others' },
 ];
 
-const SelectOptionOne: React.FC = () => {
-  const [isChecked, setIsChecked] = useState<string>("");
+export const SelectOptionOne: React.FC = () => {
+  const [isChecked, setIsChecked] = useState<string>('');
 
-  const handleRadioChange = (value: string) => {
+  const handleRadioChange = (value: string): void => {
     setIsChecked(value);
   };
   return (
@@ -40,15 +41,15 @@ const SelectOptionOne: React.FC = () => {
                 onChange={() => handleRadioChange(option.id)}
               />
               <span
-                className={`flex h-5 w-5 items-center justify-center rounded-full border ${
-                  isChecked === option.id ? "border-primary" : "border-body"
+                className={`flex size-5 items-center justify-center rounded-full border ${
+                  isChecked === option.id ? 'border-primary' : 'border-body'
                 }`}
               >
                 <span
-                  className={`h-2.5 w-2.5 rounded-full bg-primary ${
-                    isChecked === option.id ? "flex" : "hidden"
+                  className={`size-2.5 rounded-full bg-primary ${
+                    isChecked === option.id ? 'flex' : 'hidden'
                   }`}
-                ></span>
+                />
               </span>
               {option.label}
             </label>
@@ -58,5 +59,3 @@ const SelectOptionOne: React.FC = () => {
     </div>
   );
 };
-
-export default SelectOptionOne;

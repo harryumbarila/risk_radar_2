@@ -1,8 +1,7 @@
-import type { JestConfigWithTsJest } from 'ts-jest';
-import { pathsToModuleNameMapper } from 'ts-jest';
-
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import type { JestConfigWithTsJest } from 'ts-jest';
+import { pathsToModuleNameMapper } from 'ts-jest';
 
 const tsConfigPath = join(__dirname, 'tsconfig.json');
 const tsConfig = JSON.parse(readFileSync(tsConfigPath, 'utf-8'));

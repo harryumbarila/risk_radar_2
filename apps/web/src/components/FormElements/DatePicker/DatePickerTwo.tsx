@@ -1,14 +1,15 @@
-import flatpickr from "flatpickr";
-import { useEffect } from "react";
+import flatpickr from 'flatpickr';
+import type { FC } from 'react';
+import { useEffect } from 'react';
 
-const DatePickerTwo = () => {
+export const DatePickerTwo: FC = () => {
   useEffect(() => {
     // Init flatpickr
-    flatpickr(".form-datepicker", {
-      mode: "single",
+    flatpickr('.form-datepicker', {
+      mode: 'single',
       static: true,
-      monthSelectorType: "static",
-      dateFormat: "M j, Y",
+      monthSelectorType: 'static',
+      dateFormat: 'M j, Y',
       prevArrow:
         '<svg className="fill-current" width="7" height="11" viewBox="0 0 7 11"><path d="M5.4 10.8l1.4-1.4-4-4 4-4L5.4 0 0 5.4z" /></svg>',
       nextArrow:
@@ -18,7 +19,10 @@ const DatePickerTwo = () => {
 
   return (
     <div>
-      <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+      <label
+        className="mb-3 block text-sm font-medium text-black dark:text-white"
+        htmlFor="datepicker"
+      >
         Select date
       </label>
       <div className="relative">
@@ -46,5 +50,3 @@ const DatePickerTwo = () => {
     </div>
   );
 };
-
-export default DatePickerTwo;

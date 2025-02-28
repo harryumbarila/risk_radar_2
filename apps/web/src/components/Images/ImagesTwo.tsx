@@ -1,10 +1,10 @@
-import React from "react";
-import Image from "next/image";
+import Image from 'next/image';
+import React from 'react';
 
-const ImagesTwo: React.FC = () => {
+export const ImagesTwo: React.FC = () => {
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-      <div className="border-b border-stroke px-4 py-4 dark:border-strokedark sm:px-6 xl:px-7.5">
+      <div className="border-b border-stroke p-4 dark:border-strokedark sm:px-6 xl:px-7.5">
         <h3 className="font-medium text-black dark:text-white">Image Grid</h3>
       </div>
 
@@ -14,7 +14,7 @@ const ImagesTwo: React.FC = () => {
             <Image
               width={431}
               height={385}
-              src={"/images/cover/cover-03.jpg"}
+              src="/images/cover/cover-03.jpg"
               alt="Cover"
             />
           </div>
@@ -22,7 +22,7 @@ const ImagesTwo: React.FC = () => {
             <Image
               width={431}
               height={385}
-              src={"/images/cover/cover-04.jpg"}
+              src="/images/cover/cover-04.jpg"
               alt="Cover"
             />
           </div>
@@ -30,7 +30,7 @@ const ImagesTwo: React.FC = () => {
             <Image
               width={431}
               height={385}
-              src={"/images/cover/cover-05.jpg"}
+              src="/images/cover/cover-05.jpg"
               alt="Cover"
             />
           </div>
@@ -39,5 +39,3 @@ const ImagesTwo: React.FC = () => {
     </div>
   );
 };
-
-export default ImagesTwo;

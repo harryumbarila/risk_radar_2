@@ -1,14 +1,16 @@
-"use client";
-import React from "react";
-import DataStatsTwo from "../DataStats/DataStatsTwo";
-import ChartFive from "../Charts/ChartFive";
-import TableFour from "../Tables/TableFour";
-import ExternalLink from "../ExternalLink";
-import ChartSix from "../Charts/ChartSix";
-import FeaturedCampaigns from "../FeaturedCampaigns";
-import Feedback from "../Feedback";
+'use client';
 
-const Marketing: React.FC = () => {
+import React from 'react';
+
+import { ChartFive } from '@/components/Charts/ChartFive';
+import { ChartSix } from '@/components/Charts/ChartSix';
+import { DataStatsTwo } from '@/components/DataStats/DataStatsTwo';
+import { ExternalLink } from '@/components/ExternalLink';
+import { FeaturedCampaigns } from '@/components/FeaturedCampaigns';
+import { Feedback } from '@/components/Feedback';
+import { TableFour } from '@/components/Tables/TableFour';
+
+export const Marketing: React.FC = () => {
   return (
     <>
       <DataStatsTwo />
@@ -26,5 +28,3 @@ const Marketing: React.FC = () => {
     </>
   );
 };
-
-export default Marketing;

@@ -1,9 +1,9 @@
-import React from "react";
+import React from 'react';
 
-const NotificationsTwo: React.FC = () => {
+export const NotificationsTwo: React.FC = () => {
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-      <div className="border-b border-stroke px-4 py-4 dark:border-strokedark sm:px-6 xl:px-7.5">
+      <div className="border-b border-stroke p-4 dark:border-strokedark sm:px-6 xl:px-7.5">
         <h3 className="font-medium text-black dark:text-white">
           Notifications Style 2
         </h3>
@@ -12,7 +12,7 @@ const NotificationsTwo: React.FC = () => {
       <div className="p-4 sm:p-6 xl:p-10">
         <div className="max-w-[490px] rounded-lg border border-[#F5C5BB] bg-[#FCEDEA] py-4 pl-4 pr-5.5 shadow-2 dark:border-[#EA4E2C] dark:bg-[#1B1B24]">
           <div className="flex items-center justify-between">
-            <div className="flex flex-grow items-center gap-5">
+            <div className="flex grow items-center gap-5">
               <div className="flex h-15 w-full max-w-15 items-center justify-center rounded-md bg-[#EA4E2C]">
                 <svg
                   width="32"
@@ -52,7 +52,11 @@ const NotificationsTwo: React.FC = () => {
             </div>
 
             <div>
-              <button className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-[#637381] hover:text-black dark:bg-meta-4 dark:hover:text-white">
+              <button
+                className="flex size-7 items-center justify-center rounded-md bg-white text-[#637381] hover:text-black dark:bg-meta-4 dark:hover:text-white"
+                type="button"
+                aria-label="Close"
+              >
                 <svg
                   className="fill-current"
                   width="14"
@@ -76,5 +80,3 @@ const NotificationsTwo: React.FC = () => {
     </div>
   );
 };
-
-export default NotificationsTwo;

@@ -1,8 +1,8 @@
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
+import React from 'react';
 
-interface Product {
+type Product = {
   link: string;
   image: string;
   name: string;
@@ -10,21 +10,21 @@ interface Product {
   size: string;
   quantity: number;
   price: number;
-}
+};
 
 const productList: Product[] = [
   {
-    link: "#",
-    image: "/images/product/product-thumb.png",
-    name: "Mist Black Triblend",
-    color: "White",
-    size: "Medium",
+    link: '/',
+    image: '/images/product/product-thumb.png',
+    name: 'Mist Black Triblend',
+    color: 'White',
+    size: 'Medium',
     quantity: 1,
     price: 120.0,
   },
 ];
 
-const InvoiceOne: React.FC = () => {
+export const InvoiceOne: React.FC = () => {
   return (
     <div>
       <div className="flex flex-col-reverse gap-5 xl:flex-row xl:justify-between">
@@ -36,7 +36,7 @@ const InvoiceOne: React.FC = () => {
             <h4 className="mb-4 text-title-sm2 font-medium leading-[30px] text-black dark:text-white">
               Roger Culhane
             </h4>
-            <Link href="#" className="block">
+            <Link href="/" className="block">
               <span className="font-medium">Email: </span>
               contact@example.com
             </Link>
@@ -50,7 +50,7 @@ const InvoiceOne: React.FC = () => {
             <h4 className="mb-4 text-title-sm2 font-medium leading-[30px] text-black dark:text-white">
               Cristofer Levin
             </h4>
-            <Link href="#" className="block">
+            <Link href="/" className="block">
               <span className="font-medium">Email: </span>
               contact@example.com
             </Link>
@@ -61,22 +61,22 @@ const InvoiceOne: React.FC = () => {
           </div>
         </div>
         <h3 className="text-2xl font-medium text-black dark:text-white">
-          Order #15478
+          Order /15478
         </h3>
       </div>
 
       <div className="my-10 rounded-sm border border-stroke p-5 dark:border-strokedark">
-        {productList.map((item, index) => (
-          <div key={index} className="items-center sm:flex">
-            <div className="mb-3 mr-6 h-20 w-20 sm:mb-0">
+        {productList.map((item) => (
+          <div key={item.name} className="items-center sm:flex">
+            <div className="mb-3 mr-6 size-20 sm:mb-0">
               <Image
                 src={item.image}
-                className="h-full w-full rounded-sm object-cover object-center"
+                className="size-full rounded-sm object-cover object-center"
                 width={80}
                 height={80}
                 style={{
-                  width: "auto",
-                  height: "auto",
+                  width: 'auto',
+                  height: 'auto',
                 }}
                 alt="product"
               />
@@ -148,10 +148,16 @@ const InvoiceOne: React.FC = () => {
             </div>
 
             <div className="mt-10 flex flex-col justify-end gap-4 sm:flex-row">
-              <button className="flex items-center justify-center rounded border border-primary px-8 py-2.5 text-center font-medium text-primary hover:opacity-90">
+              <button
+                className="flex items-center justify-center rounded border border-primary px-8 py-2.5 text-center font-medium text-primary hover:opacity-90"
+                type="button"
+              >
                 Download Invoice
               </button>
-              <button className="flex items-center justify-center rounded bg-primary px-8 py-2.5 text-center font-medium text-gray hover:bg-opacity-90">
+              <button
+                className="flex items-center justify-center rounded bg-primary px-8 py-2.5 text-center font-medium text-gray hover:bg-opacity-90"
+                type="button"
+              >
                 Send Invoice
               </button>
             </div>
@@ -161,5 +167,3 @@ const InvoiceOne: React.FC = () => {
     </div>
   );
 };
-
-export default InvoiceOne;

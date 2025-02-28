@@ -1,9 +1,9 @@
-import React from "react";
+import React from 'react';
 
-const ProgressThree: React.FC = () => {
+export const ProgressThree: React.FC = () => {
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-      <div className="border-b border-stroke px-4 py-4 dark:border-strokedark sm:px-6 xl:px-7.5">
+      <div className="border-b border-stroke p-4 dark:border-strokedark sm:px-6 xl:px-7.5">
         <h3 className="font-medium text-black dark:text-white">
           Progress Style 3
         </h3>
@@ -39,5 +39,3 @@ const ProgressThree: React.FC = () => {
     </div>
   );
 };
-
-export default ProgressThree;

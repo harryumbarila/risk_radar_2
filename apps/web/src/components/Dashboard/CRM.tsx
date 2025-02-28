@@ -1,13 +1,15 @@
-"use client";
-import React from "react";
-import DataStatsThree from "../DataStats/DataStatsThree";
-import ChartSeven from "../Charts/ChartSeven";
-import ChartEight from "../Charts/ChartEight";
-import ChartNine from "../Charts/ChartNine";
-import LeadsReport from "../LeadsReport";
-import ToDoList from "../Todo/ToDoList";
+'use client';
 
-const CRM: React.FC = () => {
+import React from 'react';
+
+import { ChartEight } from '@/components/Charts/ChartEight';
+import { ChartNine } from '@/components/Charts/ChartNine';
+import { ChartSeven } from '@/components/Charts/ChartSeven';
+import { DataStatsThree } from '@/components/DataStats/DataStatsThree';
+import { LeadsReport } from '@/components/LeadsReport';
+import { ToDoList } from '@/components/Todo/ToDoList';
+
+export const CRM: React.FC = () => {
   return (
     <>
       <DataStatsThree />
@@ -32,5 +34,3 @@ const CRM: React.FC = () => {
     </>
   );
 };
-
-export default CRM;

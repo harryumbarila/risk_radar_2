@@ -1,15 +1,13 @@
-import React from "react";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import TeamOne from "@/components/Teams/TeamOne";
-import TeamTwo from "@/components/Teams/TeamTwo";
+import type { Metadata } from 'next';
+import React from 'react';
 
-import { Metadata } from "next";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
-  title: "Next.js Terms & Conditions | TailAdmin - Next.js Dashboard Template",
+  title: 'Next.js Terms & Conditions | TailAdmin - Next.js Dashboard Template',
   description:
-    "This is Next.js Terms & Conditions page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    'This is Next.js Terms & Conditions page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
 };
 
 const TermsConditions: React.FC = () => {

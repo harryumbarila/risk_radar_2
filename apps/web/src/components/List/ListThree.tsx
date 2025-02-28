@@ -1,43 +1,44 @@
-import React from "react";
-import Image from "next/image";
-import DropdownFive from "@/components/Dropdowns/DropdownFive";
+import Image from 'next/image';
+import React from 'react';
 
-interface ListItem {
+import { DropdownFive } from '@/components/Dropdowns/DropdownFive';
+
+type ListItem = {
   image: string;
   name: string;
   position: string;
-}
+};
 
 const listItems: ListItem[] = [
   {
-    image: "/images/user/user-01.png",
-    name: "Devid Wilium",
-    position: "Digital marketer",
+    image: '/images/user/user-01.png',
+    name: 'Devid Wilium',
+    position: 'Digital marketer',
   },
   {
-    image: "/images/user/user-03.png",
-    name: "Deniyal Shifer",
-    position: "Graphics designer",
+    image: '/images/user/user-03.png',
+    name: 'Deniyal Shifer',
+    position: 'Graphics designer',
   },
   {
-    image: "/images/user/user-02.png",
-    name: "Philifs Geno",
-    position: "Content creator",
+    image: '/images/user/user-02.png',
+    name: 'Philifs Geno',
+    position: 'Content creator',
   },
   {
-    image: "/images/user/user-05.png",
-    name: "Marko Diyan",
-    position: "Web developer",
+    image: '/images/user/user-05.png',
+    name: 'Marko Diyan',
+    position: 'Web developer',
   },
 ];
 
-const ListThree: React.FC = () => {
+export const ListThree: React.FC = () => {
   return (
     <div className="w-full max-w-[360px] rounded-md border border-stroke py-2.5 dark:border-strokedark">
       <div className="flex flex-col">
-        {listItems.map((item, index) => (
+        {listItems.map((item) => (
           <div
-            key={index}
+            key={item.name}
             className="flex items-center justify-between p-4.5 hover:bg-[#F9FAFB] dark:hover:bg-meta-4"
           >
             <div className="flex items-center">
@@ -49,8 +50,8 @@ const ListThree: React.FC = () => {
                   alt="user"
                   className="rounded-full object-cover object-center"
                   style={{
-                    width: "auto",
-                    height: "auto",
+                    width: 'auto',
+                    height: 'auto',
                   }}
                 />
               </div>
@@ -71,5 +72,3 @@ const ListThree: React.FC = () => {
     </div>
   );
 };
-
-export default ListThree;

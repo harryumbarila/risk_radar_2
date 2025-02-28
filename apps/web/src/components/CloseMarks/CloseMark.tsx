@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 
-const CloseMark: React.FC = () => {
+export const CloseMark: React.FC = () => {
   return (
     <svg
       width="25"
@@ -20,5 +20,3 @@ const CloseMark: React.FC = () => {
     </svg>
   );
 };
-
-export default CloseMark;

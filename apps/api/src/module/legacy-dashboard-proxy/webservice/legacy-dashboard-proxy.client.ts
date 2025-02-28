@@ -1,25 +1,30 @@
-import {
+import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import type { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
+import axios from 'axios';
+
+import type { ExceptionFiltersDto } from '@/api/module/legacy-dashboard-proxy/legacy-dashboard-proxy.controller';
+import type {
   ExceptionDataResponseDto,
-  kpiStatisticsResponseDto,
   KpiStatisticsResponseDto,
   MerchantResponseDto,
   RiskRadarResponseDto,
 } from '@/shared/response/legacy-dashboard-proxy';
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
-import { ExceptionFiltersDto } from '../legacy-dashboard-proxy.controller';
+import { kpiStatisticsResponseDto } from '@/shared/response/legacy-dashboard-proxy';
 
-export interface LegacyDashboardProxyClientConfig {
+export type LegacyDashboardProxyClientConfig = {
   LEGACY_DASHBOARD_URL: string;
-}
+};
 
 @Injectable()
 export class LegacyDashboardProxyClient {
   private readonly logger = new Logger(LegacyDashboardProxyClient.name);
+
   private readonly client: AxiosInstance;
 
-  constructor(configService: ConfigService<LegacyDashboardProxyClientConfig>) {
+  public constructor(
+    configService: ConfigService<LegacyDashboardProxyClientConfig>
+  ) {
     this.client = axios.create({
       baseURL: configService.get('LEGACY_DASHBOARD_URL'),
       timeout: 10000,
@@ -32,23 +37,23 @@ export class LegacyDashboardProxyClient {
           `Request: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`,
           {
             headers: config.headers,
-            params: config.params,
-            data: config.data,
-          },
+            params: config.params as unknown,
+            data: config.data as unknown,
+          }
         );
         return config;
       },
       (error) => {
         this.logger.error('Request Error:', error);
         return Promise.reject(error);
-      },
+      }
     );
 
     // Add response interceptor for logging
     this.client.interceptors.response.use(
       (response: AxiosResponse) => {
         this.logger.debug(`Response: ${response.status}`, {
-          data: response.data,
+          data: response.data as unknown,
           headers: response.headers,
         });
         return response;
@@ -60,26 +65,28 @@ export class LegacyDashboardProxyClient {
           message: error.message,
         });
         return Promise.reject(error);
-      },
+      }
     );
   }
 
-  getKPI(): KpiStatisticsResponseDto {
+  public getKPI(): KpiStatisticsResponseDto {
     return kpiStatisticsResponseDto;
   }
 
-  async getExceptionData(): Promise<ExceptionDataResponseDto> {
+  public async getExceptionData(): Promise<ExceptionDataResponseDto> {
     const response = await this.get<ExceptionDataResponseDto>(
-      '/api/v1/dashboard/riskradar/exception-information',
+      '/api/v1/dashboard/riskradar/exception-information'
     );
     return response.data;
   }
 
-  async getMerchant(mid: string): Promise<MerchantResponseDto> {
+  public getMerchant(mid: string): MerchantResponseDto {
     // const response = await this.get<MerchantResponseDto>(
     //   `/api/v1/dashboard/riskradar/merchant-data-path?mid=${mid}`,
     // );
     // return response.data;
+
+    this.logger.debug('Merchant MID:', mid);
 
     return {
       merchant_profile: [
@@ -193,12 +200,15 @@ export class LegacyDashboardProxyClient {
     };
   }
 
-  async riskRadar(filters: ExceptionFiltersDto): Promise<RiskRadarResponseDto> {
+  public riskRadar(filters: ExceptionFiltersDto): RiskRadarResponseDto {
     // const response = await this.get<RiskRadarResponseDto>(
     //   '/api/v1/dashboard/riskradar/exception-list',
     //   { params: filters },
     // );
-    //return response.data;
+    // return response.data;
+
+    this.logger.debug('Risk Radar filters:', filters);
+
     const obj = {
       DATA: [
         {
@@ -379,22 +389,23 @@ export class LegacyDashboardProxyClient {
         total_records: 11,
       },
     };
+
     return obj;
   }
 
-  async get<T>(url: string, config = {}) {
+  public async get<T>(url: string, config = {}) {
     return this.client.get<T>(url, config);
   }
 
-  async post<T>(url: string, data = {}, config = {}) {
+  public async post<T>(url: string, data = {}, config = {}) {
     return this.client.post<T>(url, data, config);
   }
 
-  async put<T>(url: string, data = {}, config = {}) {
+  public async put<T>(url: string, data = {}, config = {}) {
     return this.client.put<T>(url, data, config);
   }
 
-  async delete<T>(url: string, config = {}) {
+  public async delete<T>(url: string, config = {}) {
     return this.client.delete<T>(url, config);
   }
 }

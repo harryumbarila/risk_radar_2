@@ -1,16 +1,18 @@
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import Image from "next/image";
-import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import Link from "next/link";
+import type { Metadata } from 'next';
+import Image from 'next/image';
+import Link from 'next/link';
+import type { FC } from 'react';
+
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
-  title: "Next.js Profile | TailAdmin - Next.js Dashboard Template",
+  title: 'Next.js Profile | TailAdmin - Next.js Dashboard Template',
   description:
-    "This is Next.js Profile page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    'This is Next.js Profile page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
 };
 
-const Profile = () => {
+const Profile: FC = () => {
   return (
     <DefaultLayout>
       <div className="mx-auto max-w-242.5">
@@ -19,14 +21,14 @@ const Profile = () => {
         <div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
           <div className="relative z-20 h-35 md:h-65">
             <Image
-              src={"/images/cover/cover-01.png"}
+              src="/images/cover/cover-01.png"
               alt="profile cover"
-              className="h-full w-full rounded-tl-sm rounded-tr-sm object-cover object-center"
+              className="size-full rounded-t-sm object-cover object-center"
               width={970}
               height={260}
               style={{
-                width: "auto",
-                height: "auto",
+                width: 'auto',
+                height: 'auto',
               }}
             />
             <div className="absolute bottom-1 right-1 z-10 xsm:bottom-4 xsm:right-4">
@@ -71,18 +73,19 @@ const Profile = () => {
             <div className="relative z-30 mx-auto -mt-22 h-30 w-full max-w-30 rounded-full bg-white/20 p-1 backdrop-blur sm:h-44 sm:max-w-44 sm:p-3">
               <div className="relative drop-shadow-2">
                 <Image
-                  src={"/images/user/user-06.png"}
+                  src="/images/user/user-06.png"
                   width={160}
                   height={160}
                   style={{
-                    width: "auto",
-                    height: "auto",
+                    width: 'auto',
+                    height: 'auto',
                   }}
                   alt="profile"
                 />
                 <label
                   htmlFor="profile"
-                  className="absolute bottom-0 right-0 flex h-8.5 w-8.5 cursor-pointer items-center justify-center rounded-full bg-primary text-white hover:bg-opacity-90 sm:bottom-2 sm:right-2"
+                  className="absolute bottom-0 right-0 flex size-8.5 cursor-pointer items-center justify-center rounded-full bg-primary text-white hover:bg-opacity-90 sm:bottom-2 sm:right-2"
+                  aria-label="profile"
                 >
                   <svg
                     className="fill-current"
@@ -159,7 +162,7 @@ const Profile = () => {
                 </h4>
                 <div className="flex items-center justify-center gap-3.5">
                   <Link
-                    href="#"
+                    href="/"
                     className="hover:text-primary"
                     aria-label="social-icon"
                   >
@@ -185,7 +188,7 @@ const Profile = () => {
                     </svg>
                   </Link>
                   <Link
-                    href="#"
+                    href="/"
                     className="hover:text-primary"
                     aria-label="social-icon"
                   >
@@ -216,7 +219,7 @@ const Profile = () => {
                     </svg>
                   </Link>
                   <Link
-                    href="#"
+                    href="/"
                     className="hover:text-primary"
                     aria-label="social-icon"
                   >
@@ -247,7 +250,7 @@ const Profile = () => {
                     </svg>
                   </Link>
                   <Link
-                    href="#"
+                    href="/"
                     className="hover:text-primary"
                     aria-label="social-icon"
                   >
@@ -273,7 +276,7 @@ const Profile = () => {
                     </svg>
                   </Link>
                   <Link
-                    href="#"
+                    href="/"
                     className="hover:text-primary"
                     aria-label="social-icon"
                   >

@@ -1,10 +1,11 @@
-"use client";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import TabOne from "@/components/Tabs/TabOne";
-import TabTwo from "@/components/Tabs/TabTwo";
-import TabThree from "@/components/Tabs/TabThree";
+'use client';
 
-const Tabs: React.FC = () => {
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { TabOne } from '@/components/Tabs/TabOne';
+import { TabThree } from '@/components/Tabs/TabThree';
+import { TabTwo } from '@/components/Tabs/TabTwo';
+
+export const Tabs: React.FC = () => {
   return (
     <>
       <Breadcrumb pageName="Tabs" />
@@ -17,5 +18,3 @@ const Tabs: React.FC = () => {
     </>
   );
 };
-
-export default Tabs;

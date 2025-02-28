@@ -1,4 +1,4 @@
-import { withMiddlewareAuthRequired } from "@auth0/nextjs-auth0/edge";
+import { withMiddlewareAuthRequired } from '@auth0/nextjs-auth0/edge';
 
 export default withMiddlewareAuthRequired();
 
@@ -9,6 +9,6 @@ export const config = {
     // - _next (Next.js internals)
     // - static files (images, favicon)
     // - auth-related routes
-    "/((?!api|_next/static|_next/image|favicon.ico|login|auth).*)",
+    '/((?!api|_next/static|_next/image|favicon.ico|login|auth).*)',
   ],
 };

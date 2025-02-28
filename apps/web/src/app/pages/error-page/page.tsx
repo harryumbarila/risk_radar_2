@@ -1,14 +1,15 @@
-import React from "react";
-import Link from "next/link";
-import Image from "next/image";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import type { Metadata } from 'next';
+import Image from 'next/image';
+import Link from 'next/link';
+import React from 'react';
+
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
-  title: "Next.js Error | TailAdmin - Next.js Dashboard Template",
+  title: 'Next.js Error | TailAdmin - Next.js Dashboard Template',
   description:
-    "This is Next.js Error page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    'This is Next.js Error page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
 };
 
 const ErrorPage: React.FC = () => {
@@ -19,7 +20,7 @@ const ErrorPage: React.FC = () => {
       <div className="rounded-sm border border-stroke bg-white px-5 py-10 shadow-default dark:border-strokedark dark:bg-boxdark sm:py-20">
         <div className="mx-auto max-w-[410px]">
           <Image
-            src={"/images/illustration/illustration-01.svg"}
+            src="/images/illustration/illustration-01.svg"
             alt="illustration"
             width={400}
             height={400}

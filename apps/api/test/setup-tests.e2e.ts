@@ -8,7 +8,7 @@ beforeAll(async () => {
   // await AppDataSource.runMigrations();
 }, 8000);
 
-beforeEach(async () => {
+beforeEach(() => {
   try {
     // const entities = AppDataSource.entityMetadatas;
     // const tableNames = entities

@@ -1,14 +1,13 @@
-"use client";
-import React, { useState, ReactNode } from "react";
-import Sidebar from "@/components/Sidebar";
-import Header from "@/components/Header";
-import { NotificationsContainer } from "@/components/Notifications/NotificationContent";
+'use client';
 
-export default function DefaultLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+import type { FC, PropsWithChildren } from 'react';
+import React, { useState } from 'react';
+
+import { Header } from '@/components/Header';
+import { NotificationsContainer } from '@/components/Notifications/NotificationContent';
+import { Sidebar } from '@/components/Sidebar';
+
+export const DefaultLayout: FC<PropsWithChildren> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <>
@@ -36,4 +35,4 @@ export default function DefaultLayout({
       {/* <!-- ===== Page Wrapper End ===== --> */}
     </>
   );
-}
+};

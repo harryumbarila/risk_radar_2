@@ -1,4 +1,4 @@
-import { ConfigModuleOptions } from '@nestjs/config/dist/interfaces';
+import type { ConfigModuleOptions } from '@nestjs/config/dist/interfaces';
 
 export const rootConfig = {
   isGlobal: true,

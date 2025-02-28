@@ -1,53 +1,53 @@
-import React from "react";
-import Image from "next/image";
+import Image from 'next/image';
+import React from 'react';
 
-interface Stocks {
+type Stocks = {
   image: string;
   name: string;
   share: number;
   price: number;
   returnRate: number;
-}
+};
 
 const stocksItems: Stocks[] = [
   {
-    image: "/images/brand/brand-07.svg",
-    name: "Apple Inc",
+    image: '/images/brand/brand-07.svg',
+    name: 'Apple Inc',
     share: 16,
     price: 410.5,
     returnRate: +0.95,
   },
   {
-    image: "/images/brand/brand-01.svg",
-    name: "Google",
+    image: '/images/brand/brand-01.svg',
+    name: 'Google',
     share: 100,
     price: 410.5,
     returnRate: +0.95,
   },
   {
-    image: "/images/brand/brand-10.svg",
-    name: "Tesla",
+    image: '/images/brand/brand-10.svg',
+    name: 'Tesla',
     share: 20,
     price: 410.5,
     returnRate: +0.95,
   },
   {
-    image: "/images/brand/brand-13.svg",
-    name: "Twitter X",
+    image: '/images/brand/brand-13.svg',
+    name: 'Twitter X',
     share: 87,
     price: 410.5,
     returnRate: -0.95,
   },
   {
-    image: "/images/brand/brand-11.svg",
-    name: "Microsoft",
+    image: '/images/brand/brand-11.svg',
+    name: 'Microsoft',
     share: 37,
     price: 410.5,
     returnRate: +0.95,
   },
 ];
 
-const MyStocks: React.FC = () => {
+export const MyStocks: React.FC = () => {
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white px-5.5 py-7.5 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-5">
       <div className="mb-7.5 flex flex-wrap items-center justify-between gap-2 px-2">
@@ -86,21 +86,21 @@ const MyStocks: React.FC = () => {
       </div>
 
       <div className="flex flex-col">
-        {stocksItems.map((item, key) => (
+        {stocksItems.map((item) => (
           <div
-            key={key}
+            key={item.name}
             className="flex items-center justify-between rounded-[5px] px-4 py-3.5 hover:bg-[#F8FAFD] dark:hover:bg-meta-4"
           >
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full">
+              <div className="size-10 rounded-full">
                 <Image
                   src={item.image}
                   alt="brand"
                   width={40}
                   height={40}
                   style={{
-                    width: "auto",
-                    height: "auto",
+                    width: 'auto',
+                    height: 'auto',
                   }}
                 />
               </div>
@@ -119,7 +119,7 @@ const MyStocks: React.FC = () => {
               </p>
               <p
                 className={`flex items-center justify-end gap-1 text-xs font-medium ${
-                  item.returnRate >= 0 ? "text-meta-3" : "text-red"
+                  item.returnRate >= 0 ? 'text-meta-3' : 'text-red'
                 }`}
               >
                 {item.returnRate}%
@@ -160,5 +160,3 @@ const MyStocks: React.FC = () => {
     </div>
   );
 };
-
-export default MyStocks;

@@ -1,12 +1,12 @@
-import { ApexOptions } from "apexcharts";
-import React, { useState } from "react";
-import ReactApexChart from "react-apexcharts";
+import type { ApexOptions } from 'apexcharts';
+import React, { useState } from 'react';
+import ReactApexChart from 'react-apexcharts';
 
-interface ChartNineState {
+type ChartNineState = {
   series: { data: number[] }[];
-}
+};
 
-const ChartNine: React.FC = () => {
+export const ChartNine: React.FC = () => {
   const [state, setState] = useState<ChartNineState>({
     series: [
       {
@@ -19,19 +19,19 @@ const ChartNine: React.FC = () => {
   });
 
   // Update the state
-  const updateState = () => {
+  const updateState = (): void => {
     setState((prevState) => ({
       ...prevState,
       // Update the desired properties
     }));
   };
-  updateState;
+  updateState();
 
   const options: ApexOptions = {
-    colors: ["#3C50E0", "#80CAEE"],
+    colors: ['#3C50E0', '#80CAEE'],
     chart: {
-      fontFamily: "Satoshi, sans-serif",
-      type: "bar",
+      fontFamily: 'Satoshi, sans-serif',
+      type: 'bar',
       height: 250,
       toolbar: {
         show: false,
@@ -40,7 +40,7 @@ const ChartNine: React.FC = () => {
     plotOptions: {
       bar: {
         horizontal: false,
-        columnWidth: "35%",
+        columnWidth: '35%',
         // endingShape: 'rounded',
         borderRadius: 0,
       },
@@ -51,10 +51,10 @@ const ChartNine: React.FC = () => {
     stroke: {
       show: true,
       width: 4,
-      colors: ["transparent"],
+      colors: ['transparent'],
     },
     xaxis: {
-      categories: ["M", "T", "W", "T", "F", "S", "S"],
+      categories: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
       axisBorder: {
         show: false,
       },
@@ -64,9 +64,9 @@ const ChartNine: React.FC = () => {
     },
     legend: {
       show: false,
-      position: "top",
-      horizontalAlign: "left",
-      fontFamily: "Satoshi",
+      position: 'top',
+      horizontalAlign: 'left',
+      fontFamily: 'Satoshi',
     },
     // yaxis: {
     //   title: false,
@@ -151,5 +151,3 @@ const ChartNine: React.FC = () => {
     </div>
   );
 };
-
-export default ChartNine;

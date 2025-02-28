@@ -1,38 +1,38 @@
-import React from "react";
+import React from 'react';
 
-interface Faq {
+type Faq = {
   title: string;
   details: string;
-}
+};
 
 const faqItems: Faq[] = [
   {
-    title: "Is Windy UI Well-documented?",
+    title: 'Is Windy UI Well-documented?',
     details:
-      "It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content ui/ux strategy that we your first blog post.",
+      'It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content ui/ux strategy that we your first blog post.',
   },
   {
-    title: "Is Windy UI Well-documented?",
+    title: 'Is Windy UI Well-documented?',
     details:
-      "It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content ui/ux strategy that we your first blog post.",
+      'It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content ui/ux strategy that we your first blog post.',
   },
   {
-    title: "Is Windy UI Well-documented?",
+    title: 'Is Windy UI Well-documented?',
     details:
-      "It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content ui/ux strategy that we your first blog post.",
+      'It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content ui/ux strategy that we your first blog post.',
   },
   {
-    title: "Is Windy UI Well-documented?",
+    title: 'Is Windy UI Well-documented?',
     details:
-      "It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content ui/ux strategy that we your first blog post.",
+      'It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content ui/ux strategy that we your first blog post.',
   },
 ];
 
-const FaqOne: React.FC = () => {
+export const FaqOne: React.FC = () => {
   return (
-    <div className="grid grid-cols-1 gap-x-7.5 gap-y-7.5 sm:gap-y-12.5 xl:grid-cols-2 xl:gap-y-17.5">
-      {faqItems.map((item, index) => (
-        <div key={index} className="flex gap-6">
+    <div className="grid grid-cols-1 gap-7.5 sm:gap-y-12.5 xl:grid-cols-2 xl:gap-y-17.5">
+      {faqItems.map((item) => (
+        <div key={item.title} className="flex gap-6">
           <div className="flex h-15 w-full max-w-15 items-center justify-center rounded-xl bg-primary text-white">
             <svg
               className="fill-current"
@@ -80,5 +80,3 @@ const FaqOne: React.FC = () => {
     </div>
   );
 };
-
-export default FaqOne;

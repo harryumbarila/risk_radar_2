@@ -1,12 +1,13 @@
-import Dropzone from "dropzone";
-import { useEffect } from "react";
+import Dropzone from 'dropzone';
+import type { FC } from 'react';
+import { useEffect } from 'react';
 
-const FileDropZone = () => {
+export const FileDropZone: FC = () => {
   useEffect(() => {
-    let myDropzone = new Dropzone("#demo-upload", { url: "/file/post" });
+    const myDropzone = new Dropzone('#demo-upload', { url: '/file/post' });
 
     return () => {
-      (myDropzone as any).destroy();
+      myDropzone.destroy();
     };
   }, []);
 
@@ -25,7 +26,7 @@ const FileDropZone = () => {
         >
           <div className="dz-message">
             <div className="mb-2.5 flex justify-center">
-              <div className="flex h-15 w-15 items-center justify-center rounded-full bg-white text-black shadow-10 dark:bg-black dark:text-white">
+              <div className="flex size-15 items-center justify-center rounded-full bg-white text-black shadow-10 dark:bg-black dark:text-white">
                 <svg
                   className="fill-current"
                   width="20"
@@ -61,5 +62,3 @@ const FileDropZone = () => {
     </div>
   );
 };
-
-export default FileDropZone;

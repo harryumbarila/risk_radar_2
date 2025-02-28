@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
-const Start: React.FC = () => {
+export const Start: React.FC = () => {
   const [stared, setStared] = useState(false);
 
-  function toggleStar() {
+  function toggleStar(): void {
     setStared(() => !stared);
   }
 
@@ -16,7 +16,7 @@ const Start: React.FC = () => {
       xmlns="http://www.w3.org/2000/svg"
       onClick={toggleStar}
       className={
-        stared ? "fill-[#FFD02C] " : "fill-[#E5E7EE] dark:fill-[#E5E7EE]/70"
+        stared ? 'fill-[#FFD02C] ' : 'fill-[#E5E7EE] dark:fill-[#E5E7EE]/70'
       }
     >
       <path
@@ -26,5 +26,3 @@ const Start: React.FC = () => {
     </svg>
   );
 };
-
-export default Start;

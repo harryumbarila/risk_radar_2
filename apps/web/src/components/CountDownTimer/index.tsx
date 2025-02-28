@@ -1,13 +1,14 @@
-"use client";
-import React, { useEffect, useState } from "react";
+'use client';
 
-const CountDownTimer: React.FC = () => {
+import React, { useEffect, useState } from 'react';
+
+export const CountDownTimer: React.FC = () => {
   const [days, setDays] = useState(0);
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
 
-  const targetDate = new Date("12/31/2024 23:59:59");
+  const targetDate = new Date('12/31/2024 23:59:59');
 
   const calculateRemainingPercentage = (): string => {
     const now = new Date();
@@ -19,8 +20,8 @@ const CountDownTimer: React.FC = () => {
   };
 
   const formatNumber = (num: number): number[] => {
-    const formattedNumber = num.toString().padStart(2, "0");
-    return formattedNumber.split("").map(Number);
+    const formattedNumber = num.toString().padStart(2, '0');
+    return formattedNumber.split('').map(Number);
   };
 
   useEffect(() => {
@@ -32,7 +33,7 @@ const CountDownTimer: React.FC = () => {
       setDays(d);
 
       const h = Math.floor(
-        (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+        (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
       );
       setHours(h);
 
@@ -50,9 +51,9 @@ const CountDownTimer: React.FC = () => {
     <div className="flex flex-wrap gap-6">
       <div>
         <div className="mb-3 flex items-center gap-2">
-          {formatNumber(days).map((digit, index) => (
+          {formatNumber(days).map((digit) => (
             <div
-              key={index}
+              key={`${digit}-1`}
               className="timer-box relative z-1 overflow-hidden rounded-lg"
             >
               <span className="flex h-17.5 min-w-[56px] items-center justify-center rounded-lg bg-black px-3 text-xl font-black leading-[1.35] text-white dark:bg-boxdark lg:text-3xl xl:text-[40px]">
@@ -62,7 +63,7 @@ const CountDownTimer: React.FC = () => {
               <span
                 className="absolute bottom-0 left-0 -z-1 block w-full bg-[#000]/20"
                 style={{ height: calculateRemainingPercentage() }}
-              ></span>
+              />
             </div>
           ))}
         </div>
@@ -72,9 +73,9 @@ const CountDownTimer: React.FC = () => {
 
       <div>
         <div className="mb-3 flex items-center gap-2">
-          {formatNumber(hours).map((digit, index) => (
+          {formatNumber(hours).map((digit) => (
             <div
-              key={index}
+              key={`${digit}-2`}
               className="timer-box relative z-1 overflow-hidden rounded-lg"
             >
               <span className="flex h-17.5 min-w-[56px] items-center justify-center rounded-lg bg-black px-3 text-xl font-black leading-[1.35] text-white dark:bg-boxdark lg:text-3xl xl:text-[40px]">
@@ -84,7 +85,7 @@ const CountDownTimer: React.FC = () => {
               <span
                 className="absolute bottom-0 left-0 -z-1 block w-full bg-[#000]/20"
                 style={{ height: calculateRemainingPercentage() }}
-              ></span>
+              />
             </div>
           ))}
         </div>
@@ -94,9 +95,9 @@ const CountDownTimer: React.FC = () => {
 
       <div>
         <div className="mb-3 flex items-center gap-2">
-          {formatNumber(minutes).map((digit, index) => (
+          {formatNumber(minutes).map((digit) => (
             <div
-              key={index}
+              key={`${digit}-3`}
               className="timer-box relative z-1 overflow-hidden rounded-lg"
             >
               <span className="flex h-17.5 min-w-[56px] items-center justify-center rounded-lg bg-black px-3 text-xl font-black leading-[1.35] text-white dark:bg-boxdark lg:text-3xl xl:text-[40px]">
@@ -106,7 +107,7 @@ const CountDownTimer: React.FC = () => {
               <span
                 className="absolute bottom-0 left-0 -z-1 block w-full bg-[#000]/20"
                 style={{ height: calculateRemainingPercentage() }}
-              ></span>
+              />
             </div>
           ))}
         </div>
@@ -116,9 +117,9 @@ const CountDownTimer: React.FC = () => {
 
       <div>
         <div className="mb-3 flex items-center gap-2">
-          {formatNumber(seconds).map((digit, index) => (
+          {formatNumber(seconds).map((digit) => (
             <div
-              key={index}
+              key={`${digit}-4`}
               className="timer-box relative z-1 overflow-hidden rounded-lg"
             >
               <span className="flex h-17.5 min-w-[56px] items-center justify-center rounded-lg bg-black px-3 text-xl font-black leading-[1.35] text-white dark:bg-boxdark lg:text-3xl xl:text-[40px]">
@@ -128,7 +129,7 @@ const CountDownTimer: React.FC = () => {
               <span
                 className="absolute bottom-0 left-0 -z-1 block w-full bg-[#000]/20"
                 style={{ height: calculateRemainingPercentage() }}
-              ></span>
+              />
             </div>
           ))}
         </div>
@@ -138,5 +139,3 @@ const CountDownTimer: React.FC = () => {
     </div>
   );
 };
-
-export default CountDownTimer;

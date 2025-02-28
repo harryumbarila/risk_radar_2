@@ -1,33 +1,62 @@
-import { useState } from "react";
+import type { FC } from 'react';
+import { useState } from 'react';
 
-const dashboards = [
-  { id: 1, name: 'Dashboard Kili', url: 'https://dashboard.jobox.ai' },
-  { id: 2, name: 'Dashboard Taluspay', url: 'https://dashboard.taluspay.com' },
-  { id: 3, name: 'Dashboard Legacy RiskRadar', url: 'https://dashboard.taluspay.com' },
-];
+// const dashboards = [
+//   { id: 1, name: "Dashboard Kili", url: "https://dashboard.jobox.ai" },
+//   { id: 2, name: "Dashboard Taluspay", url: "https://dashboard.taluspay.com" },
+//   {
+//     id: 3,
+//     name: "Dashboard Legacy RiskRadar",
+//     url: "https://dashboard.taluspay.com",
+//   },
+// ];
 
 const dashboardsStaging = [
-  { id: 1, name: 'Dashboard Kili', url: 'https://dashboard-staging.joboxserver.com' },
-  { id: 2, name: 'Dashboard Taluspay', url: 'https://dashboard.taluspay-staging.com' },
-  { id: 3, name: 'Dashboard Legacy RiskRadar', url: 'https://dashboard.taluspay-staging.com' },
+  {
+    id: 1,
+    name: 'Dashboard Kili',
+    url: 'https://dashboard-staging.joboxserver.com',
+  },
+  {
+    id: 2,
+    name: 'Dashboard Taluspay',
+    url: 'https://dashboard.taluspay-staging.com',
+  },
+  {
+    id: 3,
+    name: 'Dashboard Legacy RiskRadar',
+    url: 'https://dashboard.taluspay-staging.com',
+  },
 ];
 
-// @ts-ignore
-const AppsIcon = ({dashboardEnv}) => {
+type AppsIconProps = {
+  dashboardEnv: string;
+};
+
+export const AppsIcon: FC<AppsIconProps> = ({ dashboardEnv }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const internalDashboards = dashboardEnv == 'staging' ? dashboardsStaging : dashboardsStaging;
+  const internalDashboards =
+    dashboardEnv === 'staging' ? dashboardsStaging : dashboardsStaging;
 
   // Toggle dropdown visibility
-  const toggleDropdown = () => {
+  const toggleDropdown = (): void => {
     setIsOpen(!isOpen);
   };
 
   return (
-    <div className="google-apps-icon-container" style={{ position: 'relative' }}>
+    <div
+      className="google-apps-icon-container"
+      style={{ position: 'relative' }}
+    >
       {/* Google Apps Icon */}
       <div
         onClick={toggleDropdown}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            toggleDropdown();
+          }
+        }}
         role="button"
         tabIndex={0}
         style={{
@@ -39,9 +68,9 @@ const AppsIcon = ({dashboardEnv}) => {
           cursor: 'pointer',
         }}
       >
-        {[...Array(9)].map((_, index) => (
+        {Array.from({ length: 9 }).map(() => (
           <div
-            key={index}
+            key={`google-apps-icon-${Math.random().toString(36).substr(2, 9)}`}
             style={{
               width: '2px',
               height: '2px',
@@ -87,8 +116,12 @@ const AppsIcon = ({dashboardEnv}) => {
                     borderRadius: '4px', // Rounded corners
                     transition: 'background-color 0.3s ease', // Smooth transition
                   }}
-                  onMouseEnter={(e) => ((e.target as HTMLElement).style.backgroundColor = '#f0f8ff')} // Hover background color
-                  onMouseLeave={(e) => ((e.target as HTMLElement).style.backgroundColor = '')} // Reset background
+                  onMouseEnter={(e) => {
+                    (e.target as HTMLElement).style.backgroundColor = '#f0f8ff';
+                  }} // Hover background color
+                  onMouseLeave={(e) => {
+                    (e.target as HTMLElement).style.backgroundColor = '';
+                  }} // Reset background
                 >
                   {dashboard.name}
                 </a>
@@ -100,5 +133,3 @@ const AppsIcon = ({dashboardEnv}) => {
     </div>
   );
 };
-
-export default AppsIcon;

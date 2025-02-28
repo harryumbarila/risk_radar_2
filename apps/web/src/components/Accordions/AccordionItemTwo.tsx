@@ -1,7 +1,12 @@
-import React, { useRef } from "react";
-import { FaqItem } from "@/types/faqItem";
+import React, { useRef } from 'react';
 
-const AccordionItemTwo: React.FC<FaqItem> = ({ active, handleToggle, faq }) => {
+import type { FaqItem } from '@/types/faqItem';
+
+export const AccordionItemTwo: React.FC<FaqItem> = ({
+  active,
+  handleToggle,
+  faq,
+}) => {
   const contentEl = useRef<HTMLDivElement>(null);
 
   const { header, id, text } = faq;
@@ -9,8 +14,9 @@ const AccordionItemTwo: React.FC<FaqItem> = ({ active, handleToggle, faq }) => {
   return (
     <div className="rounded-md border border-stroke p-4 shadow-9 dark:border-strokedark dark:shadow-none md:p-6 xl:p-7.5">
       <button
+        type="button"
         className={`flex w-full items-center justify-between gap-2 ${
-          active === id ? "active" : ""
+          active === id ? 'active' : ''
         }`}
         onClick={() => handleToggle(id)}
       >
@@ -22,7 +28,7 @@ const AccordionItemTwo: React.FC<FaqItem> = ({ active, handleToggle, faq }) => {
         <div className="flex h-9 w-full max-w-9 items-center justify-center rounded-full border border-primary dark:border-white">
           <svg
             className={`fill-primary duration-200 ease-in-out dark:fill-white ${
-              active === id ? "hidden" : ""
+              active === id ? 'hidden' : ''
             }`}
             width="15"
             height="15"
@@ -38,7 +44,7 @@ const AccordionItemTwo: React.FC<FaqItem> = ({ active, handleToggle, faq }) => {
 
           <svg
             className={`fill-primary duration-200 ease-in-out dark:fill-white ${
-              active === id ? "block" : "hidden"
+              active === id ? 'block' : 'hidden'
             }`}
             width="15"
             height="3"
@@ -57,7 +63,7 @@ const AccordionItemTwo: React.FC<FaqItem> = ({ active, handleToggle, faq }) => {
       <div
         ref={contentEl}
         className={`mt-5 duration-200 ease-in-out ${
-          active === id ? "block" : "hidden"
+          active === id ? 'block' : 'hidden'
         }`}
       >
         <p className="max-w-[830px] font-medium">{text}</p>
@@ -65,5 +71,3 @@ const AccordionItemTwo: React.FC<FaqItem> = ({ active, handleToggle, faq }) => {
     </div>
   );
 };
-
-export default AccordionItemTwo;

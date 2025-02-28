@@ -1,23 +1,24 @@
-"use client";
+'use client';
 
-import { notFound } from "next/navigation";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import React from "react";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import { useMerchant } from "@/hooks/risk-radar/useMerchant";
+import { notFound } from 'next/navigation';
+import type { FC } from 'react';
 
-interface Props {
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
+import { useMerchant } from '@/hooks/risk-radar/useMerchant';
+
+type Props = {
   params: {
-    merchant_id: string;
+    merchantId: string;
   };
-}
+};
 
-export default function RiskRadarMerchantPage({ params }: Props) {
-  const { merchant_id } = params;
+const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
+  const { merchantId } = params;
 
-  const { data, error, isLoading } = useMerchant(merchant_id);
+  const { data, error, isLoading } = useMerchant(merchantId);
 
-  if (!merchant_id) {
+  if (!merchantId) {
     notFound();
   }
 
@@ -64,7 +65,7 @@ export default function RiskRadarMerchantPage({ params }: Props) {
             <strong>Merchant ID:</strong> {merchantProfile?.sMId}
           </p>
           <p className="text-black dark:text-white">
-            <strong>SIC:</strong> {merchantProfile?.sSIC} -{" "}
+            <strong>SIC:</strong> {merchantProfile?.sSIC} -{' '}
             {merchantProfile?.sSICDesc}
           </p>
           <p className="text-black dark:text-white">
@@ -78,7 +79,10 @@ export default function RiskRadarMerchantPage({ params }: Props) {
 
       {/* Tabs */}
       <nav className="mb-4 flex gap-2 border-b border-stroke pb-2 dark:border-strokedark">
-        <button className="inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90">
+        <button
+          className="inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90"
+          type="button"
+        >
           Contact
         </button>
         {/* ... other tab buttons */}
@@ -102,34 +106,34 @@ export default function RiskRadarMerchantPage({ params }: Props) {
             <table className="w-full table-auto">
               <thead>
                 <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                  <th className="px-4 py-4 font-medium text-black dark:text-white">
+                  <th className="p-4 font-medium text-black dark:text-white">
                     Month/Year
                   </th>
-                  <th className="px-4 py-4 font-medium text-black dark:text-white">
+                  <th className="p-4 font-medium text-black dark:text-white">
                     Volume
                   </th>
-                  <th className="px-4 py-4 font-medium text-black dark:text-white">
+                  <th className="p-4 font-medium text-black dark:text-white">
                     Avg Ticket
                   </th>
-                  <th className="px-4 py-4 font-medium text-black dark:text-white">
+                  <th className="p-4 font-medium text-black dark:text-white">
                     Swiped %
                   </th>
-                  <th className="px-4 py-4 font-medium text-black dark:text-white">
+                  <th className="p-4 font-medium text-black dark:text-white">
                     Highest Ticket
                   </th>
-                  <th className="px-4 py-4 font-medium text-black dark:text-white">
+                  <th className="p-4 font-medium text-black dark:text-white">
                     Total CB
                   </th>
-                  <th className="px-4 py-4 font-medium text-black dark:text-white">
+                  <th className="p-4 font-medium text-black dark:text-white">
                     V CB %
                   </th>
-                  <th className="px-4 py-4 font-medium text-black dark:text-white">
+                  <th className="p-4 font-medium text-black dark:text-white">
                     MC CB %
                   </th>
-                  <th className="px-4 py-4 font-medium text-black dark:text-white">
+                  <th className="p-4 font-medium text-black dark:text-white">
                     Disc CB %
                   </th>
-                  <th className="px-4 py-4 font-medium text-black dark:text-white">
+                  <th className="p-4 font-medium text-black dark:text-white">
                     Amex CB %
                   </th>
                 </tr>
@@ -176,4 +180,6 @@ export default function RiskRadarMerchantPage({ params }: Props) {
       </section>
     </DefaultLayout>
   );
-}
+};
+
+export default RiskRadarMerchantPage;

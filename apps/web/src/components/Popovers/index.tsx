@@ -1,9 +1,10 @@
-"use client";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import PopoversOne from "@/components/Popovers/PopoversOne";
-import PopoversTwo from "@/components/Popovers/PopoversTwo";
+'use client';
 
-const Popovers: React.FC = () => {
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { PopoversOne } from '@/components/Popovers/PopoversOne';
+import { PopoversTwo } from '@/components/Popovers/PopoversTwo';
+
+export const Popovers: React.FC = () => {
   return (
     <>
       <Breadcrumb pageName="Popovers" />
@@ -15,5 +16,3 @@ const Popovers: React.FC = () => {
     </>
   );
 };
-
-export default Popovers;

@@ -1,41 +1,49 @@
-"use client";
-import { useEffect, useRef, useState } from "react";
+'use client';
 
-const DropdownFive = () => {
+import type { FC } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
+export const DropdownFive: FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const trigger = useRef<any>(null);
-  const dropdown = useRef<any>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const dropdown = useRef<HTMLDivElement>(null);
 
   // close on click outside
   useEffect(() => {
-    const clickHandler = ({ target }: MouseEvent) => {
+    const clickHandler = ({ target }: MouseEvent): void => {
       if (!dropdown.current) return;
       if (
         !dropdownOpen ||
-        dropdown.current.contains(target) ||
-        trigger.current.contains(target)
-      )
+        dropdown.current.contains(target as Node) ||
+        trigger.current?.contains(target as Node)
+      ) {
         return;
+      }
       setDropdownOpen(false);
     };
-    document.addEventListener("click", clickHandler);
-    return () => document.removeEventListener("click", clickHandler);
+    document.addEventListener('click', clickHandler);
+    return () => document.removeEventListener('click', clickHandler);
   });
 
   // close if the esc key is pressed
   useEffect(() => {
-    const keyHandler = ({ keyCode }: KeyboardEvent) => {
+    const keyHandler = ({ keyCode }: KeyboardEvent): void => {
       if (!dropdownOpen || keyCode !== 27) return;
       setDropdownOpen(false);
     };
-    document.addEventListener("keydown", keyHandler);
-    return () => document.removeEventListener("keydown", keyHandler);
+    document.addEventListener('keydown', keyHandler);
+    return () => document.removeEventListener('keydown', keyHandler);
   });
 
   return (
     <div className="relative flex">
-      <button ref={trigger} onClick={() => setDropdownOpen(!dropdownOpen)}>
+      <button
+        ref={trigger}
+        onClick={() => setDropdownOpen(!dropdownOpen)}
+        type="button"
+        aria-label="Dropdown button"
+      >
         <svg
           className="fill-current"
           width="21"
@@ -63,18 +71,22 @@ const DropdownFive = () => {
         onFocus={() => setDropdownOpen(true)}
         onBlur={() => setDropdownOpen(false)}
         className={`absolute right-0 top-full z-40 w-37.5 space-y-1 rounded bg-white p-2 shadow-card dark:bg-boxdark-2 ${
-          dropdownOpen === true ? "block" : "hidden"
+          dropdownOpen === true ? 'block' : 'hidden'
         }`}
       >
-        <button className="w-full rounded px-3 py-1.5 text-left text-sm hover:bg-gray-2 dark:hover:bg-graydark">
+        <button
+          className="w-full rounded px-3 py-1.5 text-left text-sm hover:bg-gray-2 dark:hover:bg-graydark"
+          type="button"
+        >
           Edit
         </button>
-        <button className="w-full rounded px-3 py-1.5 text-left text-sm hover:bg-gray-2 dark:hover:bg-graydark">
+        <button
+          className="w-full rounded px-3 py-1.5 text-left text-sm hover:bg-gray-2 dark:hover:bg-graydark"
+          type="button"
+        >
           Delete
         </button>
       </div>
     </div>
   );
 };
-
-export default DropdownFive;
