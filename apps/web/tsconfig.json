@@ -3,7 +3,7 @@
   "extends": "@denali/typescript-config/nextjs.json",
   "compilerOptions": {
     "paths": {
-      "@/root/*": ["./*"],
+      "@/web/*": ["./*"],
       "@/js/*": ["./src/js/*"],
       "@/app/*": ["./src/app/*"],
       "@/css/*": ["./src/css/*"],
@@ -19,7 +19,11 @@
     "next-env.d.ts",
     "src",
     ".next/types/**/*.ts",
-    "tailwind.config.js"
+    "tailwind.config.js",
+    "tests",
+    "jest.config.ts",
+    "cypress",
+    "cypress.config.ts"
   ],
   "plugins": [{ "name": "next" }]
 }

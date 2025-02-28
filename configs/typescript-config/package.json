@@ -2,15 +2,15 @@
   "name": "@denali/typescript-config",
   "version": "0.0.0",
   "private": true,
-  "license": "MIT",
-  "publishConfig": {
-    "access": "public"
-  },
   "files": [
     "base.json",
     "nextjs.json",
     "node.json",
     "react-library.json",
     "library.json"
-  ]
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }
