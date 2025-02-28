@@ -38,5 +38,6 @@ module.exports = {
     'dropzone.d.ts',
     'jsvectormap.d.ts',
     'react-table-config.d.ts',
+    'cypress.config.ts',
   ],
 };
