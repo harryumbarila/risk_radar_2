@@ -1,36 +1,38 @@
-import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import type { FC } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const DropdownNotification = () => {
+export const DropdownNotification: FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifying, setNotifying] = useState(true);
 
-  const trigger = useRef<any>(null);
-  const dropdown = useRef<any>(null);
+  const trigger = useRef<HTMLAnchorElement>(null);
+  const dropdown = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const clickHandler = ({ target }: MouseEvent) => {
+    const clickHandler = ({ target }: MouseEvent): void => {
       if (!dropdown.current) return;
       if (
         !dropdownOpen ||
-        dropdown.current.contains(target) ||
-        trigger.current.contains(target)
-      )
+        dropdown.current.contains(target as Node) ||
+        trigger.current?.contains(target as Node)
+      ) {
         return;
+      }
       setDropdownOpen(false);
     };
     document.addEventListener("click", clickHandler);
-    return () => document.removeEventListener("click", clickHandler);
+    return (): void => document.removeEventListener("click", clickHandler);
   });
 
   // close if the esc key is pressed
   useEffect(() => {
-    const keyHandler = ({ keyCode }: KeyboardEvent) => {
+    const keyHandler = ({ keyCode }: KeyboardEvent): void => {
       if (!dropdownOpen || keyCode !== 27) return;
       setDropdownOpen(false);
     };
     document.addEventListener("keydown", keyHandler);
-    return () => document.removeEventListener("keydown", keyHandler);
+    return (): void => document.removeEventListener("keydown", keyHandler);
   });
 
   return (
@@ -41,15 +43,15 @@ const DropdownNotification = () => {
           setNotifying(false);
           setDropdownOpen(!dropdownOpen);
         }}
-        href="#"
-        className="relative flex h-8.5 w-8.5 items-center justify-center rounded-full border-[0.5px] border-stroke bg-gray hover:text-primary dark:border-strokedark dark:bg-meta-4 dark:text-white"
+        href="/"
+        className="relative flex size-8.5 items-center justify-center rounded-full border-[0.5px] border-stroke bg-gray hover:text-primary dark:border-strokedark dark:bg-meta-4 dark:text-white"
       >
         <span
-          className={`absolute -top-0.5 right-0 z-1 h-2 w-2 rounded-full bg-meta-1 ${
+          className={`absolute -top-0.5 right-0 z-1 size-2 rounded-full bg-meta-1 ${
             notifying === false ? "hidden" : "inline"
           }`}
         >
-          <span className="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-meta-1 opacity-75"></span>
+          <span className="absolute -z-1 inline-flex size-full animate-ping rounded-full bg-meta-1 opacity-75" />
         </span>
 
         <svg
@@ -83,7 +85,7 @@ const DropdownNotification = () => {
           <li>
             <Link
               className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-              href="#"
+              href="/"
             >
               <p className="text-sm">
                 <span className="text-black dark:text-white">
@@ -99,7 +101,7 @@ const DropdownNotification = () => {
           <li>
             <Link
               className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-              href="#"
+              href="/"
             >
               <p className="text-sm">
                 <span className="text-black dark:text-white">
@@ -114,7 +116,7 @@ const DropdownNotification = () => {
           <li>
             <Link
               className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-              href="#"
+              href="/"
             >
               <p className="text-sm">
                 <span className="text-black dark:text-white">
@@ -130,7 +132,7 @@ const DropdownNotification = () => {
           <li>
             <Link
               className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-              href="#"
+              href="/"
             >
               <p className="text-sm">
                 <span className="text-black dark:text-white">
@@ -148,5 +150,3 @@ const DropdownNotification = () => {
     </li>
   );
 };
-
-export default DropdownNotification;

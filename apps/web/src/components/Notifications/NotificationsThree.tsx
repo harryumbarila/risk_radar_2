@@ -1,9 +1,9 @@
 import React from "react";
 
-const NotificationsThree: React.FC = () => {
+export const NotificationsThree: React.FC = () => {
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-      <div className="border-b border-stroke px-4 py-4 dark:border-strokedark sm:px-6 xl:px-7.5">
+      <div className="border-b border-stroke p-4 dark:border-strokedark sm:px-6 xl:px-7.5">
         <h3 className="font-medium text-black dark:text-white">
           Notifications Style 3
         </h3>
@@ -12,7 +12,7 @@ const NotificationsThree: React.FC = () => {
       <div className="p-4 sm:p-6 xl:p-10">
         <div className="max-w-[557px] rounded-lg border border-stroke py-6 pl-4 pr-5.5 dark:border-strokedark dark:bg-meta-4 sm:pl-6">
           <div className="flex justify-between">
-            <div className="flex flex-grow gap-6">
+            <div className="flex grow gap-6">
               <div>
                 <svg
                   width="30"
@@ -35,14 +35,18 @@ const NotificationsThree: React.FC = () => {
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                   Nullam nec ligula at dolor aliquam mollis.
                 </p>
-                <button className="mt-5 font-medium text-primary">
+                <button className="mt-5 font-medium text-primary" type="button">
                   Update now
                 </button>
               </div>
             </div>
 
             <div>
-              <button className="hover:text-black dark:hover:text-white">
+              <button
+                className="hover:text-black dark:hover:text-white"
+                type="button"
+                aria-label="Close"
+              >
                 <svg
                   className="fill-current"
                   width="14"
@@ -66,5 +70,3 @@ const NotificationsThree: React.FC = () => {
     </div>
   );
 };
-
-export default NotificationsThree;

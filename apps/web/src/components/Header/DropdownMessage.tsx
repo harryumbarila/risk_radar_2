@@ -1,38 +1,40 @@
-import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+import type { FC } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const DropdownMessage = () => {
+export const DropdownMessage: FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifying, setNotifying] = useState(true);
 
-  const trigger = useRef<any>(null);
-  const dropdown = useRef<any>(null);
+  const trigger = useRef<HTMLAnchorElement>(null);
+  const dropdown = useRef<HTMLDivElement>(null);
 
   // close on click outside
   useEffect(() => {
-    const clickHandler = ({ target }: MouseEvent) => {
+    const clickHandler = ({ target }: MouseEvent): void => {
       if (!dropdown.current) return;
       if (
         !dropdownOpen ||
-        dropdown.current.contains(target) ||
-        trigger.current.contains(target)
-      )
+        dropdown.current.contains(target as Node) ||
+        trigger.current?.contains(target as Node)
+      ) {
         return;
+      }
       setDropdownOpen(false);
     };
     document.addEventListener("click", clickHandler);
-    return () => document.removeEventListener("click", clickHandler);
+    return (): void => document.removeEventListener("click", clickHandler);
   });
 
   // close if the esc key is pressed
   useEffect(() => {
-    const keyHandler = ({ keyCode }: KeyboardEvent) => {
+    const keyHandler = ({ keyCode }: KeyboardEvent): void => {
       if (!dropdownOpen || keyCode !== 27) return;
       setDropdownOpen(false);
     };
     document.addEventListener("keydown", keyHandler);
-    return () => document.removeEventListener("keydown", keyHandler);
+    return (): void => document.removeEventListener("keydown", keyHandler);
   });
 
   return (
@@ -43,15 +45,15 @@ const DropdownMessage = () => {
           setNotifying(false);
           setDropdownOpen(!dropdownOpen);
         }}
-        className="relative flex h-8.5 w-8.5 items-center justify-center rounded-full border-[0.5px] border-stroke bg-gray hover:text-primary dark:border-strokedark dark:bg-meta-4 dark:text-white"
-        href="#"
+        className="relative flex size-8.5 items-center justify-center rounded-full border-[0.5px] border-stroke bg-gray hover:text-primary dark:border-strokedark dark:bg-meta-4 dark:text-white"
+        href="/"
       >
         <span
-          className={`absolute -right-0.5 -top-0.5 z-1 h-2 w-2 rounded-full bg-meta-1 ${
+          className={`absolute -right-0.5 -top-0.5 z-1 size-2 rounded-full bg-meta-1 ${
             notifying === false ? "hidden" : "inline"
           }`}
         >
-          <span className="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-meta-1 opacity-75"></span>
+          <span className="absolute -z-1 inline-flex size-full animate-ping rounded-full bg-meta-1 opacity-75" />
         </span>
 
         <svg
@@ -100,11 +102,11 @@ const DropdownMessage = () => {
               className="flex gap-4.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
               href="/messages"
             >
-              <div className="h-12.5 w-12.5 rounded-full">
+              <div className="size-12.5 rounded-full">
                 <Image
                   width={112}
                   height={112}
-                  src={"/images/user/user-02.png"}
+                  src="/images/user/user-02.png"
                   alt="User"
                   style={{
                     width: "auto",
@@ -127,11 +129,11 @@ const DropdownMessage = () => {
               className="flex gap-4.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
               href="/messages"
             >
-              <div className="h-12.5 w-12.5 rounded-full">
+              <div className="size-12.5 rounded-full">
                 <Image
                   width={112}
                   height={112}
-                  src={"/images/user/user-01.png"}
+                  src="/images/user/user-01.png"
                   alt="User"
                   style={{
                     width: "auto",
@@ -154,11 +156,11 @@ const DropdownMessage = () => {
               className="flex gap-4.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
               href="/messages"
             >
-              <div className="h-12.5 w-12.5 rounded-full">
+              <div className="size-12.5 rounded-full">
                 <Image
                   width={112}
                   height={112}
-                  src={"/images/user/user-03.png"}
+                  src="/images/user/user-03.png"
                   alt="User"
                   style={{
                     width: "auto",
@@ -181,11 +183,11 @@ const DropdownMessage = () => {
               className="flex gap-4.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
               href="/messages"
             >
-              <div className="h-12.5 w-12.5 rounded-full">
+              <div className="size-12.5 rounded-full">
                 <Image
                   width={112}
                   height={112}
-                  src={"/images/user/user-04.png"}
+                  src="/images/user/user-04.png"
                   alt="User"
                   style={{
                     width: "auto",
@@ -208,11 +210,11 @@ const DropdownMessage = () => {
               className="flex gap-4.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
               href="/messages"
             >
-              <div className="h-12.5 w-12.5 rounded-full">
+              <div className="size-12.5 rounded-full">
                 <Image
                   width={112}
                   height={112}
-                  src={"/images/user/user-02.png"}
+                  src="/images/user/user-02.png"
                   alt="User"
                   style={{
                     width: "auto",
@@ -236,5 +238,3 @@ const DropdownMessage = () => {
     </li>
   );
 };
-
-export default DropdownMessage;

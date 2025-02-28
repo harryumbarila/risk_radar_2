@@ -1,7 +1,7 @@
-import React from "react";
 import Link from "next/link";
+import React from "react";
 
-const InboxMenuList: React.FC = () => {
+export const InboxMenuList: React.FC = () => {
   return (
     <ul className="flex flex-col gap-2">
       <li>
@@ -200,5 +200,3 @@ const InboxMenuList: React.FC = () => {
     </ul>
   );
 };
-
-export default InboxMenuList;

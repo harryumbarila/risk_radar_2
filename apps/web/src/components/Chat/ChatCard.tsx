@@ -1,6 +1,8 @@
-import Link from "next/link";
 import Image from "next/image";
-import { Chat } from "@/types/chat";
+import Link from "next/link";
+import type { FC } from "react";
+
+import type { Chat } from "@/types/chat";
 
 const chatData: Chat[] = [
   {
@@ -53,7 +55,7 @@ const chatData: Chat[] = [
   },
 ];
 
-const ChatCard = () => {
+export const ChatCard: FC = () => {
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white py-6 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-4">
       <h4 className="mb-6 px-7.5 text-xl font-semibold text-black dark:text-white">
@@ -61,13 +63,13 @@ const ChatCard = () => {
       </h4>
 
       <div>
-        {chatData.map((chat, key) => (
+        {chatData.map((chat) => (
           <Link
             href="/"
             className="flex items-center gap-5 px-7.5 py-3 hover:bg-gray-3 dark:hover:bg-meta-4"
-            key={key}
+            key={chat.name}
           >
-            <div className="relative h-14 w-14 rounded-full">
+            <div className="relative size-14 rounded-full">
               <Image
                 width={56}
                 height={56}
@@ -79,10 +81,10 @@ const ChatCard = () => {
                 }}
               />
               <span
-                className={`absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white ${
+                className={`absolute bottom-0 right-0 size-3.5 rounded-full border-2 border-white ${
                   chat.dot === 6 ? "bg-meta-6" : `bg-meta-${chat.dot}`
                 } `}
-              ></span>
+              />
             </div>
 
             <div className="flex flex-1 items-center justify-between">
@@ -98,7 +100,7 @@ const ChatCard = () => {
                 </p>
               </div>
               {chat.textCount !== 0 && (
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary">
+                <div className="flex size-6 items-center justify-center rounded-full bg-primary">
                   <span className="text-sm font-medium text-white">
                     {" "}
                     {chat.textCount}
@@ -112,5 +114,3 @@ const ChatCard = () => {
     </div>
   );
 };
-
-export default ChatCard;

@@ -1,22 +1,24 @@
 "use client";
+
 import React, { useEffect, useRef, useState } from "react";
 
-const DropdownFour: React.FC<{ classes: string }> = ({ classes }) => {
+export const DropdownFour: React.FC<{ classes: string }> = ({ classes }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const trigger = useRef<any>(null);
-  const dropdown = useRef<any>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const dropdown = useRef<HTMLDivElement>(null);
 
   // close on click outside
   useEffect(() => {
-    const clickHandler = ({ target }: MouseEvent) => {
+    const clickHandler = ({ target }: MouseEvent): void => {
       if (!dropdown.current) return;
       if (
         !dropdownOpen ||
-        dropdown.current.contains(target) ||
-        trigger.current.contains(target)
-      )
+        dropdown.current.contains(target as Node) ||
+        trigger.current?.contains(target as Node)
+      ) {
         return;
+      }
       setDropdownOpen(false);
     };
     document.addEventListener("click", clickHandler);
@@ -25,7 +27,7 @@ const DropdownFour: React.FC<{ classes: string }> = ({ classes }) => {
 
   // close if the esc key is pressed
   useEffect(() => {
-    const keyHandler = ({ keyCode }: KeyboardEvent) => {
+    const keyHandler = ({ keyCode }: KeyboardEvent): void => {
       if (!dropdownOpen || keyCode !== 27) return;
       setDropdownOpen(false);
     };
@@ -39,6 +41,8 @@ const DropdownFour: React.FC<{ classes: string }> = ({ classes }) => {
         className="float-right inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-black shadow-11 hover:text-primary dark:bg-meta-4 dark:text-white dark:shadow-none"
         ref={trigger}
         onClick={() => setDropdownOpen(!dropdownOpen)}
+        aria-label="dropdown button"
+        type="button"
       >
         Action
         <svg
@@ -63,18 +67,25 @@ const DropdownFour: React.FC<{ classes: string }> = ({ classes }) => {
           dropdownOpen === true ? "block" : "hidden"
         }`}
       >
-        <button className="flex w-full px-4 py-2 text-sm hover:bg-whiter hover:text-primary dark:hover:bg-meta-4">
+        <button
+          className="flex w-full px-4 py-2 text-sm hover:bg-whiter hover:text-primary dark:hover:bg-meta-4"
+          type="button"
+        >
           Edit
         </button>
-        <button className="flex w-full px-4 py-2 text-sm hover:bg-whiter hover:text-primary dark:hover:bg-meta-4">
+        <button
+          className="flex w-full px-4 py-2 text-sm hover:bg-whiter hover:text-primary dark:hover:bg-meta-4"
+          type="button"
+        >
           Delete
         </button>
-        <button className="flex w-full px-4 py-2 text-sm hover:bg-whiter hover:text-primary dark:hover:bg-meta-4">
+        <button
+          className="flex w-full px-4 py-2 text-sm hover:bg-whiter hover:text-primary dark:hover:bg-meta-4"
+          type="button"
+        >
           Details
         </button>
       </div>
     </div>
   );
 };
-
-export default DropdownFour;

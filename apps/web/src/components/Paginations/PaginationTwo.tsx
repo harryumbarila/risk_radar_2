@@ -1,10 +1,10 @@
-import React from "react";
 import Link from "next/link";
+import React from "react";
 
-const PaginationTwo: React.FC = () => {
+export const PaginationTwo: React.FC = () => {
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-      <div className="border-b border-stroke px-4 py-4 dark:border-strokedark sm:px-6 xl:px-7.5">
+      <div className="border-b border-stroke p-4 dark:border-strokedark sm:px-6 xl:px-7.5">
         <h3 className="font-medium text-black dark:text-white">
           Pagination Style 2
         </h3>
@@ -15,8 +15,8 @@ const PaginationTwo: React.FC = () => {
           <ul className="flex flex-wrap items-center">
             <li>
               <Link
-                className="flex h-9 w-9 items-center justify-center rounded-l-md border border-stroke hover:border-primary hover:bg-gray hover:text-primary dark:border-strokedark dark:hover:border-primary dark:hover:bg-graydark"
-                href="#"
+                className="flex size-9 items-center justify-center rounded-l-md border border-stroke hover:border-primary hover:bg-gray hover:text-primary dark:border-strokedark dark:hover:border-primary dark:hover:bg-graydark"
+                href="/"
               >
                 <svg
                   className="fill-current"
@@ -36,7 +36,7 @@ const PaginationTwo: React.FC = () => {
             <li>
               <Link
                 className="flex items-center justify-center border border-stroke border-l-transparent px-4 py-[5px] font-medium hover:border-primary hover:bg-gray hover:text-primary dark:border-strokedark dark:hover:border-primary dark:hover:bg-graydark"
-                href="#"
+                href="/"
               >
                 1
               </Link>
@@ -44,7 +44,7 @@ const PaginationTwo: React.FC = () => {
             <li>
               <Link
                 className="flex items-center justify-center border border-stroke border-l-transparent px-4 py-[5px] font-medium hover:border-primary hover:bg-gray hover:text-primary dark:border-strokedark dark:hover:border-primary dark:hover:bg-graydark"
-                href="#"
+                href="/"
               >
                 2
               </Link>
@@ -52,7 +52,7 @@ const PaginationTwo: React.FC = () => {
             <li>
               <Link
                 className="flex items-center justify-center border border-stroke border-l-transparent px-4 py-[5px] font-medium hover:border-primary hover:bg-gray hover:text-primary dark:border-strokedark dark:hover:border-primary dark:hover:bg-graydark"
-                href="#"
+                href="/"
               >
                 3
               </Link>
@@ -60,7 +60,7 @@ const PaginationTwo: React.FC = () => {
             <li>
               <Link
                 className="flex items-center justify-center border border-stroke border-l-transparent px-4 py-[5px] font-medium hover:border-primary hover:bg-gray hover:text-primary dark:border-strokedark dark:hover:border-primary dark:hover:bg-graydark"
-                href="#"
+                href="/"
               >
                 4
               </Link>
@@ -68,15 +68,15 @@ const PaginationTwo: React.FC = () => {
             <li>
               <Link
                 className="flex items-center justify-center border border-stroke border-l-transparent px-4 py-[5px] font-medium hover:border-primary hover:bg-gray hover:text-primary dark:border-strokedark dark:hover:border-primary dark:hover:bg-graydark"
-                href="#"
+                href="/"
               >
                 5
               </Link>
             </li>
             <li>
               <Link
-                className="flex h-9 w-9 items-center justify-center rounded-r-md border border-stroke border-l-transparent hover:border-primary hover:bg-gray hover:text-primary dark:border-strokedark dark:hover:border-primary dark:hover:bg-graydark"
-                href="#"
+                className="flex size-9 items-center justify-center rounded-r-md border border-stroke border-l-transparent hover:border-primary hover:bg-gray hover:text-primary dark:border-strokedark dark:hover:border-primary dark:hover:bg-graydark"
+                href="/"
               >
                 <svg
                   className="fill-current"
@@ -99,5 +99,3 @@ const PaginationTwo: React.FC = () => {
     </div>
   );
 };
-
-export default PaginationTwo;

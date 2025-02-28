@@ -1,23 +1,28 @@
 import React, { useState } from "react";
 
-interface TaskPopupProps {
+type TaskPopupProps = {
   popupOpen: boolean;
   setPopupOpen: (open: boolean) => void;
-}
+};
 
-const TaskPopup: React.FC<TaskPopupProps> = (props) => {
+export const TaskPopup: React.FC<TaskPopupProps> = ({
+  popupOpen,
+  setPopupOpen,
+}) => {
   const [files, setFiles] = useState<FileList | null>(null);
 
   return (
     <div
       className={`fixed left-0 top-0 z-99999 flex h-screen w-full justify-center overflow-y-scroll bg-black/80 px-4 py-5 ${
-        props.popupOpen === true ? "block" : "hidden"
+        popupOpen === true ? "block" : "hidden"
       }`}
     >
       <div className="relative m-auto w-full max-w-180 rounded-sm border border-stroke bg-gray p-4 shadow-default dark:border-strokedark dark:bg-meta-4 sm:p-8 xl:p-10">
         <button
-          onClick={() => props.setPopupOpen(false)}
+          onClick={(): void => setPopupOpen(false)}
           className="absolute right-1 top-1 sm:right-5 sm:top-5"
+          type="button"
+          aria-label="Close popup"
         >
           <svg
             className="fill-current"
@@ -67,7 +72,7 @@ const TaskPopup: React.FC<TaskPopupProps> = (props) => {
               rows={7}
               placeholder="Enter task description"
               className="w-full rounded-sm border border-stroke bg-white px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-boxdark dark:text-white dark:focus:border-primary"
-            ></textarea>
+            />
           </div>
 
           <div className="mb-5">
@@ -87,7 +92,11 @@ const TaskPopup: React.FC<TaskPopupProps> = (props) => {
                   className="w-full rounded-sm border border-stroke bg-white px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-boxdark dark:text-white dark:focus:border-primary"
                 />
 
-                <button className="flex h-12.5 w-12.5 items-center justify-center rounded-sm border border-stroke bg-white p-4 hover:text-primary dark:border-strokedark dark:bg-boxdark">
+                <button
+                  className="flex size-12.5 items-center justify-center rounded-sm border border-stroke bg-white p-4 hover:text-primary dark:border-strokedark dark:bg-boxdark"
+                  type="button"
+                  aria-label="Button"
+                >
                   <svg
                     className="fill-current"
                     width="20"
@@ -119,7 +128,11 @@ const TaskPopup: React.FC<TaskPopupProps> = (props) => {
                   className="w-full rounded-sm border border-stroke bg-white px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-boxdark dark:text-white dark:focus:border-primary"
                 />
 
-                <button className="flex h-12.5 w-12.5 items-center justify-center rounded-sm border border-stroke bg-white p-4 hover:text-primary dark:border-strokedark dark:bg-boxdark">
+                <button
+                  className="flex size-12.5 items-center justify-center rounded-sm border border-stroke bg-white p-4 hover:text-primary dark:border-strokedark dark:bg-boxdark"
+                  type="button"
+                  aria-label="Add task"
+                >
                   <svg
                     className="fill-current"
                     width="20"
@@ -134,7 +147,11 @@ const TaskPopup: React.FC<TaskPopupProps> = (props) => {
                     />
                   </svg>
                 </button>
-                <button className="flex h-12.5 w-12.5 items-center justify-center rounded-sm border border-stroke bg-white p-4 hover:text-primary dark:border-strokedark dark:bg-boxdark">
+                <button
+                  className="flex size-12.5 items-center justify-center rounded-sm border border-stroke bg-white p-4 hover:text-primary dark:border-strokedark dark:bg-boxdark"
+                  type="button"
+                  aria-label="Button"
+                >
                   <svg
                     className="fill-current"
                     width="20"
@@ -166,7 +183,11 @@ const TaskPopup: React.FC<TaskPopupProps> = (props) => {
                   className="w-full rounded-sm border border-stroke bg-white px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-boxdark dark:text-white dark:focus:border-primary"
                 />
 
-                <button className="flex h-12.5 w-12.5 items-center justify-center rounded-sm border border-stroke bg-white p-4 hover:text-primary dark:border-strokedark dark:bg-boxdark">
+                <button
+                  className="flex size-12.5 items-center justify-center rounded-sm border border-stroke bg-white p-4 hover:text-primary dark:border-strokedark dark:bg-boxdark"
+                  type="button"
+                  aria-label="Button"
+                >
                   <svg
                     className="fill-current"
                     width="20"
@@ -181,7 +202,11 @@ const TaskPopup: React.FC<TaskPopupProps> = (props) => {
                     />
                   </svg>
                 </button>
-                <button className="flex h-12.5 w-12.5 items-center justify-center rounded-sm border border-stroke bg-white p-4 hover:text-primary dark:border-strokedark dark:bg-boxdark">
+                <button
+                  className="flex size-12.5 items-center justify-center rounded-sm border border-stroke bg-white p-4 hover:text-primary dark:border-strokedark dark:bg-boxdark"
+                  type="button"
+                  aria-label="Button"
+                >
                   <svg
                     className="fill-current"
                     width="20"
@@ -217,16 +242,16 @@ const TaskPopup: React.FC<TaskPopupProps> = (props) => {
             <div>
               <div
                 id="FileUpload"
-                className="relative block w-full appearance-none rounded-sm border border-dashed border-stroke bg-white px-4 py-4 dark:border-strokedark dark:bg-boxdark sm:py-14"
+                className="relative block w-full appearance-none rounded-sm border border-dashed border-stroke bg-white p-4 dark:border-strokedark dark:bg-boxdark sm:py-14"
               >
                 <input
                   type="file"
                   accept="image/*"
-                  className="absolute inset-0 z-50 m-0 h-full w-full p-0 opacity-0 outline-none"
+                  className="absolute inset-0 z-50 m-0 size-full p-0 opacity-0 outline-none"
                   onChange={(event) => setFiles(event.target.files)}
                 />
                 <div className="flex flex-col items-center justify-center space-y-3">
-                  <span className="flex h-11.5 w-11.5 items-center justify-center rounded-full border border-stroke bg-primary/5 dark:border-strokedark">
+                  <span className="flex size-11.5 items-center justify-center rounded-full border border-stroke bg-primary/5 dark:border-strokedark">
                     <svg
                       width="20"
                       height="20"
@@ -257,9 +282,13 @@ const TaskPopup: React.FC<TaskPopupProps> = (props) => {
               {files !== null && (
                 <div className="mt-4.5 border border-stroke bg-white px-4 py-3 dark:border-strokedark dark:bg-boxdark">
                   <div className="flex items-center justify-between">
-                    <span>{files[0].name}</span>
+                    <span>{files[0]?.name}</span>
 
-                    <button onClick={() => setFiles(null)}>
+                    <button
+                      onClick={() => setFiles(null)}
+                      type="button"
+                      aria-label="Button"
+                    >
                       <svg
                         className="fill-current"
                         width="10"
@@ -287,7 +316,10 @@ const TaskPopup: React.FC<TaskPopupProps> = (props) => {
               )}
             </div>
           </div>
-          <button className="flex w-full items-center justify-center gap-2 rounded bg-primary px-4.5 py-2.5 font-medium text-white hover:bg-opacity-90">
+          <button
+            className="flex w-full items-center justify-center gap-2 rounded bg-primary px-4.5 py-2.5 font-medium text-white hover:bg-opacity-90"
+            type="button"
+          >
             <svg
               className="fill-current"
               width="20"
@@ -315,5 +347,3 @@ const TaskPopup: React.FC<TaskPopupProps> = (props) => {
     </div>
   );
 };
-
-export default TaskPopup;

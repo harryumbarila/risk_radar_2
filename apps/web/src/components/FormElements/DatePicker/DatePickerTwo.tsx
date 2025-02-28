@@ -1,7 +1,8 @@
 import flatpickr from "flatpickr";
+import type { FC } from "react";
 import { useEffect } from "react";
 
-const DatePickerTwo = () => {
+export const DatePickerTwo: FC = () => {
   useEffect(() => {
     // Init flatpickr
     flatpickr(".form-datepicker", {
@@ -18,7 +19,10 @@ const DatePickerTwo = () => {
 
   return (
     <div>
-      <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+      <label
+        className="mb-3 block text-sm font-medium text-black dark:text-white"
+        htmlFor="datepicker"
+      >
         Select date
       </label>
       <div className="relative">
@@ -46,5 +50,3 @@ const DatePickerTwo = () => {
     </div>
   );
 };
-
-export default DatePickerTwo;

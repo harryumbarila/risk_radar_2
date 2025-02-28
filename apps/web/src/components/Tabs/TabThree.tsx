@@ -1,7 +1,7 @@
-import React, { useState } from "react";
 import Link from "next/link";
+import React, { useState } from "react";
 
-const TabThree: React.FC = () => {
+export const TabThree: React.FC = () => {
   const [openTab, setOpenTab] = useState(1);
 
   const activeClasses = "text-primary border-primary";
@@ -11,7 +11,7 @@ const TabThree: React.FC = () => {
     <div className="rounded-sm border border-stroke bg-white p-7.5 shadow-default dark:border-strokedark dark:bg-boxdark">
       <div className="mb-6 flex flex-wrap gap-5 border-b border-stroke dark:border-strokedark sm:gap-10">
         <Link
-          href="#"
+          href="/"
           className={`border-b-2 py-4 text-sm font-medium hover:text-primary md:text-base ${
             openTab === 1 ? activeClasses : inactiveClasses
           }`}
@@ -20,7 +20,7 @@ const TabThree: React.FC = () => {
           Profile
         </Link>
         <Link
-          href="#"
+          href="/"
           className={`border-b-2 py-4 text-sm font-medium hover:text-primary md:text-base ${
             openTab === 2 ? activeClasses : inactiveClasses
           }`}
@@ -29,7 +29,7 @@ const TabThree: React.FC = () => {
           Password
         </Link>
         <Link
-          href="#"
+          href="/"
           className={`border-b-2 py-4 text-sm font-medium hover:text-primary md:text-base ${
             openTab === 3 ? activeClasses : inactiveClasses
           }`}
@@ -38,7 +38,7 @@ const TabThree: React.FC = () => {
           Team
         </Link>
         <Link
-          href="#"
+          href="/"
           className={`border-b-2 py-4 text-sm font-medium hover:text-primary md:text-base ${
             openTab === 4 ? activeClasses : inactiveClasses
           }`}
@@ -88,5 +88,3 @@ const TabThree: React.FC = () => {
     </div>
   );
 };
-
-export default TabThree;

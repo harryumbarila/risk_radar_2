@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import DropdownDefault from "./Dropdowns/DropdownDefault";
 
-const FeaturedCampaigns: React.FC = () => {
+import { DropdownDefault } from "./Dropdowns/DropdownDefault";
+
+export const FeaturedCampaigns: React.FC = () => {
   const [openTab, setOpenTab] = useState(1);
 
   const activeClasses = "bg-primary/[0.08] text-primary border-primary";
@@ -23,6 +24,7 @@ const FeaturedCampaigns: React.FC = () => {
         {/* <!-- Featured Tab Buttons --> */}
         <div className="mb-5.5 flex flex-wrap items-center gap-3.5">
           <button
+            type="button"
             className={`inline-flex items-center gap-3 rounded-md border px-4.5 py-2 font-medium hover:border-primary hover:bg-primary/[0.08] hover:text-primary ${
               openTab === 1 ? activeClasses : inactiveClasses
             }`}
@@ -63,6 +65,7 @@ const FeaturedCampaigns: React.FC = () => {
           </button>
 
           <button
+            type="button"
             className={`inline-flex items-center gap-3 rounded-md border px-4.5 py-2 font-medium hover:border-primary hover:bg-primary/[0.08] hover:text-primary ${
               openTab === 2 ? activeClasses : inactiveClasses
             }`}
@@ -84,6 +87,7 @@ const FeaturedCampaigns: React.FC = () => {
           </button>
 
           <button
+            type="button"
             className={`inline-flex items-center gap-3 rounded-md border px-4.5 py-2 font-medium hover:border-primary hover:bg-primary/[0.08] hover:text-primary ${
               openTab === 3 ? activeClasses : inactiveClasses
             }`}
@@ -162,6 +166,7 @@ const FeaturedCampaigns: React.FC = () => {
           </button>
 
           <button
+            type="button"
             className={`inline-flex items-center gap-3 rounded-md border px-4.5 py-2 font-medium hover:border-primary hover:bg-primary/[0.08] hover:text-primary ${
               openTab === 4 ? activeClasses : inactiveClasses
             }`}
@@ -617,5 +622,3 @@ const FeaturedCampaigns: React.FC = () => {
     </div>
   );
 };
-
-export default FeaturedCampaigns;

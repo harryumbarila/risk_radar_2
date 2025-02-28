@@ -1,6 +1,7 @@
+import type { FC } from "react";
 import { useState } from "react";
 
-const CheckboxTwo = () => {
+export const CheckboxTwo: FC = () => {
   const [isChecked, setIsChecked] = useState<boolean>(false);
 
   return (
@@ -19,7 +20,7 @@ const CheckboxTwo = () => {
             }}
           />
           <div
-            className={`mr-4 flex h-5 w-5 items-center justify-center rounded border ${
+            className={`mr-4 flex size-5 items-center justify-center rounded border ${
               isChecked && "border-primary bg-gray dark:bg-transparent"
             }`}
           >
@@ -36,7 +37,7 @@ const CheckboxTwo = () => {
                   fill="#3056D3"
                   stroke="#3056D3"
                   strokeWidth="0.4"
-                ></path>
+                />
               </svg>
             </span>
           </div>
@@ -46,5 +47,3 @@ const CheckboxTwo = () => {
     </div>
   );
 };
-
-export default CheckboxTwo;

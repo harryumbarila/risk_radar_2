@@ -1,9 +1,9 @@
 import React from "react";
 
-interface Faq {
+type Faq = {
   title: string;
   details: string;
-}
+};
 
 const faqItems: Faq[] = [
   {
@@ -28,11 +28,11 @@ const faqItems: Faq[] = [
   },
 ];
 
-const FaqOne: React.FC = () => {
+export const FaqOne: React.FC = () => {
   return (
-    <div className="grid grid-cols-1 gap-x-7.5 gap-y-7.5 sm:gap-y-12.5 xl:grid-cols-2 xl:gap-y-17.5">
-      {faqItems.map((item, index) => (
-        <div key={index} className="flex gap-6">
+    <div className="grid grid-cols-1 gap-7.5 sm:gap-y-12.5 xl:grid-cols-2 xl:gap-y-17.5">
+      {faqItems.map((item) => (
+        <div key={item.title} className="flex gap-6">
           <div className="flex h-15 w-full max-w-15 items-center justify-center rounded-xl bg-primary text-white">
             <svg
               className="fill-current"
@@ -80,5 +80,3 @@ const FaqOne: React.FC = () => {
     </div>
   );
 };
-
-export default FaqOne;

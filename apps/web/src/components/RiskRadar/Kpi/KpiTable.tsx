@@ -1,11 +1,12 @@
 import React from "react";
-import { KpiStatisticsResponseDto } from "@/shared/response/legacy-dashboard-proxy";
 
-interface KpiTableProps {
+import type { KpiStatisticsResponseDto } from "@/shared/response/legacy-dashboard-proxy";
+
+type KpiTableProps = {
   data: KpiStatisticsResponseDto;
-}
+};
 
-const KpiTable: React.FC<KpiTableProps> = ({ data }) => {
+export const KpiTable: React.FC<KpiTableProps> = ({ data }) => {
   const tableData = [
     {
       kpi: "Processing MIDs",
@@ -66,8 +67,8 @@ const KpiTable: React.FC<KpiTableProps> = ({ data }) => {
         </tr>
       </thead>
       <tbody>
-        {tableData.map((row, index) => (
-          <tr key={index}>
+        {tableData.map((row) => (
+          <tr key={row.kpi}>
             <td className="border-b border-[#eee] px-3 py-2 text-xs dark:border-strokedark">
               {row.kpi}
             </td>
@@ -95,5 +96,3 @@ const KpiTable: React.FC<KpiTableProps> = ({ data }) => {
     </table>
   );
 };
-
-export default KpiTable;

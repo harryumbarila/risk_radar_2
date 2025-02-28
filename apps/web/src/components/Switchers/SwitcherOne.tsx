@@ -1,6 +1,7 @@
+import type { FC } from "react";
 import { useState } from "react";
 
-const SwitcherOne = () => {
+export const SwitcherOne: FC = () => {
   const [enabled, setEnabled] = useState<boolean>(false);
 
   return (
@@ -8,6 +9,7 @@ const SwitcherOne = () => {
       <label
         htmlFor="toggle1"
         className="flex cursor-pointer select-none items-center"
+        aria-label="Switcher"
       >
         <div className="relative">
           <input
@@ -18,16 +20,14 @@ const SwitcherOne = () => {
               setEnabled(!enabled);
             }}
           />
-          <div className="block h-8 w-14 rounded-full bg-meta-9 dark:bg-[#5A616B]"></div>
+          <div className="block h-8 w-14 rounded-full bg-meta-9 dark:bg-[#5A616B]" />
           <div
-            className={`absolute left-1 top-1 h-6 w-6 rounded-full bg-white transition ${
+            className={`absolute left-1 top-1 size-6 rounded-full bg-white transition ${
               enabled && "!right-1 !translate-x-full !bg-primary dark:!bg-white"
             }`}
-          ></div>
+          />
         </div>
       </label>
     </div>
   );
 };
-
-export default SwitcherOne;

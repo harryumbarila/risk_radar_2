@@ -1,25 +1,19 @@
 "use client";
 
 import React, { useState } from "react";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+
+import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
+import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
 import { showNotification } from "@/components/Notifications/NotificationContent";
-import { useUsersData } from "@/hooks/attribution-url/useUsersData";
-import { useChannels } from "@/hooks/attribution-url/useChannels";
-import { usePartners } from "@/hooks/attribution-url/usePartners";
 import { useLeadSources } from "@/hooks/attribution-url/useLeadSources";
 import { useSourceMatcher } from "@/hooks/attribution-url/useSourceMatcher";
-
+import { useUsersData } from "@/hooks/attribution-url/useUsersData";
 
 const AttributionUrl: React.FC = () => {
   // Add hook
   const { findMatchingSourceNameForReferralPartner } = useSourceMatcher();
 
-  const {
-    data: usersData,
-    error: usersError,
-    isLoading: usersLoading,
-  } = useUsersData();
+  const { data: usersData, isLoading: usersLoading } = useUsersData();
 
   const [irisUser, setIrisUser] = useState("");
   const [channel, setChannel] = useState("");
@@ -31,9 +25,9 @@ const AttributionUrl: React.FC = () => {
   const [selectedPartnerName, setSelectedPartnerName] = useState<string>("");
 
   // New state variables for dropdown options
-  const [channels, setChannels] = useState<
-    Array<{ id: number; name: string }>
-  >([]);
+  const [channels, setChannels] = useState<Array<{ id: number; name: string }>>(
+    [],
+  );
   const [rslOptions, setRslOptions] = useState<
     Array<{ id: number; name: string }>
   >([]);
@@ -41,7 +35,7 @@ const AttributionUrl: React.FC = () => {
     Array<{ user_id: number; username: string }>
   >([]);
 
-  const handleGenerateLink = () => {
+  const handleGenerateLink = (): void => {
     // 1. Validation
     if (!irisUser || !channel) {
       showNotification({
@@ -69,7 +63,7 @@ const AttributionUrl: React.FC = () => {
       // find correct source id by checking source name with selected partner name
       const selectedSource = findMatchingSourceNameForReferralPartner(
         selectedPartnerName,
-        leadSourcesData?.data
+        leadSourcesData?.data,
       );
 
       if (selectedSource) {
@@ -93,9 +87,9 @@ const AttributionUrl: React.FC = () => {
     });
   };
 
-  const handleCopyLink = () => {
+  const handleCopyLink = (): void => {
     if (generatedLink) {
-      navigator.clipboard.writeText(generatedLink);
+      navigator.clipboard.writeText(generatedLink).catch(() => {});
       showNotification({
         title: "Success",
         message: "Operation completed successfully",
@@ -105,7 +99,9 @@ const AttributionUrl: React.FC = () => {
     }
   };
 
-  const handlePartnerChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handlePartnerChange = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ): void => {
     const selectedValue = e.target.value;
     setReferralPartner(selectedValue);
     // Clear dependent fields
@@ -120,7 +116,9 @@ const AttributionUrl: React.FC = () => {
     }
   };
 
-  const handleIrisUserChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleIrisUserChange = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ): void => {
     const selectedValue = e.target.value;
     setIrisUser(selectedValue);
 
@@ -132,13 +130,13 @@ const AttributionUrl: React.FC = () => {
 
     // Find the selected user
     const selectedUser = usersData?.data?.find(
-      (user) => user.value === parseInt(selectedValue),
+      (user) => user.value === parseInt(selectedValue, 10),
     );
 
     if (selectedUser) {
       // Set groups/channels
-      const channels = selectedUser.channels || [];
-      setChannels(channels);
+      const userChannels = selectedUser.channels || [];
+      setChannels(userChannels);
 
       // Set RSL users
       const rslUsers = selectedUser.rsl || [];
@@ -161,13 +159,16 @@ const AttributionUrl: React.FC = () => {
         <div className="p-6.5">
           {/* IRIS User */}
           <div className="mb-4.5">
-            <label className="mb-2.5 block text-black dark:text-white">
+            <label
+              className="mb-2.5 block text-black dark:text-white"
+              htmlFor="iris-user"
+            >
               Choose IRIS User
             </label>
             <div className="relative z-20 bg-transparent dark:bg-form-input">
               {usersLoading ? (
                 <div className="flex items-center justify-center py-3">
-                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+                  <div className="size-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                 </div>
               ) : (
                 <select
@@ -187,7 +188,10 @@ const AttributionUrl: React.FC = () => {
           </div>
           {/* Channel */}
           <div className="mb-4.5">
-            <label className="mb-2.5 block text-black dark:text-white">
+            <label
+              className="mb-2.5 block text-black dark:text-white"
+              htmlFor="channel"
+            >
               Channel
             </label>
             <div className="relative z-20 bg-transparent dark:bg-form-input">
@@ -208,7 +212,10 @@ const AttributionUrl: React.FC = () => {
 
           {/* RSL */}
           <div className="mb-4.5">
-            <label className="mb-2.5 block text-black dark:text-white">
+            <label
+              className="mb-2.5 block text-black dark:text-white"
+              htmlFor="rsl"
+            >
               RSL
             </label>
             <div className="relative z-20 bg-transparent dark:bg-form-input">
@@ -229,7 +236,10 @@ const AttributionUrl: React.FC = () => {
 
           {/* Referral Partner */}
           <div className="mb-4.5">
-            <label className="mb-2.5 block text-black dark:text-white">
+            <label
+              className="mb-2.5 block text-black dark:text-white"
+              htmlFor="referral-partner"
+            >
               Referral Partner
             </label>
             <div className="relative z-20 bg-transparent dark:bg-form-input">
@@ -250,13 +260,17 @@ const AttributionUrl: React.FC = () => {
           <button
             onClick={handleGenerateLink}
             className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90"
+            type="button"
           >
             Generate Link
           </button>
 
           {generatedLink && (
             <div className="mt-4.5">
-              <label className="mb-2.5 block text-black dark:text-white">
+              <label
+                className="mb-2.5 block text-black dark:text-white"
+                htmlFor="generated-link"
+              >
                 Generated Link:
               </label>
               <div className="flex items-center gap-3">
@@ -269,6 +283,7 @@ const AttributionUrl: React.FC = () => {
                 <button
                   onClick={handleCopyLink}
                   className="flex justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90"
+                  type="button"
                 >
                   Copy
                 </button>

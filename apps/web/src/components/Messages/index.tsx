@@ -1,9 +1,11 @@
 "use client";
-import Image from "next/image";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import DropdownDefault from "@/components/Dropdowns/DropdownDefault";
 
-const Messages: React.FC = () => {
+import Image from "next/image";
+
+import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
+import { DropdownDefault } from "@/components/Dropdowns/DropdownDefault";
+
+export const Messages: React.FC = () => {
   const chatList = [
     {
       imgSrc: "/images/user/user-03.png",
@@ -55,7 +57,11 @@ const Messages: React.FC = () => {
                   className="w-full rounded border border-stroke bg-gray-2 py-2.5 pl-5 pr-10 text-sm outline-none focus:border-primary dark:border-strokedark dark:bg-boxdark-2"
                   placeholder="Search..."
                 />
-                <button className="absolute right-4 top-1/2 -translate-y-1/2">
+                <button
+                  className="absolute right-4 top-1/2 -translate-y-1/2"
+                  type="button"
+                  aria-label="Button"
+                >
                   <svg
                     width="18"
                     height="18"
@@ -80,21 +86,21 @@ const Messages: React.FC = () => {
               </form>
               <div className="no-scrollbar max-h-full space-y-2.5 overflow-auto">
                 {/* <!-- Chat List Item --> */}
-                {chatList.map((object, item) => {
+                {chatList.map((object) => {
                   return (
                     <div
-                      key={item}
+                      key={object.name}
                       className="flex cursor-pointer items-center rounded px-4 py-2 hover:bg-gray-2 dark:hover:bg-strokedark"
                     >
                       <div className="relative mr-3.5 h-11 w-full max-w-11 rounded-full">
                         <Image
                           src={object.imgSrc}
                           alt="profile"
-                          className="h-full w-full object-cover object-center"
+                          className="size-full object-cover object-center"
                           width={44}
                           height={44}
                         />
-                        <span className="absolute bottom-0 right-0 block h-3 w-3 rounded-full border-2 border-gray-2 bg-success"></span>
+                        <span className="absolute bottom-0 right-0 block size-3 rounded-full border-2 border-gray-2 bg-success" />
                       </div>
                       <div className="w-full">
                         <h5 className="text-sm font-medium text-black dark:text-white">
@@ -116,9 +122,9 @@ const Messages: React.FC = () => {
               <div className="flex items-center">
                 <div className="mr-4.5 h-13 w-full max-w-13 overflow-hidden rounded-full">
                   <Image
-                    src={"/images/user/user-01.png"}
+                    src="/images/user/user-01.png"
                     alt="avatar"
-                    className="h-full w-full object-cover object-center"
+                    className="size-full object-cover object-center"
                     width={52}
                     height={52}
                   />
@@ -202,10 +208,14 @@ const Messages: React.FC = () => {
                   <input
                     type="text"
                     placeholder="Type something here"
-                    className="h-13 w-full rounded-md border border-stroke bg-gray pl-5 pr-19 text-black placeholder-body outline-none focus:border-primary dark:border-strokedark dark:bg-boxdark-2 dark:text-white"
+                    className="h-13 w-full rounded-md border border-stroke bg-gray pl-5 pr-19 text-black outline-none placeholder:text-body focus:border-primary dark:border-strokedark dark:bg-boxdark-2 dark:text-white"
                   />
                   <div className="absolute right-5 top-1/2 inline-flex -translate-y-1/2 items-center justify-end space-x-4">
-                    <button className="hover:text-primary">
+                    <button
+                      className="hover:text-primary"
+                      type="button"
+                      aria-label="Button"
+                    >
                       <svg
                         width="18"
                         height="18"
@@ -219,7 +229,11 @@ const Messages: React.FC = () => {
                         />
                       </svg>
                     </button>
-                    <button className="hover:text-primary">
+                    <button
+                      className="hover:text-primary"
+                      type="button"
+                      aria-label="Button"
+                    >
                       <svg
                         width="19"
                         height="18"
@@ -250,7 +264,11 @@ const Messages: React.FC = () => {
                     </button>
                   </div>
                 </div>
-                <button className="flex h-13 w-full max-w-13 items-center justify-center rounded-md bg-primary text-white hover:bg-opacity-90">
+                <button
+                  className="flex h-13 w-full max-w-13 items-center justify-center rounded-md bg-primary text-white hover:bg-opacity-90"
+                  type="button"
+                  aria-label="Button"
+                >
                   <svg
                     width="24"
                     height="24"
@@ -283,5 +301,3 @@ const Messages: React.FC = () => {
     </>
   );
 };
-
-export default Messages;

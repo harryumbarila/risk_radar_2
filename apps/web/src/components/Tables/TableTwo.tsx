@@ -1,5 +1,7 @@
 import Image from "next/image";
-import { Product } from "@/types/product";
+import type { FC } from "react";
+
+import type { Product } from "@/types/product";
 
 const productData: Product[] = [
   {
@@ -36,7 +38,7 @@ const productData: Product[] = [
   },
 ];
 
-const TableTwo = () => {
+export const TableTwo: FC = () => {
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
       <div className="px-4 py-6 md:px-6 xl:px-7.5">
@@ -63,10 +65,10 @@ const TableTwo = () => {
         </div>
       </div>
 
-      {productData.map((product, key) => (
+      {productData.map((product) => (
         <div
           className="grid grid-cols-6 border-t border-stroke px-4 py-4.5 dark:border-strokedark sm:grid-cols-8 md:px-6 2xl:px-7.5"
-          key={key}
+          key={product.name}
         >
           <div className="col-span-3 flex items-center">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -104,5 +106,3 @@ const TableTwo = () => {
     </div>
   );
 };
-
-export default TableTwo;

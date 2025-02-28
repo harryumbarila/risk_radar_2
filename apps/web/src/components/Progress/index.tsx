@@ -1,11 +1,12 @@
 "use client";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import ProgressOne from "@/components/Progress/ProgressOne";
-import ProgressTwo from "@/components/Progress/ProgressTwo";
-import ProgressThree from "@/components/Progress/ProgressThree";
-import ProgressFour from "@/components/Progress/ProgressFour";
 
-const Progress: React.FC = () => {
+import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
+import { ProgressFour } from "@/components/Progress/ProgressFour";
+import { ProgressOne } from "@/components/Progress/ProgressOne";
+import { ProgressThree } from "@/components/Progress/ProgressThree";
+import { ProgressTwo } from "@/components/Progress/ProgressTwo";
+
+export const Progress: React.FC = () => {
   return (
     <>
       <Breadcrumb pageName="Progress" />
@@ -19,5 +20,3 @@ const Progress: React.FC = () => {
     </>
   );
 };
-
-export default Progress;

@@ -1,8 +1,8 @@
-import React from "react";
-import Messages from "@/components/Messages";
+import type { Metadata } from "next";
+import type { FC } from "react";
 
-import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
+import { Messages } from "@/components/Messages";
 
 export const metadata: Metadata = {
   title: "Next.js Messages | TailAdmin - Next.js Dashboard Template",
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   // other metadata
 };
 
-const MessagesPage = () => {
+const MessagesPage: FC = () => {
   return (
     <DefaultLayout>
       <Messages />

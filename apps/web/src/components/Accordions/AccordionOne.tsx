@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import AccordionItemOne from "./AccordionItemOne";
-import { FAQ } from "@/types/faq";
+
+import type { FAQ } from "@/types/faq";
+
+import { AccordionItemOne } from "./AccordionItemOne";
 
 const header = `How long we deliver your first blog post?`;
 const text = `It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content marketing strategy that we do before writing your first blog post, Ipsum available .`;
@@ -33,10 +35,10 @@ const faqs: FAQ[] = [
   },
 ];
 
-const AccordionOne: React.FC = () => {
+export const AccordionOne: React.FC = () => {
   const [active, setActive] = useState<number | null>(null);
 
-  const handleToggle = (index: number) => {
+  const handleToggle = (index: number): void => {
     if (active === index) {
       setActive(null);
     } else {
@@ -46,7 +48,7 @@ const AccordionOne: React.FC = () => {
 
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-      <div className="border-b border-stroke px-4 py-4 dark:border-strokedark sm:px-6 xl:px-7.5">
+      <div className="border-b border-stroke p-4 dark:border-strokedark sm:px-6 xl:px-7.5">
         <h3 className="font-medium text-black dark:text-white">
           Accordions Style 1
         </h3>
@@ -90,5 +92,3 @@ const AccordionOne: React.FC = () => {
     </div>
   );
 };
-
-export default AccordionOne;

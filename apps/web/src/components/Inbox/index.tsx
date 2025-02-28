@@ -1,11 +1,13 @@
 "use client";
-import React, { useState } from "react";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import DropdownDefault from "@/components/Dropdowns/DropdownDefault";
-import InboxMenuList from "@/components/Inbox/InboxMenuList";
-import InboxList from "@/components/Inbox/InboxList";
 
-const Inbox: React.FC = () => {
+import React, { useState } from "react";
+
+import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
+import { DropdownDefault } from "@/components/Dropdowns/DropdownDefault";
+import { InboxList } from "@/components/Inbox/InboxList";
+import { InboxMenuList } from "@/components/Inbox/InboxMenuList";
+
+export const Inbox: React.FC = () => {
   const [inboxSidebarToggle, setInboxSidebarToggle] = useState(false);
 
   return (
@@ -20,13 +22,15 @@ const Inbox: React.FC = () => {
             }`}
           >
             <button
+              type="button"
               onClick={() => setInboxSidebarToggle(!inboxSidebarToggle)}
               className={`absolute -right-20 z-99999 block rounded-md border border-stroke bg-white p-1.5 shadow-sm dark:border-strokedark dark:bg-boxdark lg:hidden ${
                 inboxSidebarToggle && "!-right-9"
               }`}
+              aria-label="Close"
             >
               <svg
-                className="h-5 w-5 fill-current"
+                className="size-5 fill-current"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 32 32"
               >
@@ -35,7 +39,10 @@ const Inbox: React.FC = () => {
             </button>
 
             <div className="px-4 pt-4">
-              <button className="flex w-full rounded-md bg-primary px-5.5 py-2.5 font-medium text-white">
+              <button
+                className="flex w-full rounded-md bg-primary px-5.5 py-2.5 font-medium text-white"
+                type="button"
+              >
                 Compose
               </button>
             </div>
@@ -46,11 +53,12 @@ const Inbox: React.FC = () => {
           </div>
           <div className="flex h-full flex-col border-l border-stroke dark:border-strokedark lg:w-4/5">
             {/* <!-- ====== Inbox List Start --> */}
-            <div className="flex flex-col-reverse justify-between gap-6 py-4.5 pl-4 pr-4 sm:flex-row lg:pl-10 lg:pr-7.5">
+            <div className="flex flex-col-reverse justify-between gap-6 px-4 py-4.5 sm:flex-row lg:pl-10 lg:pr-7.5">
               <div className="flex items-center gap-4">
                 <label
                   htmlFor="checkboxAll"
                   className="flex cursor-pointer select-none items-center font-medium"
+                  aria-label="Select all"
                 >
                   <div className="relative">
                     <input
@@ -58,7 +66,7 @@ const Inbox: React.FC = () => {
                       id="checkboxAll"
                       className="tableCheckbox sr-only"
                     />
-                    <div className="box flex h-5 w-5 items-center justify-center rounded-[3px] border-[.5px] border-stroke bg-gray-2 text-white dark:border-strokedark dark:bg-boxdark-2">
+                    <div className="box flex size-5 items-center justify-center rounded-[3px] border-[.5px] border-stroke bg-gray-2 text-white dark:border-strokedark dark:bg-boxdark-2">
                       <span className="opacity-0">
                         <svg width="14" height="14" viewBox="0 0 10 10">
                           <path
@@ -73,7 +81,7 @@ const Inbox: React.FC = () => {
                   </div>
                 </label>
 
-                <button>
+                <button type="button" aria-label="Delete">
                   <svg
                     className="fill-danger"
                     width="18"
@@ -101,7 +109,7 @@ const Inbox: React.FC = () => {
                   </svg>
                 </button>
 
-                <button>
+                <button type="button" aria-label="Archive">
                   <svg
                     width="18"
                     height="18"
@@ -150,7 +158,11 @@ const Inbox: React.FC = () => {
                     />
                   </svg>
                 </span>
-                <button className="absolute right-0 top-1/2 -translate-y-1/2">
+                <button
+                  className="absolute right-0 top-1/2 -translate-y-1/2"
+                  type="button"
+                  aria-label="Search"
+                >
                   <svg
                     className="fill-[#637381] hover:fill-primary"
                     width="18"
@@ -239,7 +251,11 @@ const Inbox: React.FC = () => {
                 1-5 of 29
               </p>
               <div className="flex items-center justify-end space-x-3">
-                <button className="flex h-7.5 w-7.5 items-center justify-center rounded border border-stroke bg-whiten hover:border-primary hover:bg-primary hover:text-white dark:border-strokedark dark:bg-whiten/30">
+                <button
+                  className="flex size-7.5 items-center justify-center rounded border border-stroke bg-whiten hover:border-primary hover:bg-primary hover:text-white dark:border-strokedark dark:bg-whiten/30"
+                  aria-label="Previous"
+                  type="button"
+                >
                   <svg
                     width="18"
                     height="18"
@@ -253,7 +269,11 @@ const Inbox: React.FC = () => {
                     />
                   </svg>
                 </button>
-                <button className="flex h-7.5 w-7.5 items-center justify-center rounded border border-stroke bg-whiten hover:border-primary hover:bg-primary hover:text-white dark:border-strokedark dark:bg-whiten/30">
+                <button
+                  className="flex size-7.5 items-center justify-center rounded border border-stroke bg-whiten hover:border-primary hover:bg-primary hover:text-white dark:border-strokedark dark:bg-whiten/30"
+                  aria-label="Next"
+                  type="button"
+                >
                   <svg
                     width="18"
                     height="18"
@@ -276,5 +296,3 @@ const Inbox: React.FC = () => {
     </>
   );
 };
-
-export default Inbox;

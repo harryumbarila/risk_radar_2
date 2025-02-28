@@ -1,12 +1,12 @@
-import React from "react";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+import React from "react";
 
-interface Team {
+type Team = {
   image: string;
   name: string;
   position: string;
-}
+};
 
 const teamItems: Team[] = [
   {
@@ -31,11 +31,11 @@ const teamItems: Team[] = [
   },
 ];
 
-const TeamOne: React.FC = () => {
+export const TeamOne: React.FC = () => {
   return (
     <div className="grid grid-cols-1 gap-15 py-4 sm:grid-cols-2 sm:py-6 xl:grid-cols-4 xl:py-7.5 2xl:py-15">
-      {teamItems.map((item, index) => (
-        <div key={index}>
+      {teamItems.map((item) => (
+        <div key={item.name}>
           <div className="relative z-1 mx-auto h-[170px] w-full max-w-[170px] rounded-full">
             <Image
               width={170}
@@ -472,7 +472,7 @@ const TeamOne: React.FC = () => {
           </div>
 
           <div className="flex items-center justify-center gap-5.5">
-            <Link href="#" className="text-bodydark2 hover:text-primary">
+            <Link href="/" className="text-bodydark2 hover:text-primary">
               <svg
                 className="fill-current"
                 width="20"
@@ -488,7 +488,7 @@ const TeamOne: React.FC = () => {
               </svg>
             </Link>
 
-            <Link href="#" className="text-bodydark2 hover:text-primary">
+            <Link href="/" className="text-bodydark2 hover:text-primary">
               <svg
                 className="fill-current"
                 width="20"
@@ -504,7 +504,7 @@ const TeamOne: React.FC = () => {
               </svg>
             </Link>
 
-            <Link href="#" className="text-bodydark2 hover:text-primary">
+            <Link href="/" className="text-bodydark2 hover:text-primary">
               <svg
                 className="fill-current"
                 width="20"
@@ -533,5 +533,3 @@ const TeamOne: React.FC = () => {
     </div>
   );
 };
-
-export default TeamOne;

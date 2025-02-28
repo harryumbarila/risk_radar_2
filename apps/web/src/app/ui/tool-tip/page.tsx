@@ -1,9 +1,10 @@
+import type { Metadata } from "next";
 import React from "react";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import TooltipsOne from "@/components/ToolTips/TooltipsOne";
-import TooltipsTwo from "@/components/ToolTips/TooltipsTwo";
-import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+
+import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
+import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
+import { TooltipsOne } from "@/components/ToolTips/TooltipsOne";
+import { TooltipsTwo } from "@/components/ToolTips/TooltipsTwo";
 
 export const metadata: Metadata = {
   title: "Next.js Tooltips | TailAdmin - Next.js Dashboard Template",

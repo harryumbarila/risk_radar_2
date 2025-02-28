@@ -1,7 +1,8 @@
+import type { Metadata } from "next";
 import React from "react";
-import Progress from "@/components/Progress";
-import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+
+import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
+import { Progress } from "@/components/Progress";
 
 export const metadata: Metadata = {
   title: "Next.js Progress | TailAdmin - Next.js Dashboard Template",

@@ -1,15 +1,15 @@
-import { ApexOptions } from "apexcharts";
+import type { ApexOptions } from "apexcharts";
 import React, { useState } from "react";
 import ReactApexChart from "react-apexcharts";
 
-interface ChartTenState {
+type ChartTenState = {
   series: {
     name: string;
     data: number[];
   }[];
-}
+};
 
-const ChartTen: React.FC = () => {
+export const ChartTen: React.FC = () => {
   const [state, setState] = useState<ChartTenState>({
     series: [
       {
@@ -28,13 +28,13 @@ const ChartTen: React.FC = () => {
   });
 
   // Update the state
-  const updateState = () => {
+  const updateState = (): void => {
     setState((prevState) => ({
       ...prevState,
       // Update the desired properties
     }));
   };
-  updateState;
+  updateState();
 
   const options: ApexOptions = {
     colors: ["#3C50E0", "#13C296", "#F2994A"],
@@ -167,5 +167,3 @@ const ChartTen: React.FC = () => {
     </div>
   );
 };
-
-export default ChartTen;

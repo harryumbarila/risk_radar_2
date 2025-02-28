@@ -1,12 +1,12 @@
-import { ApexOptions } from "apexcharts";
+import type { ApexOptions } from "apexcharts";
 import React, { useState } from "react";
 import ReactApexChart from "react-apexcharts";
 
-interface ChartFiveState {
+type ChartFiveState = {
   series: { data: number[] }[];
-}
+};
 
-const ChartFive: React.FC = () => {
+export const ChartFive: React.FC = () => {
   const [state, setState] = useState<ChartFiveState>({
     series: [
       {
@@ -16,13 +16,13 @@ const ChartFive: React.FC = () => {
   });
 
   // Update the state
-  const updateState = () => {
+  const updateState = (): void => {
     setState((prevState) => ({
       ...prevState,
       // Update the desired properties
     }));
   };
-  updateState;
+  updateState();
 
   const options: ApexOptions = {
     colors: ["#3C50E0"],
@@ -133,5 +133,3 @@ const ChartFive: React.FC = () => {
     </div>
   );
 };
-
-export default ChartFive;

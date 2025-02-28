@@ -1,15 +1,15 @@
-import { ApexOptions } from "apexcharts";
+import type { ApexOptions } from "apexcharts";
 import React, { useState } from "react";
 import ReactApexChart from "react-apexcharts";
 
-interface ChartSevenState {
+type ChartSevenState = {
   series: {
     name: string;
     data: number[];
   }[];
-}
+};
 
-const ChartSeven: React.FC = () => {
+export const ChartSeven: React.FC = () => {
   const [state, setState] = useState<ChartSevenState>({
     series: [
       {
@@ -24,13 +24,13 @@ const ChartSeven: React.FC = () => {
   });
 
   // Update the state
-  const updateState = () => {
+  const updateState = (): void => {
     setState((prevState) => ({
       ...prevState,
       // Update the desired properties
     }));
   };
-  updateState;
+  updateState();
 
   const options: ApexOptions = {
     legend: {
@@ -108,9 +108,8 @@ const ChartSeven: React.FC = () => {
       },
       y: {
         title: {
-          formatter: function (e) {
+          formatter() {
             return "";
-            e;
           },
         },
       },
@@ -220,5 +219,3 @@ const ChartSeven: React.FC = () => {
     </div>
   );
 };
-
-export default ChartSeven;

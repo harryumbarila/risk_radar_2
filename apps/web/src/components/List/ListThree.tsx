@@ -1,12 +1,13 @@
-import React from "react";
 import Image from "next/image";
-import DropdownFive from "@/components/Dropdowns/DropdownFive";
+import React from "react";
 
-interface ListItem {
+import { DropdownFive } from "@/components/Dropdowns/DropdownFive";
+
+type ListItem = {
   image: string;
   name: string;
   position: string;
-}
+};
 
 const listItems: ListItem[] = [
   {
@@ -31,13 +32,13 @@ const listItems: ListItem[] = [
   },
 ];
 
-const ListThree: React.FC = () => {
+export const ListThree: React.FC = () => {
   return (
     <div className="w-full max-w-[360px] rounded-md border border-stroke py-2.5 dark:border-strokedark">
       <div className="flex flex-col">
-        {listItems.map((item, index) => (
+        {listItems.map((item) => (
           <div
-            key={index}
+            key={item.name}
             className="flex items-center justify-between p-4.5 hover:bg-[#F9FAFB] dark:hover:bg-meta-4"
           >
             <div className="flex items-center">
@@ -71,5 +72,3 @@ const ListThree: React.FC = () => {
     </div>
   );
 };
-
-export default ListThree;

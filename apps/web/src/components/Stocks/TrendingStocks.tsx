@@ -1,14 +1,15 @@
-import React from "react";
 import Image from "next/image";
-import DropdownDefault from "@/components/Dropdowns/DropdownDefault";
+import React from "react";
 
-interface Stocks {
+import { DropdownDefault } from "@/components/Dropdowns/DropdownDefault";
+
+type Stocks = {
   image: string;
   name: string;
   gross: string;
   price: string;
   returnRate: number;
-}
+};
 
 const stocksItems: Stocks[] = [
   {
@@ -34,7 +35,7 @@ const stocksItems: Stocks[] = [
   },
 ];
 
-const TrendingStocks: React.FC = () => {
+export const TrendingStocks: React.FC = () => {
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white px-5 pb-10 pt-7.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7 xl:col-span-5">
       <div className="mb-7.5 flex items-center justify-between">
@@ -49,14 +50,14 @@ const TrendingStocks: React.FC = () => {
       </div>
 
       <div className="flex flex-col gap-5">
-        {stocksItems.map((item, key) => (
+        {stocksItems.map((item) => (
           <div
-            key={key}
+            key={item.name}
             className="rounded-[5px] border border-stroke p-5 dark:border-strokedark"
           >
             <div className="mb-5.5 flex items-center justify-between">
               <div className="flex items-center gap-4.5">
-                <div className="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-[#EEF2F8]">
+                <div className="flex size-11.5 items-center justify-center rounded-full bg-[#EEF2F8]">
                   <Image
                     src={item.image}
                     alt="brand"
@@ -125,10 +126,16 @@ const TrendingStocks: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-4">
-              <button className="flex w-full items-center justify-center rounded-[5px] bg-[#F3F5F8] px-7.5 py-2 text-sm font-medium text-black hover:bg-primary/[0.15] hover:text-primary dark:bg-meta-4 dark:text-white dark:hover:bg-primary/[0.15] dark:hover:text-primary">
+              <button
+                className="flex w-full items-center justify-center rounded-[5px] bg-[#F3F5F8] px-7.5 py-2 text-sm font-medium text-black hover:bg-primary/[0.15] hover:text-primary dark:bg-meta-4 dark:text-white dark:hover:bg-primary/[0.15] dark:hover:text-primary"
+                type="button"
+              >
                 Short
               </button>
-              <button className="flex w-full items-center justify-center rounded-[5px] bg-[#F3F5F8] px-7.5 py-2 text-sm font-medium text-black hover:bg-primary/[0.15] hover:text-primary dark:bg-meta-4 dark:text-white dark:hover:bg-primary/[0.15] dark:hover:text-primary">
+              <button
+                className="flex w-full items-center justify-center rounded-[5px] bg-[#F3F5F8] px-7.5 py-2 text-sm font-medium text-black hover:bg-primary/[0.15] hover:text-primary dark:bg-meta-4 dark:text-white dark:hover:bg-primary/[0.15] dark:hover:text-primary"
+                type="button"
+              >
                 Buy
               </button>
             </div>
@@ -138,5 +145,3 @@ const TrendingStocks: React.FC = () => {
     </div>
   );
 };
-
-export default TrendingStocks;

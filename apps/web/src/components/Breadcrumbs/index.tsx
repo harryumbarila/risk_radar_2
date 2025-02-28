@@ -1,10 +1,11 @@
 "use client";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import BreadcrumbOne from "@/components/Breadcrumbs/BreadcrumbOne";
-import BreadcrumbTwo from "@/components/Breadcrumbs/BreadcrumbTwo";
-import BreadcrumbThree from "@/components/Breadcrumbs/BreadcrumbThree";
 
-const Breadcrumbs: React.FC = () => {
+import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
+import { BreadcrumbOne } from "@/components/Breadcrumbs/BreadcrumbOne";
+import { BreadcrumbThree } from "@/components/Breadcrumbs/BreadcrumbThree";
+import { BreadcrumbTwo } from "@/components/Breadcrumbs/BreadcrumbTwo";
+
+export const Breadcrumbs: React.FC = () => {
   return (
     <>
       <Breadcrumb pageName="Breadcrumb" />
@@ -17,5 +18,3 @@ const Breadcrumbs: React.FC = () => {
     </>
   );
 };
-
-export default Breadcrumbs;

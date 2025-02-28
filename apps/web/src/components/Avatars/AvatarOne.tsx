@@ -1,11 +1,11 @@
-import React from "react";
 import Image from "next/image";
+import React from "react";
 
-interface Avatar {
+type Avatar = {
   image: string;
   classes: string;
   size: number;
-}
+};
 
 const avatarItems: Avatar[] = [
   {
@@ -30,11 +30,11 @@ const avatarItems: Avatar[] = [
   },
 ];
 
-const AvatarOne: React.FC = () => {
+export const AvatarOne: React.FC = () => {
   return (
     <div className="flex items-center gap-6">
-      {avatarItems.map((item, index) => (
-        <div key={index} className={`w-full rounded-full ${item.classes}`}>
+      {avatarItems.map((item) => (
+        <div key={item.image} className={`w-full rounded-full ${item.classes}`}>
           <Image
             width={item.size}
             height={item.size}
@@ -51,5 +51,3 @@ const AvatarOne: React.FC = () => {
     </div>
   );
 };
-
-export default AvatarOne;

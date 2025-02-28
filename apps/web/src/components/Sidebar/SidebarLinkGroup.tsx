@@ -1,22 +1,22 @@
 "use client";
-import { ReactNode, useState } from "react";
 
-interface SidebarLinkGroupProps {
+import type { FC, ReactNode } from "react";
+import { useState } from "react";
+
+type SidebarLinkGroupProps = {
   children: (handleClick: () => void, open: boolean) => ReactNode;
   activeCondition: boolean;
-}
+};
 
-const SidebarLinkGroup = ({
+export const SidebarLinkGroup: FC<SidebarLinkGroupProps> = ({
   children,
   activeCondition,
 }: SidebarLinkGroupProps) => {
   const [open, setOpen] = useState<boolean>(activeCondition);
 
-  const handleClick = () => {
+  const handleClick = (): void => {
     setOpen(!open);
   };
 
   return <li>{children(handleClick, open)}</li>;
 };
-
-export default SidebarLinkGroup;

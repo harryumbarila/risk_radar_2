@@ -1,8 +1,8 @@
 import React from "react";
 
-interface ListItem {
+type ListItem = {
   text: string;
-}
+};
 
 const listItems: ListItem[] = [
   { text: "Lorem ipsum dolor sit amet" },
@@ -12,13 +12,13 @@ const listItems: ListItem[] = [
   { text: "If you are going to use a of Lorem" },
 ];
 
-const ListTwo: React.FC = () => {
+export const ListTwo: React.FC = () => {
   return (
     <div className="min-w-[370px] max-w-max rounded-md border border-stroke py-1 dark:border-strokedark">
       <ul className="flex flex-col">
-        {listItems.map((item, index) => (
+        {listItems.map((item) => (
           <li
-            key={index}
+            key={item.text}
             className="flex items-center gap-2.5 border-b border-stroke px-5 py-3 last:border-b-0 dark:border-strokedark"
           >
             <span className="text-primary">
@@ -59,5 +59,3 @@ const ListTwo: React.FC = () => {
     </div>
   );
 };
-
-export default ListTwo;

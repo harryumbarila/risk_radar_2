@@ -1,7 +1,6 @@
 import React from "react";
-import Image from "next/image";
 
-const PricingTableOne: React.FC = () => {
+export const PricingTableOne: React.FC = () => {
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-3 2xl:gap-7.5">
       {/* <!-- Pricing Item --> */}
@@ -31,7 +30,10 @@ const PricingTableOne: React.FC = () => {
           <li className="font-medium">Lifetime Free Updates</li>
         </ul>
 
-        <button className="mt-9 flex rounded-md border border-primary px-9 py-3 font-medium text-primary hover:bg-primary hover:text-white">
+        <button
+          className="mt-9 flex rounded-md border border-primary px-9 py-3 font-medium text-primary hover:bg-primary hover:text-white"
+          type="button"
+        >
           Purchase Now
         </button>
       </div>
@@ -86,7 +88,10 @@ const PricingTableOne: React.FC = () => {
           <li className="font-medium">Lifetime Free Updates</li>
         </ul>
 
-        <button className="mt-9 flex rounded-md border border-primary px-9 py-3 font-medium text-primary hover:bg-primary hover:text-white">
+        <button
+          className="mt-9 flex rounded-md border border-primary px-9 py-3 font-medium text-primary hover:bg-primary hover:text-white"
+          type="button"
+        >
           Purchase Now
         </button>
       </div>
@@ -118,12 +123,13 @@ const PricingTableOne: React.FC = () => {
           <li className="font-medium">Lifetime Free Updates</li>
         </ul>
 
-        <button className="mt-9 flex rounded-md border border-primary px-9 py-3 font-medium text-primary hover:bg-primary hover:text-white">
+        <button
+          className="mt-9 flex rounded-md border border-primary px-9 py-3 font-medium text-primary hover:bg-primary hover:text-white"
+          type="button"
+        >
           Purchase Now
         </button>
       </div>
     </div>
   );
 };
-
-export default PricingTableOne;

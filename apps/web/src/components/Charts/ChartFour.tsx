@@ -1,12 +1,12 @@
-import { ApexOptions } from "apexcharts";
+import type { ApexOptions } from "apexcharts";
 import React, { useState } from "react";
 import ReactApexChart from "react-apexcharts";
 
-interface ChartFourState {
+type ChartFourState = {
   series: { data: number[] }[];
-}
+};
 
-const ChartFour: React.FC = () => {
+export const ChartFour: React.FC = () => {
   const [state, setState] = useState<ChartFourState>({
     series: [
       {
@@ -20,13 +20,13 @@ const ChartFour: React.FC = () => {
   });
 
   // Update the state
-  const updateState = () => {
+  const updateState = (): void => {
     setState((prevState) => ({
       ...prevState,
       // Update the desired properties
     }));
   };
-  updateState;
+  updateState();
 
   const options: ApexOptions = {
     colors: ["#3C50E0"],
@@ -123,11 +123,12 @@ const ChartFour: React.FC = () => {
       x: {
         show: false,
       },
-      y: {
-        formatter: function (val: any) {
-          return val;
-        },
-      },
+
+      // y: {
+      //   formatter(val: unknown): unknown {
+      //     return val;
+      //   },
+      // },
     },
   };
 
@@ -152,5 +153,3 @@ const ChartFour: React.FC = () => {
     </div>
   );
 };
-
-export default ChartFour;

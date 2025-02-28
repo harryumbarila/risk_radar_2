@@ -1,41 +1,43 @@
-import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { useUser } from "@auth0/nextjs-auth0/client";
+import Link from "next/link";
+import type { FC } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const DropdownUser = () => {
+export const DropdownUser: FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const { user } = useUser();
 
-  const trigger = useRef<any>(null);
-  const dropdown = useRef<any>(null);
+  const trigger = useRef<HTMLAnchorElement>(null);
+  const dropdown = useRef<HTMLDivElement>(null);
 
   // close on click outside
   useEffect(() => {
-    const clickHandler = ({ target }: MouseEvent) => {
+    const clickHandler = ({ target }: MouseEvent): void => {
       if (!dropdown.current) return;
       if (
         !dropdownOpen ||
-        dropdown.current.contains(target) ||
-        trigger.current.contains(target)
-      )
+        dropdown.current.contains(target as Node) ||
+        trigger.current?.contains(target as Node)
+      ) {
         return;
+      }
       setDropdownOpen(false);
     };
     document.addEventListener("click", clickHandler);
-    return () => document.removeEventListener("click", clickHandler);
+    return (): void => document.removeEventListener("click", clickHandler);
   });
 
   // close if the esc key is pressed
   useEffect(() => {
-    const keyHandler = ({ keyCode }: KeyboardEvent) => {
+    const keyHandler = ({ keyCode }: KeyboardEvent): void => {
       if (!dropdownOpen || keyCode !== 27) return;
       setDropdownOpen(false);
     };
     document.addEventListener("keydown", keyHandler);
-    return () => document.removeEventListener("keydown", keyHandler);
+    return (): void => document.removeEventListener("keydown", keyHandler);
   });
 
-  const handleLogout = () => {
+  const handleLogout = (): void => {
     window.location.assign("/api/auth/logout");
   };
 
@@ -45,7 +47,7 @@ const DropdownUser = () => {
         ref={trigger}
         onClick={() => setDropdownOpen(!dropdownOpen)}
         className="flex items-center gap-4"
-        href="#"
+        href="/"
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
@@ -81,6 +83,7 @@ const DropdownUser = () => {
         }`}
       >
         <button
+          type="button"
           onClick={handleLogout}
           className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
         >
@@ -108,5 +111,3 @@ const DropdownUser = () => {
     </div>
   );
 };
-
-export default DropdownUser;

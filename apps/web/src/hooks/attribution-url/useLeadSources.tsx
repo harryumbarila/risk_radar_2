@@ -1,16 +1,22 @@
 import useSWR from "swr";
+
 import { baseApi } from "@/hooks/baseApi";
-import { IrisLeadSourcesResponseDto } from "@/shared/response/iris-proxy";
+import type { IrisLeadSourcesResponseDto } from "@/shared/response/iris-proxy";
 
-export const useLeadSources = () => {
-    const { data, error, isLoading } = useSWR<IrisLeadSourcesResponseDto>(
-        "/v1/iris_proxy/lead-sources",
-        baseApi,
-        {
-            dedupingInterval: 100,
-            revalidateOnFocus: false,
-        }
-    );
+type UseLeadSourcesReturnType = {
+  data: IrisLeadSourcesResponseDto | undefined;
+  error: unknown;
+  isLoading: boolean;
+};
 
-    return { data, error, isLoading };
+export const useLeadSources = (): UseLeadSourcesReturnType => {
+  const { data, error, isLoading } = useSWR<
+    IrisLeadSourcesResponseDto,
+    unknown
+  >("/v1/iris_proxy/lead-sources", baseApi, {
+    dedupingInterval: 100,
+    revalidateOnFocus: false,
+  });
+
+  return { data, error, isLoading };
 };

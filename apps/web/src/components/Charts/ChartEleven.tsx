@@ -1,19 +1,19 @@
-import { ApexOptions } from "apexcharts";
+import type { ApexOptions } from "apexcharts";
 import React, { useState } from "react";
 import ReactApexChart from "react-apexcharts";
 
-interface ChartElevenState {
+type ChartElevenState = {
   series: {
     name: string;
     data: number[];
   }[];
-}
+};
 
-interface ChartElevenProps {
+type ChartElevenProps = {
   returnRate: number;
-}
+};
 
-const ChartEleven: React.FC<ChartElevenProps> = ({
+export const ChartEleven: React.FC<ChartElevenProps> = ({
   returnRate: returnRateValue,
 }) => {
   const [state, setState] = useState<ChartElevenState>({
@@ -29,13 +29,13 @@ const ChartEleven: React.FC<ChartElevenProps> = ({
   });
 
   // Update the state
-  const updateState = () => {
+  const updateState = (): void => {
     setState((prevState) => ({
       ...prevState,
       // Update the desired properties
     }));
   };
-  updateState;
+  updateState();
 
   const options: ApexOptions = {
     colors: [returnRateValue >= 0 ? "#10B981" : "#FB5454"],
@@ -120,5 +120,3 @@ const ChartEleven: React.FC<ChartElevenProps> = ({
     </div>
   );
 };
-
-export default ChartEleven;

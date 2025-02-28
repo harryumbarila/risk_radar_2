@@ -1,7 +1,8 @@
-import React from "react";
-import DataTables from "@/components/DataTables";
-import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import type { Metadata } from "next";
+import type { FC } from "react";
+
+import { DataTables } from "@/components/DataTables";
+import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
 
 export const metadata: Metadata = {
   title: "Next.js DataTables | TailAdmin - Next.js Dashboard Template",
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
   // other metadata
 };
 
-const DataTablesPage = () => {
+const DataTablesPage: FC = () => {
   return (
     <DefaultLayout>
       <DataTables />

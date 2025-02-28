@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import AccordionItemTwo from "./AccordionItemTwo";
-import { FAQ } from "@/types/faq";
+
+import type { FAQ } from "@/types/faq";
+
+import { AccordionItemTwo } from "./AccordionItemTwo";
 
 const text = `There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything.`;
 
@@ -27,10 +29,10 @@ const faqs: FAQ[] = [
   },
 ];
 
-const AccordionTwo: React.FC = () => {
+export const AccordionTwo: React.FC = () => {
   const [active, setActive] = useState<number | null>(null);
 
-  const handleToggle = (index: number) => {
+  const handleToggle = (index: number): void => {
     if (active === index) {
       setActive(null);
     } else {
@@ -40,7 +42,7 @@ const AccordionTwo: React.FC = () => {
 
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-      <div className="border-b border-stroke px-4 py-4 dark:border-strokedark sm:px-6 xl:px-7.5">
+      <div className="border-b border-stroke p-4 dark:border-strokedark sm:px-6 xl:px-7.5">
         <h3 className="font-medium text-black dark:text-white">
           Accordions Style 2
         </h3>
@@ -63,5 +65,3 @@ const AccordionTwo: React.FC = () => {
     </div>
   );
 };
-
-export default AccordionTwo;

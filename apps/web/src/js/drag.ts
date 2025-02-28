@@ -1,6 +1,29 @@
-const Drag = (): void => {
+export const Drag = (): void => {
   const draggables = document.querySelectorAll<HTMLElement>(".task");
   const droppables = document.querySelectorAll<HTMLElement>(".swim-lane");
+
+  const insertAboveTask = (
+    zone: HTMLElement,
+    mouseY: number,
+  ): HTMLElement | null => {
+    const els = zone.querySelectorAll<HTMLElement>(".task:not(.is-dragging)");
+
+    let closestTask: HTMLElement | null = null;
+    let closestOffset = Number.NEGATIVE_INFINITY;
+
+    els.forEach((task) => {
+      const { top } = task.getBoundingClientRect();
+
+      const offset = mouseY - top;
+
+      if (offset < 0 && offset > closestOffset) {
+        closestOffset = offset;
+        closestTask = task;
+      }
+    });
+
+    return closestTask;
+  };
 
   draggables.forEach((task) => {
     task.addEventListener("dragstart", () => {
@@ -25,29 +48,4 @@ const Drag = (): void => {
       }
     });
   });
-
-  const insertAboveTask = (
-    zone: HTMLElement,
-    mouseY: number,
-  ): HTMLElement | null => {
-    const els = zone.querySelectorAll<HTMLElement>(".task:not(.is-dragging)");
-
-    let closestTask: HTMLElement | null = null;
-    let closestOffset = Number.NEGATIVE_INFINITY;
-
-    els.forEach((task) => {
-      const { top } = task.getBoundingClientRect();
-
-      const offset = mouseY - top;
-
-      if (offset < 0 && offset > closestOffset) {
-        closestOffset = offset;
-        closestTask = task;
-      }
-    });
-
-    return closestTask;
-  };
 };
-
-export default Drag;

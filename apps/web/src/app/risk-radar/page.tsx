@@ -1,24 +1,22 @@
 "use client";
 
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import React, { useEffect, useState } from "react";
-import RiskRadarTableComponent from "../../components/RiskRadar/RiskRadarTable";
-import Loader from "@/components/common/Loader";
+import { useRouter } from "next/navigation";
+import type { FC } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+
+import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
+import { Loader } from "@/components/common/Loader";
+import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
+import { RiskRadarTableComponent } from "@/components/RiskRadar/RiskRadarTable";
 import { useExceptionData } from "@/hooks/risk-radar/useExceptionData";
 import { useFilteredRiskRadar } from "@/hooks/risk-radar/useFilteredRiskRadar";
-import { useRouter } from "next/navigation";
 
-const RiskRadar = () => {
+const RiskRadar: FC = () => {
   const router = useRouter();
 
   const [selectedStatus, setSelectedStatus] = useState<string>("");
 
-  const {
-    data: exceptionData,
-    error: exceptionError,
-    isLoading: exceptionLoading,
-  } = useExceptionData();
+  const { data: exceptionData } = useExceptionData();
 
   const {
     filters,
@@ -40,17 +38,37 @@ const RiskRadar = () => {
         view_all_exceptions: true,
       }));
     }
-  }, [exceptionData]);
+  }, [exceptionData, setFilters]);
 
   const handleMIDInputChange = (
     event: React.KeyboardEvent<HTMLInputElement>,
-  ) => {
+  ): void => {
     if (event.key === "Enter") {
       event.preventDefault();
       const merchantId = event.currentTarget.value;
       router.push(`/risk-radar/merchants/${merchantId}`);
     }
   };
+
+  const filterComponent = useMemo(() => {
+    if (filterLoading) {
+      return <Loader size="small" fullScreen={false} />;
+    }
+
+    if (filterError) {
+      return (
+        <div className="flex h-56 items-center justify-center">
+          <p className="text-red-500">Error fetching data</p>
+        </div>
+      );
+    }
+
+    if (filteredData) {
+      return <RiskRadarTableComponent data={filteredData} />;
+    }
+
+    return <div>No data available</div>;
+  }, [filterError, filterLoading, filteredData]);
 
   return (
     <DefaultLayout>
@@ -67,7 +85,10 @@ const RiskRadar = () => {
             <form action="#">
               <div className="p-6.5">
                 <div className="mb-5">
-                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                  <label
+                    className="mb-3 block text-sm font-medium text-black dark:text-white"
+                    htmlFor="system"
+                  >
                     Select System
                   </label>
                   <div className="flex flex-col gap-2.5">
@@ -78,7 +99,7 @@ const RiskRadar = () => {
                           name="system"
                           id={`source-${source.pk}`}
                           value={source.pk}
-                          className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
+                          className="size-4 border-gray-300 text-primary focus:ring-primary"
                           onChange={(e) =>
                             setFilters((prev) => ({
                               ...prev,
@@ -102,7 +123,7 @@ const RiskRadar = () => {
                     <input
                       type="checkbox"
                       id="viewAll"
-                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                      className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
                       onChange={(e) => {
                         setFilters((prev) => ({
                           ...prev,
@@ -120,7 +141,10 @@ const RiskRadar = () => {
                 </div>
                 <div className="mb-5 flex flex-col gap-6 xl:flex-row">
                   <div className="w-full xl:w-1/2">
-                    <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                    <label
+                      className="mb-3 block text-sm font-medium text-black dark:text-white"
+                      htmlFor="startDate"
+                    >
                       Start Date
                     </label>
                     <input
@@ -136,7 +160,10 @@ const RiskRadar = () => {
                   </div>
 
                   <div className="w-full xl:w-1/2">
-                    <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                    <label
+                      className="mb-3 block text-sm font-medium text-black dark:text-white"
+                      htmlFor="endDate"
+                    >
                       End Date
                     </label>
                     <input
@@ -166,7 +193,10 @@ const RiskRadar = () => {
             <form action="#">
               <div className="p-6.5">
                 <div className="mb-5">
-                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                  <label
+                    className="mb-3 block text-sm font-medium text-black dark:text-white"
+                    htmlFor="exceptionType"
+                  >
                     Select Exception Types
                   </label>
                   <select
@@ -207,7 +237,10 @@ const RiskRadar = () => {
             <form action="#">
               <div className="p-6.5">
                 <div className="mb-5">
-                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                  <label
+                    className="mb-3 block text-sm font-medium text-black dark:text-white"
+                    htmlFor="status"
+                  >
                     Status
                   </label>
                   <select
@@ -234,7 +267,10 @@ const RiskRadar = () => {
 
                 {selectedStatus === "Assigned" && (
                   <div className="mb-5 mt-4">
-                    <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                    <label
+                      className="mb-3 block text-sm font-medium text-black dark:text-white"
+                      htmlFor="assignedTo"
+                    >
                       Assign To User
                     </label>
                     <select
@@ -262,14 +298,17 @@ const RiskRadar = () => {
                 )}
                 <div className="relative mb-5">
                   <div className="absolute inset-x-0 top-1/2 flex -translate-y-1/2 items-center justify-center">
-                    <div className="absolute inset-x-0 h-px bg-stroke dark:bg-strokedark"></div>
+                    <div className="absolute inset-x-0 h-px bg-stroke dark:bg-strokedark" />
                     <span className="relative z-10 bg-white px-4 text-sm font-medium text-black dark:bg-boxdark dark:text-white">
                       OR
                     </span>
                   </div>
                 </div>
                 <div className="mb-5">
-                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                  <label
+                    className="mb-3 block text-sm font-medium text-black dark:text-white"
+                    htmlFor="mid"
+                  >
                     MID
                   </label>
                   <input
@@ -281,7 +320,10 @@ const RiskRadar = () => {
                 </div>
 
                 <div className="mb-5">
-                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                  <label
+                    className="mb-3 block text-sm font-medium text-black dark:text-white"
+                    htmlFor="dba"
+                  >
                     DBA/SIC
                   </label>
                   <input
@@ -296,19 +338,7 @@ const RiskRadar = () => {
         </div>
       </div>
 
-      <div className="mt-4">
-        {filterLoading ? (
-          <Loader size={"small"} fullScreen={false} />
-        ) : filterError ? (
-          <div className="flex h-56 items-center justify-center">
-            <p className="text-red-500">Error fetching data</p>
-          </div>
-        ) : filteredData ? (
-          <RiskRadarTableComponent data={filteredData} />
-        ) : (
-          <div>No data available</div>
-        )}
-      </div>
+      <div className="mt-4">{filterComponent}</div>
     </DefaultLayout>
   );
 };

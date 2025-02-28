@@ -1,10 +1,11 @@
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import TableOne from "@/components/Tables/TableOne";
-import TableThree from "@/components/Tables/TableThree";
-import TableTwo from "@/components/Tables/TableTwo";
+import type { Metadata } from "next";
+import type { FC } from "react";
 
-import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
+import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
+import { TableOne } from "@/components/Tables/TableOne";
+import { TableThree } from "@/components/Tables/TableThree";
+import { TableTwo } from "@/components/Tables/TableTwo";
 
 export const metadata: Metadata = {
   title: "Next.js Tables | TailAdmin - Next.js Dashboard Template",
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
     "This is Next.js Tables page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
 };
 
-const TablesPage = () => {
+const TablesPage: FC = () => {
   return (
     <DefaultLayout>
       <Breadcrumb pageName="Tables" />

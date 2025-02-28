@@ -1,9 +1,10 @@
 "use client";
+
 import { useEffect, useState } from "react";
 
 type SetValue<T> = T | ((val: T) => T);
 
-function useLocalStorage<T>(
+export function useLocalStorage<T>(
   key: string,
   initialValue: T,
 ): [T, (value: SetValue<T>) => void] {
@@ -16,22 +17,23 @@ function useLocalStorage<T>(
         // browser code
         const item = window.localStorage.getItem(key);
         // Parse stored json or if none return initialValue
-        return item ? JSON.parse(item) : initialValue;
+        return item ? (JSON.parse(item) as T) : initialValue;
       }
     } catch (error) {
       // If error also return initialValue
-      console.log(error);
-      return initialValue;
+      // eslint-disable-next-line no-console
+      console.error(error);
     }
+    return initialValue;
   });
 
   // useEffect to update local storage when the state changes
   useEffect(() => {
     try {
       // Allow value to be a function so we have same API as useState
-      const valueToStore =
+      const valueToStore: T =
         typeof storedValue === "function"
-          ? storedValue(storedValue)
+          ? (storedValue as (val: T) => T)(storedValue)
           : storedValue;
       // Save state
       if (typeof window !== "undefined") {
@@ -40,11 +42,10 @@ function useLocalStorage<T>(
       }
     } catch (error) {
       // A more advanced implementation would handle the error case
-      console.log(error);
+      // eslint-disable-next-line no-console
+      console.error(error);
     }
   }, [key, storedValue]);
 
   return [storedValue, setStoredValue];
 }
-
-export default useLocalStorage;

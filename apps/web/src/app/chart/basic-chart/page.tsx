@@ -1,8 +1,8 @@
-import BasicChart from "@/components/Charts/BasicChart";
-import { Metadata } from "next";
-import FormElements from "@/components/FormElements";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import type { Metadata } from "next";
 import React from "react";
+
+import { BasicChart } from "@/components/Charts/BasicChart";
+import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
 
 export const metadata: Metadata = {
   title: "Next.js Basic Chart | TailAdmin - Next.js Dashboard Template",

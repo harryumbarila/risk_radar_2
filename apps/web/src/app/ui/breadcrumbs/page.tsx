@@ -1,8 +1,8 @@
-import React from "react";
-import Breadcrumbs from "@/components/Breadcrumbs";
+import type { Metadata } from "next";
+import type { FC } from "react";
 
-import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
 
 export const metadata: Metadata = {
   title: "Next.js Breadcrumbs | TailAdmin - Next.js Dashboard Template",
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   // other metadata
 };
 
-const BreadcrumbsPage = () => {
+const BreadcrumbsPage: FC = () => {
   return (
     <DefaultLayout>
       <Breadcrumbs />

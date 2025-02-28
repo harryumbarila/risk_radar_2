@@ -1,6 +1,7 @@
-import React from "react";
-import DropdownDefault from "./Dropdowns/DropdownDefault";
 import Image from "next/image";
+import React from "react";
+
+import { DropdownDefault } from "./Dropdowns/DropdownDefault";
 
 type FeedbackData = {
   avatar: string;
@@ -36,7 +37,7 @@ const feedbackData: FeedbackData[] = [
   },
 ];
 
-const Feedback: React.FC = () => {
+export const Feedback: React.FC = () => {
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-6">
       <div className="flex items-start justify-between border-b border-stroke px-6 py-5 dark:border-strokedark">
@@ -51,7 +52,7 @@ const Feedback: React.FC = () => {
       <div className="p-6">
         <div className="flex flex-col gap-7">
           {feedbackData.map((feedback, key) => (
-            <div className="relative z-1 flex gap-5.5" key={key}>
+            <div className="relative z-1 flex gap-5.5" key={feedback.name}>
               <div className="h-16 w-full max-w-16 rounded-full border-[3px] border-stroke dark:border-strokedark">
                 <Image
                   width={64}
@@ -78,7 +79,7 @@ const Feedback: React.FC = () => {
               </div>
 
               {key === 0 && (
-                <span className="absolute left-8 -z-1 block h-[300%] w-[1px] border-l border-dashed border-stroke dark:border-strokedark"></span>
+                <span className="absolute left-8 -z-1 block h-[300%] w-px border-l border-dashed border-stroke dark:border-strokedark" />
               )}
             </div>
           ))}
@@ -87,5 +88,3 @@ const Feedback: React.FC = () => {
     </div>
   );
 };
-
-export default Feedback;

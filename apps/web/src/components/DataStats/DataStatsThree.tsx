@@ -1,6 +1,6 @@
 import React from "react";
 
-const DataStatsThree: React.FC = () => {
+export const DataStatsThree: React.FC = () => {
   return (
     <div>
       <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -71,7 +71,7 @@ const DataStatsThree: React.FC = () => {
             </div>
 
             <div>
-              <svg className="h-17.5 w-17.5 -rotate-90 transform">
+              <svg className="size-17.5 -rotate-90">
                 <circle
                   className="text-stroke dark:text-strokedark"
                   strokeWidth="10"
@@ -127,8 +127,9 @@ const DataStatsThree: React.FC = () => {
               </span>
             </div>
 
+            {/* eslint-disable-next-line react/no-unknown-property */}
             <div x-data="{percent : 30}">
-              <svg className="h-17.5 w-17.5 -rotate-90 transform">
+              <svg className="size-17.5 -rotate-90">
                 <circle
                   className="text-stroke dark:text-strokedark"
                   strokeWidth="10"
@@ -185,7 +186,7 @@ const DataStatsThree: React.FC = () => {
             </div>
 
             <div>
-              <svg className="h-17.5 w-17.5 -rotate-90 transform">
+              <svg className="size-17.5 -rotate-90">
                 <circle
                   className="text-stroke dark:text-strokedark"
                   strokeWidth="10"
@@ -216,5 +217,3 @@ const DataStatsThree: React.FC = () => {
     </div>
   );
 };
-
-export default DataStatsThree;

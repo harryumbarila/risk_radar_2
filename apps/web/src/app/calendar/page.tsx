@@ -1,6 +1,8 @@
-import Calendar from "@/components/Calender";
-import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import type { Metadata } from "next";
+import type { FC } from "react";
+
+import { Calendar } from "@/components/Calender";
+import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
 
 export const metadata: Metadata = {
   title: "Next.js Calender | TailAdmin - Next.js Dashboard Template",
@@ -9,7 +11,7 @@ export const metadata: Metadata = {
   // other metadata
 };
 
-const CalendarPage = () => {
+const CalendarPage: FC = () => {
   return (
     <DefaultLayout>
       <Calendar />

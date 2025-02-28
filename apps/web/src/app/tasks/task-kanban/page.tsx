@@ -1,8 +1,8 @@
-import React from "react";
-import TaskKanban from "@/components/Tasks/KanbanTasks";
+import type { Metadata } from "next";
+import type { FC } from "react";
 
-import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
+import { TaskKanban } from "@/components/Tasks/KanbanTasks";
 
 export const metadata: Metadata = {
   title: "Next.js Kanban | TailAdmin - Next.js Dashboard Template",
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   // other metadata
 };
 
-const TaskKanbanPage = () => {
+const TaskKanbanPage: FC = () => {
   return (
     <DefaultLayout>
       <TaskKanban />

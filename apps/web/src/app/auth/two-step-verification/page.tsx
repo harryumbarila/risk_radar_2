@@ -1,6 +1,6 @@
-import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import React from "react";
 
 const TwoStepVerification: React.FC = () => {
   return (
@@ -13,7 +13,7 @@ const TwoStepVerification: React.FC = () => {
                 <Image
                   width={176}
                   height={32}
-                  src={"/images/logo/logo-dark.svg"}
+                  src="/images/logo/logo-dark.svg"
                   alt="Logo"
                   priority
                   className="dark:hidden"
@@ -21,7 +21,7 @@ const TwoStepVerification: React.FC = () => {
                 <Image
                   width={176}
                   height={32}
-                  src={"/images/logo/logo.svg"}
+                  src="/images/logo/logo.svg"
                   alt="Logo"
                   priority
                   className="hidden dark:block"
@@ -39,9 +39,9 @@ const TwoStepVerification: React.FC = () => {
 
                 <form>
                   <div className="flex items-center gap-4.5">
-                    {Array.from({ length: 4 }).map((_, index) => (
+                    {Array.from({ length: 4 }).map(() => (
                       <input
-                        key={index}
+                        key={`verification-code-${Math.random().toString(36).substr(2, 9)}`}
                         type="text"
                         className="w-full rounded-md border-[1.5px] border-stroke bg-transparent p-3 text-center text-2xl font-medium text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                       />
@@ -50,10 +50,15 @@ const TwoStepVerification: React.FC = () => {
 
                   <p className="mb-5 mt-4 text-left font-medium text-black dark:text-white">
                     Did not receive a code?
-                    <button className="text-primary">Resend</button>
+                    <button className="text-primary" type="button">
+                      Resend
+                    </button>
                   </p>
 
-                  <button className="flex w-full justify-center rounded-md bg-primary p-[13px] font-bold text-gray hover:bg-opacity-90">
+                  <button
+                    className="flex w-full justify-center rounded-md bg-primary p-[13px] font-bold text-gray hover:bg-opacity-90"
+                    type="submit"
+                  >
                     Verify
                   </button>
 

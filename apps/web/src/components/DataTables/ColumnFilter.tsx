@@ -1,13 +1,13 @@
 import React from "react";
 
-interface ColumnFilterProps {
+type ColumnFilterProps = {
   column: {
     filterValue: string;
     setFilter: (value: string) => void;
   };
-}
+};
 
-const ColumnFilter: React.FC<ColumnFilterProps> = ({ column }) => {
+export const ColumnFilter: React.FC<ColumnFilterProps> = ({ column }) => {
   const { filterValue, setFilter } = column;
 
   return (
@@ -22,5 +22,3 @@ const ColumnFilter: React.FC<ColumnFilterProps> = ({ column }) => {
     </div>
   );
 };
-
-export default ColumnFilter;

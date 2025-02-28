@@ -1,11 +1,11 @@
+import type { Metadata } from "next";
 import React from "react";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import CardsItemOne from "@/components/cards/CardsItemOne";
-import CardsItemTwo from "@/components/cards/CardsItemTwo";
-import CardsItemThree from "@/components/cards/CardsItemThree";
 
-import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
+import { CardsItemOne } from "@/components/cards/CardsItemOne";
+import { CardsItemThree } from "@/components/cards/CardsItemThree";
+import { CardsItemTwo } from "@/components/cards/CardsItemTwo";
+import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
 
 export const metadata: Metadata = {
   title: "Next.js Cards | TailAdmin - Next.js Dashboard Template",
@@ -92,9 +92,9 @@ const Cards: React.FC = () => {
       <Breadcrumb pageName="Cards" />
 
       <div className="grid grid-cols-1 gap-7.5 sm:grid-cols-2 xl:grid-cols-3">
-        {cardsItemOneData.map((card, key) => (
+        {cardsItemOneData.map((card) => (
           <CardsItemOne
-            key={key}
+            key={card.name}
             imageSrc={card.imageSrc}
             name={card.name}
             role={card.role}
@@ -110,9 +110,9 @@ const Cards: React.FC = () => {
       </h2>
 
       <div className="grid grid-cols-1 gap-7.5 sm:grid-cols-2 xl:grid-cols-3">
-        {cardsItemTwoData.map((card, key) => (
+        {cardsItemTwoData.map((card) => (
           <CardsItemTwo
-            key={key}
+            key={card.cardTitle}
             cardImageSrc={card.cardImageSrc}
             cardTitle={card.cardTitle}
             cardContent={card.cardContent}
@@ -125,9 +125,9 @@ const Cards: React.FC = () => {
       </h2>
 
       <div className="grid grid-cols-1 gap-7.5 sm:grid-cols-2 xl:grid-cols-3">
-        {cardsItemThreeData.map((card, key) => (
+        {cardsItemThreeData.map((card) => (
           <CardsItemThree
-            key={key}
+            key={card.cardTitle}
             cardTitle={card.cardTitle}
             cardContent={card.cardContent}
           />

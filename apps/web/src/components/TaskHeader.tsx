@@ -1,23 +1,26 @@
-import { useEffect, useRef, useState } from "react";
-import TaskPopup from "./TaskPopup";
 import Image from "next/image";
+import type { FC } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const TaskHeader = () => {
+import { TaskPopup } from "./TaskPopup";
+
+export const TaskHeader: FC = () => {
   const [popupOpen, setPopupOpen] = useState(false);
 
-  const trigger = useRef<any>(null);
-  const popup = useRef<any>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const popup = useRef<HTMLDivElement>(null);
 
   // close on click outside
   useEffect(() => {
-    const clickHandler = ({ target }: MouseEvent) => {
+    const clickHandler = ({ target }: MouseEvent): void => {
       if (!popup.current) return;
       if (
         !popupOpen ||
-        popup.current.contains(target) ||
-        trigger.current.contains(target)
-      )
+        popup.current.contains(target as Node) ||
+        trigger.current?.contains(target as Node)
+      ) {
         return;
+      }
       setPopupOpen(false);
     };
     document.addEventListener("click", clickHandler);
@@ -26,7 +29,7 @@ const TaskHeader = () => {
 
   // close if the esc key is pressed
   useEffect(() => {
-    const keyHandler = ({ keyCode }: KeyboardEvent) => {
+    const keyHandler = ({ keyCode }: KeyboardEvent): void => {
       if (!popupOpen || keyCode !== 27) return;
       setPopupOpen(false);
     };
@@ -43,39 +46,55 @@ const TaskHeader = () => {
       </div>
       <div className="flex flex-col gap-4 2xsm:flex-row 2xsm:items-center">
         <div className="flex -space-x-2">
-          <button className="h-9 w-9 rounded-full border-2 border-white dark:border-boxdark">
+          <button
+            className="size-9 rounded-full border-2 border-white dark:border-boxdark"
+            type="button"
+          >
             <Image
               width={36}
               height={36}
-              src={"/images/user/user-07.png"}
+              src="/images/user/user-07.png"
               alt="User"
             />
           </button>
-          <button className="h-9 w-9 rounded-full border-2 border-white dark:border-boxdark">
+          <button
+            className="size-9 rounded-full border-2 border-white dark:border-boxdark"
+            type="button"
+          >
             <Image
               width={36}
               height={36}
-              src={"/images/user/user-08.png"}
+              src="/images/user/user-08.png"
               alt="User"
             />
           </button>
-          <button className="h-9 w-9 rounded-full border-2 border-white dark:border-boxdark">
+          <button
+            className="size-9 rounded-full border-2 border-white dark:border-boxdark"
+            type="button"
+          >
             <Image
               width={36}
               height={36}
-              src={"/images/user/user-09.png"}
+              src="/images/user/user-09.png"
               alt="User"
             />
           </button>
-          <button className="h-9 w-9 rounded-full border-2 border-white dark:border-boxdark">
+          <button
+            className="size-9 rounded-full border-2 border-white dark:border-boxdark"
+            type="button"
+          >
             <Image
               width={36}
               height={36}
-              src={"/images/user/user-10.png"}
+              src="/images/user/user-10.png"
               alt="User"
             />
           </button>
-          <button className="flex h-9 w-9 items-center justify-center rounded-full border border-stroke bg-white text-primary dark:border-strokedark dark:bg-[#4f5e77] dark:text-white">
+          <button
+            className="flex size-9 items-center justify-center rounded-full border border-stroke bg-white text-primary dark:border-strokedark dark:bg-[#4f5e77] dark:text-white"
+            type="button"
+            aria-label="Button"
+          >
             <svg
               className="fill-current"
               width="16"
@@ -97,6 +116,7 @@ const TaskHeader = () => {
             ref={trigger}
             onClick={() => setPopupOpen(!popupOpen)}
             className="flex items-center gap-2 rounded bg-primary px-4.5 py-2 font-medium text-white hover:bg-opacity-80"
+            type="button"
           >
             <svg
               className="fill-current"
@@ -122,5 +142,3 @@ const TaskHeader = () => {
     </div>
   );
 };
-
-export default TaskHeader;

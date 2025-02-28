@@ -1,10 +1,11 @@
 "use client";
+
 import React, { useState } from "react";
 
-interface Language {
+type Language = {
   id: string;
   name: string;
-}
+};
 
 const languages: Language[] = [
   { id: "C", name: "C" },
@@ -32,25 +33,25 @@ const CheckboxInputGroup: React.FC<{
         onChange={onChange}
       />
       <span
-        className={`flex h-5 w-5 items-center justify-center rounded-full border ${
+        className={`flex size-5 items-center justify-center rounded-full border ${
           isChecked ? "border-primary" : "border-body"
         }`}
       >
         <span
-          className={`h-2.5 w-2.5 rounded-full bg-primary ${
+          className={`size-2.5 rounded-full bg-primary ${
             isChecked ? "flex" : "hidden"
           }`}
-        ></span>
+        />
       </span>
       {id}
     </label>
   </div>
 );
 
-const SelectOptionThree: React.FC = () => {
+export const SelectOptionThree: React.FC = () => {
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
 
-  const handleLanguageChange = (id: string) => {
+  const handleLanguageChange = (id: string): void => {
     setSelectedLanguages((prevSelectedLanguages) => {
       if (prevSelectedLanguages.includes(id)) {
         // Deselect the language if it's already selected
@@ -64,7 +65,11 @@ const SelectOptionThree: React.FC = () => {
 
   return (
     <div className="mb-6">
-      <label className="mb-4.5 block text-sm font-medium text-black dark:text-white">
+      <label
+        className="mb-4.5 block text-sm font-medium text-black dark:text-white"
+        aria-label="Languages"
+        htmlFor="languages"
+      >
         Which languages & frameworks you know?
       </label>
 
@@ -81,5 +86,3 @@ const SelectOptionThree: React.FC = () => {
     </div>
   );
 };
-
-export default SelectOptionThree;

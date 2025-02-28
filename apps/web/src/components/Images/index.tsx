@@ -1,9 +1,10 @@
 "use client";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import ImagesTwo from "@/components/Images/ImagesTwo";
-import ImagesOne from "@/components/Images/ImagesOne";
 
-const Images: React.FC = () => {
+import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
+import { ImagesOne } from "@/components/Images/ImagesOne";
+import { ImagesTwo } from "@/components/Images/ImagesTwo";
+
+export const Images: React.FC = () => {
   return (
     <>
       <Breadcrumb pageName="Images" />
@@ -15,5 +16,3 @@ const Images: React.FC = () => {
     </>
   );
 };
-
-export default Images;

@@ -1,23 +1,29 @@
-export const ROLE_SALES = "Sales";
+import type { UserProfile } from "@auth0/nextjs-auth0/client";
 
-import { UserProfile, useUser } from "@auth0/nextjs-auth0/client";
+export const ROLE_SALES = "Sales";
 
 const CUSTOM_ROLES_CLAIM = "https://taluspay.com/roles";
 
-export function roles(user: UserProfile | undefined) {
+type RolesReturnType = {
+  roles: string[];
+  isRole: (role: string) => boolean;
+  isSales: () => boolean;
+};
+
+export function roles(user: UserProfile | undefined): RolesReturnType {
   // Extract roles from the user object
-  const roles =
+  const userRoles =
     user && user[CUSTOM_ROLES_CLAIM]
       ? (user[CUSTOM_ROLES_CLAIM] as string[])
       : [];
 
   const isRole = (role: string): boolean => {
-    return roles.includes(role);
+    return userRoles.includes(role);
   };
 
   const isSales = (): boolean => {
-    return roles.includes(ROLE_SALES);
+    return userRoles.includes(ROLE_SALES);
   };
 
-  return { roles, isRole, isSales };
+  return { roles: userRoles, isRole, isSales };
 }

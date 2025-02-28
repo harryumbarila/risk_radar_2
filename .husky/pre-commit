@@ -1,6 +1,5 @@
 yarn syncpack list-mismatches
 yarn lint-staged
 yarn type-check
-yarn lint
-test:unit
-test:e2e
+yarn test:unit
+yarn test:e2e

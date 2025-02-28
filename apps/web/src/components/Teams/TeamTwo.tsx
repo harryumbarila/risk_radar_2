@@ -1,12 +1,12 @@
-import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import React from "react";
 
-interface Team {
+type Team = {
   image: string;
   name: string;
   position: string;
-}
+};
 
 const teamItems: Team[] = [
   {
@@ -31,13 +31,13 @@ const teamItems: Team[] = [
   },
 ];
 
-const TeamTwo: React.FC = () => {
+export const TeamTwo: React.FC = () => {
   return (
     <div className="mx-auto w-full max-w-[1170px]">
       <div className="grid grid-cols-1 gap-7.5 sm:grid-cols-2 xl:grid-cols-4">
-        {teamItems.map((item, index) => (
+        {teamItems.map((item) => (
           <div
-            key={index}
+            key={`${item.name}`}
             className="group rounded-[10px] border border-stroke px-4 pb-10 pt-12 dark:border-strokedark"
           >
             <div className="relative z-1 mx-auto h-30 w-full max-w-30 rounded-full">
@@ -270,7 +270,7 @@ const TeamTwo: React.FC = () => {
                 </svg>
               </span>
 
-              <span className="absolute bottom-0 left-0 -z-1 h-9.5 w-9.5 rounded-full bg-meta-3 opacity-0 transition-all group-hover:opacity-100"></span>
+              <span className="absolute bottom-0 left-0 -z-1 size-9.5 rounded-full bg-meta-3 opacity-0 transition-all group-hover:opacity-100" />
             </div>
 
             <div className="my-5 text-center">
@@ -281,7 +281,7 @@ const TeamTwo: React.FC = () => {
             </div>
 
             <div className="flex items-center justify-center gap-5.5">
-              <Link href="#" className="text-bodydark2 hover:text-primary">
+              <Link href="/" className="text-bodydark2 hover:text-primary">
                 <svg
                   className="fill-current"
                   width="18"
@@ -297,7 +297,7 @@ const TeamTwo: React.FC = () => {
                 </svg>
               </Link>
 
-              <Link href="#" className="text-bodydark2 hover:text-primary">
+              <Link href="/" className="text-bodydark2 hover:text-primary">
                 <svg
                   className="fill-current"
                   width="18"
@@ -313,7 +313,7 @@ const TeamTwo: React.FC = () => {
                 </svg>
               </Link>
 
-              <Link href="#" className="text-bodydark2 hover:text-primary">
+              <Link href="/" className="text-bodydark2 hover:text-primary">
                 <svg
                   className="fill-current"
                   width="18"
@@ -343,5 +343,3 @@ const TeamTwo: React.FC = () => {
     </div>
   );
 };
-
-export default TeamTwo;

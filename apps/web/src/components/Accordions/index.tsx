@@ -1,9 +1,10 @@
 "use client";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import AccordionOne from "@/components/Accordions/AccordionOne";
-import AccordionTwo from "@/components/Accordions/AccordionTwo";
 
-const Accordion: React.FC = () => {
+import { AccordionOne } from "@/components/Accordions/AccordionOne";
+import { AccordionTwo } from "@/components/Accordions/AccordionTwo";
+import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
+
+export const Accordion: React.FC = () => {
   return (
     <>
       <Breadcrumb pageName="Accordion" />
@@ -15,5 +16,3 @@ const Accordion: React.FC = () => {
     </>
   );
 };
-
-export default Accordion;

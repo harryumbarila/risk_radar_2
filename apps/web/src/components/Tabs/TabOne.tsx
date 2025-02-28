@@ -1,7 +1,7 @@
-import React, { useState } from "react";
 import Link from "next/link";
+import React, { useState } from "react";
 
-const TabOne: React.FC = () => {
+export const TabOne: React.FC = () => {
   const [openTab, setOpenTab] = useState(1);
 
   const activeClasses = "bg-primary text-white";
@@ -11,7 +11,7 @@ const TabOne: React.FC = () => {
     <div className="rounded-sm border border-stroke bg-white p-7.5 shadow-default dark:border-strokedark dark:bg-boxdark">
       <div className="mb-7.5 flex flex-wrap gap-3 rounded-lg border border-stroke px-4 py-3 dark:border-strokedark">
         <Link
-          href="#"
+          href="/"
           className={`rounded-md px-4 py-3 text-sm font-medium hover:bg-primary hover:text-white dark:hover:bg-primary md:text-base lg:px-6 ${
             openTab === 1 ? activeClasses : inactiveClasses
           }`}
@@ -20,7 +20,7 @@ const TabOne: React.FC = () => {
           Home
         </Link>
         <Link
-          href="#"
+          href="/"
           className={`rounded-md px-4 py-3 text-sm font-medium hover:bg-primary hover:text-white dark:hover:bg-primary md:text-base lg:px-6 ${
             openTab === 2 ? activeClasses : inactiveClasses
           }`}
@@ -29,7 +29,7 @@ const TabOne: React.FC = () => {
           About Us
         </Link>
         <Link
-          href="#"
+          href="/"
           className={`rounded-md px-4 py-3 text-sm font-medium hover:bg-primary hover:text-white dark:hover:bg-primary md:text-base lg:px-6 ${
             openTab === 3 ? activeClasses : inactiveClasses
           }`}
@@ -38,7 +38,7 @@ const TabOne: React.FC = () => {
           Our Team
         </Link>
         <Link
-          href="#"
+          href="/"
           className={`rounded-md px-4 py-3 text-sm font-medium hover:bg-primary hover:text-white dark:hover:bg-primary md:text-base lg:px-6 ${
             openTab === 4 ? activeClasses : inactiveClasses
           }`}
@@ -92,5 +92,3 @@ const TabOne: React.FC = () => {
     </div>
   );
 };
-
-export default TabOne;

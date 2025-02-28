@@ -1,9 +1,12 @@
 import React from "react";
 
-const SpinnerTwo: React.FC = () => {
+export const SpinnerTwo: React.FC = () => {
   return (
     <div className="flex items-center gap-4">
-      <button className="inline-flex items-center gap-3 rounded-md bg-primary px-5 py-3 text-white hover:bg-opacity-90">
+      <button
+        className="inline-flex items-center gap-3 rounded-md bg-primary px-5 py-3 text-white hover:bg-opacity-90"
+        type="button"
+      >
         <span className="animate-spin">
           <svg
             width="24"
@@ -26,7 +29,11 @@ const SpinnerTwo: React.FC = () => {
         Loading...
       </button>
 
-      <button className="inline-flex items-center gap-3 rounded-md bg-primary px-5 py-3.5 text-white hover:bg-opacity-90">
+      <button
+        className="inline-flex items-center gap-3 rounded-md bg-primary px-5 py-3.5 text-white hover:bg-opacity-90"
+        type="button"
+        aria-label="Button"
+      >
         <span className="animate-spin">
           <svg
             width="24"
@@ -50,5 +57,3 @@ const SpinnerTwo: React.FC = () => {
     </div>
   );
 };
-
-export default SpinnerTwo;

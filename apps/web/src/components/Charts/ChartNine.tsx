@@ -1,12 +1,12 @@
-import { ApexOptions } from "apexcharts";
+import type { ApexOptions } from "apexcharts";
 import React, { useState } from "react";
 import ReactApexChart from "react-apexcharts";
 
-interface ChartNineState {
+type ChartNineState = {
   series: { data: number[] }[];
-}
+};
 
-const ChartNine: React.FC = () => {
+export const ChartNine: React.FC = () => {
   const [state, setState] = useState<ChartNineState>({
     series: [
       {
@@ -19,13 +19,13 @@ const ChartNine: React.FC = () => {
   });
 
   // Update the state
-  const updateState = () => {
+  const updateState = (): void => {
     setState((prevState) => ({
       ...prevState,
       // Update the desired properties
     }));
   };
-  updateState;
+  updateState();
 
   const options: ApexOptions = {
     colors: ["#3C50E0", "#80CAEE"],
@@ -151,5 +151,3 @@ const ChartNine: React.FC = () => {
     </div>
   );
 };
-
-export default ChartNine;

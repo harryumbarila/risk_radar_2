@@ -1,9 +1,10 @@
 import noUiSlider from "nouislider";
+import type { FC } from "react";
 import { useEffect } from "react";
 
-const RangeSliderOne = () => {
+export const RangeSliderOne: FC = () => {
   useEffect(() => {
-    const sliderOne = document.getElementById("rangeSliderOne") as any;
+    const sliderOne = document.getElementById("rangeSliderOne") as HTMLElement;
 
     noUiSlider.create(sliderOne, {
       start: [20],
@@ -15,15 +16,16 @@ const RangeSliderOne = () => {
     });
 
     return () => {
-      (sliderOne.noUiSlider as any).destroy();
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      sliderOne.noUiSlider.destroy();
     };
   }, []);
 
   return (
     <div className="rangeSliderCommon rangeSliderOne">
-      <div id="rangeSliderOne"></div>
+      <div id="rangeSliderOne" />
     </div>
   );
 };
-
-export default RangeSliderOne;

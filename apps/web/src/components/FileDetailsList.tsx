@@ -1,6 +1,6 @@
 import React from "react";
 
-const FileDetailsList: React.FC = () => {
+export const FileDetailsList: React.FC = () => {
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
@@ -68,7 +68,7 @@ const FileDetailsList: React.FC = () => {
             </div>
 
             <div>
-              <p className="text-lg font-medium text-[#219653]">Image</p>
+              <p className="text-lg font-medium text-success">Image</p>
               <span className="font-medium">12 files</span>
             </div>
           </div>
@@ -183,5 +183,3 @@ const FileDetailsList: React.FC = () => {
     </div>
   );
 };
-
-export default FileDetailsList;

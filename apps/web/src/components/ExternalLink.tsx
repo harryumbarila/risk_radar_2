@@ -1,8 +1,9 @@
-import React from "react";
 import Link from "next/link";
-import DropdownDefault from "./Dropdowns/DropdownDefault";
+import React from "react";
 
-const ExternalLink: React.FC = () => {
+import { DropdownDefault } from "./Dropdowns/DropdownDefault";
+
+export const ExternalLink: React.FC = () => {
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-5">
       <div className="flex items-start justify-between border-b border-stroke px-6 py-5 dark:border-strokedark">
@@ -39,14 +40,14 @@ const ExternalLink: React.FC = () => {
               />
             </svg>
 
-            <Link href="#">
+            <Link href="/">
               <h4 className="font-medium text-black group-hover:text-primary dark:text-white dark:group-hover:text-primary">
                 Google Analytics
               </h4>
             </Link>
           </div>
 
-          <Link href="#" className="inline-block">
+          <Link href="/" className="inline-block">
             <svg
               className="fill-current"
               width="16"
@@ -92,14 +93,14 @@ const ExternalLink: React.FC = () => {
               </defs>
             </svg>
 
-            <Link href="#">
+            <Link href="/">
               <h4 className="font-medium text-black group-hover:text-primary dark:text-white dark:group-hover:text-primary">
                 Facebook Ads
               </h4>
             </Link>
           </div>
 
-          <Link href="#" className="inline-block">
+          <Link href="/" className="inline-block">
             <svg
               className="fill-current"
               width="16"
@@ -138,14 +139,14 @@ const ExternalLink: React.FC = () => {
               />
             </svg>
 
-            <Link href="#">
+            <Link href="/">
               <h4 className="font-medium text-black group-hover:text-primary dark:text-white dark:group-hover:text-primary">
                 Seranking
               </h4>
             </Link>
           </div>
 
-          <Link href="#" className="inline-block">
+          <Link href="/" className="inline-block">
             <svg
               className="fill-current"
               width="16"
@@ -241,14 +242,14 @@ const ExternalLink: React.FC = () => {
               </defs>
             </svg>
 
-            <Link href="">
+            <Link href="/">
               <h4 className="font-medium text-black group-hover:text-primary dark:text-white dark:group-hover:text-primary">
                 Instagram Ads
               </h4>
             </Link>
           </div>
 
-          <Link href="#" className="inline-block">
+          <Link href="/" className="inline-block">
             <svg
               className="fill-current"
               width="16"
@@ -275,5 +276,3 @@ const ExternalLink: React.FC = () => {
     </div>
   );
 };
-
-export default ExternalLink;

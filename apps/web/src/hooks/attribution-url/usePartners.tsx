@@ -1,9 +1,16 @@
 import useSWR from "swr";
-import { baseApi } from "@/hooks/baseApi";
-import { IrisPartnersResponseDto } from "@/shared/response/iris-proxy";
 
-export const usePartners = () => {
-  const { data, error, isLoading } = useSWR<IrisPartnersResponseDto>(
+import { baseApi } from "@/hooks/baseApi";
+import type { IrisPartnersResponseDto } from "@/shared/response/iris-proxy";
+
+type UsePartnersReturnType = {
+  data: IrisPartnersResponseDto | undefined;
+  error: unknown;
+  isLoading: boolean;
+};
+
+export const usePartners = (): UsePartnersReturnType => {
+  const { data, error, isLoading } = useSWR<IrisPartnersResponseDto, unknown>(
     "/v1/iris_proxy/partners", // Only the relative endpoint
     baseApi, // Use the fetcher with BASE_URL
     {

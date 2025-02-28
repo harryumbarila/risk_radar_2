@@ -1,10 +1,10 @@
-import React from "react";
-import Link from "next/link";
+import type { Metadata } from "next";
 import Image from "next/image";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
+import Link from "next/link";
+import React from "react";
 
-import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
+import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
 
 export const metadata: Metadata = {
   title: "Next.js SignUp Page | TailAdmin - Next.js Dashboard Template",
@@ -24,14 +24,14 @@ const SignUp: React.FC = () => {
               <Link className="mb-5.5 inline-block" href="/">
                 <Image
                   className="hidden dark:block"
-                  src={"/images/logo/logo.svg"}
+                  src="/images/logo/logo.svg"
                   alt="Logo"
                   width={176}
                   height={32}
                 />
                 <Image
                   className="dark:hidden"
-                  src={"/images/logo/logo-dark.svg"}
+                  src="/images/logo/logo-dark.svg"
                   alt="Logo"
                   width={176}
                   height={32}
@@ -176,7 +176,10 @@ const SignUp: React.FC = () => {
 
               <form>
                 <div className="mb-4">
-                  <label className="mb-2.5 block font-medium text-black dark:text-white">
+                  <label
+                    className="mb-2.5 block font-medium text-black dark:text-white"
+                    htmlFor="name"
+                  >
                     Name
                   </label>
                   <div className="relative">
@@ -211,7 +214,10 @@ const SignUp: React.FC = () => {
                 </div>
 
                 <div className="mb-4">
-                  <label className="mb-2.5 block font-medium text-black dark:text-white">
+                  <label
+                    className="mb-2.5 block font-medium text-black dark:text-white"
+                    htmlFor="email"
+                  >
                     Email
                   </label>
                   <div className="relative">
@@ -242,7 +248,10 @@ const SignUp: React.FC = () => {
                 </div>
 
                 <div className="mb-4">
-                  <label className="mb-2.5 block font-medium text-black dark:text-white">
+                  <label
+                    className="mb-2.5 block font-medium text-black dark:text-white"
+                    htmlFor="password"
+                  >
                     Password
                   </label>
                   <div className="relative">
@@ -277,7 +286,10 @@ const SignUp: React.FC = () => {
                 </div>
 
                 <div className="mb-6">
-                  <label className="mb-2.5 block font-medium text-black dark:text-white">
+                  <label
+                    className="mb-2.5 block font-medium text-black dark:text-white"
+                    htmlFor="retype-password"
+                  >
                     Re-type Password
                   </label>
                   <div className="relative">
@@ -319,7 +331,10 @@ const SignUp: React.FC = () => {
                   />
                 </div>
 
-                <button className="flex w-full items-center justify-center gap-3.5 rounded-lg border border-stroke bg-gray p-4 hover:bg-opacity-50 dark:border-strokedark dark:bg-meta-4 dark:hover:bg-opacity-50">
+                <button
+                  className="flex w-full items-center justify-center gap-3.5 rounded-lg border border-stroke bg-gray p-4 hover:bg-opacity-50 dark:border-strokedark dark:bg-meta-4 dark:hover:bg-opacity-50"
+                  type="button"
+                >
                   <span>
                     <svg
                       width="20"

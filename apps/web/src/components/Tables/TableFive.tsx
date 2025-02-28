@@ -1,11 +1,11 @@
 import React from "react";
 
-interface User {
+type User = {
   name: string;
   title: string;
   email: string;
   role: string;
-}
+};
 
 const users: User[] = [
   {
@@ -58,7 +58,7 @@ const users: User[] = [
   },
 ];
 
-const TableFive: React.FC = () => {
+export const TableFive: React.FC = () => {
   return (
     <div className="overflow-hidden rounded-[10px]">
       <div className="max-w-full overflow-x-auto">
@@ -93,9 +93,9 @@ const TableFive: React.FC = () => {
 
           {/* table body start */}
           <div className="bg-white dark:bg-boxdark">
-            {users.map((user, index) => (
+            {users.map((user) => (
               <div
-                key={index}
+                key={user.name}
                 className="grid grid-cols-12 border-t border-[#EEEEEE] px-5 py-4 dark:border-strokedark lg:px-7.5 2xl:px-11"
               >
                 <div className="col-span-3">
@@ -123,7 +123,9 @@ const TableFive: React.FC = () => {
                 </div>
 
                 <div className="col-span-1">
-                  <button className="float-right text-primary">Edit</button>
+                  <button className="float-right text-primary" type="button">
+                    Edit
+                  </button>
                 </div>
               </div>
             ))}
@@ -134,5 +136,3 @@ const TableFive: React.FC = () => {
     </div>
   );
 };
-
-export default TableFive;

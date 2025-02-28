@@ -1,7 +1,8 @@
 import React from "react";
-import DropdownDefault from "../Dropdowns/DropdownDefault";
 
-const DataStatsTwo: React.FC = () => {
+import { DropdownDefault } from "@/components/Dropdowns/DropdownDefault";
+
+export const DataStatsTwo: React.FC = () => {
   return (
     <div>
       <div className="mb-5 flex items-center justify-between">
@@ -162,5 +163,3 @@ const DataStatsTwo: React.FC = () => {
     </div>
   );
 };
-
-export default DataStatsTwo;

@@ -1,7 +1,12 @@
 import React, { useRef } from "react";
-import { FaqItem } from "@/types/faqItem";
 
-const AccordionItemTwo: React.FC<FaqItem> = ({ active, handleToggle, faq }) => {
+import type { FaqItem } from "@/types/faqItem";
+
+export const AccordionItemTwo: React.FC<FaqItem> = ({
+  active,
+  handleToggle,
+  faq,
+}) => {
   const contentEl = useRef<HTMLDivElement>(null);
 
   const { header, id, text } = faq;
@@ -9,6 +14,7 @@ const AccordionItemTwo: React.FC<FaqItem> = ({ active, handleToggle, faq }) => {
   return (
     <div className="rounded-md border border-stroke p-4 shadow-9 dark:border-strokedark dark:shadow-none md:p-6 xl:p-7.5">
       <button
+        type="button"
         className={`flex w-full items-center justify-between gap-2 ${
           active === id ? "active" : ""
         }`}
@@ -65,5 +71,3 @@ const AccordionItemTwo: React.FC<FaqItem> = ({ active, handleToggle, faq }) => {
     </div>
   );
 };
-
-export default AccordionItemTwo;

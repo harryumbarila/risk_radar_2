@@ -1,16 +1,17 @@
-import { ApexOptions } from "apexcharts";
+import type { ApexOptions } from "apexcharts";
 import React, { useState } from "react";
 import ReactApexChart from "react-apexcharts";
-import DropdownDefault from "../Dropdowns/DropdownDefault";
 
-interface ChartSixState {
+import { DropdownDefault } from "@/components/Dropdowns/DropdownDefault";
+
+type ChartSixState = {
   series: {
     name: string;
     data: number[];
   }[];
-}
+};
 
-const ChartSix: React.FC = () => {
+export const ChartSix: React.FC = () => {
   const [state, setState] = useState<ChartSixState>({
     series: [
       {
@@ -26,13 +27,13 @@ const ChartSix: React.FC = () => {
   });
 
   // Update the state
-  const updateState = () => {
+  const updateState = (): void => {
     setState((prevState) => ({
       ...prevState,
       // Update the desired properties
     }));
   };
-  updateState;
+  updateState();
 
   const options: ApexOptions = {
     legend: {
@@ -192,5 +193,3 @@ const ChartSix: React.FC = () => {
     </div>
   );
 };
-
-export default ChartSix;

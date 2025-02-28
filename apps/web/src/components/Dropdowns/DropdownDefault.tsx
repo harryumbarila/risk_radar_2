@@ -1,21 +1,23 @@
+import type { FC } from "react";
 import { useEffect, useRef, useState } from "react";
 
-const DropdownDefault = () => {
+export const DropdownDefault: FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const trigger = useRef<any>(null);
-  const dropdown = useRef<any>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const dropdown = useRef<HTMLDivElement>(null);
 
   // close on click outside
   useEffect(() => {
-    const clickHandler = ({ target }: MouseEvent) => {
+    const clickHandler = ({ target }: MouseEvent): void => {
       if (!dropdown.current) return;
       if (
         !dropdownOpen ||
-        dropdown.current.contains(target) ||
-        trigger.current.contains(target)
-      )
+        dropdown.current.contains(target as Node) ||
+        trigger.current?.contains(target as Node)
+      ) {
         return;
+      }
       setDropdownOpen(false);
     };
     document.addEventListener("click", clickHandler);
@@ -24,7 +26,7 @@ const DropdownDefault = () => {
 
   // close if the esc key is pressed
   useEffect(() => {
-    const keyHandler = ({ keyCode }: KeyboardEvent) => {
+    const keyHandler = ({ keyCode }: KeyboardEvent): void => {
       if (!dropdownOpen || keyCode !== 27) return;
       setDropdownOpen(false);
     };
@@ -38,6 +40,8 @@ const DropdownDefault = () => {
         className="text-[#98A6AD] hover:text-body"
         ref={trigger}
         onClick={() => setDropdownOpen(!dropdownOpen)}
+        type="button"
+        aria-label="Dropdown button"
       >
         <svg
           className="fill-current"
@@ -69,7 +73,10 @@ const DropdownDefault = () => {
           dropdownOpen === true ? "block" : "hidden"
         }`}
       >
-        <button className="flex w-full items-center gap-2 rounded-sm px-4 py-1.5 text-left text-sm hover:bg-gray dark:hover:bg-meta-4">
+        <button
+          className="flex w-full items-center gap-2 rounded-sm px-4 py-1.5 text-left text-sm hover:bg-gray dark:hover:bg-meta-4"
+          type="button"
+        >
           <svg
             className="fill-current"
             width="16"
@@ -92,7 +99,10 @@ const DropdownDefault = () => {
           </svg>
           Edit
         </button>
-        <button className="flex w-full items-center gap-2 rounded-sm px-4 py-1.5 text-left text-sm hover:bg-gray dark:hover:bg-meta-4">
+        <button
+          className="flex w-full items-center gap-2 rounded-sm px-4 py-1.5 text-left text-sm hover:bg-gray dark:hover:bg-meta-4"
+          type="button"
+        >
           <svg
             className="fill-current"
             width="16"
@@ -124,5 +134,3 @@ const DropdownDefault = () => {
     </div>
   );
 };
-
-export default DropdownDefault;

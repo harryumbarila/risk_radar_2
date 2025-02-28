@@ -1,16 +1,17 @@
 "use client";
-import { ApexOptions } from "apexcharts";
-import React, { useEffect, useState } from "react";
+
+import type { ApexOptions } from "apexcharts";
+import React, { useState } from "react";
 import ReactApexChart from "react-apexcharts";
 
-interface ChartTwelveState {
+type ChartTwelveState = {
   series: {
     name: string;
     data: [number, number][];
   }[];
-}
+};
 
-const ChartTwelve: React.FC = () => {
+export const ChartTwelve: React.FC = () => {
   const [state, setState] = useState<ChartTwelveState>({
     series: [
       {
@@ -252,14 +253,13 @@ const ChartTwelve: React.FC = () => {
   });
 
   // Update the state
-  const updateState = () => {
+  const updateState = (): void => {
     setState((prevState) => ({
       ...prevState,
       // Update the desired properties
     }));
   };
-
-  updateState;
+  updateState();
 
   const options: ApexOptions = {
     colors: ["#3C50E0"],
@@ -291,10 +291,10 @@ const ChartTwelve: React.FC = () => {
       size: 0,
     },
 
-    labels: {
-      show: false,
-      position: "top",
-    } as any,
+    // labels: {
+    //   show: false,
+    //   position: "top",
+    // },
 
     xaxis: {
       type: "datetime",
@@ -315,10 +315,10 @@ const ChartTwelve: React.FC = () => {
 
     fill: {
       gradient: {
-        enabled: true,
+        // enabled: true,
         opacityFrom: 0.55,
         opacityTo: 0,
-      } as any,
+      },
     },
 
     grid: {
@@ -430,5 +430,3 @@ const ChartTwelve: React.FC = () => {
     </div>
   );
 };
-
-export default ChartTwelve;

@@ -1,14 +1,14 @@
-import React from "react";
 import Image from "next/image";
+import React from "react";
 
-interface Notification {
+type Notification = {
   active: boolean;
   image: string;
   name: string;
   details: string;
   time: string;
   date: string;
-}
+};
 
 const notificationList: Notification[] = [
   {
@@ -53,10 +53,10 @@ const notificationList: Notification[] = [
   },
 ];
 
-const NotificationsFour: React.FC = () => {
+export const NotificationsFour: React.FC = () => {
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-      <div className="border-b border-stroke px-4 py-4 dark:border-strokedark sm:px-6 xl:px-7.5">
+      <div className="border-b border-stroke p-4 dark:border-strokedark sm:px-6 xl:px-7.5">
         <h3 className="font-medium text-black dark:text-white">
           Notifications Style 4
         </h3>
@@ -64,9 +64,9 @@ const NotificationsFour: React.FC = () => {
 
       <div className="p-4 sm:p-6 xl:p-10">
         <div className="flex flex-col gap-5">
-          {notificationList.map((item, index) => (
+          {notificationList.map((item) => (
             <div
-              key={index}
+              key={item.name}
               className={`rounded-[10px] border-l-[5px] bg-white px-4 py-6 shadow-13 dark:bg-boxdark sm:px-5 xl:px-7.5 ${
                 item.active ? "border-meta-3" : "border-red"
               }`}
@@ -87,9 +87,9 @@ const NotificationsFour: React.FC = () => {
 
                     <span
                       className={`absolute -top-0.5 right-0.5 h-4 w-full max-w-4 rounded-full border-[2.3px] border-white ${
-                        item.active ? "bg-[#219653]" : "bg-red"
+                        item.active ? "bg-success" : "bg-red"
                       }`}
-                    ></span>
+                    />
                   </div>
 
                   <div className="w-full">
@@ -112,5 +112,3 @@ const NotificationsFour: React.FC = () => {
     </div>
   );
 };
-
-export default NotificationsFour;

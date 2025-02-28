@@ -1,6 +1,6 @@
 import React from "react";
 
-const CheckMark: React.FC = () => {
+export const CheckMark: React.FC = () => {
   return (
     <svg
       width="25"
@@ -20,5 +20,3 @@ const CheckMark: React.FC = () => {
     </svg>
   );
 };
-
-export default CheckMark;

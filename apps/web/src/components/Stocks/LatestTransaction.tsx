@@ -1,14 +1,14 @@
-import React from "react";
 import Image from "next/image";
+import React from "react";
 
-interface Stocks {
+type Stocks = {
   image: string;
   name: string;
   interestRate: number;
   returnRate: number;
   price: number;
   date: string;
-}
+};
 
 const stocksItems: Stocks[] = [
   {
@@ -69,7 +69,7 @@ const stocksItems: Stocks[] = [
   },
 ];
 
-const LatestTransaction: React.FC = () => {
+export const LatestTransaction: React.FC = () => {
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white p-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:p-7.5 xl:col-span-7">
       <div className="mb-10 flex flex-wrap items-center justify-between gap-2">
@@ -105,13 +105,13 @@ const LatestTransaction: React.FC = () => {
       </div>
 
       <div className="flex flex-col gap-[25px]">
-        {stocksItems.map((item, key) => (
+        {stocksItems.map((item) => (
           <div
-            key={key}
+            key={item.name}
             className="grid grid-cols-2 items-center gap-5 xsm:grid-cols-3 sm:grid-cols-8"
           >
             <div className="flex items-center gap-4.5 sm:col-span-3 2xl:col-span-2">
-              <div className="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-[#EEF2F8]">
+              <div className="flex size-11.5 items-center justify-center rounded-full bg-[#EEF2F8]">
                 <Image
                   src={item.image}
                   alt="brand"
@@ -191,5 +191,3 @@ const LatestTransaction: React.FC = () => {
     </div>
   );
 };
-
-export default LatestTransaction;

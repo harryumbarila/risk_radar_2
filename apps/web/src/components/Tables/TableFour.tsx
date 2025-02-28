@@ -1,6 +1,7 @@
-import { BRAND } from "@/types/brand";
 import Image from "next/image";
-import DropdownDefault from "../Dropdowns/DropdownDefault";
+
+import { DropdownDefault } from "@/components/Dropdowns/DropdownDefault";
+import type { BRAND } from "@/types/brand";
 
 const brandData: BRAND[] = [
   {
@@ -45,7 +46,7 @@ const brandData: BRAND[] = [
   },
 ];
 
-const TableFour: React.FC = () => {
+export const TableFour: React.FC = () => {
   return (
     <div className="col-span-12 xl:col-span-7">
       <div className="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
@@ -89,10 +90,10 @@ const TableFour: React.FC = () => {
                   ? ""
                   : "border-b border-stroke dark:border-strokedark"
               }`}
-              key={key}
+              key={brand.name}
             >
               <div className="flex items-center gap-3 p-2.5 xl:p-5">
-                <div className="h-9 w-full max-w-9 flex-shrink-0">
+                <div className="h-9 w-full max-w-9 shrink-0">
                   <Image src={brand.logo} width={60} height={50} alt="Brand" />
                 </div>
                 <p className="hidden font-medium text-black dark:text-white sm:block">
@@ -120,5 +121,3 @@ const TableFour: React.FC = () => {
     </div>
   );
 };
-
-export default TableFour;
