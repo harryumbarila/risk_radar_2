@@ -3,6 +3,6 @@
   "rules": {
     "body-leading-blank": [2, "always"],
     "footer-leading-blank": [2, "always"],
-    "scope-enum": [2, "always", ["deps", "app"]]
+    "scope-enum": [2, "always", ["api", "web", "ui", "shared"]]
   }
 }
