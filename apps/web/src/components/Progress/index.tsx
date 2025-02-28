@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { ProgressFour } from "@/components/Progress/ProgressFour";
-import { ProgressOne } from "@/components/Progress/ProgressOne";
-import { ProgressThree } from "@/components/Progress/ProgressThree";
-import { ProgressTwo } from "@/components/Progress/ProgressTwo";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { ProgressFour } from '@/components/Progress/ProgressFour';
+import { ProgressOne } from '@/components/Progress/ProgressOne';
+import { ProgressThree } from '@/components/Progress/ProgressThree';
+import { ProgressTwo } from '@/components/Progress/ProgressTwo';
 
 export const Progress: React.FC = () => {
   return (

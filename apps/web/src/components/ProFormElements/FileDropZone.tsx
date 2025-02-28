@@ -1,10 +1,10 @@
-import Dropzone from "dropzone";
-import type { FC } from "react";
-import { useEffect } from "react";
+import Dropzone from 'dropzone';
+import type { FC } from 'react';
+import { useEffect } from 'react';
 
 export const FileDropZone: FC = () => {
   useEffect(() => {
-    const myDropzone = new Dropzone("#demo-upload", { url: "/file/post" });
+    const myDropzone = new Dropzone('#demo-upload', { url: '/file/post' });
 
     return () => {
       myDropzone.destroy();

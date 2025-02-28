@@ -1,13 +1,13 @@
-import "react-toastify/dist/ReactToastify.css";
+import 'react-toastify/dist/ReactToastify.css';
 
-import type { FC } from "react";
-import React from "react";
-import { toast, ToastContainer } from "react-toastify";
+import type { FC } from 'react';
+import React from 'react';
+import { toast, ToastContainer } from 'react-toastify';
 
 type NotificationProps = {
   title: string;
   message: string;
-  type?: "success" | "error" | "info" | "warning";
+  type?: 'success' | 'error' | 'info' | 'warning';
   icon?: React.ReactNode;
   bgColor?: string;
 };
@@ -17,7 +17,7 @@ const NotificationContent: React.FC<NotificationProps> = ({
   message,
   type,
   icon,
-  bgColor = "#1EA779",
+  bgColor = '#1EA779',
 }) => {
   const defaultIcon = (
     <svg
@@ -62,7 +62,7 @@ const NotificationContent: React.FC<NotificationProps> = ({
 export const showNotification = ({
   title,
   message,
-  type = "success",
+  type = 'success',
   icon,
   bgColor,
 }: NotificationProps): void => {
@@ -75,13 +75,13 @@ export const showNotification = ({
       type={type}
     />,
     {
-      position: "top-right",
+      position: 'top-right',
       autoClose: 3000,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
       draggable: true,
-    },
+    }
   );
 };
 

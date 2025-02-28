@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 
-import { DropdownDefault } from "@/components/Dropdowns/DropdownDefault";
+import { DropdownDefault } from '@/components/Dropdowns/DropdownDefault';
 
 export const DataStatsTwo: React.FC = () => {
   return (

@@ -138,14 +138,14 @@ describe('IrisProxyController (e2e)', () => {
       expect(response.body.data[0]).toHaveProperty('id', 71);
       expect(response.body.data[0]).toHaveProperty(
         'name',
-        'Default Referral Partner',
+        'Default Referral Partner'
       );
     });
 
     it('should return staging partners when IRIS_ENV is staging', async () => {
       // Override the config mock for this test
       configServiceMock.get = jest.fn((key) =>
-        key === 'IRIS_ENV' ? 'staging' : undefined,
+        key === 'IRIS_ENV' ? 'staging' : undefined
       );
 
       const response = await request(app.getHttpServer())
@@ -157,7 +157,7 @@ describe('IrisProxyController (e2e)', () => {
       expect(response.body.data[0]).toHaveProperty('id', 41);
       expect(response.body.data[0]).toHaveProperty(
         'name',
-        'Default Referral Partner',
+        'Default Referral Partner'
       );
     });
   });

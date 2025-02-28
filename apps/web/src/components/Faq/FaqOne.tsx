@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 type Faq = {
   title: string;
@@ -7,24 +7,24 @@ type Faq = {
 
 const faqItems: Faq[] = [
   {
-    title: "Is Windy UI Well-documented?",
+    title: 'Is Windy UI Well-documented?',
     details:
-      "It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content ui/ux strategy that we your first blog post.",
+      'It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content ui/ux strategy that we your first blog post.',
   },
   {
-    title: "Is Windy UI Well-documented?",
+    title: 'Is Windy UI Well-documented?',
     details:
-      "It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content ui/ux strategy that we your first blog post.",
+      'It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content ui/ux strategy that we your first blog post.',
   },
   {
-    title: "Is Windy UI Well-documented?",
+    title: 'Is Windy UI Well-documented?',
     details:
-      "It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content ui/ux strategy that we your first blog post.",
+      'It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content ui/ux strategy that we your first blog post.',
   },
   {
-    title: "Is Windy UI Well-documented?",
+    title: 'Is Windy UI Well-documented?',
     details:
-      "It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content ui/ux strategy that we your first blog post.",
+      'It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content ui/ux strategy that we your first blog post.',
   },
 ];
 

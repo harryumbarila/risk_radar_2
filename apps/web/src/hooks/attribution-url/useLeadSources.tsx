@@ -1,7 +1,7 @@
-import useSWR from "swr";
+import useSWR from 'swr';
 
-import { baseApi } from "@/hooks/baseApi";
-import type { IrisLeadSourcesResponseDto } from "@/shared/response/iris-proxy";
+import { baseApi } from '@/hooks/baseApi';
+import type { IrisLeadSourcesResponseDto } from '@/shared/response/iris-proxy';
 
 type UseLeadSourcesReturnType = {
   data: IrisLeadSourcesResponseDto | undefined;
@@ -13,7 +13,7 @@ export const useLeadSources = (): UseLeadSourcesReturnType => {
   const { data, error, isLoading } = useSWR<
     IrisLeadSourcesResponseDto,
     unknown
-  >("/v1/iris_proxy/lead-sources", baseApi, {
+  >('/v1/iris_proxy/lead-sources', baseApi, {
     dedupingInterval: 100,
     revalidateOnFocus: false,
   });

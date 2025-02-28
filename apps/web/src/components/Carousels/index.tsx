@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { CarouselOne } from "@/components/Carousels/CarouselOne";
-import { CarouselThree } from "@/components/Carousels/CarouselThree";
-import { CarouselTwo } from "@/components/Carousels/CarouselTwo";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { CarouselOne } from '@/components/Carousels/CarouselOne';
+import { CarouselThree } from '@/components/Carousels/CarouselThree';
+import { CarouselTwo } from '@/components/Carousels/CarouselTwo';
 
 export const Carousel: React.FC = () => {
   return (

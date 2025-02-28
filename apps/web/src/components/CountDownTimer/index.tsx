@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
 export const CountDownTimer: React.FC = () => {
   const [days, setDays] = useState(0);
@@ -8,7 +8,7 @@ export const CountDownTimer: React.FC = () => {
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
 
-  const targetDate = new Date("12/31/2024 23:59:59");
+  const targetDate = new Date('12/31/2024 23:59:59');
 
   const calculateRemainingPercentage = (): string => {
     const now = new Date();
@@ -20,8 +20,8 @@ export const CountDownTimer: React.FC = () => {
   };
 
   const formatNumber = (num: number): number[] => {
-    const formattedNumber = num.toString().padStart(2, "0");
-    return formattedNumber.split("").map(Number);
+    const formattedNumber = num.toString().padStart(2, '0');
+    return formattedNumber.split('').map(Number);
   };
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export const CountDownTimer: React.FC = () => {
       setDays(d);
 
       const h = Math.floor(
-        (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+        (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
       );
       setHours(h);
 

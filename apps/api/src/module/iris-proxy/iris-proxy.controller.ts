@@ -22,7 +22,7 @@ export type IrisProxyControllerConfig = {
 export class IrisProxyController {
   public constructor(
     private readonly client: IrisClient,
-    private readonly configService: ConfigService<IrisProxyControllerConfig>,
+    private readonly configService: ConfigService<IrisProxyControllerConfig>
   ) {}
 
   @ApiResponse({

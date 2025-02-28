@@ -1,15 +1,15 @@
-import type { Metadata } from "next";
-import React from "react";
+import type { Metadata } from 'next';
+import React from 'react';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
-import { PricingTableOne } from "@/components/PricingTables/PricingTableOne";
-import { PricingTableTwo } from "@/components/PricingTables/PricingTableTwo";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
+import { PricingTableOne } from '@/components/PricingTables/PricingTableOne';
+import { PricingTableTwo } from '@/components/PricingTables/PricingTableTwo';
 
 export const metadata: Metadata = {
-  title: "Next.js Pricing Table | TailAdmin - Next.js Dashboard Template",
+  title: 'Next.js Pricing Table | TailAdmin - Next.js Dashboard Template',
   description:
-    "This is Next.js Pricing Table page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    'This is Next.js Pricing Table page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
 };
 
 const PricingTables: React.FC = () => {

@@ -1,13 +1,13 @@
-import type { Metadata } from "next";
-import type { FC } from "react";
+import type { Metadata } from 'next';
+import type { FC } from 'react';
 
-import { FormElements } from "@/components/FormElements";
-import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
+import { FormElements } from '@/components/FormElements';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
-  title: "Next.js Form Elements | TailAdmin - Next.js Dashboard Template",
+  title: 'Next.js Form Elements | TailAdmin - Next.js Dashboard Template',
   description:
-    "This is Next.js Form Elements page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    'This is Next.js Form Elements page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
 };
 
 const FormElementsPage: FC = () => {

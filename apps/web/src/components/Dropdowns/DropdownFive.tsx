@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import type { FC } from "react";
-import { useEffect, useRef, useState } from "react";
+import type { FC } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export const DropdownFive: FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -22,8 +22,8 @@ export const DropdownFive: FC = () => {
       }
       setDropdownOpen(false);
     };
-    document.addEventListener("click", clickHandler);
-    return () => document.removeEventListener("click", clickHandler);
+    document.addEventListener('click', clickHandler);
+    return () => document.removeEventListener('click', clickHandler);
   });
 
   // close if the esc key is pressed
@@ -32,8 +32,8 @@ export const DropdownFive: FC = () => {
       if (!dropdownOpen || keyCode !== 27) return;
       setDropdownOpen(false);
     };
-    document.addEventListener("keydown", keyHandler);
-    return () => document.removeEventListener("keydown", keyHandler);
+    document.addEventListener('keydown', keyHandler);
+    return () => document.removeEventListener('keydown', keyHandler);
   });
 
   return (
@@ -71,7 +71,7 @@ export const DropdownFive: FC = () => {
         onFocus={() => setDropdownOpen(true)}
         onBlur={() => setDropdownOpen(false)}
         className={`absolute right-0 top-full z-40 w-37.5 space-y-1 rounded bg-white p-2 shadow-card dark:bg-boxdark-2 ${
-          dropdownOpen === true ? "block" : "hidden"
+          dropdownOpen === true ? 'block' : 'hidden'
         }`}
       >
         <button

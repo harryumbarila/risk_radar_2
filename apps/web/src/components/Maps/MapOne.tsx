@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import "jsvectormap/dist/jsvectormap.css";
-import "@/js/us-aea-en";
+import 'jsvectormap/dist/jsvectormap.css';
+import '@/js/us-aea-en';
 
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 
 export const MapOne: React.FC = () => {
   useEffect(() => {
@@ -42,10 +42,10 @@ export const MapOne: React.FC = () => {
     // });
 
     return () => {
-      const map = document.getElementById("mapOne");
+      const map = document.getElementById('mapOne');
 
       if (map) {
-        map.innerHTML = "";
+        map.innerHTML = '';
       }
     };
   }, []);

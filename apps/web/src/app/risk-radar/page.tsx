@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import type { FC } from "react";
-import React, { useEffect, useMemo, useState } from "react";
+import { useRouter } from 'next/navigation';
+import type { FC } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { Loader } from "@/components/common/Loader";
-import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
-import { RiskRadarTableComponent } from "@/components/RiskRadar/RiskRadarTable";
-import { useExceptionData } from "@/hooks/risk-radar/useExceptionData";
-import { useFilteredRiskRadar } from "@/hooks/risk-radar/useFilteredRiskRadar";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { Loader } from '@/components/common/Loader';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
+import { RiskRadarTableComponent } from '@/components/RiskRadar/RiskRadarTable';
+import { useExceptionData } from '@/hooks/risk-radar/useExceptionData';
+import { useFilteredRiskRadar } from '@/hooks/risk-radar/useFilteredRiskRadar';
 
 const RiskRadar: FC = () => {
   const router = useRouter();
 
-  const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const [selectedStatus, setSelectedStatus] = useState<string>('');
 
   const { data: exceptionData } = useExceptionData();
 
@@ -29,7 +29,7 @@ const RiskRadar: FC = () => {
   useEffect(() => {
     if (exceptionData?.exception_type) {
       const allExceptionTypes = exceptionData.exception_type.map((type) =>
-        String(type.pk),
+        String(type.pk)
       );
 
       setFilters((prev) => ({
@@ -41,9 +41,9 @@ const RiskRadar: FC = () => {
   }, [exceptionData, setFilters]);
 
   const handleMIDInputChange = (
-    event: React.KeyboardEvent<HTMLInputElement>,
+    event: React.KeyboardEvent<HTMLInputElement>
   ): void => {
-    if (event.key === "Enter") {
+    if (event.key === 'Enter') {
       event.preventDefault();
       const merchantId = event.currentTarget.value;
       router.push(`/risk-radar/merchants/${merchantId}`);
@@ -206,7 +206,7 @@ const RiskRadar: FC = () => {
                     onChange={(e) => {
                       const values = Array.from(
                         e.target.selectedOptions,
-                        (option) => option.value,
+                        (option) => option.value
                       );
                       setFilters((prev) => ({
                         ...prev,
@@ -265,7 +265,7 @@ const RiskRadar: FC = () => {
                   </select>
                 </div>
 
-                {selectedStatus === "Assigned" && (
+                {selectedStatus === 'Assigned' && (
                   <div className="mb-5 mt-4">
                     <label
                       className="mb-3 block text-sm font-medium text-black dark:text-white"

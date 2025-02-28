@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { notFound } from "next/navigation";
-import type { FC } from "react";
+import { notFound } from 'next/navigation';
+import type { FC } from 'react';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
-import { useMerchant } from "@/hooks/risk-radar/useMerchant";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
+import { useMerchant } from '@/hooks/risk-radar/useMerchant';
 
 type Props = {
   params: {
@@ -65,7 +65,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             <strong>Merchant ID:</strong> {merchantProfile?.sMId}
           </p>
           <p className="text-black dark:text-white">
-            <strong>SIC:</strong> {merchantProfile?.sSIC} -{" "}
+            <strong>SIC:</strong> {merchantProfile?.sSIC} -{' '}
             {merchantProfile?.sSICDesc}
           </p>
           <p className="text-black dark:text-white">

@@ -1,15 +1,15 @@
-import type { Metadata } from "next";
-import type { FC } from "react";
+import type { Metadata } from 'next';
+import type { FC } from 'react';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
-import { SpinnerOne } from "@/components/Spinners/SpinnerOne";
-import { SpinnerTwo } from "@/components/Spinners/SpinnerTwo";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
+import { SpinnerOne } from '@/components/Spinners/SpinnerOne';
+import { SpinnerTwo } from '@/components/Spinners/SpinnerTwo';
 
 export const metadata: Metadata = {
-  title: "Next.js Spinners | TailAdmin - Next.js Dashboard Template",
+  title: 'Next.js Spinners | TailAdmin - Next.js Dashboard Template',
   description:
-    "This is Next.js Spinners page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    'This is Next.js Spinners page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
 };
 
 const SpinnersPage: FC = () => {

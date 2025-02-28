@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
-import { showNotification } from "@/components/Notifications/NotificationContent";
-import { useLeadSources } from "@/hooks/attribution-url/useLeadSources";
-import { useSourceMatcher } from "@/hooks/attribution-url/useSourceMatcher";
-import { useUsersData } from "@/hooks/attribution-url/useUsersData";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
+import { showNotification } from '@/components/Notifications/NotificationContent';
+import { useLeadSources } from '@/hooks/attribution-url/useLeadSources';
+import { useSourceMatcher } from '@/hooks/attribution-url/useSourceMatcher';
+import { useUsersData } from '@/hooks/attribution-url/useUsersData';
 
 const AttributionUrl: React.FC = () => {
   // Add hook
@@ -15,18 +15,18 @@ const AttributionUrl: React.FC = () => {
 
   const { data: usersData, isLoading: usersLoading } = useUsersData();
 
-  const [irisUser, setIrisUser] = useState("");
-  const [channel, setChannel] = useState("");
-  const [rsl, setRsl] = useState("");
-  const [referralPartner, setReferralPartner] = useState("");
-  const [generatedLink, setGeneratedLink] = useState("");
+  const [irisUser, setIrisUser] = useState('');
+  const [channel, setChannel] = useState('');
+  const [rsl, setRsl] = useState('');
+  const [referralPartner, setReferralPartner] = useState('');
+  const [generatedLink, setGeneratedLink] = useState('');
 
   const { data: leadSourcesData } = useLeadSources();
-  const [selectedPartnerName, setSelectedPartnerName] = useState<string>("");
+  const [selectedPartnerName, setSelectedPartnerName] = useState<string>('');
 
   // New state variables for dropdown options
   const [channels, setChannels] = useState<Array<{ id: number; name: string }>>(
-    [],
+    []
   );
   const [rslOptions, setRslOptions] = useState<
     Array<{ id: number; name: string }>
@@ -39,10 +39,10 @@ const AttributionUrl: React.FC = () => {
     // 1. Validation
     if (!irisUser || !channel) {
       showNotification({
-        title: "Validation Error",
-        message: "IRIS User, Channel are required fields",
-        type: "error",
-        bgColor: "#FF0000",
+        title: 'Validation Error',
+        message: 'IRIS User, Channel are required fields',
+        type: 'error',
+        bgColor: '#FF0000',
       });
       return;
     }
@@ -63,7 +63,7 @@ const AttributionUrl: React.FC = () => {
       // find correct source id by checking source name with selected partner name
       const selectedSource = findMatchingSourceNameForReferralPartner(
         selectedPartnerName,
-        leadSourcesData?.data,
+        leadSourcesData?.data
       );
 
       if (selectedSource) {
@@ -80,10 +80,10 @@ const AttributionUrl: React.FC = () => {
     setGeneratedLink(link);
 
     showNotification({
-      title: "Success",
-      message: "Attribution link generated successfully",
-      type: "success",
-      bgColor: "#4CAF50",
+      title: 'Success',
+      message: 'Attribution link generated successfully',
+      type: 'success',
+      bgColor: '#4CAF50',
     });
   };
 
@@ -91,24 +91,24 @@ const AttributionUrl: React.FC = () => {
     if (generatedLink) {
       navigator.clipboard.writeText(generatedLink).catch(() => {});
       showNotification({
-        title: "Success",
-        message: "Operation completed successfully",
-        type: "success",
-        bgColor: "#4CAF50",
+        title: 'Success',
+        message: 'Operation completed successfully',
+        type: 'success',
+        bgColor: '#4CAF50',
       });
     }
   };
 
   const handlePartnerChange = (
-    e: React.ChangeEvent<HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLSelectElement>
   ): void => {
     const selectedValue = e.target.value;
     setReferralPartner(selectedValue);
     // Clear dependent fields
-    setGeneratedLink("");
+    setGeneratedLink('');
     // Find the selected partner
     const selectedPartner = partnerOptions.find(
-      (partner) => partner.user_id.toString() === selectedValue,
+      (partner) => partner.user_id.toString() === selectedValue
     );
     if (selectedPartner) {
       // Set the selected partner name
@@ -117,20 +117,20 @@ const AttributionUrl: React.FC = () => {
   };
 
   const handleIrisUserChange = (
-    e: React.ChangeEvent<HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLSelectElement>
   ): void => {
     const selectedValue = e.target.value;
     setIrisUser(selectedValue);
 
     // Clear dependent fields
-    setChannel("");
-    setRsl("");
-    setReferralPartner("");
-    setGeneratedLink("");
+    setChannel('');
+    setRsl('');
+    setReferralPartner('');
+    setGeneratedLink('');
 
     // Find the selected user
     const selectedUser = usersData?.data?.find(
-      (user) => user.value === parseInt(selectedValue, 10),
+      (user) => user.value === parseInt(selectedValue, 10)
     );
 
     if (selectedUser) {

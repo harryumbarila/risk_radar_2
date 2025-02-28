@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 
-import { Start } from "@/components/Start";
+import { Start } from '@/components/Start';
 
 export const InboxList: React.FC = () => {
   return (

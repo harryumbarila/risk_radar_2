@@ -6,7 +6,7 @@ const nextConfig = {
   },
   typescript: {
     ignoreBuildErrors: !!process.env.CI,
-    tsconfigPath: "tsconfig.build.json",
+    tsconfigPath: 'tsconfig.build.json',
   },
 };
 

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import type { FC, PropsWithChildren } from "react";
+import type { FC, PropsWithChildren } from 'react';
 
-import { AppsIcon } from "@/components/AppsIcon/AppsIcon";
+import { AppsIcon } from '@/components/AppsIcon/AppsIcon';
 
 export const NoAuthLayout: FC<PropsWithChildren> = ({ children }) => {
   return (

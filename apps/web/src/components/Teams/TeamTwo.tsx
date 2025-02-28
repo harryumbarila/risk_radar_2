@@ -1,6 +1,6 @@
-import Image from "next/image";
-import Link from "next/link";
-import React from "react";
+import Image from 'next/image';
+import Link from 'next/link';
+import React from 'react';
 
 type Team = {
   image: string;
@@ -10,24 +10,24 @@ type Team = {
 
 const teamItems: Team[] = [
   {
-    image: "/images/team/team-05.png",
-    name: "Matheus Ferrero",
-    position: "Marketing Expert",
+    image: '/images/team/team-05.png',
+    name: 'Matheus Ferrero',
+    position: 'Marketing Expert',
   },
   {
-    image: "/images/team/team-06.png",
-    name: "Stuard Ferrel",
-    position: "Digital Marketer",
+    image: '/images/team/team-06.png',
+    name: 'Stuard Ferrel',
+    position: 'Digital Marketer',
   },
   {
-    image: "/images/team/team-07.png",
-    name: "Eva Hudson",
-    position: "Creative Designer",
+    image: '/images/team/team-07.png',
+    name: 'Eva Hudson',
+    position: 'Creative Designer',
   },
   {
-    image: "/images/team/team-08.png",
-    name: "Jackie Sanders",
-    position: "SEO Expert",
+    image: '/images/team/team-08.png',
+    name: 'Jackie Sanders',
+    position: 'SEO Expert',
   },
 ];
 

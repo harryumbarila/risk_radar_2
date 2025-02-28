@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { AccordionOne } from "@/components/Accordions/AccordionOne";
-import { AccordionTwo } from "@/components/Accordions/AccordionTwo";
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
+import { AccordionOne } from '@/components/Accordions/AccordionOne';
+import { AccordionTwo } from '@/components/Accordions/AccordionTwo';
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
 
 export const Accordion: React.FC = () => {
   return (

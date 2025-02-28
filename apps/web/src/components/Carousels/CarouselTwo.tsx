@@ -1,11 +1,11 @@
-import "swiper/css";
-import "swiper/css/autoplay";
-import "swiper/css/pagination";
+import 'swiper/css';
+import 'swiper/css/autoplay';
+import 'swiper/css/pagination';
 
-import Image from "next/image";
-import React from "react";
-import { Autoplay, Pagination } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
+import Image from 'next/image';
+import React from 'react';
+import { Autoplay, Pagination } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
 export const CarouselTwo: React.FC = () => {
   return (

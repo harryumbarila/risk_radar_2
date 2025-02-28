@@ -23,7 +23,7 @@ export class LegacyDashboardProxyClient {
   private readonly client: AxiosInstance;
 
   public constructor(
-    configService: ConfigService<LegacyDashboardProxyClientConfig>,
+    configService: ConfigService<LegacyDashboardProxyClientConfig>
   ) {
     this.client = axios.create({
       baseURL: configService.get('LEGACY_DASHBOARD_URL'),
@@ -39,14 +39,14 @@ export class LegacyDashboardProxyClient {
             headers: config.headers,
             params: config.params as unknown,
             data: config.data as unknown,
-          },
+          }
         );
         return config;
       },
       (error) => {
         this.logger.error('Request Error:', error);
         return Promise.reject(error);
-      },
+      }
     );
 
     // Add response interceptor for logging
@@ -65,7 +65,7 @@ export class LegacyDashboardProxyClient {
           message: error.message,
         });
         return Promise.reject(error);
-      },
+      }
     );
   }
 
@@ -75,7 +75,7 @@ export class LegacyDashboardProxyClient {
 
   public async getExceptionData(): Promise<ExceptionDataResponseDto> {
     const response = await this.get<ExceptionDataResponseDto>(
-      '/api/v1/dashboard/riskradar/exception-information',
+      '/api/v1/dashboard/riskradar/exception-information'
     );
     return response.data;
   }

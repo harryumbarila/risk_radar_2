@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { TabOne } from "@/components/Tabs/TabOne";
-import { TabThree } from "@/components/Tabs/TabThree";
-import { TabTwo } from "@/components/Tabs/TabTwo";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { TabOne } from '@/components/Tabs/TabOne';
+import { TabThree } from '@/components/Tabs/TabThree';
+import { TabTwo } from '@/components/Tabs/TabTwo';
 
 export const Tabs: React.FC = () => {
   return (

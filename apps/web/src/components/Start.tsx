@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 export const Start: React.FC = () => {
   const [stared, setStared] = useState(false);
@@ -16,7 +16,7 @@ export const Start: React.FC = () => {
       xmlns="http://www.w3.org/2000/svg"
       onClick={toggleStar}
       className={
-        stared ? "fill-[#FFD02C] " : "fill-[#E5E7EE] dark:fill-[#E5E7EE]/70"
+        stared ? 'fill-[#FFD02C] ' : 'fill-[#E5E7EE] dark:fill-[#E5E7EE]/70'
       }
     >
       <path

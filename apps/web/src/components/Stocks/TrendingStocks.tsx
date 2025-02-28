@@ -1,7 +1,7 @@
-import Image from "next/image";
-import React from "react";
+import Image from 'next/image';
+import React from 'react';
 
-import { DropdownDefault } from "@/components/Dropdowns/DropdownDefault";
+import { DropdownDefault } from '@/components/Dropdowns/DropdownDefault';
 
 type Stocks = {
   image: string;
@@ -13,24 +13,24 @@ type Stocks = {
 
 const stocksItems: Stocks[] = [
   {
-    image: "/images/brand/brand-14.svg",
-    name: "Netflix",
-    gross: "12,453.00",
-    price: "1,984.00",
+    image: '/images/brand/brand-14.svg',
+    name: 'Netflix',
+    gross: '12,453.00',
+    price: '1,984.00',
     returnRate: 0.14,
   },
   {
-    image: "/images/brand/brand-15.svg",
-    name: "Apple Inc.",
-    gross: "132,453.00",
-    price: "2,634.00",
+    image: '/images/brand/brand-15.svg',
+    name: 'Apple Inc.',
+    gross: '132,453.00',
+    price: '2,634.00',
     returnRate: 1.03,
   },
   {
-    image: "/images/brand/brand-16.svg",
-    name: "Meta",
-    gross: "31,428.00",
-    price: "2,432.00",
+    image: '/images/brand/brand-16.svg',
+    name: 'Meta',
+    gross: '31,428.00',
+    price: '2,432.00',
     returnRate: 0.08,
   },
 ];
@@ -64,8 +64,8 @@ export const TrendingStocks: React.FC = () => {
                     width={46}
                     height={46}
                     style={{
-                      width: "auto",
-                      height: "auto",
+                      width: 'auto',
+                      height: 'auto',
                     }}
                   />
                 </div>
@@ -81,7 +81,7 @@ export const TrendingStocks: React.FC = () => {
               <div className="text-right">
                 <p
                   className={`mb-0.5 flex items-center justify-end gap-1 text-xs font-medium ${
-                    item.returnRate >= 0 ? "text-meta-3" : "text-red"
+                    item.returnRate >= 0 ? 'text-meta-3' : 'text-red'
                   }`}
                 >
                   {item.returnRate}%
@@ -117,10 +117,10 @@ export const TrendingStocks: React.FC = () => {
                 </p>
                 <p
                   className={`text-xs font-medium ${
-                    item.returnRate >= 0 ? "text-meta-3" : "text-red"
+                    item.returnRate >= 0 ? 'text-meta-3' : 'text-red'
                   }`}
                 >
-                  {item.returnRate >= 0 ? "+" : "-"} ${item.price}
+                  {item.returnRate >= 0 ? '+' : '-'} ${item.price}
                 </p>
               </div>
             </div>

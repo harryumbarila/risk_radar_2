@@ -1,5 +1,5 @@
-import Image from "next/image";
-import React from "react";
+import Image from 'next/image';
+import React from 'react';
 
 type Avatar = {
   image: string;
@@ -9,23 +9,23 @@ type Avatar = {
 
 const avatarItems: Avatar[] = [
   {
-    image: "/images/user/user-03.png",
-    classes: "max-w-6 h-6",
+    image: '/images/user/user-03.png',
+    classes: 'max-w-6 h-6',
     size: 24,
   },
   {
-    image: "/images/user/user-03.png",
-    classes: "max-w-9.5 h-9.5",
+    image: '/images/user/user-03.png',
+    classes: 'max-w-9.5 h-9.5',
     size: 38,
   },
   {
-    image: "/images/user/user-03.png",
-    classes: "max-w-13 h-13",
+    image: '/images/user/user-03.png',
+    classes: 'max-w-13 h-13',
     size: 52,
   },
   {
-    image: "/images/user/user-03.png",
-    classes: "max-w-20 h-20",
+    image: '/images/user/user-03.png',
+    classes: 'max-w-20 h-20',
     size: 80,
   },
 ];
@@ -39,8 +39,8 @@ export const AvatarOne: React.FC = () => {
             width={item.size}
             height={item.size}
             style={{
-              width: "100%",
-              height: "auto",
+              width: '100%',
+              height: 'auto',
             }}
             src={item.image}
             alt="User"

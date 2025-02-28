@@ -1,5 +1,5 @@
-import type { FC } from "react";
-import { useState } from "react";
+import type { FC } from 'react';
+import { useState } from 'react';
 
 export const SwitcherThree: FC = () => {
   const [enabled, setEnabled] = useState(false);
@@ -23,10 +23,10 @@ export const SwitcherThree: FC = () => {
           <div className="block h-8 w-14 rounded-full bg-meta-9 dark:bg-[#5A616B]" />
           <div
             className={`dot absolute left-1 top-1 flex size-6 items-center justify-center rounded-full bg-white transition ${
-              enabled && "!right-1 !translate-x-full !bg-primary dark:!bg-white"
+              enabled && '!right-1 !translate-x-full !bg-primary dark:!bg-white'
             }`}
           >
-            <span className={`hidden ${enabled && "!block"}`}>
+            <span className={`hidden ${enabled && '!block'}`}>
               <svg
                 className="fill-white dark:fill-black"
                 width="11"
@@ -43,7 +43,7 @@ export const SwitcherThree: FC = () => {
                 />
               </svg>
             </span>
-            <span className={`${enabled && "hidden"}`}>
+            <span className={`${enabled && 'hidden'}`}>
               <svg
                 className="size-4 stroke-current"
                 fill="none"

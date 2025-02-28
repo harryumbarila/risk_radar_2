@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 
 type Option = {
   value: string;
@@ -25,9 +25,9 @@ export const MultiSelect: React.FC<DropdownProps> = ({ id }) => {
         const newOptions: Option[] = [];
         for (let i = 0; i < select.options.length; i + 1) {
           newOptions.push({
-            value: select.options[i]?.value ?? "",
-            text: select.options[i]?.innerText ?? "",
-            selected: select.options[i]?.hasAttribute("selected") ?? false,
+            value: select.options[i]?.value ?? '',
+            text: select.options[i]?.innerText ?? '',
+            selected: select.options[i]?.hasAttribute('selected') ?? false,
           });
         }
         setOptions(newOptions);
@@ -47,7 +47,7 @@ export const MultiSelect: React.FC<DropdownProps> = ({ id }) => {
 
   const select = (
     index: number,
-    event: React.MouseEvent | React.KeyboardEvent,
+    event: React.MouseEvent | React.KeyboardEvent
   ): void => {
     const newOptions = [...options];
 
@@ -80,7 +80,7 @@ export const MultiSelect: React.FC<DropdownProps> = ({ id }) => {
   };
 
   const selectedValues = (): string[] => {
-    return selected.map((option) => options[option]?.value ?? "");
+    return selected.map((option) => options[option]?.value ?? '');
   };
 
   useEffect(() => {
@@ -95,8 +95,8 @@ export const MultiSelect: React.FC<DropdownProps> = ({ id }) => {
       }
       setShow(false);
     };
-    document.addEventListener("click", clickHandler);
-    return () => document.removeEventListener("click", clickHandler);
+    document.addEventListener('click', clickHandler);
+    return () => document.removeEventListener('click', clickHandler);
   });
 
   return (
@@ -126,7 +126,7 @@ export const MultiSelect: React.FC<DropdownProps> = ({ id }) => {
                 className="w-full"
                 role="button"
                 onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
+                  if (event.key === 'Enter' || event.key === ' ') {
                     open();
                   }
                 }}
@@ -146,7 +146,7 @@ export const MultiSelect: React.FC<DropdownProps> = ({ id }) => {
                           <div
                             onClick={() => remove(index)}
                             onKeyDown={(event) => {
-                              if (event.key === "Enter" || event.key === " ") {
+                              if (event.key === 'Enter' || event.key === ' ') {
                                 remove(index);
                               }
                             }}
@@ -215,7 +215,7 @@ export const MultiSelect: React.FC<DropdownProps> = ({ id }) => {
               <div className="w-full px-4">
                 <div
                   className={`max-h-select absolute left-0 top-full z-40 w-full overflow-y-auto rounded bg-white shadow dark:bg-form-input ${
-                    isOpen() ? "" : "hidden"
+                    isOpen() ? '' : 'hidden'
                   }`}
                   ref={dropdownRef}
                   onFocus={() => setShow(true)}
@@ -231,14 +231,14 @@ export const MultiSelect: React.FC<DropdownProps> = ({ id }) => {
                           className="w-full cursor-pointer rounded-t border-b border-stroke hover:bg-primary/5 dark:border-form-strokedark"
                           onClick={(event) => select(index, event)}
                           onKeyDown={(event) => {
-                            if (event.key === "Enter" || event.key === " ") {
+                            if (event.key === 'Enter' || event.key === ' ') {
                               select(index, event);
                             }
                           }}
                         >
                           <div
                             className={`relative flex w-full items-center border-l-2 border-transparent p-2 ${
-                              option.selected ? "border-primary" : ""
+                              option.selected ? 'border-primary' : ''
                             }`}
                           >
                             <div className="flex w-full items-center">

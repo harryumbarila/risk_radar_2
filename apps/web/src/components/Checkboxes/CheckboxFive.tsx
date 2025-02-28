@@ -1,5 +1,5 @@
-import type { FC } from "react";
-import { useState } from "react";
+import type { FC } from 'react';
+import { useState } from 'react';
 
 export const CheckboxFive: FC = () => {
   const [isChecked, setIsChecked] = useState<boolean>(false);
@@ -21,7 +21,7 @@ export const CheckboxFive: FC = () => {
           />
           <div
             className={`box mr-4 flex size-5 items-center justify-center rounded-full border border-primary ${
-              isChecked && "!border-4"
+              isChecked && '!border-4'
             }`}
           >
             <span className="size-2.5 rounded-full bg-white dark:bg-transparent" />

@@ -1,7 +1,7 @@
-import Image from "next/image";
-import React from "react";
+import Image from 'next/image';
+import React from 'react';
 
-import { DropdownDefault } from "./Dropdowns/DropdownDefault";
+import { DropdownDefault } from './Dropdowns/DropdownDefault';
 
 type FeedbackData = {
   avatar: string;
@@ -13,24 +13,24 @@ type FeedbackData = {
 
 const feedbackData: FeedbackData[] = [
   {
-    avatar: "/images/user/user-14.png",
-    name: "Timothy Smith",
-    name2: "Killan James",
+    avatar: '/images/user/user-14.png',
+    name: 'Timothy Smith',
+    name2: 'Killan James',
     feedback: `It's an Affiliate commissions SaaS application that allows you
     to track your affiliate revenue.`,
     time: 1,
   },
   {
-    avatar: "/images/user/user-15.png",
-    name: "Nancy Martino",
-    name2: "Matney",
+    avatar: '/images/user/user-15.png',
+    name: 'Nancy Martino',
+    name2: 'Matney',
     feedback: `There are many variations of passages of Lorem Ipsum available, but the majority have suffered.`,
     time: 2,
   },
   {
-    avatar: "/images/user/user-16.png",
-    name: "Michael Morris",
-    name2: "Williams Son",
+    avatar: '/images/user/user-16.png',
+    name: 'Michael Morris',
+    name2: 'Williams Son',
     feedback: `It's an Affiliate commissions SaaS application that allows you
     to track your affiliate revenue.`,
     time: 3,
@@ -70,7 +70,7 @@ export const Feedback: React.FC = () => {
                   <span className="font-medium">{feedback.name2}</span>
                 </p>
                 <span className="mt-1 block text-sm">
-                  {" "}
+                  {' '}
                   {feedback.time} hour ago
                 </span>
                 <p className="mt-2.5 text-black dark:text-white">

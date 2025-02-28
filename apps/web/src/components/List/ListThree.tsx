@@ -1,7 +1,7 @@
-import Image from "next/image";
-import React from "react";
+import Image from 'next/image';
+import React from 'react';
 
-import { DropdownFive } from "@/components/Dropdowns/DropdownFive";
+import { DropdownFive } from '@/components/Dropdowns/DropdownFive';
 
 type ListItem = {
   image: string;
@@ -11,24 +11,24 @@ type ListItem = {
 
 const listItems: ListItem[] = [
   {
-    image: "/images/user/user-01.png",
-    name: "Devid Wilium",
-    position: "Digital marketer",
+    image: '/images/user/user-01.png',
+    name: 'Devid Wilium',
+    position: 'Digital marketer',
   },
   {
-    image: "/images/user/user-03.png",
-    name: "Deniyal Shifer",
-    position: "Graphics designer",
+    image: '/images/user/user-03.png',
+    name: 'Deniyal Shifer',
+    position: 'Graphics designer',
   },
   {
-    image: "/images/user/user-02.png",
-    name: "Philifs Geno",
-    position: "Content creator",
+    image: '/images/user/user-02.png',
+    name: 'Philifs Geno',
+    position: 'Content creator',
   },
   {
-    image: "/images/user/user-05.png",
-    name: "Marko Diyan",
-    position: "Web developer",
+    image: '/images/user/user-05.png',
+    name: 'Marko Diyan',
+    position: 'Web developer',
   },
 ];
 
@@ -50,8 +50,8 @@ export const ListThree: React.FC = () => {
                   alt="user"
                   className="rounded-full object-cover object-center"
                   style={{
-                    width: "auto",
-                    height: "auto",
+                    width: 'auto',
+                    height: 'auto',
                   }}
                 />
               </div>

@@ -1,8 +1,8 @@
-import Image from "next/image";
-import Link from "next/link";
-import React from "react";
+import Image from 'next/image';
+import Link from 'next/link';
+import React from 'react';
 
-import { CountDownTimer } from "@/components/CountDownTimer";
+import { CountDownTimer } from '@/components/CountDownTimer';
 
 const UnderMaintenance: React.FC = () => {
   return (

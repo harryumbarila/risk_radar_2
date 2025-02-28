@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { DropdownDefault } from "@/components/Dropdowns/DropdownDefault";
-import { TaskHeader } from "@/components/TaskHeader";
-import { Drag } from "@/js/drag";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { DropdownDefault } from '@/components/Dropdowns/DropdownDefault';
+import { TaskHeader } from '@/components/TaskHeader';
+import { Drag } from '@/js/drag';
 
 export const TaskList: React.FC = () => {
   useEffect(() => {

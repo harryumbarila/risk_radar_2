@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 
-import { DropdownDefault } from "./Dropdowns/DropdownDefault";
+import { DropdownDefault } from './Dropdowns/DropdownDefault';
 
 export const TopContent: React.FC = () => {
   return (

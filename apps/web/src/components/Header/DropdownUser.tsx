@@ -1,7 +1,7 @@
-import { useUser } from "@auth0/nextjs-auth0/client";
-import Link from "next/link";
-import type { FC } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useUser } from '@auth0/nextjs-auth0/client';
+import Link from 'next/link';
+import type { FC } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export const DropdownUser: FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -23,8 +23,8 @@ export const DropdownUser: FC = () => {
       }
       setDropdownOpen(false);
     };
-    document.addEventListener("click", clickHandler);
-    return (): void => document.removeEventListener("click", clickHandler);
+    document.addEventListener('click', clickHandler);
+    return (): void => document.removeEventListener('click', clickHandler);
   });
 
   // close if the esc key is pressed
@@ -33,12 +33,12 @@ export const DropdownUser: FC = () => {
       if (!dropdownOpen || keyCode !== 27) return;
       setDropdownOpen(false);
     };
-    document.addEventListener("keydown", keyHandler);
-    return (): void => document.removeEventListener("keydown", keyHandler);
+    document.addEventListener('keydown', keyHandler);
+    return (): void => document.removeEventListener('keydown', keyHandler);
   });
 
   const handleLogout = (): void => {
-    window.location.assign("/api/auth/logout");
+    window.location.assign('/api/auth/logout');
   };
 
   return (
@@ -51,9 +51,9 @@ export const DropdownUser: FC = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            {user?.name || "Loading..."}
+            {user?.name || 'Loading...'}
           </span>
-          <span className="block text-xs">{user?.email || "Loading..."}</span>
+          <span className="block text-xs">{user?.email || 'Loading...'}</span>
         </span>
 
         <svg
@@ -79,7 +79,7 @@ export const DropdownUser: FC = () => {
         onFocus={() => setDropdownOpen(true)}
         onBlur={() => setDropdownOpen(false)}
         className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark ${
-          dropdownOpen === true ? "block" : "hidden"
+          dropdownOpen === true ? 'block' : 'hidden'
         }`}
       >
         <button

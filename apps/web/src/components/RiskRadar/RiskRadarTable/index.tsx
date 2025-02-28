@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import type { FC } from "react";
+import type { FC } from 'react';
 
-import RiskRadarTable from "@/components/RiskRadar/RiskRadarTable/RiskRadarTable";
-import type { RiskRadarResponseDto } from "@/shared/response/legacy-dashboard-proxy";
+import RiskRadarTable from '@/components/RiskRadar/RiskRadarTable/RiskRadarTable';
+import type { RiskRadarResponseDto } from '@/shared/response/legacy-dashboard-proxy';
 
 export type RiskRadarTableComponentProps = {
   data: RiskRadarResponseDto;

@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import React, { useEffect } from "react";
+import Image from 'next/image';
+import React, { useEffect } from 'react';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { DropdownDefault } from "@/components/Dropdowns/DropdownDefault";
-import { TaskHeader } from "@/components/TaskHeader";
-import { Drag } from "@/js/drag";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { DropdownDefault } from '@/components/Dropdowns/DropdownDefault';
+import { TaskHeader } from '@/components/TaskHeader';
+import { Drag } from '@/js/drag';
 
 export const TaskKanban: React.FC = () => {
   useEffect(() => {

@@ -1,6 +1,6 @@
-import type { ApexOptions } from "apexcharts";
-import React, { useState } from "react";
-import ReactApexChart from "react-apexcharts";
+import type { ApexOptions } from 'apexcharts';
+import React, { useState } from 'react';
+import ReactApexChart from 'react-apexcharts';
 
 type ChartNineState = {
   series: { data: number[] }[];
@@ -28,10 +28,10 @@ export const ChartNine: React.FC = () => {
   updateState();
 
   const options: ApexOptions = {
-    colors: ["#3C50E0", "#80CAEE"],
+    colors: ['#3C50E0', '#80CAEE'],
     chart: {
-      fontFamily: "Satoshi, sans-serif",
-      type: "bar",
+      fontFamily: 'Satoshi, sans-serif',
+      type: 'bar',
       height: 250,
       toolbar: {
         show: false,
@@ -40,7 +40,7 @@ export const ChartNine: React.FC = () => {
     plotOptions: {
       bar: {
         horizontal: false,
-        columnWidth: "35%",
+        columnWidth: '35%',
         // endingShape: 'rounded',
         borderRadius: 0,
       },
@@ -51,10 +51,10 @@ export const ChartNine: React.FC = () => {
     stroke: {
       show: true,
       width: 4,
-      colors: ["transparent"],
+      colors: ['transparent'],
     },
     xaxis: {
-      categories: ["M", "T", "W", "T", "F", "S", "S"],
+      categories: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
       axisBorder: {
         show: false,
       },
@@ -64,9 +64,9 @@ export const ChartNine: React.FC = () => {
     },
     legend: {
       show: false,
-      position: "top",
-      horizontalAlign: "left",
-      fontFamily: "Satoshi",
+      position: 'top',
+      horizontalAlign: 'left',
+      fontFamily: 'Satoshi',
     },
     // yaxis: {
     //   title: false,

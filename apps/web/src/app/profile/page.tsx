@@ -1,15 +1,15 @@
-import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
-import type { FC } from "react";
+import type { Metadata } from 'next';
+import Image from 'next/image';
+import Link from 'next/link';
+import type { FC } from 'react';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
-  title: "Next.js Profile | TailAdmin - Next.js Dashboard Template",
+  title: 'Next.js Profile | TailAdmin - Next.js Dashboard Template',
   description:
-    "This is Next.js Profile page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    'This is Next.js Profile page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
 };
 
 const Profile: FC = () => {
@@ -27,8 +27,8 @@ const Profile: FC = () => {
               width={970}
               height={260}
               style={{
-                width: "auto",
-                height: "auto",
+                width: 'auto',
+                height: 'auto',
               }}
             />
             <div className="absolute bottom-1 right-1 z-10 xsm:bottom-4 xsm:right-4">
@@ -77,8 +77,8 @@ const Profile: FC = () => {
                   width={160}
                   height={160}
                   style={{
-                    width: "auto",
-                    height: "auto",
+                    width: 'auto',
+                    height: 'auto',
                   }}
                   alt="profile"
                 />

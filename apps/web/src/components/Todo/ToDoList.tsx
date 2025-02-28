@@ -1,42 +1,42 @@
-import Image from "next/image";
-import React from "react";
+import Image from 'next/image';
+import React from 'react';
 
-import { DropdownDefault } from "@/components/Dropdowns/DropdownDefault";
+import { DropdownDefault } from '@/components/Dropdowns/DropdownDefault';
 
 const todoData = [
   {
-    logo: "/images/todo/uideck.svg",
-    title: "Next.js Uideck Yearly Meetings",
-    time: "10:20 AM - 3:00 PM",
-    date: "14 February,2025",
-    status: "Completed",
+    logo: '/images/todo/uideck.svg',
+    title: 'Next.js Uideck Yearly Meetings',
+    time: '10:20 AM - 3:00 PM',
+    date: '14 February,2025',
+    status: 'Completed',
   },
   {
-    logo: "/images/todo/dribble.svg",
-    title: "Next.js 2025 Dribbble Meet Up",
-    time: "09:30 AM - 12:00 AM",
-    date: "14 February,2025",
-    status: "Upcoming",
+    logo: '/images/todo/dribble.svg',
+    title: 'Next.js 2025 Dribbble Meet Up',
+    time: '09:30 AM - 12:00 AM',
+    date: '14 February,2025',
+    status: 'Upcoming',
   },
   {
-    logo: "/images/todo/linkdin.svg",
-    title: "Next.js 2025 Linkedin Meet Up",
-    time: "10:30 AM - 11:00 PM",
-    date: "14 February,2025",
-    status: "Canceled",
+    logo: '/images/todo/linkdin.svg',
+    title: 'Next.js 2025 Linkedin Meet Up',
+    time: '10:30 AM - 11:00 PM',
+    date: '14 February,2025',
+    status: 'Canceled',
   },
 ];
 
 const getStatusClass = (status: string): string => {
   switch (status) {
-    case "Completed":
-      return "bg-meta-3/[0.08] text-meta-3";
-    case "Upcoming":
-      return "bg-primary/[0.08] text-primary";
-    case "Canceled":
-      return "bg-red/[0.08] text-red";
+    case 'Completed':
+      return 'bg-meta-3/[0.08] text-meta-3';
+    case 'Upcoming':
+      return 'bg-primary/[0.08] text-primary';
+    case 'Canceled':
+      return 'bg-red/[0.08] text-red';
     default:
-      return "";
+      return '';
   }
 };
 
@@ -70,8 +70,8 @@ export const ToDoList: React.FC = () => {
                       width={32}
                       height={32}
                       style={{
-                        width: "auto",
-                        height: "auto",
+                        width: 'auto',
+                        height: 'auto',
                       }}
                       alt={todo.title}
                     />

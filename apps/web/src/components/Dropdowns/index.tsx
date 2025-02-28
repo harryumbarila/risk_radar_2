@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { DropdownsOne } from "@/components/Dropdowns/DropdownsOne";
-import { DropdownsThree } from "@/components/Dropdowns/DropdownsThree";
-import { DropdownsTwo } from "@/components/Dropdowns/DropdownsTwo";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { DropdownsOne } from '@/components/Dropdowns/DropdownsOne';
+import { DropdownsThree } from '@/components/Dropdowns/DropdownsThree';
+import { DropdownsTwo } from '@/components/Dropdowns/DropdownsTwo';
 
 export const Dropdowns: React.FC = () => {
   return (

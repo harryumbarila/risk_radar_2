@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import React from "react";
+import React from 'react';
 
-import { ChartTwelve } from "@/components/Charts/ChartTwelve";
-import { DataStatsFour } from "@/components/DataStats/DataStatsFour";
-import { LatestTransaction } from "@/components/Stocks/LatestTransaction";
-import { MyStocks } from "@/components/Stocks/MyStocks";
-import { TrendingStocks } from "@/components/Stocks/TrendingStocks";
+import { ChartTwelve } from '@/components/Charts/ChartTwelve';
+import { DataStatsFour } from '@/components/DataStats/DataStatsFour';
+import { LatestTransaction } from '@/components/Stocks/LatestTransaction';
+import { MyStocks } from '@/components/Stocks/MyStocks';
+import { TrendingStocks } from '@/components/Stocks/TrendingStocks';
 
 export const Stocks: React.FC = () => {
   return (

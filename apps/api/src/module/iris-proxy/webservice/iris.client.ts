@@ -45,14 +45,14 @@ export class IrisClient {
             headers: config.headers,
             params: config.params as unknown,
             data: config.data as unknown,
-          },
+          }
         );
         return config;
       },
       (error) => {
         this.logger.error('Request Error:', error);
         return Promise.reject(error);
-      },
+      }
     );
 
     // Add response interceptor for logging
@@ -71,7 +71,7 @@ export class IrisClient {
           message: error.message,
         });
         return Promise.reject(error);
-      },
+      }
     );
   }
 
@@ -110,7 +110,7 @@ export class IrisClient {
                 'Content-Type': 'application/json',
                 'X-API-KEY': this.apiKey,
               },
-            },
+            }
           );
 
           const clearedResponseData = response.data.data.map((user) => {
@@ -160,7 +160,7 @@ export class IrisClient {
           'Content-Type': 'application/json',
           'X-API-KEY': this.apiKey,
         },
-      },
+      }
     );
     return response.data;
   }
@@ -173,7 +173,7 @@ export class IrisClient {
           'Content-Type': 'application/json',
           'X-API-KEY': this.apiKey,
         },
-      },
+      }
     );
     return response.data;
   }

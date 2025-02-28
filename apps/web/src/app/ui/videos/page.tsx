@@ -1,14 +1,14 @@
-import type { Metadata } from "next";
-import React from "react";
+import type { Metadata } from 'next';
+import React from 'react';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
-import { VideosItem } from "@/components/VideosItem";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
+import { VideosItem } from '@/components/VideosItem';
 
 export const metadata: Metadata = {
-  title: "Next.js Videos | TailAdmin - Next.js Dashboard Template",
+  title: 'Next.js Videos | TailAdmin - Next.js Dashboard Template',
   description:
-    "This is Next.js Videos page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    'This is Next.js Videos page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
 };
 
 const Videos: React.FC = () => {

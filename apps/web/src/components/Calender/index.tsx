@@ -1,6 +1,6 @@
-import type { FC } from "react";
+import type { FC } from 'react';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
 
 export const Calendar: FC = () => {
   return (

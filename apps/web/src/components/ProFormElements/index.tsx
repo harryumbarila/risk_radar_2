@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import type { FC } from "react";
+import type { FC } from 'react';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { FileDropZone } from "@/components/ProFormElements/FileDropZone";
-import { RangeSliderOne } from "@/components/ProFormElements/RangeSlider/RangeSliderOne";
-import { RangeSliderTwo } from "@/components/ProFormElements/RangeSlider/RangeSliderTwo";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { FileDropZone } from '@/components/ProFormElements/FileDropZone';
+import { RangeSliderOne } from '@/components/ProFormElements/RangeSlider/RangeSliderOne';
+import { RangeSliderTwo } from '@/components/ProFormElements/RangeSlider/RangeSliderTwo';
 
 export const ProFormElements: FC = () => {
   return (

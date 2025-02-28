@@ -1,8 +1,8 @@
-import Image from "next/image";
-import Link from "next/link";
-import React from "react";
+import Image from 'next/image';
+import Link from 'next/link';
+import React from 'react';
 
-import type { CardItemProps } from "@/types/cards";
+import type { CardItemProps } from '@/types/cards';
 
 export const CardsItemTwo: React.FC<CardItemProps> = ({
   cardImageSrc,
@@ -12,7 +12,7 @@ export const CardsItemTwo: React.FC<CardItemProps> = ({
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
       <Link href="/" className="block px-4 pt-4">
-        <Image width={432} height={238} src={cardImageSrc || ""} alt="Cards" />
+        <Image width={432} height={238} src={cardImageSrc || ''} alt="Cards" />
       </Link>
 
       <div className="p-6">

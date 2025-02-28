@@ -1,5 +1,5 @@
-import type { FC } from "react";
-import { useState } from "react";
+import type { FC } from 'react';
+import { useState } from 'react';
 
 export const CheckboxTwo: FC = () => {
   const [isChecked, setIsChecked] = useState<boolean>(false);
@@ -21,10 +21,10 @@ export const CheckboxTwo: FC = () => {
           />
           <div
             className={`mr-4 flex size-5 items-center justify-center rounded border ${
-              isChecked && "border-primary bg-gray dark:bg-transparent"
+              isChecked && 'border-primary bg-gray dark:bg-transparent'
             }`}
           >
-            <span className={`opacity-0 ${isChecked && "!opacity-100"}`}>
+            <span className={`opacity-0 ${isChecked && '!opacity-100'}`}>
               <svg
                 width="11"
                 height="8"

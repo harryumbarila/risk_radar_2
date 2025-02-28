@@ -1,8 +1,8 @@
-import Image from "next/image";
-import type { FC } from "react";
-import { useEffect, useRef, useState } from "react";
+import Image from 'next/image';
+import type { FC } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import { TaskPopup } from "./TaskPopup";
+import { TaskPopup } from './TaskPopup';
 
 export const TaskHeader: FC = () => {
   const [popupOpen, setPopupOpen] = useState(false);
@@ -23,8 +23,8 @@ export const TaskHeader: FC = () => {
       }
       setPopupOpen(false);
     };
-    document.addEventListener("click", clickHandler);
-    return () => document.removeEventListener("click", clickHandler);
+    document.addEventListener('click', clickHandler);
+    return () => document.removeEventListener('click', clickHandler);
   });
 
   // close if the esc key is pressed
@@ -33,8 +33,8 @@ export const TaskHeader: FC = () => {
       if (!popupOpen || keyCode !== 27) return;
       setPopupOpen(false);
     };
-    document.addEventListener("keydown", keyHandler);
-    return () => document.removeEventListener("keydown", keyHandler);
+    document.addEventListener('keydown', keyHandler);
+    return () => document.removeEventListener('keydown', keyHandler);
   });
 
   return (

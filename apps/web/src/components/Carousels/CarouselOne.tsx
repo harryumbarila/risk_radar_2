@@ -1,10 +1,10 @@
-import "swiper/css";
-import "swiper/css/navigation";
+import 'swiper/css';
+import 'swiper/css/navigation';
 
-import Image from "next/image";
-import React from "react";
-import { Navigation } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
+import Image from 'next/image';
+import React from 'react';
+import { Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
 export const CarouselOne: React.FC = () => {
   return (
@@ -20,8 +20,8 @@ export const CarouselOne: React.FC = () => {
           className="carouselOne"
           modules={[Navigation]}
           navigation={{
-            nextEl: ".swiper-button-next",
-            prevEl: ".swiper-button-prev",
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
           }}
         >
           <SwiperSlide>

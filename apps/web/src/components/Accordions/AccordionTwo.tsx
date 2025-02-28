@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
-import type { FAQ } from "@/types/faq";
+import type { FAQ } from '@/types/faq';
 
-import { AccordionItemTwo } from "./AccordionItemTwo";
+import { AccordionItemTwo } from './AccordionItemTwo';
 
 const text = `There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything.`;
 

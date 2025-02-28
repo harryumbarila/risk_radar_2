@@ -1,8 +1,8 @@
-import type { ApexOptions } from "apexcharts";
-import React, { useState } from "react";
-import ReactApexChart from "react-apexcharts";
+import type { ApexOptions } from 'apexcharts';
+import React, { useState } from 'react';
+import ReactApexChart from 'react-apexcharts';
 
-import { DropdownDefault } from "@/components/Dropdowns/DropdownDefault";
+import { DropdownDefault } from '@/components/Dropdowns/DropdownDefault';
 
 type ChartSixState = {
   series: {
@@ -15,12 +15,12 @@ export const ChartSix: React.FC = () => {
   const [state, setState] = useState<ChartSixState>({
     series: [
       {
-        name: "Product One",
+        name: 'Product One',
         data: [168, 285, 131, 248, 187, 295, 191, 269, 201, 185, 252, 151],
       },
 
       {
-        name: "Product Two",
+        name: 'Product Two',
         data: [268, 185, 251, 198, 287, 205, 281, 199, 259, 185, 150, 111],
       },
     ],
@@ -38,14 +38,14 @@ export const ChartSix: React.FC = () => {
   const options: ApexOptions = {
     legend: {
       show: false,
-      position: "top",
-      horizontalAlign: "left",
+      position: 'top',
+      horizontalAlign: 'left',
     },
-    colors: ["#13C296", "#3C50E0"],
+    colors: ['#13C296', '#3C50E0'],
     chart: {
-      fontFamily: "Satoshi, sans-serif",
+      fontFamily: 'Satoshi, sans-serif',
       height: 200,
-      type: "area",
+      type: 'area',
       toolbar: {
         show: false,
       },
@@ -77,7 +77,7 @@ export const ChartSix: React.FC = () => {
     ],
     stroke: {
       width: [2, 2],
-      curve: "smooth",
+      curve: 'smooth',
     },
 
     markers: {
@@ -104,20 +104,20 @@ export const ChartSix: React.FC = () => {
       enabled: false,
     },
     xaxis: {
-      type: "category",
+      type: 'category',
       categories: [
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
       ],
       axisBorder: {
         show: false,
@@ -129,7 +129,7 @@ export const ChartSix: React.FC = () => {
     yaxis: {
       title: {
         style: {
-          fontSize: "0px",
+          fontSize: '0px',
         },
       },
     },

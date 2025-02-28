@@ -1,6 +1,6 @@
-import Image from "next/image";
-import Link from "next/link";
-import React from "react";
+import Image from 'next/image';
+import Link from 'next/link';
+import React from 'react';
 
 type Product = {
   link: string;
@@ -14,11 +14,11 @@ type Product = {
 
 const productList: Product[] = [
   {
-    link: "/",
-    image: "/images/product/product-thumb.png",
-    name: "Mist Black Triblend",
-    color: "White",
-    size: "Medium",
+    link: '/',
+    image: '/images/product/product-thumb.png',
+    name: 'Mist Black Triblend',
+    color: 'White',
+    size: 'Medium',
     quantity: 1,
     price: 120.0,
   },
@@ -75,8 +75,8 @@ export const InvoiceOne: React.FC = () => {
                 width={80}
                 height={80}
                 style={{
-                  width: "auto",
-                  height: "auto",
+                  width: 'auto',
+                  height: 'auto',
                 }}
                 alt="product"
               />

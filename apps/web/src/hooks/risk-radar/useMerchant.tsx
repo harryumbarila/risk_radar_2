@@ -1,8 +1,8 @@
-import useSWR from "swr";
+import useSWR from 'swr';
 
-import type { MerchantResponseDto } from "@/shared/response/legacy-dashboard-proxy";
+import type { MerchantResponseDto } from '@/shared/response/legacy-dashboard-proxy';
 
-import { riskRadarApi } from "./riskRadarApi";
+import { riskRadarApi } from './riskRadarApi';
 
 type UseMerchantReturnType = {
   data: MerchantResponseDto | undefined;
@@ -17,7 +17,7 @@ export const useMerchant = (mid: string): UseMerchantReturnType => {
     {
       dedupingInterval: 100,
       revalidateOnFocus: false,
-    },
+    }
   );
 
   return { data, error, isLoading };

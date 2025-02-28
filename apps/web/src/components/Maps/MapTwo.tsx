@@ -1,43 +1,43 @@
-"use client";
+'use client';
 
-import "jsvectormap/dist/jsvectormap.css";
-import "jsvectormap/dist/maps/world";
+import 'jsvectormap/dist/jsvectormap.css';
+import 'jsvectormap/dist/maps/world';
 
-import Image from "next/image";
-import React, { useEffect } from "react";
+import Image from 'next/image';
+import React, { useEffect } from 'react';
 
-import type { Country } from "@/types/country";
+import type { Country } from '@/types/country';
 
 const countryData: Country[] = [
   {
-    flag: "/images/country/country-01.svg",
+    flag: '/images/country/country-01.svg',
     percentage: 35,
-    name: "United States",
+    name: 'United States',
   },
   {
-    flag: "/images/country/country-02.svg",
+    flag: '/images/country/country-02.svg',
     percentage: 26,
-    name: "Canada",
+    name: 'Canada',
   },
   {
-    flag: "/images/country/country-03.svg",
+    flag: '/images/country/country-03.svg',
     percentage: 18,
-    name: "France",
+    name: 'France',
   },
   {
-    flag: "/images/country/country-04.svg",
+    flag: '/images/country/country-04.svg',
     percentage: 14,
-    name: "Italy",
+    name: 'Italy',
   },
   {
-    flag: "/images/country/country-05.svg",
+    flag: '/images/country/country-05.svg',
     percentage: 10,
-    name: "Australia",
+    name: 'Australia',
   },
   {
-    flag: "/images/country/country-06.svg",
+    flag: '/images/country/country-06.svg',
     percentage: 7,
-    name: "India",
+    name: 'India',
   },
 ];
 
@@ -68,9 +68,9 @@ export const MapTwo: React.FC = () => {
 
     return () => {
       // mapTwo.destroy();
-      const map = document.getElementById("mapTwo");
+      const map = document.getElementById('mapTwo');
       if (map) {
-        map.innerHTML = "";
+        map.innerHTML = '';
       }
     };
   }, []);

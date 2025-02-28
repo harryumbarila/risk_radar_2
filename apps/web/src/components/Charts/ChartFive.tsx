@@ -1,6 +1,6 @@
-import type { ApexOptions } from "apexcharts";
-import React, { useState } from "react";
-import ReactApexChart from "react-apexcharts";
+import type { ApexOptions } from 'apexcharts';
+import React, { useState } from 'react';
+import ReactApexChart from 'react-apexcharts';
 
 type ChartFiveState = {
   series: { data: number[] }[];
@@ -25,10 +25,10 @@ export const ChartFive: React.FC = () => {
   updateState();
 
   const options: ApexOptions = {
-    colors: ["#3C50E0"],
+    colors: ['#3C50E0'],
     chart: {
-      fontFamily: "Satoshi, sans-serif",
-      type: "bar",
+      fontFamily: 'Satoshi, sans-serif',
+      type: 'bar',
       height: 350,
       toolbar: {
         show: false,
@@ -37,7 +37,7 @@ export const ChartFive: React.FC = () => {
     plotOptions: {
       bar: {
         horizontal: false,
-        columnWidth: "25%",
+        columnWidth: '25%',
         // endingShape: 'rounded',
         borderRadius: 0,
       },
@@ -48,10 +48,10 @@ export const ChartFive: React.FC = () => {
     stroke: {
       show: true,
       width: 4,
-      colors: ["transparent"],
+      colors: ['transparent'],
     },
     xaxis: {
-      categories: ["M", "T", "W", "T", "F", "S", "S"],
+      categories: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
       axisBorder: {
         show: false,
       },
@@ -61,9 +61,9 @@ export const ChartFive: React.FC = () => {
     },
     legend: {
       show: true,
-      position: "top",
-      horizontalAlign: "left",
-      fontFamily: "Satoshi",
+      position: 'top',
+      horizontalAlign: 'left',
+      fontFamily: 'Satoshi',
     },
     grid: {
       strokeDashArray: 7,

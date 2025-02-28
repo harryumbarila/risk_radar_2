@@ -1,7 +1,7 @@
-import Link from "next/link";
-import React from "react";
+import Link from 'next/link';
+import React from 'react';
 
-import type { CardItemProps } from "@/types/cards";
+import type { CardItemProps } from '@/types/cards';
 
 export const CardsItemThree: React.FC<CardItemProps> = ({
   cardTitle,

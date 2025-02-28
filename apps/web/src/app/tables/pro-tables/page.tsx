@@ -1,15 +1,15 @@
-import type { Metadata } from "next";
-import type { FC } from "react";
+import type { Metadata } from 'next';
+import type { FC } from 'react';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
-import { TableFive } from "@/components/Tables/TableFive";
-import { TableSix } from "@/components/Tables/TableSix";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
+import { TableFive } from '@/components/Tables/TableFive';
+import { TableSix } from '@/components/Tables/TableSix';
 
 export const metadata: Metadata = {
-  title: "Next.js Pro Tables | TailAdmin - Next.js Dashboard Template",
+  title: 'Next.js Pro Tables | TailAdmin - Next.js Dashboard Template',
   description:
-    "This is Next.js Pro Tables page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    'This is Next.js Pro Tables page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
 };
 
 const ProTablesPage: FC = () => {

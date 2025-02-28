@@ -1,5 +1,5 @@
-import type { FC } from "react";
-import { useState } from "react";
+import type { FC } from 'react';
+import { useState } from 'react';
 
 export const SwitcherOne: FC = () => {
   const [enabled, setEnabled] = useState<boolean>(false);
@@ -23,7 +23,7 @@ export const SwitcherOne: FC = () => {
           <div className="block h-8 w-14 rounded-full bg-meta-9 dark:bg-[#5A616B]" />
           <div
             className={`absolute left-1 top-1 size-6 rounded-full bg-white transition ${
-              enabled && "!right-1 !translate-x-full !bg-primary dark:!bg-white"
+              enabled && '!right-1 !translate-x-full !bg-primary dark:!bg-white'
             }`}
           />
         </div>

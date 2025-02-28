@@ -1,12 +1,12 @@
 export const Drag = (): void => {
-  const draggables = document.querySelectorAll<HTMLElement>(".task");
-  const droppables = document.querySelectorAll<HTMLElement>(".swim-lane");
+  const draggables = document.querySelectorAll<HTMLElement>('.task');
+  const droppables = document.querySelectorAll<HTMLElement>('.swim-lane');
 
   const insertAboveTask = (
     zone: HTMLElement,
-    mouseY: number,
+    mouseY: number
   ): HTMLElement | null => {
-    const els = zone.querySelectorAll<HTMLElement>(".task:not(.is-dragging)");
+    const els = zone.querySelectorAll<HTMLElement>('.task:not(.is-dragging)');
 
     let closestTask: HTMLElement | null = null;
     let closestOffset = Number.NEGATIVE_INFINITY;
@@ -26,20 +26,20 @@ export const Drag = (): void => {
   };
 
   draggables.forEach((task) => {
-    task.addEventListener("dragstart", () => {
-      task.classList.add("is-dragging");
+    task.addEventListener('dragstart', () => {
+      task.classList.add('is-dragging');
     });
-    task.addEventListener("dragend", () => {
-      task.classList.remove("is-dragging");
+    task.addEventListener('dragend', () => {
+      task.classList.remove('is-dragging');
     });
   });
 
   droppables.forEach((zone) => {
-    zone.addEventListener("dragover", (e) => {
+    zone.addEventListener('dragover', (e) => {
       e.preventDefault();
 
       const bottomTask = insertAboveTask(zone, e.clientY);
-      const curTask = document.querySelector(".is-dragging") as HTMLElement;
+      const curTask = document.querySelector('.is-dragging') as HTMLElement;
 
       if (!bottomTask) {
         zone.appendChild(curTask);

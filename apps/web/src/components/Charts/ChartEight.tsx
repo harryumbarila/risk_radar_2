@@ -1,6 +1,6 @@
-import type { ApexOptions } from "apexcharts";
-import React, { useState } from "react";
-import ReactApexChart from "react-apexcharts";
+import type { ApexOptions } from 'apexcharts';
+import React, { useState } from 'react';
+import ReactApexChart from 'react-apexcharts';
 
 type ChartEightState = {
   series: number[];
@@ -22,20 +22,20 @@ export const ChartEight: React.FC = () => {
 
   const options: ApexOptions = {
     chart: {
-      type: "donut",
+      type: 'donut',
     },
-    colors: ["#0FADCF", "#80CAEE", "#3C50E0"],
-    labels: ["Desktop", "Tablet", "Mobile"],
+    colors: ['#0FADCF', '#80CAEE', '#3C50E0'],
+    labels: ['Desktop', 'Tablet', 'Mobile'],
     legend: {
       show: false,
-      position: "bottom",
+      position: 'bottom',
     },
 
     plotOptions: {
       pie: {
         donut: {
-          size: "75%",
-          background: "transparent",
+          size: '75%',
+          background: 'transparent',
         },
       },
     },

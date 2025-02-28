@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import React from "react";
+import React from 'react';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { ChartTen } from "@/components/Charts/ChartTen";
-import { DownloadList } from "@/components/DownloadList";
-import { FileDetailsList } from "@/components/FileDetailsList";
-import { StorageChart } from "@/components/Storage/StorageChart";
-import { StorageList } from "@/components/Storage/StorageList";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { ChartTen } from '@/components/Charts/ChartTen';
+import { DownloadList } from '@/components/DownloadList';
+import { FileDetailsList } from '@/components/FileDetailsList';
+import { StorageChart } from '@/components/Storage/StorageChart';
+import { StorageList } from '@/components/Storage/StorageList';
 
 export const FileManager: React.FC = () => {
   return (

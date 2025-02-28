@@ -1,15 +1,15 @@
-import React from "react";
+import React from 'react';
 
 type ListItem = {
   text: string;
 };
 
 const listItems: ListItem[] = [
-  { text: "Lorem ipsum dolor sit amet" },
-  { text: "It is a long established fact reader" },
-  { text: "The point of using Lorem Ipsum" },
-  { text: "There are many variations of passages" },
-  { text: "If you are going to use a of Lorem" },
+  { text: 'Lorem ipsum dolor sit amet' },
+  { text: 'It is a long established fact reader' },
+  { text: 'The point of using Lorem Ipsum' },
+  { text: 'There are many variations of passages' },
+  { text: 'If you are going to use a of Lorem' },
 ];
 
 export const ListTwo: React.FC = () => {

@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useUser } from "@auth0/nextjs-auth0/client";
-import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import type { FC } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useUser } from '@auth0/nextjs-auth0/client';
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import type { FC } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import { roles } from "@/types/roles";
+import { roles } from '@/types/roles';
 
-import { SidebarLinkGroup } from "./SidebarLinkGroup";
+import { SidebarLinkGroup } from './SidebarLinkGroup';
 
 type SidebarProps = {
   sidebarOpen: boolean;
@@ -24,10 +24,10 @@ export const Sidebar: FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
   const trigger = useRef<HTMLButtonElement>(null);
   const sidebar = useRef<HTMLDivElement>(null);
 
-  const storedSidebarExpanded = "true";
+  const storedSidebarExpanded = 'true';
 
   const [sidebarExpanded, setSidebarExpanded] = useState(
-    storedSidebarExpanded === null ? false : storedSidebarExpanded === "true",
+    storedSidebarExpanded === null ? false : storedSidebarExpanded === 'true'
   );
 
   // close on click outside
@@ -43,8 +43,8 @@ export const Sidebar: FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
       }
       setSidebarOpen(false);
     };
-    document.addEventListener("click", clickHandler);
-    return (): void => document.removeEventListener("click", clickHandler);
+    document.addEventListener('click', clickHandler);
+    return (): void => document.removeEventListener('click', clickHandler);
   });
 
   // close if the esc key is pressed
@@ -53,16 +53,16 @@ export const Sidebar: FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
       if (!sidebarOpen || keyCode !== 27) return;
       setSidebarOpen(false);
     };
-    document.addEventListener("keydown", keyHandler);
-    return (): void => document.removeEventListener("keydown", keyHandler);
+    document.addEventListener('keydown', keyHandler);
+    return (): void => document.removeEventListener('keydown', keyHandler);
   });
 
   useEffect(() => {
-    localStorage.setItem("sidebar-expanded", sidebarExpanded.toString());
+    localStorage.setItem('sidebar-expanded', sidebarExpanded.toString());
     if (sidebarExpanded) {
-      document.querySelector("body")?.classList.add("sidebar-expanded");
+      document.querySelector('body')?.classList.add('sidebar-expanded');
     } else {
-      document.querySelector("body")?.classList.remove("sidebar-expanded");
+      document.querySelector('body')?.classList.remove('sidebar-expanded');
     }
   }, [sidebarExpanded]);
 
@@ -70,7 +70,7 @@ export const Sidebar: FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
     <aside
       ref={sidebar}
       className={`absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hidden bg-black duration-300 ease-linear dark:bg-boxdark lg:static lg:translate-x-0 ${
-        sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}
     >
       {/* <!-- SIDEBAR HEADER --> */}
@@ -124,7 +124,7 @@ export const Sidebar: FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
               {/* <!-- Menu Item Dashboard --> */}
               <SidebarLinkGroup
                 activeCondition={
-                  pathname === "/" || pathname.includes("attribution-url")
+                  pathname === '/' || pathname.includes('attribution-url')
                 }
               >
                 {(handleClick, open) => {
@@ -133,9 +133,9 @@ export const Sidebar: FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
                       <Link
                         href="/"
                         className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                          (pathname === "/" ||
-                            pathname.includes("dashboard")) &&
-                          "bg-graydark dark:bg-meta-4"
+                          (pathname === '/' ||
+                            pathname.includes('dashboard')) &&
+                          'bg-graydark dark:bg-meta-4'
                         }`}
                         onClick={(e) => {
                           e.preventDefault();
@@ -174,7 +174,7 @@ export const Sidebar: FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
                         Dashboard
                         <svg
                           className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
-                            open && "rotate-180"
+                            open && 'rotate-180'
                           }`}
                           width="20"
                           height="20"
@@ -193,7 +193,7 @@ export const Sidebar: FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
                       {/* <!-- Dropdown Menu Start --> */}
                       <div
                         className={`translate overflow-hidden${
-                          !open && "hidden"
+                          !open && 'hidden'
                         }`}
                       >
                         <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
@@ -202,7 +202,7 @@ export const Sidebar: FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
                               <Link
                                 href="/"
                                 className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                  pathname === "/" && "text-white"
+                                  pathname === '/' && 'text-white'
                                 }`}
                               >
                                 Risk Radar
@@ -213,7 +213,7 @@ export const Sidebar: FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
                             <Link
                               href="/attribution-url"
                               className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                pathname === "/attribution-url" && "text-white"
+                                pathname === '/attribution-url' && 'text-white'
                               }`}
                             >
                               Attribution URL

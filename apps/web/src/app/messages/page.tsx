@@ -1,13 +1,13 @@
-import type { Metadata } from "next";
-import type { FC } from "react";
+import type { Metadata } from 'next';
+import type { FC } from 'react';
 
-import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
-import { Messages } from "@/components/Messages";
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
+import { Messages } from '@/components/Messages';
 
 export const metadata: Metadata = {
-  title: "Next.js Messages | TailAdmin - Next.js Dashboard Template",
+  title: 'Next.js Messages | TailAdmin - Next.js Dashboard Template',
   description:
-    "This is Next.js Messages page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    'This is Next.js Messages page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
   // other metadata
 };
 

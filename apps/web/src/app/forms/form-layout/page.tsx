@@ -1,15 +1,15 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import type { FC } from "react";
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import type { FC } from 'react';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
-import { SelectGroupOne } from "@/components/SelectGroup/SelectGroupOne";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
+import { SelectGroupOne } from '@/components/SelectGroup/SelectGroupOne';
 
 export const metadata: Metadata = {
-  title: "Next.js Form Layout | TailAdmin - Next.js Dashboard Template",
+  title: 'Next.js Form Layout | TailAdmin - Next.js Dashboard Template',
   description:
-    "This is Next.js Form Layout page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    'This is Next.js Form Layout page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
 };
 
 const FormLayout: FC = () => {

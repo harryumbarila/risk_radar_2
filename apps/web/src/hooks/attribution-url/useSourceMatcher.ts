@@ -1,13 +1,13 @@
-import type { IrisLeadSourcesResponseDto } from "@/shared/response/iris-proxy";
+import type { IrisLeadSourcesResponseDto } from '@/shared/response/iris-proxy';
 
 type FindMatchingSourceNameForReferralPartnerReturnType =
-  | IrisLeadSourcesResponseDto["data"][number]
+  | IrisLeadSourcesResponseDto['data'][number]
   | undefined;
 
 type UseSourceMatcherReturnType = {
   findMatchingSourceNameForReferralPartner: (
     partnerName: string,
-    sources?: IrisLeadSourcesResponseDto["data"],
+    sources?: IrisLeadSourcesResponseDto['data']
   ) => FindMatchingSourceNameForReferralPartnerReturnType;
 };
 
@@ -17,13 +17,13 @@ type UseSourceMatcherReturnType = {
 export const useSourceMatcher = (): UseSourceMatcherReturnType => {
   const findMatchingSourceNameForReferralPartner = (
     partnerName: string,
-    sources: IrisLeadSourcesResponseDto["data"] = [],
+    sources: IrisLeadSourcesResponseDto['data'] = []
   ): FindMatchingSourceNameForReferralPartnerReturnType => {
     return sources.find((source) => {
       const sourceName = source.name.toLowerCase();
       const referralPartnerName = partnerName.toLowerCase();
       return (
-        sourceName.includes("referral partner") &&
+        sourceName.includes('referral partner') &&
         sourceName.includes(referralPartnerName)
       );
     });

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import type { FC, ReactNode } from "react";
-import { useState } from "react";
+import type { FC, ReactNode } from 'react';
+import { useState } from 'react';
 
 type SidebarLinkGroupProps = {
   children: (handleClick: () => void, open: boolean) => ReactNode;

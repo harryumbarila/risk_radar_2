@@ -1,34 +1,34 @@
-"use client";
+'use client';
 
-import "flatpickr/dist/flatpickr.min.css";
+import 'flatpickr/dist/flatpickr.min.css';
 
-import flatpickr from "flatpickr";
+import flatpickr from 'flatpickr';
 // without this the component renders on server and throws an error
-import dynamic from "next/dynamic";
-import React, { useEffect } from "react";
+import dynamic from 'next/dynamic';
+import React, { useEffect } from 'react';
 
-import { ChartFour } from "@/components/Charts/ChartFour";
-import { ChartThree } from "@/components/Charts/ChartThree";
-import { DataStats } from "@/components/DataStats/DataStats";
-import { TableTwo } from "@/components/Tables/TableTwo";
-import { TopChannels } from "@/components/TopChannels";
-import { TopContent } from "@/components/TopContent";
+import { ChartFour } from '@/components/Charts/ChartFour';
+import { ChartThree } from '@/components/Charts/ChartThree';
+import { DataStats } from '@/components/DataStats/DataStats';
+import { TableTwo } from '@/components/Tables/TableTwo';
+import { TopChannels } from '@/components/TopChannels';
+import { TopContent } from '@/components/TopContent';
 
 const MapTwo = dynamic(
-  () => import("@/components/Maps/MapTwo").then((m) => m.MapTwo),
+  () => import('@/components/Maps/MapTwo').then((m) => m.MapTwo),
   {
     ssr: false,
-  },
+  }
 );
 
 export const Analytics: React.FC = () => {
   useEffect(() => {
     // Init flatpickr
-    const fp = flatpickr(".datepicker", {
-      mode: "range",
+    const fp = flatpickr('.datepicker', {
+      mode: 'range',
       static: true,
-      monthSelectorType: "static",
-      dateFormat: "M j, Y",
+      monthSelectorType: 'static',
+      dateFormat: 'M j, Y',
       defaultDate: [new Date().setDate(new Date().getDate() - 6), new Date()],
       prevArrow:
         '<svg className="fill-current" width="7" height="11" viewBox="0 0 7 11"><path d="M5.4 10.8l1.4-1.4-4-4 4-4L5.4 0 0 5.4z" /></svg>',
@@ -36,14 +36,14 @@ export const Analytics: React.FC = () => {
         '<svg className="fill-current" width="7" height="11" viewBox="0 0 7 11"><path d="M1.4 10.8L0 9.4l4-4-4-4L1.4 0l5.4 5.4z" /></svg>',
       onReady: (_: Date[], dateStr: string, instance: flatpickr.Instance) => {
         const { element } = instance;
-        (element as HTMLInputElement).value = dateStr.replace("to", "-");
-        const customClass = instance.element.getAttribute("data-class");
-        instance.calendarContainer.classList.add(customClass ?? "");
+        (element as HTMLInputElement).value = dateStr.replace('to', '-');
+        const customClass = instance.element.getAttribute('data-class');
+        instance.calendarContainer.classList.add(customClass ?? '');
         // `selectedDates`;
       },
       onChange: (_: Date[], dateStr: string, instance: flatpickr.Instance) => {
         const { element } = instance;
-        (element as HTMLInputElement).value = dateStr.replace("to", "-");
+        (element as HTMLInputElement).value = dateStr.replace('to', '-');
         // selectedDates;
       },
     });

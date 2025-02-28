@@ -1,8 +1,8 @@
-import type { UserProfile } from "@auth0/nextjs-auth0/client";
+import type { UserProfile } from '@auth0/nextjs-auth0/client';
 
-export const ROLE_SALES = "Sales";
+export const ROLE_SALES = 'Sales';
 
-const CUSTOM_ROLES_CLAIM = "https://taluspay.com/roles";
+const CUSTOM_ROLES_CLAIM = 'https://taluspay.com/roles';
 
 type RolesReturnType = {
   roles: string[];

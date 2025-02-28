@@ -1,12 +1,12 @@
-import "swiper/css";
-import "swiper/css/navigation";
+import 'swiper/css';
+import 'swiper/css/navigation';
 
-import Image from "next/image";
-import React from "react";
-import { Navigation } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
+import Image from 'next/image';
+import React from 'react';
+import { Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
-import { ChartEleven } from "@/components/Charts/ChartEleven";
+import { ChartEleven } from '@/components/Charts/ChartEleven';
 
 type Stats = {
   image: string;
@@ -17,38 +17,38 @@ type Stats = {
 
 const statsItems: Stats[] = [
   {
-    image: "/images/brand/brand-07.svg",
-    name: "Apple",
+    image: '/images/brand/brand-07.svg',
+    name: 'Apple',
     share: 410.5,
     returnRate: -1.1,
   },
   {
-    image: "/images/brand/brand-08.svg",
-    name: "Meta",
+    image: '/images/brand/brand-08.svg',
+    name: 'Meta',
     share: 157.36,
     returnRate: -0.1,
   },
   {
-    image: "/images/brand/brand-09.svg",
-    name: "Google",
+    image: '/images/brand/brand-09.svg',
+    name: 'Google',
     share: 743.76,
     returnRate: +0.95,
   },
   {
-    image: "/images/brand/brand-10.svg",
-    name: "Tesla",
+    image: '/images/brand/brand-10.svg',
+    name: 'Tesla',
     share: 234.09,
     returnRate: -1.1,
   },
   {
-    image: "/images/brand/brand-11.svg",
-    name: "Microsoft",
+    image: '/images/brand/brand-11.svg',
+    name: 'Microsoft',
     share: 410.5,
     returnRate: -2.9,
   },
   {
-    image: "/images/brand/brand-12.svg",
-    name: "Amazon",
+    image: '/images/brand/brand-12.svg',
+    name: 'Amazon',
     share: 743.76,
     returnRate: +0.65,
   },
@@ -61,8 +61,8 @@ export const DataStatsFour: React.FC = () => {
         className="dataStatsSlider swiper !-mx-px"
         modules={[Navigation]}
         navigation={{
-          nextEl: ".swiper-button-next",
-          prevEl: ".swiper-button-prev",
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
         }}
         slidesPerView={1}
         breakpoints={{
@@ -91,8 +91,8 @@ export const DataStatsFour: React.FC = () => {
                     width={42}
                     height={42}
                     style={{
-                      width: "auto",
-                      height: "auto",
+                      width: 'auto',
+                      height: 'auto',
                     }}
                   />
                 </div>
@@ -117,7 +117,7 @@ export const DataStatsFour: React.FC = () => {
 
                 <p
                   className={`flex items-center gap-1 font-medium ${
-                    item.returnRate >= 0 ? "text-meta-3" : "text-red"
+                    item.returnRate >= 0 ? 'text-meta-3' : 'text-red'
                   }`}
                 >
                   {item.returnRate}%

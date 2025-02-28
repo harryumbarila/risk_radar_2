@@ -1,15 +1,15 @@
-import type { Metadata } from "next";
-import React from "react";
+import type { Metadata } from 'next';
+import React from 'react';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
-import { TeamOne } from "@/components/Teams/TeamOne";
-import { TeamTwo } from "@/components/Teams/TeamTwo";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
+import { TeamOne } from '@/components/Teams/TeamOne';
+import { TeamTwo } from '@/components/Teams/TeamTwo';
 
 export const metadata: Metadata = {
-  title: "Next.js Teams | TailAdmin - Next.js Dashboard Template",
+  title: 'Next.js Teams | TailAdmin - Next.js Dashboard Template',
   description:
-    "This is Next.js Teams page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    'This is Next.js Teams page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
 };
 
 const Team: React.FC = () => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 
 export const ModalTwo: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -19,8 +19,8 @@ export const ModalTwo: React.FC = () => {
       }
       setModalOpen(false);
     };
-    document.addEventListener("click", clickHandler);
-    return () => document.removeEventListener("click", clickHandler);
+    document.addEventListener('click', clickHandler);
+    return () => document.removeEventListener('click', clickHandler);
   });
 
   // close if the esc key is pressed
@@ -29,8 +29,8 @@ export const ModalTwo: React.FC = () => {
       if (!modalOpen || keyCode !== 27) return;
       setModalOpen(false);
     };
-    document.addEventListener("keydown", keyHandler);
-    return () => document.removeEventListener("keydown", keyHandler);
+    document.addEventListener('keydown', keyHandler);
+    return () => document.removeEventListener('keydown', keyHandler);
   });
 
   return (
@@ -45,7 +45,7 @@ export const ModalTwo: React.FC = () => {
       </button>
       <div
         className={`fixed left-0 top-0 z-999999 flex size-full min-h-screen items-center justify-center bg-black/90 px-4 py-5 ${
-          modalOpen ? "block" : "hidden"
+          modalOpen ? 'block' : 'hidden'
         }`}
       >
         <div

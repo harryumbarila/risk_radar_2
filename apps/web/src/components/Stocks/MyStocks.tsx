@@ -1,5 +1,5 @@
-import Image from "next/image";
-import React from "react";
+import Image from 'next/image';
+import React from 'react';
 
 type Stocks = {
   image: string;
@@ -11,36 +11,36 @@ type Stocks = {
 
 const stocksItems: Stocks[] = [
   {
-    image: "/images/brand/brand-07.svg",
-    name: "Apple Inc",
+    image: '/images/brand/brand-07.svg',
+    name: 'Apple Inc',
     share: 16,
     price: 410.5,
     returnRate: +0.95,
   },
   {
-    image: "/images/brand/brand-01.svg",
-    name: "Google",
+    image: '/images/brand/brand-01.svg',
+    name: 'Google',
     share: 100,
     price: 410.5,
     returnRate: +0.95,
   },
   {
-    image: "/images/brand/brand-10.svg",
-    name: "Tesla",
+    image: '/images/brand/brand-10.svg',
+    name: 'Tesla',
     share: 20,
     price: 410.5,
     returnRate: +0.95,
   },
   {
-    image: "/images/brand/brand-13.svg",
-    name: "Twitter X",
+    image: '/images/brand/brand-13.svg',
+    name: 'Twitter X',
     share: 87,
     price: 410.5,
     returnRate: -0.95,
   },
   {
-    image: "/images/brand/brand-11.svg",
-    name: "Microsoft",
+    image: '/images/brand/brand-11.svg',
+    name: 'Microsoft',
     share: 37,
     price: 410.5,
     returnRate: +0.95,
@@ -99,8 +99,8 @@ export const MyStocks: React.FC = () => {
                   width={40}
                   height={40}
                   style={{
-                    width: "auto",
-                    height: "auto",
+                    width: 'auto',
+                    height: 'auto',
                   }}
                 />
               </div>
@@ -119,7 +119,7 @@ export const MyStocks: React.FC = () => {
               </p>
               <p
                 className={`flex items-center justify-end gap-1 text-xs font-medium ${
-                  item.returnRate >= 0 ? "text-meta-3" : "text-red"
+                  item.returnRate >= 0 ? 'text-meta-3' : 'text-red'
                 }`}
               >
                 {item.returnRate}%

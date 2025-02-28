@@ -1,13 +1,13 @@
-import type { Metadata } from "next";
-import type { FC } from "react";
+import type { Metadata } from 'next';
+import type { FC } from 'react';
 
-import { Accordion } from "@/components/Accordions";
-import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
+import { Accordion } from '@/components/Accordions';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
-  title: "Next.js Accordion | TailAdmin - Next.js Dashboard Template",
+  title: 'Next.js Accordion | TailAdmin - Next.js Dashboard Template',
   description:
-    "This is Next.js Accordion page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    'This is Next.js Accordion page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
   // other metadata
 };
 

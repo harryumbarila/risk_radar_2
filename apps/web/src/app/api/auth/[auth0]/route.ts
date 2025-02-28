@@ -1,6 +1,6 @@
-import { handleAuth } from "@auth0/nextjs-auth0";
+import { handleAuth } from '@auth0/nextjs-auth0';
 
-import { auth0Config } from "@/root/auth0-config";
+import { auth0Config } from '@/root/auth0-config';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error

@@ -1,7 +1,7 @@
-import Image from "next/image";
-import Link from "next/link";
-import type { FC } from "react";
-import { useEffect, useRef, useState } from "react";
+import Image from 'next/image';
+import Link from 'next/link';
+import type { FC } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export const DropdownMessage: FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -23,8 +23,8 @@ export const DropdownMessage: FC = () => {
       }
       setDropdownOpen(false);
     };
-    document.addEventListener("click", clickHandler);
-    return (): void => document.removeEventListener("click", clickHandler);
+    document.addEventListener('click', clickHandler);
+    return (): void => document.removeEventListener('click', clickHandler);
   });
 
   // close if the esc key is pressed
@@ -33,8 +33,8 @@ export const DropdownMessage: FC = () => {
       if (!dropdownOpen || keyCode !== 27) return;
       setDropdownOpen(false);
     };
-    document.addEventListener("keydown", keyHandler);
-    return (): void => document.removeEventListener("keydown", keyHandler);
+    document.addEventListener('keydown', keyHandler);
+    return (): void => document.removeEventListener('keydown', keyHandler);
   });
 
   return (
@@ -50,7 +50,7 @@ export const DropdownMessage: FC = () => {
       >
         <span
           className={`absolute -right-0.5 -top-0.5 z-1 size-2 rounded-full bg-meta-1 ${
-            notifying === false ? "hidden" : "inline"
+            notifying === false ? 'hidden' : 'inline'
           }`}
         >
           <span className="absolute -z-1 inline-flex size-full animate-ping rounded-full bg-meta-1 opacity-75" />
@@ -89,7 +89,7 @@ export const DropdownMessage: FC = () => {
         onFocus={() => setDropdownOpen(true)}
         onBlur={() => setDropdownOpen(false)}
         className={`absolute -right-16 mt-2.5 flex h-90 w-75 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark sm:right-0 sm:w-80 ${
-          dropdownOpen === true ? "block" : "hidden"
+          dropdownOpen === true ? 'block' : 'hidden'
         }`}
       >
         <div className="px-4.5 py-3">
@@ -109,8 +109,8 @@ export const DropdownMessage: FC = () => {
                   src="/images/user/user-02.png"
                   alt="User"
                   style={{
-                    width: "auto",
-                    height: "auto",
+                    width: 'auto',
+                    height: 'auto',
                   }}
                 />
               </div>
@@ -136,8 +136,8 @@ export const DropdownMessage: FC = () => {
                   src="/images/user/user-01.png"
                   alt="User"
                   style={{
-                    width: "auto",
-                    height: "auto",
+                    width: 'auto',
+                    height: 'auto',
                   }}
                 />
               </div>
@@ -163,8 +163,8 @@ export const DropdownMessage: FC = () => {
                   src="/images/user/user-03.png"
                   alt="User"
                   style={{
-                    width: "auto",
-                    height: "auto",
+                    width: 'auto',
+                    height: 'auto',
                   }}
                 />
               </div>
@@ -190,8 +190,8 @@ export const DropdownMessage: FC = () => {
                   src="/images/user/user-04.png"
                   alt="User"
                   style={{
-                    width: "auto",
-                    height: "auto",
+                    width: 'auto',
+                    height: 'auto',
                   }}
                 />
               </div>
@@ -217,8 +217,8 @@ export const DropdownMessage: FC = () => {
                   src="/images/user/user-02.png"
                   alt="User"
                   style={{
-                    width: "auto",
-                    height: "auto",
+                    width: 'auto',
+                    height: 'auto',
                   }}
                 />
               </div>

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import type { ApexOptions } from "apexcharts";
-import React, { useState } from "react";
-import ReactApexChart from "react-apexcharts";
+import type { ApexOptions } from 'apexcharts';
+import React, { useState } from 'react';
+import ReactApexChart from 'react-apexcharts';
 
 type ChartTwelveState = {
   series: {
@@ -15,7 +15,7 @@ export const ChartTwelve: React.FC = () => {
   const [state, setState] = useState<ChartTwelveState>({
     series: [
       {
-        name: "Total Investment",
+        name: 'Total Investment',
         data: [
           [1746153600000, 30.95],
           [1746240000000, 31.34],
@@ -262,12 +262,12 @@ export const ChartTwelve: React.FC = () => {
   updateState();
 
   const options: ApexOptions = {
-    colors: ["#3C50E0"],
+    colors: ['#3C50E0'],
     chart: {
-      fontFamily: "Satoshi, sans-serif",
+      fontFamily: 'Satoshi, sans-serif',
       height: 310,
-      id: "area-datetime",
-      type: "area",
+      id: 'area-datetime',
+      type: 'area',
       toolbar: {
         show: false,
       },
@@ -275,11 +275,11 @@ export const ChartTwelve: React.FC = () => {
 
     legend: {
       show: false,
-      position: "top",
-      horizontalAlign: "left",
+      position: 'top',
+      horizontalAlign: 'left',
     },
     stroke: {
-      curve: "straight",
+      curve: 'straight',
       width: [1, 1],
     },
 
@@ -297,7 +297,7 @@ export const ChartTwelve: React.FC = () => {
     // },
 
     xaxis: {
-      type: "datetime",
+      type: 'datetime',
       tickAmount: 10,
       axisBorder: {
         show: false,
@@ -309,7 +309,7 @@ export const ChartTwelve: React.FC = () => {
 
     tooltip: {
       x: {
-        format: "dd MMM yyyy",
+        format: 'dd MMM yyyy',
       },
     },
 

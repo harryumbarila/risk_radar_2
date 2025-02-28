@@ -1,10 +1,10 @@
-import noUiSlider from "nouislider";
-import type { FC } from "react";
-import { useEffect } from "react";
+import noUiSlider from 'nouislider';
+import type { FC } from 'react';
+import { useEffect } from 'react';
 
 export const RangeSliderTwo: FC = () => {
   useEffect(() => {
-    const sliderTwo = document.getElementById("rangeSliderTwo") as HTMLElement;
+    const sliderTwo = document.getElementById('rangeSliderTwo') as HTMLElement;
 
     noUiSlider.create(sliderTwo, {
       start: [20],

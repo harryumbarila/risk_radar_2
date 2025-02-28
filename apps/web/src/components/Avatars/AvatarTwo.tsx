@@ -1,5 +1,5 @@
-import Image from "next/image";
-import React from "react";
+import Image from 'next/image';
+import React from 'react';
 
 type Avatar = {
   image: string;
@@ -10,27 +10,27 @@ type Avatar = {
 
 const avatarItems: Avatar[] = [
   {
-    image: "/images/user/user-03.png",
-    classes: "max-w-6 h-6",
-    bulletClasses: "max-w-2 -right-px -top-px h-2 border",
+    image: '/images/user/user-03.png',
+    classes: 'max-w-6 h-6',
+    bulletClasses: 'max-w-2 -right-px -top-px h-2 border',
     size: 24,
   },
   {
-    image: "/images/user/user-03.png",
-    classes: "max-w-9.5 h-9.5",
-    bulletClasses: "max-w-3.5 -right-0.5 -top-0.5 h-3.5 border-2",
+    image: '/images/user/user-03.png',
+    classes: 'max-w-9.5 h-9.5',
+    bulletClasses: 'max-w-3.5 -right-0.5 -top-0.5 h-3.5 border-2',
     size: 38,
   },
   {
-    image: "/images/user/user-03.png",
-    classes: "max-w-13 h-13",
-    bulletClasses: "max-w-4.5 -right-0.5 -top-0.5 h-4.5 border-[2.7px]",
+    image: '/images/user/user-03.png',
+    classes: 'max-w-13 h-13',
+    bulletClasses: 'max-w-4.5 -right-0.5 -top-0.5 h-4.5 border-[2.7px]',
     size: 52,
   },
   {
-    image: "/images/user/user-03.png",
-    classes: "max-w-20 h-20",
-    bulletClasses: "max-w-5.5 right-0 top-0 h-5.5 border-[3px]",
+    image: '/images/user/user-03.png',
+    classes: 'max-w-20 h-20',
+    bulletClasses: 'max-w-5.5 right-0 top-0 h-5.5 border-[3px]',
     size: 80,
   },
 ];
@@ -47,8 +47,8 @@ export const AvatarTwo: React.FC = () => {
             width={item.size}
             height={item.size}
             style={{
-              width: "100%",
-              height: "auto",
+              width: '100%',
+              height: 'auto',
             }}
             src={item.image}
             alt="User"

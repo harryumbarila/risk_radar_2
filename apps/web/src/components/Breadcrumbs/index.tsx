@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { BreadcrumbOne } from "@/components/Breadcrumbs/BreadcrumbOne";
-import { BreadcrumbThree } from "@/components/Breadcrumbs/BreadcrumbThree";
-import { BreadcrumbTwo } from "@/components/Breadcrumbs/BreadcrumbTwo";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { BreadcrumbOne } from '@/components/Breadcrumbs/BreadcrumbOne';
+import { BreadcrumbThree } from '@/components/Breadcrumbs/BreadcrumbThree';
+import { BreadcrumbTwo } from '@/components/Breadcrumbs/BreadcrumbTwo';
 
 export const Breadcrumbs: React.FC = () => {
   return (

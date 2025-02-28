@@ -1,15 +1,15 @@
-import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
-import React from "react";
+import type { Metadata } from 'next';
+import Image from 'next/image';
+import Link from 'next/link';
+import React from 'react';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
-  title: "Next.js MailSuccess | TailAdmin - Next.js Dashboard Template",
+  title: 'Next.js MailSuccess | TailAdmin - Next.js Dashboard Template',
   description:
-    "This is Next.js MailSuccess page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    'This is Next.js MailSuccess page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
 };
 
 const MailSuccess: React.FC = () => {

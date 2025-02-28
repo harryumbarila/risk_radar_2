@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { PopoversOne } from "@/components/Popovers/PopoversOne";
-import { PopoversTwo } from "@/components/Popovers/PopoversTwo";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { PopoversOne } from '@/components/Popovers/PopoversOne';
+import { PopoversTwo } from '@/components/Popovers/PopoversTwo';
 
 export const Popovers: React.FC = () => {
   return (

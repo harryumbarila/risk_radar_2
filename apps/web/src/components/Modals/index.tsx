@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { ModalOne } from "@/components/Modals/ModalOne";
-import { ModalThree } from "@/components/Modals/ModalThree";
-import { ModalTwo } from "@/components/Modals/ModalTwo";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { ModalOne } from '@/components/Modals/ModalOne';
+import { ModalThree } from '@/components/Modals/ModalThree';
+import { ModalTwo } from '@/components/Modals/ModalTwo';
 
 export const Modals: React.FC = () => {
   return (

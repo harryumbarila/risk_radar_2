@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 type Option = {
   id: string;
@@ -8,13 +8,13 @@ type Option = {
 };
 
 const options: Option[] = [
-  { id: "Yes", label: "Yes" },
-  { id: "No", label: "No" },
-  { id: "Maybe", label: "Maybe" },
+  { id: 'Yes', label: 'Yes' },
+  { id: 'No', label: 'No' },
+  { id: 'Maybe', label: 'Maybe' },
 ];
 
 export const SelectOptionTwo: React.FC = () => {
-  const [isChecked, setIsChecked] = useState<string>("");
+  const [isChecked, setIsChecked] = useState<string>('');
 
   const handleRadioChange = (value: string): void => {
     setIsChecked(value);
@@ -42,12 +42,12 @@ export const SelectOptionTwo: React.FC = () => {
               />
               <span
                 className={`flex size-5 items-center justify-center rounded-full border ${
-                  isChecked === option.id ? "border-primary" : "border-body"
+                  isChecked === option.id ? 'border-primary' : 'border-body'
                 }`}
               >
                 <span
                   className={`size-2.5 rounded-full bg-primary ${
-                    isChecked === option.id ? "flex" : "hidden"
+                    isChecked === option.id ? 'flex' : 'hidden'
                   }`}
                 />
               </span>

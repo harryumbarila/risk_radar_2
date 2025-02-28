@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import Link from "next/link";
-import React from "react";
+import Image from 'next/image';
+import Link from 'next/link';
+import React from 'react';
 
-import { NoAuthLayout } from "@/components/Layouts/NoAuthLayout";
+import { NoAuthLayout } from '@/components/Layouts/NoAuthLayout';
 
 const SignIn: React.FC = () => {
   const handleClick = (event: React.MouseEvent<HTMLInputElement>): void => {
     event.preventDefault();
-    window.location.assign("/api/auth/login");
+    window.location.assign('/api/auth/login');
   };
 
   return (

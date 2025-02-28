@@ -1,11 +1,11 @@
-import Link from "next/link";
-import React, { useState } from "react";
+import Link from 'next/link';
+import React, { useState } from 'react';
 
 export const TabThree: React.FC = () => {
   const [openTab, setOpenTab] = useState(1);
 
-  const activeClasses = "text-primary border-primary";
-  const inactiveClasses = "border-transparent";
+  const activeClasses = 'text-primary border-primary';
+  const inactiveClasses = 'border-transparent';
 
   return (
     <div className="rounded-sm border border-stroke bg-white p-7.5 shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -50,7 +50,7 @@ export const TabThree: React.FC = () => {
 
       <div>
         <div
-          className={`leading-relaxed ${openTab === 1 ? "block" : "hidden"}`}
+          className={`leading-relaxed ${openTab === 1 ? 'block' : 'hidden'}`}
         >
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
           luctus ligula nec dolor placerat, a consequat elit volutpat. Quisque
@@ -59,7 +59,7 @@ export const TabThree: React.FC = () => {
           torquent per conubia nostra, per
         </div>
         <div
-          className={`leading-relaxed ${openTab === 2 ? "block" : "hidden"}`}
+          className={`leading-relaxed ${openTab === 2 ? 'block' : 'hidden'}`}
         >
           Tab2 ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
           luctus ligula nec dolor placerat, a consequat elit volutpat. Quisque
@@ -68,7 +68,7 @@ export const TabThree: React.FC = () => {
           torquent per conubia nostra, per
         </div>
         <div
-          className={`leading-relaxed ${openTab === 3 ? "block" : "hidden"}`}
+          className={`leading-relaxed ${openTab === 3 ? 'block' : 'hidden'}`}
         >
           Tab3 ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
           luctus ligula nec dolor placerat, a consequat elit volutpat. Quisque
@@ -77,7 +77,7 @@ export const TabThree: React.FC = () => {
           torquent per conubia nostra, per
         </div>
         <div
-          className={`leading-relaxed ${openTab === 4 ? "block" : "hidden"}`}
+          className={`leading-relaxed ${openTab === 4 ? 'block' : 'hidden'}`}
         >
           Tab4 Lorem ipsum dolor sit amet, consectetur adipisicing elit. Officia
           nisi, doloribus nulla cumque molestias corporis eaque harum vero! Quas

@@ -1,6 +1,6 @@
-import type { ApexOptions } from "apexcharts";
-import React, { useState } from "react";
-import ReactApexChart from "react-apexcharts";
+import type { ApexOptions } from 'apexcharts';
+import React, { useState } from 'react';
+import ReactApexChart from 'react-apexcharts';
 
 type ChartSevenState = {
   series: {
@@ -13,11 +13,11 @@ export const ChartSeven: React.FC = () => {
   const [state, setState] = useState<ChartSevenState>({
     series: [
       {
-        name: "Received Amount",
+        name: 'Received Amount',
         data: [0, 20, 35, 45, 35, 55, 65, 50, 65, 75, 60, 75],
       },
       {
-        name: "Due Amount",
+        name: 'Due Amount',
         data: [15, 9, 17, 32, 25, 68, 80, 68, 84, 94, 74, 62],
       },
     ],
@@ -35,14 +35,14 @@ export const ChartSeven: React.FC = () => {
   const options: ApexOptions = {
     legend: {
       show: false,
-      position: "top",
-      horizontalAlign: "left",
+      position: 'top',
+      horizontalAlign: 'left',
     },
-    colors: ["#3C50E0", "#C7D2E2"],
+    colors: ['#3C50E0', '#C7D2E2'],
     chart: {
-      fontFamily: "Satoshi, sans-serif",
+      fontFamily: 'Satoshi, sans-serif',
       height: 310,
-      type: "area",
+      type: 'area',
       toolbar: {
         show: false,
       },
@@ -73,7 +73,7 @@ export const ChartSeven: React.FC = () => {
       },
     ],
     stroke: {
-      curve: "smooth",
+      curve: 'smooth',
       // width: ['3.5', '3.5'],
     },
 
@@ -109,7 +109,7 @@ export const ChartSeven: React.FC = () => {
       y: {
         title: {
           formatter() {
-            return "";
+            return '';
           },
         },
       },
@@ -118,20 +118,20 @@ export const ChartSeven: React.FC = () => {
       },
     },
     xaxis: {
-      type: "category",
+      type: 'category',
       categories: [
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
       ],
       axisBorder: {
         show: false,
@@ -143,7 +143,7 @@ export const ChartSeven: React.FC = () => {
     yaxis: {
       title: {
         style: {
-          fontSize: "0px",
+          fontSize: '0px',
         },
       },
     },

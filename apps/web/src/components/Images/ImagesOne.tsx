@@ -1,9 +1,9 @@
-import Image from "next/image";
-import React, { useEffect } from "react";
+import Image from 'next/image';
+import React, { useEffect } from 'react';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
-import ImageResize from "@/js/image-resize";
+import ImageResize from '@/js/image-resize';
 
 export const ImagesOne: React.FC = () => {
   useEffect(() => {

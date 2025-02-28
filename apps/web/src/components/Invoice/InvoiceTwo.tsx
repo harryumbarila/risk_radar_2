@@ -1,5 +1,5 @@
-import Link from "next/link";
-import React from "react";
+import Link from 'next/link';
+import React from 'react';
 
 type Product = {
   brand: string;
@@ -11,36 +11,36 @@ type Product = {
 
 const productList: Product[] = [
   {
-    brand: "Techno",
-    description: "Kemon 24 smart phone",
+    brand: 'Techno',
+    description: 'Kemon 24 smart phone',
     quantity: 1,
     pricePerUnit: 200,
     total: 200,
   },
   {
-    brand: "Vivo",
-    description: "Vivo 32 smart phone",
+    brand: 'Vivo',
+    description: 'Vivo 32 smart phone',
     quantity: 3,
     pricePerUnit: 300,
     total: 900,
   },
   {
-    brand: "Samsung",
-    description: "S23 Ultra",
+    brand: 'Samsung',
+    description: 'S23 Ultra',
     quantity: 1,
     pricePerUnit: 1300,
     total: 1300,
   },
   {
-    brand: "Apple",
-    description: "iPhone 15Pro Max",
+    brand: 'Apple',
+    description: 'iPhone 15Pro Max',
     quantity: 2,
     pricePerUnit: 1200,
     total: 2400,
   },
   {
-    brand: "Oppo",
-    description: "Fold X",
+    brand: 'Oppo',
+    description: 'Fold X',
     quantity: 1,
     pricePerUnit: 900,
     total: 900,
@@ -130,13 +130,13 @@ export const InVoiceTwo: React.FC = () => {
           </h4>
           <Link href="/" className="block">
             <span className="font-medium text-black dark:text-white">
-              Email:{" "}
+              Email:{' '}
             </span>
             contact@example.com
           </Link>
           <span className="mt-1.5 block">
             <span className="font-medium text-black dark:text-white">
-              Address:{" "}
+              Address:{' '}
             </span>
             2972 Westheimer Rd. Santa Ana.
           </span>
@@ -151,13 +151,13 @@ export const InVoiceTwo: React.FC = () => {
           </h4>
           <Link href="/" className="block">
             <span className="font-medium text-black dark:text-white">
-              Email:{" "}
+              Email:{' '}
             </span>
             contact@example.com
           </Link>
           <span className="mt-1.5 block">
             <span className="font-medium text-black dark:text-white">
-              Address:{" "}
+              Address:{' '}
             </span>
             New York, USA 2707 Davis Anenue
           </span>
@@ -284,8 +284,8 @@ export const InVoiceTwo: React.FC = () => {
 
               <p className="flex justify-between font-medium text-black dark:text-white">
                 <span>
-                  {" "}
-                  Vat <span className="text-red">(5%)</span>{" "}
+                  {' '}
+                  Vat <span className="text-red">(5%)</span>{' '}
                 </span>
                 <span> $235 </span>
               </p>

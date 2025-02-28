@@ -1,6 +1,6 @@
-import type { ApexOptions } from "apexcharts";
-import React, { useState } from "react";
-import ReactApexChart from "react-apexcharts";
+import type { ApexOptions } from 'apexcharts';
+import React, { useState } from 'react';
+import ReactApexChart from 'react-apexcharts';
 
 type ChartElevenState = {
   series: {
@@ -19,7 +19,7 @@ export const ChartEleven: React.FC<ChartElevenProps> = ({
   const [state, setState] = useState<ChartElevenState>({
     series: [
       {
-        name: "New Sales",
+        name: 'New Sales',
         data:
           returnRateValue >= 0
             ? [151, 252, 185, 201, 269, 191, 295, 187, 248, 370, 310, 350, 300]
@@ -38,11 +38,11 @@ export const ChartEleven: React.FC<ChartElevenProps> = ({
   updateState();
 
   const options: ApexOptions = {
-    colors: [returnRateValue >= 0 ? "#10B981" : "#FB5454"],
+    colors: [returnRateValue >= 0 ? '#10B981' : '#FB5454'],
     chart: {
-      fontFamily: "Satoshi, sans-serif",
+      fontFamily: 'Satoshi, sans-serif',
       height: 70,
-      type: "area",
+      type: 'area',
       parentHeightOffset: 0,
 
       toolbar: {
@@ -67,25 +67,25 @@ export const ChartEleven: React.FC<ChartElevenProps> = ({
       enabled: false,
     },
     stroke: {
-      curve: "smooth",
+      curve: 'smooth',
       width: 1,
     },
     xaxis: {
-      type: "datetime",
+      type: 'datetime',
       categories: [
-        "2018-09-19T00:00:00.000Z",
-        "2018-09-19T01:30:00.000Z",
-        "2018-09-19T02:30:00.000Z",
-        "2018-09-19T03:30:00.000Z",
-        "2018-09-19T04:30:00.000Z",
-        "2018-09-19T05:30:00.000Z",
-        "2018-09-19T06:30:00.000Z",
-        "2018-09-19T07:30:00.000Z",
-        "2018-09-19T08:30:00.000Z",
-        "2018-09-19T09:30:00.000Z",
-        "2018-09-19T10:30:00.000Z",
-        "2018-09-19T11:30:00.000Z",
-        "2018-09-19T12:30:00.000Z",
+        '2018-09-19T00:00:00.000Z',
+        '2018-09-19T01:30:00.000Z',
+        '2018-09-19T02:30:00.000Z',
+        '2018-09-19T03:30:00.000Z',
+        '2018-09-19T04:30:00.000Z',
+        '2018-09-19T05:30:00.000Z',
+        '2018-09-19T06:30:00.000Z',
+        '2018-09-19T07:30:00.000Z',
+        '2018-09-19T08:30:00.000Z',
+        '2018-09-19T09:30:00.000Z',
+        '2018-09-19T10:30:00.000Z',
+        '2018-09-19T11:30:00.000Z',
+        '2018-09-19T12:30:00.000Z',
       ],
       labels: {
         show: false,

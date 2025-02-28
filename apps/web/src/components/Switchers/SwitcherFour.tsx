@@ -1,5 +1,5 @@
-import type { FC } from "react";
-import { useState } from "react";
+import type { FC } from 'react';
+import { useState } from 'react';
 
 export const SwitcherFour: FC = () => {
   const [enabled, setEnabled] = useState<boolean>(false);
@@ -23,7 +23,7 @@ export const SwitcherFour: FC = () => {
           <div className="block h-8 w-14 rounded-full bg-black" />
           <div
             className={`absolute left-1 top-1 flex size-6 items-center justify-center rounded-full bg-white transition ${
-              enabled && "!right-1 !translate-x-full"
+              enabled && '!right-1 !translate-x-full'
             }`}
           />
         </div>

@@ -1,6 +1,6 @@
-import Link from "next/link";
-import type { FC } from "react";
-import { useEffect, useRef, useState } from "react";
+import Link from 'next/link';
+import type { FC } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export const DropdownNotification: FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -21,8 +21,8 @@ export const DropdownNotification: FC = () => {
       }
       setDropdownOpen(false);
     };
-    document.addEventListener("click", clickHandler);
-    return (): void => document.removeEventListener("click", clickHandler);
+    document.addEventListener('click', clickHandler);
+    return (): void => document.removeEventListener('click', clickHandler);
   });
 
   // close if the esc key is pressed
@@ -31,8 +31,8 @@ export const DropdownNotification: FC = () => {
       if (!dropdownOpen || keyCode !== 27) return;
       setDropdownOpen(false);
     };
-    document.addEventListener("keydown", keyHandler);
-    return (): void => document.removeEventListener("keydown", keyHandler);
+    document.addEventListener('keydown', keyHandler);
+    return (): void => document.removeEventListener('keydown', keyHandler);
   });
 
   return (
@@ -48,7 +48,7 @@ export const DropdownNotification: FC = () => {
       >
         <span
           className={`absolute -top-0.5 right-0 z-1 size-2 rounded-full bg-meta-1 ${
-            notifying === false ? "hidden" : "inline"
+            notifying === false ? 'hidden' : 'inline'
           }`}
         >
           <span className="absolute -z-1 inline-flex size-full animate-ping rounded-full bg-meta-1 opacity-75" />
@@ -74,7 +74,7 @@ export const DropdownNotification: FC = () => {
         onFocus={() => setDropdownOpen(true)}
         onBlur={() => setDropdownOpen(false)}
         className={`absolute -right-27 mt-2.5 flex h-90 w-75 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark sm:right-0 sm:w-80 ${
-          dropdownOpen === true ? "block" : "hidden"
+          dropdownOpen === true ? 'block' : 'hidden'
         }`}
       >
         <div className="px-4.5 py-3">
@@ -90,7 +90,7 @@ export const DropdownNotification: FC = () => {
               <p className="text-sm">
                 <span className="text-black dark:text-white">
                   Edit your information in a swipe
-                </span>{" "}
+                </span>{' '}
                 Sint occaecat cupidatat non proident, sunt in culpa qui officia
                 deserunt mollit anim.
               </p>
@@ -106,7 +106,7 @@ export const DropdownNotification: FC = () => {
               <p className="text-sm">
                 <span className="text-black dark:text-white">
                   It is a long established fact
-                </span>{" "}
+                </span>{' '}
                 that a reader will be distracted by the readable.
               </p>
 
@@ -121,7 +121,7 @@ export const DropdownNotification: FC = () => {
               <p className="text-sm">
                 <span className="text-black dark:text-white">
                   There are many variations
-                </span>{" "}
+                </span>{' '}
                 of passages of Lorem Ipsum available, but the majority have
                 suffered
               </p>
@@ -137,7 +137,7 @@ export const DropdownNotification: FC = () => {
               <p className="text-sm">
                 <span className="text-black dark:text-white">
                   There are many variations
-                </span>{" "}
+                </span>{' '}
                 of passages of Lorem Ipsum available, but the majority have
                 suffered
               </p>

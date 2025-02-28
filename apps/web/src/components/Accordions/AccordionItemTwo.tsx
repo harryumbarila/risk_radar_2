@@ -1,6 +1,6 @@
-import React, { useRef } from "react";
+import React, { useRef } from 'react';
 
-import type { FaqItem } from "@/types/faqItem";
+import type { FaqItem } from '@/types/faqItem';
 
 export const AccordionItemTwo: React.FC<FaqItem> = ({
   active,
@@ -16,7 +16,7 @@ export const AccordionItemTwo: React.FC<FaqItem> = ({
       <button
         type="button"
         className={`flex w-full items-center justify-between gap-2 ${
-          active === id ? "active" : ""
+          active === id ? 'active' : ''
         }`}
         onClick={() => handleToggle(id)}
       >
@@ -28,7 +28,7 @@ export const AccordionItemTwo: React.FC<FaqItem> = ({
         <div className="flex h-9 w-full max-w-9 items-center justify-center rounded-full border border-primary dark:border-white">
           <svg
             className={`fill-primary duration-200 ease-in-out dark:fill-white ${
-              active === id ? "hidden" : ""
+              active === id ? 'hidden' : ''
             }`}
             width="15"
             height="15"
@@ -44,7 +44,7 @@ export const AccordionItemTwo: React.FC<FaqItem> = ({
 
           <svg
             className={`fill-primary duration-200 ease-in-out dark:fill-white ${
-              active === id ? "block" : "hidden"
+              active === id ? 'block' : 'hidden'
             }`}
             width="15"
             height="3"
@@ -63,7 +63,7 @@ export const AccordionItemTwo: React.FC<FaqItem> = ({
       <div
         ref={contentEl}
         className={`mt-5 duration-200 ease-in-out ${
-          active === id ? "block" : "hidden"
+          active === id ? 'block' : 'hidden'
         }`}
       >
         <p className="max-w-[830px] font-medium">{text}</p>

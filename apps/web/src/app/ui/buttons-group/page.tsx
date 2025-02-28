@@ -1,15 +1,15 @@
-import type { Metadata } from "next";
-import React from "react";
+import type { Metadata } from 'next';
+import React from 'react';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { ButtonsGroupOne } from "@/components/ButtonsGroups/ButtonsGroupOne";
-import { ButtonsGroupTwo } from "@/components/ButtonsGroups/ButtonsGroupTwo";
-import { DefaultLayout } from "@/components/Layouts/DefaultLayout";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { ButtonsGroupOne } from '@/components/ButtonsGroups/ButtonsGroupOne';
+import { ButtonsGroupTwo } from '@/components/ButtonsGroups/ButtonsGroupTwo';
+import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
-  title: "Next.js Button Groups | TailAdmin - Next.js Dashboard Template",
+  title: 'Next.js Button Groups | TailAdmin - Next.js Dashboard Template',
   description:
-    "This is Next.js Button Groups page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    'This is Next.js Button Groups page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
 };
 
 const ButtonsGroup: React.FC = () => {

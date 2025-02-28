@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 
-import type { KpiStatisticsResponseDto } from "@/shared/response/legacy-dashboard-proxy";
+import type { KpiStatisticsResponseDto } from '@/shared/response/legacy-dashboard-proxy';
 
 type KpiTableProps = {
   data: KpiStatisticsResponseDto;
@@ -9,43 +9,43 @@ type KpiTableProps = {
 export const KpiTable: React.FC<KpiTableProps> = ({ data }) => {
   const tableData = [
     {
-      kpi: "Processing MIDs",
+      kpi: 'Processing MIDs',
       count: data.processingMIDs.count,
       volume: data.processingMIDs.amount,
     },
     {
-      kpi: "Exception MIDs",
+      kpi: 'Exception MIDs',
       count: data.exceptionMIDs.count,
       countPercent: data.exceptionMIDs.percentageIncrease,
       volume: data.exceptionMIDs.amount,
       volumePercent: data.exceptionMIDs.amountPercentageIncrease,
     },
     {
-      kpi: "NDF Processing MIDs",
+      kpi: 'NDF Processing MIDs',
       count: data.ndfProcessingMIDs.count,
       volume: data.ndfProcessingMIDs.amount,
     },
     {
-      kpi: "NDF Exception MIDs",
+      kpi: 'NDF Exception MIDs',
       count: data.ndfExceptionMIDs.count,
       countPercent: data.ndfExceptionMIDs.count,
       volume: data.ndfExceptionMIDs.amount,
       volumePercent: data.ndfExceptionMIDs.amountPercentageIncrease,
     },
     {
-      kpi: "Reviewed",
+      kpi: 'Reviewed',
       count: data.reviewed.count,
       volume: data.reviewed.amount,
     },
-    { kpi: "Queued", count: data.queued.count, volume: data.queued.amount },
-    { kpi: "Divert", count: data.divert.count, volume: data.divert.amount },
+    { kpi: 'Queued', count: data.queued.count, volume: data.queued.amount },
+    { kpi: 'Divert', count: data.divert.count, volume: data.divert.amount },
     {
-      kpi: "Divert Release",
+      kpi: 'Divert Release',
       count: data.divertRelease.count,
       volume: data.divertRelease.amount,
     },
     {
-      kpi: "Auto Divert",
+      kpi: 'Auto Divert',
       count: data.autoDivert.count,
       volume: data.autoDivert.amount,
     },
@@ -76,7 +76,7 @@ export const KpiTable: React.FC<KpiTableProps> = ({ data }) => {
               {row.count}
               {row.countPercent && (
                 <span className="text-xs text-meta-3">
-                  {" "}
+                  {' '}
                   ({row.countPercent}%)
                 </span>
               )}
@@ -85,7 +85,7 @@ export const KpiTable: React.FC<KpiTableProps> = ({ data }) => {
               {row.volume}
               {row.volumePercent && (
                 <span className="text-xs text-meta-3">
-                  {" "}
+                  {' '}
                   ({row.volumePercent}%)
                 </span>
               )}

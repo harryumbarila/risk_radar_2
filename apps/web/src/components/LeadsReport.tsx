@@ -1,49 +1,49 @@
-import Image from "next/image";
+import Image from 'next/image';
 
-import type { Lead } from "@/types/Lead";
+import type { Lead } from '@/types/Lead';
 
-import { DropdownDefault } from "./Dropdowns/DropdownDefault";
+import { DropdownDefault } from './Dropdowns/DropdownDefault';
 
 const leadsData: Lead[] = [
   {
-    avatar: "/images/user/user-17.png",
-    name: "Charlie Donin",
-    email: "wdavis@aol.com",
-    project: "25 Dec 2024 - 28 Dec 2024",
+    avatar: '/images/user/user-17.png',
+    name: 'Charlie Donin',
+    email: 'wdavis@aol.com',
+    project: '25 Dec 2024 - 28 Dec 2024',
     duration: 3,
-    status: "lost",
+    status: 'lost',
   },
   {
-    avatar: "/images/user/user-18.png",
-    name: "Makenna Carder",
-    email: "ltorres@aol.com",
-    project: "25 Dec 2024 - 28 Dec 2024",
+    avatar: '/images/user/user-18.png',
+    name: 'Makenna Carder',
+    email: 'ltorres@aol.com',
+    project: '25 Dec 2024 - 28 Dec 2024',
     duration: 3,
-    status: "active",
+    status: 'active',
   },
   {
-    avatar: "/images/user/user-19.png",
-    name: "Talan Dokidis",
-    email: "rtaylor@aol.com",
-    project: "25 Dec 2024 - 28 Dec 2024",
+    avatar: '/images/user/user-19.png',
+    name: 'Talan Dokidis',
+    email: 'rtaylor@aol.com',
+    project: '25 Dec 2024 - 28 Dec 2024',
     duration: 3,
-    status: "active",
+    status: 'active',
   },
   {
-    avatar: "/images/user/user-20.png",
-    name: "Cheyenne Levin",
-    email: "ebrown@aol.com",
-    project: "25 Dec 2024 - 28 Dec 2024",
+    avatar: '/images/user/user-20.png',
+    name: 'Cheyenne Levin',
+    email: 'ebrown@aol.com',
+    project: '25 Dec 2024 - 28 Dec 2024',
     duration: 3,
-    status: "active",
+    status: 'active',
   },
   {
-    avatar: "/images/user/user-21.png",
-    name: "James Aminoff",
-    email: "slee@aol.com",
-    project: "25 Dec 2024 - 28 Dec 2024",
+    avatar: '/images/user/user-21.png',
+    name: 'James Aminoff',
+    email: 'slee@aol.com',
+    project: '25 Dec 2024 - 28 Dec 2024',
     duration: 3,
-    status: "lost",
+    status: 'lost',
   },
 ];
 
@@ -116,12 +116,12 @@ export const LeadsReport: React.FC = () => {
                 <div className="w-4/12 2xsm:w-3/12 md:w-2/12 xl:w-1/12">
                   <span
                     className={`inline-block rounded  px-2.5 py-0.5 text-sm font-medium ${
-                      lead.status === "lost"
-                        ? "bg-red/[0.08] text-red"
-                        : "bg-meta-3/[0.08] text-meta-3"
+                      lead.status === 'lost'
+                        ? 'bg-red/[0.08] text-red'
+                        : 'bg-meta-3/[0.08] text-meta-3'
                     } `}
                   >
-                    {lead.status === "lost" ? "Lost Lead" : "Active"}
+                    {lead.status === 'lost' ? 'Lost Lead' : 'Active'}
                   </span>
                 </div>
                 <div className="hidden w-2/12 2xsm:block md:w-1/12">

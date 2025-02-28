@@ -1,11 +1,11 @@
-import Link from "next/link";
-import React, { useState } from "react";
+import Link from 'next/link';
+import React, { useState } from 'react';
 
 export const TabOne: React.FC = () => {
   const [openTab, setOpenTab] = useState(1);
 
-  const activeClasses = "bg-primary text-white";
-  const inactiveClasses = "bg-gray dark:bg-meta-4 text-black dark:text-white";
+  const activeClasses = 'bg-primary text-white';
+  const inactiveClasses = 'bg-gray dark:bg-meta-4 text-black dark:text-white';
 
   return (
     <div className="rounded-sm border border-stroke bg-white p-7.5 shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -50,7 +50,7 @@ export const TabOne: React.FC = () => {
 
       <div>
         <div
-          className={`leading-relaxed ${openTab === 1 ? "block" : "hidden"}`}
+          className={`leading-relaxed ${openTab === 1 ? 'block' : 'hidden'}`}
         >
           Lorem ipsum dolor sit amet, consectetur adipisicing elit. Officia
           nisi, doloribus nulla cumque molestias corporis eaque harum vero! Quas
@@ -58,7 +58,7 @@ export const TabOne: React.FC = () => {
           quod.
         </div>
         <div
-          className={`leading-relaxed ${openTab === 2 ? "block" : "hidden"}`}
+          className={`leading-relaxed ${openTab === 2 ? 'block' : 'hidden'}`}
         >
           Lorem ipsum dolor sit amet, consectetur adipisicing elit. Officia
           nisi, doloribus nulla cumque molestias corporis eaque harum vero! Quas
@@ -68,7 +68,7 @@ export const TabOne: React.FC = () => {
           praesentium nihil veritatis.
         </div>
         <div
-          className={`leading-relaxed ${openTab === 3 ? "block" : "hidden"}`}
+          className={`leading-relaxed ${openTab === 3 ? 'block' : 'hidden'}`}
         >
           Lorem ipsum dolor sit amet, consectetur adipisicing elit. Officia
           nisi, doloribus nulla cumque molestias corporis eaque harum vero! Quas
@@ -81,7 +81,7 @@ export const TabOne: React.FC = () => {
           ducimus recusandae repellat quasi eaque, suscipit praesentium totam?
         </div>
         <div
-          className={`leading-relaxed ${openTab === 4 ? "block" : "hidden"}`}
+          className={`leading-relaxed ${openTab === 4 ? 'block' : 'hidden'}`}
         >
           Lorem ipsum dolor sit amet, consectetur adipisicing elit. Officia
           nisi, doloribus nulla cumque molestias corporis eaque harum vero! Quas

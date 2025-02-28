@@ -1,5 +1,5 @@
-import Image from "next/image";
-import React from "react";
+import Image from 'next/image';
+import React from 'react';
 
 type Notification = {
   active: boolean;
@@ -13,43 +13,43 @@ type Notification = {
 const notificationList: Notification[] = [
   {
     active: true,
-    image: "/images/user/user-03.png",
-    name: "Dwayne Bero",
-    details: "Project assigned by the manager",
-    time: "5 min ago",
-    date: "24, Nov 2027",
+    image: '/images/user/user-03.png',
+    name: 'Dwayne Bero',
+    details: 'Project assigned by the manager',
+    time: '5 min ago',
+    date: '24, Nov 2027',
   },
   {
     active: true,
-    image: "/images/user/user-22.png",
-    name: "Talan Curtis",
-    details: "Approved date for sanction of load is verified",
-    time: "22, Feb 2027",
-    date: "24, Nov 2027",
+    image: '/images/user/user-22.png',
+    name: 'Talan Curtis',
+    details: 'Approved date for sanction of load is verified',
+    time: '22, Feb 2027',
+    date: '24, Nov 2027',
   },
   {
     active: true,
-    image: "/images/user/user-23.png",
-    name: "Talan Rhiel Madsen",
-    details: "Admin and other team accepted your work request",
-    time: "12 min ago",
-    date: "12, Jan 2027",
+    image: '/images/user/user-23.png',
+    name: 'Talan Rhiel Madsen',
+    details: 'Admin and other team accepted your work request',
+    time: '12 min ago',
+    date: '12, Jan 2027',
   },
   {
     active: false,
-    image: "/images/user/user-24.png",
-    name: "Charlie Botosh",
-    details: "Temporarily your account has been suspended",
-    time: "1 year ago",
-    date: "09, Dec 2026",
+    image: '/images/user/user-24.png',
+    name: 'Charlie Botosh',
+    details: 'Temporarily your account has been suspended',
+    time: '1 year ago',
+    date: '09, Dec 2026',
   },
   {
     active: true,
-    image: "/images/user/user-25.png",
-    name: "Jordyn Torff",
-    details: "You have changed your password successfully",
-    time: "1 year ago",
-    date: "30, Mar 2026",
+    image: '/images/user/user-25.png',
+    name: 'Jordyn Torff',
+    details: 'You have changed your password successfully',
+    time: '1 year ago',
+    date: '30, Mar 2026',
   },
 ];
 
@@ -68,7 +68,7 @@ export const NotificationsFour: React.FC = () => {
             <div
               key={item.name}
               className={`rounded-[10px] border-l-[5px] bg-white px-4 py-6 shadow-13 dark:bg-boxdark sm:px-5 xl:px-7.5 ${
-                item.active ? "border-meta-3" : "border-red"
+                item.active ? 'border-meta-3' : 'border-red'
               }`}
             >
               <div className="flex flex-wrap items-center justify-between gap-5">
@@ -80,14 +80,14 @@ export const NotificationsFour: React.FC = () => {
                       src={item.image}
                       alt="user"
                       style={{
-                        width: "auto",
-                        height: "auto",
+                        width: 'auto',
+                        height: 'auto',
                       }}
                     />
 
                     <span
                       className={`absolute -top-0.5 right-0.5 h-4 w-full max-w-4 rounded-full border-[2.3px] border-white ${
-                        item.active ? "bg-success" : "bg-red"
+                        item.active ? 'bg-success' : 'bg-red'
                       }`}
                     />
                   </div>

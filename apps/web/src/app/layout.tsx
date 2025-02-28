@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import "@/css/satoshi.css";
-import "@/css/simple-datatables.css";
-import "@/css/style.css";
-import "dropzone/dist/dropzone.css";
-import "flatpickr/dist/flatpickr.min.css";
-import "jsvectormap/dist/jsvectormap.css";
-import "nouislider/dist/nouislider.css";
+import '@/css/satoshi.css';
+import '@/css/simple-datatables.css';
+import '@/css/style.css';
+import 'dropzone/dist/dropzone.css';
+import 'flatpickr/dist/flatpickr.min.css';
+import 'jsvectormap/dist/jsvectormap.css';
+import 'nouislider/dist/nouislider.css';
 
-import { UserProvider } from "@auth0/nextjs-auth0/client";
-import type { FC, PropsWithChildren } from "react";
-import { useEffect, useState } from "react";
+import { UserProvider } from '@auth0/nextjs-auth0/client';
+import type { FC, PropsWithChildren } from 'react';
+import { useEffect, useState } from 'react';
 
-import { Loader } from "@/components/common/Loader";
+import { Loader } from '@/components/common/Loader';
 
 const RootLayout: FC<PropsWithChildren> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true);

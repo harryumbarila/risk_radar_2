@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 type VideosItemProps = {
   title: string;
@@ -25,10 +25,10 @@ export const VideosItem: React.FC<VideosItemProps> = ({
         <iframe
           title={title}
           className={`w-full 
-            ${embeds && "aspect-video"} 
-            ${aspectOne && "aspect-square"} 
-            ${aspectFour && "aspect-4/3"} 
-            ${aspectTwentyOne && "aspect-21/9"}
+            ${embeds && 'aspect-video'} 
+            ${aspectOne && 'aspect-square'} 
+            ${aspectFour && 'aspect-4/3'} 
+            ${aspectTwentyOne && 'aspect-21/9'}
           `}
           src="https://www.youtube.com/embed/zpOULjyy-n8?rel=0"
           allowFullScreen

@@ -38,14 +38,14 @@ export class ExceptionFiltersDto {
   @IsString()
   @IsOptional()
   @Transform(({ value }: { value: string }) =>
-    value === 'null' ? null : value,
+    value === 'null' ? null : value
   )
   public MID?: string | null;
 
   @IsString()
   @IsOptional()
   @Transform(({ value }: { value: string }) =>
-    value === 'null' ? null : value,
+    value === 'null' ? null : value
   )
   public dba_or_sic?: string | null;
 
@@ -114,7 +114,7 @@ export class LegacyDashboardProxyController {
   @ApiOperation({ operationId: 'risk_radar', summary: 'Get risk radar' })
   @Get('risk_radar')
   public riskRadar(
-    @Query() filters: ExceptionFiltersDto,
+    @Query() filters: ExceptionFiltersDto
   ): RiskRadarResponseDto {
     return this.client.riskRadar(filters);
   }

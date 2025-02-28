@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
-import { Breadcrumb } from "@/components/Breadcrumbs/Breadcrumb";
-import { DropdownDefault } from "@/components/Dropdowns/DropdownDefault";
-import { InboxList } from "@/components/Inbox/InboxList";
-import { InboxMenuList } from "@/components/Inbox/InboxMenuList";
+import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
+import { DropdownDefault } from '@/components/Dropdowns/DropdownDefault';
+import { InboxList } from '@/components/Inbox/InboxList';
+import { InboxMenuList } from '@/components/Inbox/InboxMenuList';
 
 export const Inbox: React.FC = () => {
   const [inboxSidebarToggle, setInboxSidebarToggle] = useState(false);
@@ -18,14 +18,14 @@ export const Inbox: React.FC = () => {
         <div className="h-full rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark lg:flex">
           <div
             className={`fixed bottom-0 top-22.5 z-999 flex w-[230px] -translate-x-[120%] flex-col rounded-md border border-stroke bg-white dark:border-strokedark dark:bg-boxdark lg:static lg:w-1/5 lg:translate-x-0 lg:border-none ${
-              inboxSidebarToggle && "!translate-x-0 duration-300 ease-linear"
+              inboxSidebarToggle && '!translate-x-0 duration-300 ease-linear'
             }`}
           >
             <button
               type="button"
               onClick={() => setInboxSidebarToggle(!inboxSidebarToggle)}
               className={`absolute -right-20 z-99999 block rounded-md border border-stroke bg-white p-1.5 shadow-sm dark:border-strokedark dark:bg-boxdark lg:hidden ${
-                inboxSidebarToggle && "!-right-9"
+                inboxSidebarToggle && '!-right-9'
               }`}
               aria-label="Close"
             >

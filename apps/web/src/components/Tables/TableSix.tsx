@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 
-import { DropdownFour } from "@/components/Dropdowns/DropdownFour";
+import { DropdownFour } from '@/components/Dropdowns/DropdownFour';
 
 type TableData = {
   name: string;
@@ -11,38 +11,38 @@ type TableData = {
 
 const data: TableData[] = [
   {
-    name: "Musharof Chowdhury",
-    position: "Multidisciplinary Web Entrepreneur",
-    email: "musharof@example.com",
-    role: "Owner",
+    name: 'Musharof Chowdhury',
+    position: 'Multidisciplinary Web Entrepreneur',
+    email: 'musharof@example.com',
+    role: 'Owner',
   },
   {
-    name: "Naimur Rahman",
-    position: "Website Front-end Developer",
-    email: "naimurrahman@example.com",
-    role: "Member",
+    name: 'Naimur Rahman',
+    position: 'Website Front-end Developer',
+    email: 'naimurrahman@example.com',
+    role: 'Member',
   },
   {
-    name: "Shafiq Hammad",
-    position: "Regional Paradigm Technician",
-    email: "shafiq.hd@example.com",
-    role: "Moderator",
+    name: 'Shafiq Hammad',
+    position: 'Regional Paradigm Technician',
+    email: 'shafiq.hd@example.com',
+    role: 'Moderator',
   },
   {
-    name: "Alex Semuyel",
-    position: "Applications Engineer",
-    email: "alex.semuel@example.com",
-    role: "Admin",
+    name: 'Alex Semuyel',
+    position: 'Applications Engineer',
+    email: 'alex.semuel@example.com',
+    role: 'Admin',
   },
 ];
 
 const getDropdownClasses = (index: number): string => {
   if (index < 2) {
-    return "top-full mt-1";
+    return 'top-full mt-1';
   } else if (index >= data.length - 2) {
-    return "bottom-full mb-1";
+    return 'bottom-full mb-1';
   } else {
-    return "";
+    return '';
   }
 };
 

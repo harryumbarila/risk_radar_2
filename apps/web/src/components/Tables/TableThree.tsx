@@ -1,42 +1,42 @@
-import type { FC } from "react";
+import type { FC } from 'react';
 
-import type { Package } from "@/types/package";
+import type { Package } from '@/types/package';
 
 const packageData: Package[] = [
   {
-    name: "Free package",
+    name: 'Free package',
     price: 0.0,
     invoiceDate: `Jan 13,2023`,
-    status: "Paid",
+    status: 'Paid',
   },
   {
-    name: "Standard Package",
+    name: 'Standard Package',
     price: 59.0,
     invoiceDate: `Jan 13,2023`,
-    status: "Paid",
+    status: 'Paid',
   },
   {
-    name: "Business Package",
+    name: 'Business Package',
     price: 99.0,
     invoiceDate: `Jan 13,2023`,
-    status: "Unpaid",
+    status: 'Unpaid',
   },
   {
-    name: "Standard Package",
+    name: 'Standard Package',
     price: 59.0,
     invoiceDate: `Jan 13,2023`,
-    status: "Pending",
+    status: 'Pending',
   },
 ];
 
 const getStatusClass = (status: string): string => {
   switch (status) {
-    case "Paid":
-      return "bg-success text-success";
-    case "Unpaid":
-      return "bg-danger text-danger";
+    case 'Paid':
+      return 'bg-success text-success';
+    case 'Unpaid':
+      return 'bg-danger text-danger';
     default:
-      return "bg-warning text-warning";
+      return 'bg-warning text-warning';
   }
 };
 

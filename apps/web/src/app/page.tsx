@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useUser } from "@auth0/nextjs-auth0/client";
-import type { FC } from "react";
+import { useUser } from '@auth0/nextjs-auth0/client';
+import type { FC } from 'react';
 
-import AttributionUrl from "@/app/attribution-url/page";
-import RiskRadar from "@/app/risk-radar/page";
-import { roles } from "@/types/roles";
+import AttributionUrl from '@/app/attribution-url/page';
+import RiskRadar from '@/app/risk-radar/page';
+import { roles } from '@/types/roles';
 
 const Home: FC = () => {
   const { user } = useUser();

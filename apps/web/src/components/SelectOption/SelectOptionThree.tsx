@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 type Language = {
   id: string;
@@ -8,13 +8,13 @@ type Language = {
 };
 
 const languages: Language[] = [
-  { id: "C", name: "C" },
-  { id: "C++", name: "C++" },
-  { id: "Java", name: "Java" },
-  { id: "Python", name: "Python" },
-  { id: "JavaScript", name: "JavaScript" },
-  { id: "React", name: "React" },
-  { id: "Angular", name: "Angular" },
+  { id: 'C', name: 'C' },
+  { id: 'C++', name: 'C++' },
+  { id: 'Java', name: 'Java' },
+  { id: 'Python', name: 'Python' },
+  { id: 'JavaScript', name: 'JavaScript' },
+  { id: 'React', name: 'React' },
+  { id: 'Angular', name: 'Angular' },
 ];
 
 const CheckboxInputGroup: React.FC<{
@@ -34,12 +34,12 @@ const CheckboxInputGroup: React.FC<{
       />
       <span
         className={`flex size-5 items-center justify-center rounded-full border ${
-          isChecked ? "border-primary" : "border-body"
+          isChecked ? 'border-primary' : 'border-body'
         }`}
       >
         <span
           className={`size-2.5 rounded-full bg-primary ${
-            isChecked ? "flex" : "hidden"
+            isChecked ? 'flex' : 'hidden'
           }`}
         />
       </span>
