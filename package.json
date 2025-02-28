@@ -9,6 +9,7 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
+    "commit": "git-cz",
     "format": "prettier --write .",
     "lint": "turbo lint",
     "prepare": "husky",
@@ -26,6 +27,8 @@
     "@denali/shared": "*",
     "@denali/typescript-config": "*",
     "cross-env": "^7.0.3",
+    "cz-git": "^1.11.0",
+    "git-cz": "^4.9.0",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
@@ -37,5 +40,11 @@
   "engines": {
     "node": ">=22"
   },
-  "packageManager": "yarn@1.22.21"
+  "packageManager": "yarn@1.22.21",
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git",
+      "useEmoji": true
+    }
+  }
 }
