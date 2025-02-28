@@ -8,7 +8,7 @@ ADD dist.tgz ./
 ENV NPM_CONFIG_LOGLEVEL warn
 
 RUN node -v
-RUN yarn install
+RUN yarn --frozen-lockfile
 RUN yarn turbo run build --filter=@denali/api
 RUN rm -rv /var/www/html/apps/api/.env || true
 
