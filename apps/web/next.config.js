@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+module.exports = {
   reactStrictMode: true,
   eslint: {
     ignoreDuringBuilds: !!process.env.CI,
@@ -9,5 +9,3 @@ const nextConfig = {
     tsconfigPath: 'tsconfig.build.json',
   },
 };
-
-export default nextConfig;
