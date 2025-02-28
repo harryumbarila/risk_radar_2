@@ -19,6 +19,9 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
+      - name: Run lint
+        run: yarn run lint
+
       - name: Run API tests unit
         run: yarn run test:unit
         working-directory: apps/api
