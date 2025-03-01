@@ -8,8 +8,9 @@
   ],
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo dev",
     "commit": "git-cz",
+    "dev": "turbo dev",
+    "docs": "yarn workspace @denali/docs run dev-docs",
     "format": "prettier --write .",
     "lint": "turbo lint",
     "prepare": "husky",
@@ -19,6 +20,12 @@
     "test:e2e": "turbo run test:e2e",
     "test:unit": "turbo run test:unit",
     "type-check": "turbo run type-check"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git",
+      "useEmoji": true
+    }
   },
   "devDependencies": {
     "@commitlint/cli": "^17.4.4",
@@ -40,11 +47,5 @@
   "engines": {
     "node": ">=22"
   },
-  "packageManager": "yarn@1.22.21",
-  "config": {
-    "commitizen": {
-      "path": "node_modules/cz-git",
-      "useEmoji": true
-    }
-  }
+  "packageManager": "yarn@1.22.21"
 }
