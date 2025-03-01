@@ -5,7 +5,6 @@ apps/
 configs/
 .prettierrc
 .prettierignore
-.eslintrc.js
 .lintstagedrc.cjs
 package.json
 .syncpackrc
