@@ -22,9 +22,14 @@ jobs:
       - name: Run lint
         run: yarn run lint
 
-      - name: Run API tests unit
+      - name: Run tests unit
         run: yarn run test:unit
 
-      - name: Run API tests e2e
+      - name: Run tests e2e
         run: yarn run test:e2e
-        working-directory: apps/api
+
+      - name: Run API build
+        run: yarn turbo run build --filter=@denali/api
+
+      - name: Run WEB build
+        run: yarn turbo run build --filter=@denali/web
