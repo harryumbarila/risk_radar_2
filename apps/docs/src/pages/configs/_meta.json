@@ -1,0 +1,5 @@
+{
+  "eslint-configs": "ESLint",
+  "typescript-configs": "TypeScript",
+  "jest-configs": "Jest"
+}
