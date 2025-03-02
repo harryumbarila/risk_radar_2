@@ -1,0 +1,11 @@
+{
+  "extends": "@denali/typescript-config/node.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@denali/*": ["packages/*/src"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}

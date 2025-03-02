@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@denali/typescript-config/nextjs.json",
+  "compilerOptions": {
+    "paths": {
+      "@/web/*": ["./*"],
+      "@/js/*": ["./src/js/*"],
+      "@/app/*": ["./src/app/*"],
+      "@/css/*": ["./src/css/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/hooks/*": ["./src/hooks/*"],
+      "@/types/*": ["./src/types/*"],
+      "@/auth0-config": ["./src/auth0-config.ts"],
+
+      "@/shared/*": ["../../packages/shared/src/*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "src",
+    ".next/types/**/*.ts",
+    "tailwind.config.js",
+    "tests",
+    "jest.config.ts",
+    "cypress",
+    "cypress.config.ts"
+  ],
+  "plugins": [{ "name": "next" }]
+}

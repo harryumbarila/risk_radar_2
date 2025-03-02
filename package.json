@@ -1,0 +1,50 @@
+{
+  "name": "daneli",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "configs/*"
+  ],
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "commit": "git-cz",
+    "format": "prettier --write .",
+    "lint": "turbo lint",
+    "prepare": "husky",
+    "start:api": "turbo run start --filter=@denali/api",
+    "start:web": "turbo run start --filter=@denali/web",
+    "sync-packages": "syncpack fix-mismatches",
+    "test:e2e": "turbo run test:e2e",
+    "test:unit": "turbo run test:unit",
+    "type-check": "turbo run type-check"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^17.4.4",
+    "@commitlint/config-conventional": "^17.4.4",
+    "@denali/eslint-config": "*",
+    "@denali/shared": "*",
+    "@denali/typescript-config": "*",
+    "cross-env": "^7.0.3",
+    "cz-git": "^1.11.0",
+    "git-cz": "^4.9.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.2.5",
+    "rimraf": "^5.0.5",
+    "syncpack": "^12.3.0",
+    "tspath": "^2.6.8",
+    "turbo": "latest"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "yarn@1.22.21",
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git",
+      "useEmoji": true
+    }
+  }
+}
