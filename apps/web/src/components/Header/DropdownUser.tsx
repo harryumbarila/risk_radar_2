@@ -1,11 +1,17 @@
-import { useUser } from '@auth0/nextjs-auth0/client';
 import Link from 'next/link';
-import type { FC } from 'react';
+import { FC, useCallback } from 'react';
 import { useEffect, useRef, useState } from 'react';
+import { useAuth } from '@frontegg/nextjs';
+import { useRouter } from 'next/navigation';
 
 export const DropdownUser: FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const { user } = useUser();
+  const router = useRouter();
+  const { user } = useAuth();
+
+  const handleLogout = useCallback(() => {
+    router.replace('/account/logout');
+  }, [router]);
 
   const trigger = useRef<HTMLAnchorElement>(null);
   const dropdown = useRef<HTMLDivElement>(null);
@@ -36,10 +42,6 @@ export const DropdownUser: FC = () => {
     document.addEventListener('keydown', keyHandler);
     return (): void => document.removeEventListener('keydown', keyHandler);
   });
-
-  const handleLogout = (): void => {
-    window.location.assign('/api/auth/logout');
-  };
 
   return (
     <div className="relative">

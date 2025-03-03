@@ -1,6 +1,5 @@
 'use client';
 
-import { useUser } from '@auth0/nextjs-auth0/client';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -10,6 +9,7 @@ import { useEffect, useRef, useState } from 'react';
 import { roles } from '@/types/roles';
 
 import { SidebarLinkGroup } from './SidebarLinkGroup';
+import { useAuth } from '@frontegg/nextjs';
 
 type SidebarProps = {
   sidebarOpen: boolean;
@@ -18,7 +18,7 @@ type SidebarProps = {
 
 export const Sidebar: FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
   const pathname = usePathname();
-  const { user } = useUser();
+  const { user } = useAuth();
   const { isSales } = roles(user);
 
   const trigger = useRef<HTMLButtonElement>(null);

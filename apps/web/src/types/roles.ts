@@ -1,28 +1,24 @@
-import type { UserProfile } from '@auth0/nextjs-auth0/client';
+import { User } from '@frontegg/redux-store/auth/interfaces';
+import { IRole } from '@frontegg/rest-api/roles/interfaces';
 
 export const ROLE_SALES = 'Sales';
 
-const CUSTOM_ROLES_CLAIM = 'https://taluspay.com/roles';
-
 type RolesReturnType = {
-  roles: string[];
+  roles: IRole[];
   isRole: (role: string) => boolean;
   isSales: () => boolean;
 };
 
-export function roles(user: UserProfile | undefined): RolesReturnType {
+export function roles(user: User | null | undefined): RolesReturnType {
   // Extract roles from the user object
-  const userRoles =
-    user && user[CUSTOM_ROLES_CLAIM]
-      ? (user[CUSTOM_ROLES_CLAIM] as string[])
-      : [];
+  const userRoles = user && user.roles.length >= 0 ? user.roles : [];
 
   const isRole = (role: string): boolean => {
-    return userRoles.includes(role);
+    return userRoles.some((userRole) => userRole.name === role);
   };
 
   const isSales = (): boolean => {
-    return userRoles.includes(ROLE_SALES);
+    return userRoles.some((userRole) => userRole.name === ROLE_SALES);
   };
 
   return { roles: userRoles, isRole, isSales };
