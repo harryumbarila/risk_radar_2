@@ -34,4 +34,4 @@ jobs:
       - name: Run WEB build
         run: yarn turbo run build --filter=@denali/web
         env:
-          FRONTEGG_ENCRYPTION_PASSWORD: ""
+          CI: true
