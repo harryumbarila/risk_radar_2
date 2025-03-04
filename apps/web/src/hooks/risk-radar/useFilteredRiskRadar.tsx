@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+
 import useBaseApi from '@/hooks/useBaseApi';
 import type { RiskRadarResponseDto } from '@/shared/response';
 
@@ -81,7 +82,7 @@ export const useFilteredRiskRadar = (): UseFilteredRiskRadarReturnType => {
     };
 
     fetchData().catch(() => {});
-  }, [filters, isInitialized]);
+  }, [filters, isInitialized, makeRequest]);
 
   return { filters, setFilters, data, isLoading, error };
 };
