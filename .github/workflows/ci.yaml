@@ -16,6 +16,9 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
+      - name: Install system dependencies
+        run: apt-get update && apt-get install -y bash
+
       - name: Install dependencies
         run: yarn install
 
