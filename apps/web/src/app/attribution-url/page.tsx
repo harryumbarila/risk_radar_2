@@ -1,10 +1,8 @@
 'use client';
 
+import { Breadcrumb, DefaultLayout, showNotification } from '@denali/ui';
 import React, { useState } from 'react';
 
-import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
-import { showNotification } from '@/components/Notifications/NotificationContent';
 import { useLeadSources } from '@/hooks/attribution-url/useLeadSources';
 import { useSourceMatcher } from '@/hooks/attribution-url/useSourceMatcher';
 import { useUsersData } from '@/hooks/attribution-url/useUsersData';

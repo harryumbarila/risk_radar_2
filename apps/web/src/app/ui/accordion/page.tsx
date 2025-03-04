@@ -1,8 +1,6 @@
+import { Accordion, DefaultLayout } from '@denali/ui';
 import type { Metadata } from 'next';
 import type { FC } from 'react';
-
-import { Accordion } from '@/components/Accordions';
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
   title: 'Next.js Accordion | TailAdmin - Next.js Dashboard Template',

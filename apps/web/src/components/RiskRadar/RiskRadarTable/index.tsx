@@ -2,8 +2,9 @@
 
 import type { FC } from 'react';
 
-import RiskRadarTable from '@/components/RiskRadar/RiskRadarTable/RiskRadarTable';
 import type { RiskRadarResponseDto } from '@/shared/response/legacy-dashboard-proxy';
+
+import RiskRadarTable from './RiskRadarTable';
 
 export type RiskRadarTableComponentProps = {
   data: RiskRadarResponseDto;

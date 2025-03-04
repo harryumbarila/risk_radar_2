@@ -1,7 +1,14 @@
 {
   "extends": "@denali/typescript-config/react-library.json",
   "compilerOptions": {
-    "outDir": "dist"
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@/ui/*": ["./src/*"],
+
+      "@/shared/*": ["../../packages/shared/src/*"]
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]

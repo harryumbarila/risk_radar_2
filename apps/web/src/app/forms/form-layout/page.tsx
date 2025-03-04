@@ -1,10 +1,7 @@
+import { Breadcrumb, DefaultLayout, SelectGroupOne } from '@denali/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { FC } from 'react';
-
-import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
-import { SelectGroupOne } from '@/components/SelectGroup/SelectGroupOne';
 
 export const metadata: Metadata = {
   title: 'Next.js Form Layout | TailAdmin - Next.js Dashboard Template',

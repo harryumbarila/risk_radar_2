@@ -1,10 +1,6 @@
+import { Breadcrumb, DefaultLayout, SpinnerOne, SpinnerTwo } from '@denali/ui';
 import type { Metadata } from 'next';
 import type { FC } from 'react';
-
-import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
-import { SpinnerOne } from '@/components/Spinners/SpinnerOne';
-import { SpinnerTwo } from '@/components/Spinners/SpinnerTwo';
 
 export const metadata: Metadata = {
   title: 'Next.js Spinners | TailAdmin - Next.js Dashboard Template',

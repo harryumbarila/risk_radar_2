@@ -1,10 +1,11 @@
+import {
+  Breadcrumb,
+  DefaultLayout,
+  PricingTableOne,
+  PricingTableTwo,
+} from '@denali/ui';
 import type { Metadata } from 'next';
 import React from 'react';
-
-import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
-import { PricingTableOne } from '@/components/PricingTables/PricingTableOne';
-import { PricingTableTwo } from '@/components/PricingTables/PricingTableTwo';
 
 export const metadata: Metadata = {
   title: 'Next.js Pricing Table | TailAdmin - Next.js Dashboard Template',

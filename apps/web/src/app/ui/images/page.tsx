@@ -1,8 +1,6 @@
+import { DefaultLayout, Images } from '@denali/ui';
 import type { Metadata } from 'next';
 import type { FC } from 'react';
-
-import { Images } from '@/components/Images';
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
   title: 'Next.js Images | TailAdmin - Next.js Dashboard Template',

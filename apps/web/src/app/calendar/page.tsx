@@ -1,8 +1,6 @@
+import { Calendar, DefaultLayout } from '@denali/ui';
 import type { Metadata } from 'next';
 import type { FC } from 'react';
-
-import { Calendar } from '@/components/Calender';
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
   title: 'Next.js Calender | TailAdmin - Next.js Dashboard Template',

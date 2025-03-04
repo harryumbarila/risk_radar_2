@@ -1,12 +1,10 @@
 'use client';
 
+import { Breadcrumb, DefaultLayout, Loader } from '@denali/ui';
 import { useRouter } from 'next/navigation';
 import type { FC } from 'react';
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
-import { Loader } from '@/components/common/Loader';
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 import { RiskRadarTableComponent } from '@/components/RiskRadar/RiskRadarTable';
 import { useExceptionData } from '@/hooks/risk-radar/useExceptionData';
 import { useFilteredRiskRadar } from '@/hooks/risk-radar/useFilteredRiskRadar';

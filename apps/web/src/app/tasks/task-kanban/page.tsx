@@ -1,8 +1,6 @@
+import { DefaultLayout, TaskKanban } from '@denali/ui';
 import type { Metadata } from 'next';
 import type { FC } from 'react';
-
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
-import { TaskKanban } from '@/components/Tasks/KanbanTasks';
 
 export const metadata: Metadata = {
   title: 'Next.js Kanban | TailAdmin - Next.js Dashboard Template',

@@ -3,7 +3,7 @@ import '@/css/simple-datatables.css';
 import '@/css/style.css';
 import 'dropzone/dist/dropzone.css';
 import 'flatpickr/dist/flatpickr.min.css';
-import 'jsvectormap/dist/jsvectormap.css';
+// import 'jsvectormap/dist/jsvectormap.css';
 import 'nouislider/dist/nouislider.css';
 
 import { FronteggAppProvider } from '@frontegg/nextjs/app';

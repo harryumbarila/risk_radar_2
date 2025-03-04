@@ -1,11 +1,12 @@
+import {
+  Breadcrumb,
+  DefaultLayout,
+  TableOne,
+  TableThree,
+  TableTwo,
+} from '@denali/ui';
 import type { Metadata } from 'next';
 import type { FC } from 'react';
-
-import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
-import { TableOne } from '@/components/Tables/TableOne';
-import { TableThree } from '@/components/Tables/TableThree';
-import { TableTwo } from '@/components/Tables/TableTwo';
 
 export const metadata: Metadata = {
   title: 'Next.js Tables | TailAdmin - Next.js Dashboard Template',

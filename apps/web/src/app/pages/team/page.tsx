@@ -1,10 +1,6 @@
+import { Breadcrumb, DefaultLayout, TeamOne, TeamTwo } from '@denali/ui';
 import type { Metadata } from 'next';
 import React from 'react';
-
-import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
-import { TeamOne } from '@/components/Teams/TeamOne';
-import { TeamTwo } from '@/components/Teams/TeamTwo';
 
 export const metadata: Metadata = {
   title: 'Next.js Teams | TailAdmin - Next.js Dashboard Template',

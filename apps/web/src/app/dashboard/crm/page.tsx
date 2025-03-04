@@ -1,8 +1,6 @@
+import { CRM, DefaultLayout } from '@denali/ui';
 import type { Metadata } from 'next';
 import type { FC } from 'react';
-
-import { CRM } from '@/components/Dashboard/CRM';
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
   title: 'Next.js CRM Dashboard | TailAdmin - Next.js Dashboard Template',

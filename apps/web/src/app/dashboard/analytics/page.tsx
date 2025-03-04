@@ -1,8 +1,6 @@
+import { Analytics, DefaultLayout } from '@denali/ui';
 import type { Metadata } from 'next';
 import type { FC } from 'react';
-
-import { Analytics } from '@/components/Dashboard/Analytics';
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
   title: 'Next.js Analytics Dashboard | TailAdmin - Next.js Dashboard Template',

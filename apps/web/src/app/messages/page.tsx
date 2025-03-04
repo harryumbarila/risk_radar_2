@@ -1,8 +1,6 @@
+import { DefaultLayout, Messages } from '@denali/ui';
 import type { Metadata } from 'next';
 import type { FC } from 'react';
-
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
-import { Messages } from '@/components/Messages';
 
 export const metadata: Metadata = {
   title: 'Next.js Messages | TailAdmin - Next.js Dashboard Template',

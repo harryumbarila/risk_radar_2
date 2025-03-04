@@ -12,7 +12,8 @@
       "@/types/*": ["./src/types/*"],
       "@/auth0-config": ["./src/auth0-config.ts"],
 
-      "@/shared/*": ["../../packages/shared/src/*"]
+      "@/shared/*": ["../../packages/shared/src/*"],
+      "@/ui/*": ["../../packages/ui/src/*"]
     }
   },
   "include": [

@@ -1,8 +1,6 @@
+import { DefaultLayout, ProFormElements } from '@denali/ui';
 import type { Metadata } from 'next';
 import type { FC } from 'react';
-
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
-import { ProFormElements } from '@/components/ProFormElements';
 
 export const metadata: Metadata = {
   title: 'Next.js Pro Form Elements | TailAdmin - Next.js Dashboard Template',
