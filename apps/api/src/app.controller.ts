@@ -6,6 +6,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { Public } from '@/api/shared/auth/decorator/public.decorator';
+
 class AppVersionResponseDto {
   @ApiProperty({ description: 'Current app version' })
   public version: string;
@@ -44,6 +46,7 @@ class AppStatusResponseDto {
 
 @ApiTags('App')
 @Controller()
+@Public()
 export class AppController {
   @ApiResponse({
     status: 200,

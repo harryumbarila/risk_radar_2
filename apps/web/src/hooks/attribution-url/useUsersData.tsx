@@ -1,7 +1,5 @@
-import useSWR from 'swr';
-
-import { baseApi } from '@/hooks/baseApi';
 import type { IrisFilteredUsersResponseDto } from '@/shared/response/iris-proxy';
+import { useApiSWR } from '@/hooks/useBaseApi';
 
 type UseUsersDataReturnType = {
   data: IrisFilteredUsersResponseDto | undefined;
@@ -10,16 +8,8 @@ type UseUsersDataReturnType = {
 };
 
 export const useUsersData = (): UseUsersDataReturnType => {
-  const { data, error, isLoading } = useSWR<
-    IrisFilteredUsersResponseDto,
-    unknown
-  >(
-    '/v1/iris_proxy/users', // Only the relative endpoint
-    baseApi, // Use the fetcher with BASE_URL
-    {
-      dedupingInterval: 100,
-      revalidateOnFocus: false,
-    }
+  const { data, error, isLoading } = useApiSWR<IrisFilteredUsersResponseDto>(
+    '/v1/iris_proxy/users'
   );
 
   return { data, error, isLoading };
