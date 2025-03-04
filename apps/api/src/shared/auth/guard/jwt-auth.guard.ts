@@ -3,14 +3,12 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
 
-import { AuthService } from '../auth.service';
-import { IS_PUBLIC_KEY } from '../decorator/public.decorator';
+import { AuthService } from '@/api/shared/auth/auth.service';
+import { IS_PUBLIC_KEY } from '@/api/shared/auth/decorator/public.decorator';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   public static readonly REQUEST_USER_ENTITY_KEY: string = 'userEntity';
-
-  public static readonly JWT_BEARER_HEADER_VALUE: string = 'Bearer';
 
   public constructor(
     private authService: AuthService,
