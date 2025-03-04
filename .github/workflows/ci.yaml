@@ -16,9 +16,6 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Install system dependencies
-        run: apt-get update && apt-get install -y bash coreutils
-
       - name: Install dependencies
         run: yarn install
 
@@ -35,14 +32,17 @@ jobs:
         run: yarn turbo run build --filter=@denali/api
 
       - name: Set Frontegg environment variables
-        run: echo "FRONTEGG_APP_URL=http://localhost:3000" >> $GITHUB_ENV && \
-          echo "FRONTEGG_BASE_URL=https://app-nypv37bm638g.frontegg.com" >> $GITHUB_ENV && \
-          echo "FRONTEGG_CLIENT_ID=XXX" >> $GITHUB_ENV && \
-          echo "FRONTEGG_APP_ID=XXX" >> $GITHUB_ENV && \
-          echo "FRONTEGG_ENCRYPTION_PASSWORD=XXX" >> $GITHUB_ENV && \
-          echo "FRONTEGG_COOKIE_NAME=fe_session" >> $GITHUB_ENV && \
-          echo "FRONTEGG_HOSTED_LOGIN=true" >> $GITHUB_ENV && \
-          echo "FRONTEGG_LOG_LEVEL=debug" >> $GITHUB_ENV
+        run: |
+          cat >> $GITHUB_ENV << EOF
+          FRONTEGG_APP_URL=http://localhost:3000
+          FRONTEGG_BASE_URL=https://app-nypv37bm638g.frontegg.com
+          FRONTEGG_CLIENT_ID=XXX
+          FRONTEGG_APP_ID=XXX
+          FRONTEGG_ENCRYPTION_PASSWORD=XXX
+          FRONTEGG_COOKIE_NAME=fe_session
+          FRONTEGG_HOSTED_LOGIN=true
+          FRONTEGG_LOG_LEVEL=debug
+          EOF
 
       - name: Run WEB build
         run: yarn turbo run build --filter=@denali/web
