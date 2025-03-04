@@ -12,7 +12,7 @@ RUN yarn --frozen-lockfile
 
 ENV CI true 
 
-RUN echo "FRONTEGG_ENCRYPTION_PASSWORD=XXX" >> /var/www/html/.env.local
+RUN echo "FRONTEGG_ENCRYPTION_PASSWORD=XXX" >> /var/www/html/apps/web/.env.local
 
 RUN yarn turbo run build --filter=@denali/web
 
