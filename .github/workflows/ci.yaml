@@ -31,19 +31,7 @@ jobs:
       - name: Run API build
         run: yarn turbo run build --filter=@denali/api
 
-      - name: Create .env.local file
-        run: |
-          echo "FRONTEGG_APP_URL=ybuser" >> .env.local
-          echo "FRONTEGG_BASE_URL=password" >> .env.local
-          echo "FRONTEGG_CLIENT_ID=yb" >> .env.local
-          echo "FRONTEGG_APP_ID=postgres" >> .env.local
-          echo "FRONTEGG_ENCRYPTION_PASSWORD=5432" >> .env.local
-          echo "FRONTEGG_COOKIE_NAME=5432" >> .env.local
-          echo "FRONTEGG_HOSTED_LOGIN=ci" >> .env.local
-          set -o allexport
-          source .env.local
-          set +o allexport
-        shell: bash
-
       - name: Run WEB build
         run: yarn turbo run build --filter=@denali/web
+        env:
+          FRONTEGG_ENCRYPTION_PASSWORD: ""
