@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import useBaseApi from '@/hooks/useBaseApi';
 import type { RiskRadarResponseDto } from '@/shared/response';
-
-import { riskRadarApi } from './riskRadarApi';
 
 export type FilterState = {
   from_date: string;
@@ -27,6 +26,8 @@ type UseFilteredRiskRadarReturnType = {
 };
 
 export const useFilteredRiskRadar = (): UseFilteredRiskRadarReturnType => {
+  const { makeRequest } = useBaseApi();
+
   const [filters, setFilters] = useState<FilterState>({
     from_date: '',
     to_date: '',
@@ -68,7 +69,7 @@ export const useFilteredRiskRadar = (): UseFilteredRiskRadarReturnType => {
           records_per_page: filters.records_per_page.toString(),
         });
 
-        const result = await riskRadarApi<RiskRadarResponseDto>(
+        const result = await makeRequest<RiskRadarResponseDto>(
           `/v1/legacy_dashboard_proxy/risk_radar?${queryParams.toString()}`
         );
         setData(result);
@@ -81,7 +82,7 @@ export const useFilteredRiskRadar = (): UseFilteredRiskRadarReturnType => {
     };
 
     fetchData().catch(() => {});
-  }, [filters, isInitialized]);
+  }, [filters, isInitialized, makeRequest]);
 
   return { filters, setFilters, data, isLoading, error };
 };

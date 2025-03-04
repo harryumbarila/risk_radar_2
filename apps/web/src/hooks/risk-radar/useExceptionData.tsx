@@ -1,8 +1,5 @@
-import useSWR from 'swr';
-
+import { useApiSWR } from '@/hooks/useBaseApi';
 import type { ExceptionDataResponseDto } from '@/shared/response/legacy-dashboard-proxy';
-
-import { riskRadarApi } from './riskRadarApi';
 
 type UseExceptionDataReturnType = {
   data: ExceptionDataResponseDto | undefined;
@@ -11,13 +8,8 @@ type UseExceptionDataReturnType = {
 };
 
 export const useExceptionData = (): UseExceptionDataReturnType => {
-  const { data, error, isLoading } = useSWR<ExceptionDataResponseDto, unknown>(
-    '/v1/legacy_dashboard_proxy/exception_data', // Only the relative endpoint
-    riskRadarApi, // Use the fetcher with BASE_URL
-    {
-      dedupingInterval: 100,
-      revalidateOnFocus: false,
-    }
+  const { data, error, isLoading } = useApiSWR<ExceptionDataResponseDto>(
+    '/v1/legacy_dashboard_proxy/exception_data'
   );
 
   return { data, error, isLoading };

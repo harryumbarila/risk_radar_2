@@ -37,6 +37,9 @@ yarn dev
 This will launch the **NestJS** server, making your API available at
 `http://localhost:3001/`.
 
+This will launch swagger documentation
+
+`http://localhost:3001/api/swagger`.
 ---
 
 ### 🏗️ Building for Production
@@ -68,10 +71,10 @@ Your API will now be running in production mode. 🎯
 ```text
 api/
 ├── src/
-│   ├── modules/         # Feature modules (e.g., users, products, auth)
+│   ├── module/         # Feature modules (e.g., users, products, auth)
 │   │   ├── user/        # User module (controller, service, DTOs, etc.)
 │   │   ├── auth/        # Authentication module (NextAuth integration)
-│   │   ├── common/      # Shared utilities (filters, guards, pipes, etc.)
+|   |── shared/          # Shared utilities (filters, guards, pipes, etc.)
 │   ├── main.ts          # API entry point
 │   ├── app.module.ts    # Root application module
 ├── tests/               # Unit tests with Jest
