@@ -31,18 +31,19 @@ jobs:
       - name: Run API build
         run: yarn turbo run build --filter=@denali/api
 
-      - name: Set Frontegg environment variables
+      - name: Create .env.local file
         run: |
-          cat >> $GITHUB_ENV << EOF
-          FRONTEGG_APP_URL=http://localhost:3000
-          FRONTEGG_BASE_URL=https://app-nypv37bm638g.frontegg.com
-          FRONTEGG_CLIENT_ID=XXX
-          FRONTEGG_APP_ID=XXX
-          FRONTEGG_ENCRYPTION_PASSWORD=XXX
-          FRONTEGG_COOKIE_NAME=fe_session
-          FRONTEGG_HOSTED_LOGIN=true
-          FRONTEGG_LOG_LEVEL=debug
-          EOF
+          echo "FRONTEGG_APP_URL=ybuser" >> .env.local
+          echo "FRONTEGG_BASE_URL=password" >> .env.local
+          echo "FRONTEGG_CLIENT_ID=yb" >> .env.local
+          echo "FRONTEGG_APP_ID=postgres" >> .env.local
+          echo "FRONTEGG_ENCRYPTION_PASSWORD=5432" >> .env.local
+          echo "FRONTEGG_COOKIE_NAME=5432" >> .env.local
+          echo "FRONTEGG_HOSTED_LOGIN=ci" >> .env.local
+          set -o allexport
+          source .env.local
+          set +o allexport
+        shell: bash
 
       - name: Run WEB build
         run: yarn turbo run build --filter=@denali/web
