@@ -1,5 +1,6 @@
 import { useAuth } from '@frontegg/nextjs';
-import useSWR, { SWRConfiguration, SWRResponse } from 'swr';
+import type { SWRConfiguration, SWRResponse } from 'swr';
+import useSWR from 'swr';
 
 const BACKEND_BASE_URL = 'https://dashboard-api.taluspay-staging.com';
 

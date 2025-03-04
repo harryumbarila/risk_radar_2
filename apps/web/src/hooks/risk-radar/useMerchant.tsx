@@ -1,5 +1,5 @@
-import type { MerchantResponseDto } from '@/shared/response/legacy-dashboard-proxy';
 import { useApiSWR } from '@/hooks/useBaseApi';
+import type { MerchantResponseDto } from '@/shared/response/legacy-dashboard-proxy';
 
 type UseMerchantReturnType = {
   data: MerchantResponseDto | undefined;

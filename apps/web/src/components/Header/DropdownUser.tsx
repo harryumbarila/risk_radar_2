@@ -1,8 +1,8 @@
-import Link from 'next/link';
-import { FC, useCallback } from 'react';
-import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@frontegg/nextjs';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import type { FC } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export const DropdownUser: FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);

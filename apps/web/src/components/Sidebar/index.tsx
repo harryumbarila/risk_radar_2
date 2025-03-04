@@ -1,5 +1,6 @@
 'use client';
 
+import { useAuth } from '@frontegg/nextjs';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -9,7 +10,6 @@ import { useEffect, useRef, useState } from 'react';
 import { roles } from '@/types/roles';
 
 import { SidebarLinkGroup } from './SidebarLinkGroup';
-import { useAuth } from '@frontegg/nextjs';
 
 type SidebarProps = {
   sidebarOpen: boolean;

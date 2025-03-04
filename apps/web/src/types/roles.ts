@@ -1,5 +1,5 @@
-import { User } from '@frontegg/redux-store/auth/interfaces';
-import { IRole } from '@frontegg/rest-api/roles/interfaces';
+import type { User } from '@frontegg/redux-store/auth/interfaces';
+import type { IRole } from '@frontegg/rest-api/roles/interfaces';
 
 export const ROLE_SALES = 'Sales';
 

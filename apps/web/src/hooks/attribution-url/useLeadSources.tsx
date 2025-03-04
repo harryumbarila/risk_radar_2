@@ -1,5 +1,5 @@
-import type { IrisLeadSourcesResponseDto } from '@/shared/response/iris-proxy';
 import { useApiSWR } from '@/hooks/useBaseApi';
+import type { IrisLeadSourcesResponseDto } from '@/shared/response/iris-proxy';
 
 type UseLeadSourcesReturnType = {
   data: IrisLeadSourcesResponseDto | undefined;

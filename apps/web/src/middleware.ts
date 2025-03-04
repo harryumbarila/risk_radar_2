@@ -1,9 +1,9 @@
-import { NextRequest } from 'next/server';
 import { handleSessionOnEdge } from '@frontegg/nextjs/edge';
+import type { NextRequest } from 'next/server';
 
 export const middleware = async (request: NextRequest) => {
   const { pathname, searchParams } = request.nextUrl;
-  const headers = request.headers;
+  const { headers } = request;
 
   // shouldByPassMiddleware from getSessionOnEdge was moved under the hood of handleSessionOnEdge
 

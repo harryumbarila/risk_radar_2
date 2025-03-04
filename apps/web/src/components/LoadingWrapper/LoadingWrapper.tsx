@@ -1,6 +1,8 @@
 'use client';
 
-import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
+import type { FC, PropsWithChildren } from 'react';
+import React, { useEffect, useState } from 'react';
+
 import { Loader } from '@/components/common/Loader';
 
 export const LoadingWrapper: FC<PropsWithChildren> = ({ children }) => {

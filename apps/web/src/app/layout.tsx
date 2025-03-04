@@ -5,8 +5,8 @@ import 'dropzone/dist/dropzone.css';
 import 'flatpickr/dist/flatpickr.min.css';
 import 'jsvectormap/dist/jsvectormap.css';
 import 'nouislider/dist/nouislider.css';
-import { FronteggAppProvider } from '@frontegg/nextjs/app';
 
+import { FronteggAppProvider } from '@frontegg/nextjs/app';
 import type { FC, PropsWithChildren } from 'react';
 
 import { LoadingWrapper } from '@/components/LoadingWrapper/LoadingWrapper';
