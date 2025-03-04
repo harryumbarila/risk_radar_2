@@ -17,7 +17,12 @@ type SidebarProps = {
 };
 
 export const Sidebar: FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
-  const pathname = usePathname();
+  let pathname = usePathname();
+
+  if (pathname == null) {
+    pathname = '';
+  }
+
   const { user } = useAuth();
   const { isSales } = roles(user);
 
