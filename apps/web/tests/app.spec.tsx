@@ -1,17 +1,13 @@
 import '@testing-library/jest-dom';
 
 import { render, screen } from '@testing-library/react';
-import type { PropsWithChildren } from 'react';
 
-import App from '@/app/page';
+import MainPage from '@/app/page';
 
 // Mock the Auth0 hooks
-jest.mock('@auth0/nextjs-auth0/client', () => ({
-  UserProvider: ({ children }: PropsWithChildren): React.ReactNode => {
-    return children;
-  },
-  useUser: jest.fn(() => ({
-    user: { name: 'Test User', email: 'test@example.com' },
+jest.mock('@frontegg/nextjs', () => ({
+  useAuth: jest.fn(() => ({
+    user: { name: 'Test User', email: 'test@example.com', roles: ['Sales'] },
     error: null,
     isLoading: false,
   })),
@@ -30,9 +26,9 @@ jest.mock('next/navigation', () => ({
   usePathname: jest.fn(() => '/'),
 }));
 
-describe('App Component', () => {
+describe('MainPage Component', () => {
   it('renders the main page', () => {
-    render(<App />);
+    render(<MainPage />);
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
   });
 });
