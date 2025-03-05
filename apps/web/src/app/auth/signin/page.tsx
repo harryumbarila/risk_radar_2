@@ -1,9 +1,10 @@
 'use client';
 
-import { NoAuthLayout } from '@denali/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
+
+import { NoAuthLayout } from '@/components/layouts/no-auth-layout';
 
 const SignIn: React.FC = () => {
   const handleClick = (event: React.MouseEvent<HTMLInputElement>): void => {
