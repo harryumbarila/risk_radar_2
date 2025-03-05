@@ -1,10 +1,7 @@
 import type { ApexOptions } from 'apexcharts';
-import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
 
-const ReactApexChart = dynamic(() => import('react-apexcharts'), {
-  ssr: false,
-});
+import { ApexChartWrapper } from './wrapper/apex-chart-wrapper';
 
 type ChartEightState = {
   series: number[];
@@ -22,8 +19,6 @@ export const ChartEight: React.FC = () => {
       // Update the desired properties
     }));
   };
-
-  const isClient = typeof window === 'object';
 
   useEffect(() => {
     updateState();
@@ -116,13 +111,11 @@ export const ChartEight: React.FC = () => {
       </div>
       <div className="mb-2">
         <div id="chartEight" className="mx-auto flex justify-center">
-          {isClient && (
-            <ReactApexChart
-              options={options}
-              series={state.series}
-              type="donut"
-            />
-          )}
+          <ApexChartWrapper
+            options={options}
+            series={state.series}
+            type="donut"
+          />
         </div>
       </div>
 

@@ -1,12 +1,9 @@
 'use client';
 
 import type { ApexOptions } from 'apexcharts';
-import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
 
-const ReactApexChart = dynamic(() => import('react-apexcharts'), {
-  ssr: false,
-});
+import { ApexChartWrapper } from './wrapper/apex-chart-wrapper';
 
 type ChartTwelveState = {
   series: {
@@ -256,8 +253,6 @@ export const ChartTwelve: React.FC = () => {
     ],
   });
 
-  const isClient = typeof window === 'object';
-
   // Update the state
   const updateState = (): void => {
     setState((prevState) => ({
@@ -428,14 +423,12 @@ export const ChartTwelve: React.FC = () => {
       </div>
       <div>
         <div id="chartThirteen" className="-ml-5">
-          {isClient && (
-            <ReactApexChart
-              options={options}
-              series={state.series}
-              type="area"
-              height={310}
-            />
-          )}
+          <ApexChartWrapper
+            options={options}
+            series={state.series}
+            type="area"
+            height={310}
+          />
         </div>
       </div>
     </div>

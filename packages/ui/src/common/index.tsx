@@ -42,6 +42,7 @@ export * from './charts/chart-ten';
 export * from './charts/chart-three';
 export * from './charts/chart-twelve';
 export * from './charts/chart-two';
+export * from './charts/wrapper/apex-chart-wrapper';
 export * from './chat/chat-card';
 export * from './check-marks/check-mark';
 export * from './checkboxes/checkbox-five';

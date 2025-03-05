@@ -1,10 +1,7 @@
 import type { ApexOptions } from 'apexcharts';
-import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
 
-const ReactApexChart = dynamic(() => import('react-apexcharts'), {
-  ssr: false,
-});
+import { ApexChartWrapper } from './wrapper/apex-chart-wrapper';
 
 type ChartThreeState = {
   series: number[];
@@ -57,8 +54,6 @@ export const ChartThree: React.FC = () => {
   const [state, setState] = useState<ChartThreeState>({
     series: [65, 34, 12, 56],
   });
-
-  const isClient = typeof window === 'object';
 
   const handleReset = (): void => {
     setState((prevState) => ({
@@ -119,13 +114,11 @@ export const ChartThree: React.FC = () => {
 
       <div className="mb-2">
         <div id="chartThree" className="mx-auto flex justify-center">
-          {isClient && (
-            <ReactApexChart
-              options={options}
-              series={state.series}
-              type="donut"
-            />
-          )}
+          <ApexChartWrapper
+            options={options}
+            series={state.series}
+            type="donut"
+          />
         </div>
       </div>
 

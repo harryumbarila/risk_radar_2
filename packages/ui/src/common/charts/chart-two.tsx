@@ -1,10 +1,7 @@
 import type { ApexOptions } from 'apexcharts';
-import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
 
-const ReactApexChart = dynamic(() => import('react-apexcharts'), {
-  ssr: false,
-});
+import { ApexChartWrapper } from './wrapper/apex-chart-wrapper';
 
 const options: ApexOptions = {
   colors: ['#3C50E0', '#80CAEE'],
@@ -83,8 +80,6 @@ export const ChartTwo: React.FC = () => {
     ],
   });
 
-  const isClient = typeof window === 'object';
-
   const handleReset = (): void => {
     setState((prevState) => ({
       ...prevState,
@@ -143,14 +138,12 @@ export const ChartTwo: React.FC = () => {
 
       <div>
         <div id="chartTwo" className="-mb-9 -ml-5">
-          {isClient && (
-            <ReactApexChart
-              options={options}
-              series={state.series}
-              type="bar"
-              height={350}
-            />
-          )}
+          <ApexChartWrapper
+            options={options}
+            series={state.series}
+            type="bar"
+            height={350}
+          />
         </div>
       </div>
     </div>

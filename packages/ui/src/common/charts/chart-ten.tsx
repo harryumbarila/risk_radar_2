@@ -1,10 +1,7 @@
 import type { ApexOptions } from 'apexcharts';
-import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
 
-const ReactApexChart = dynamic(() => import('react-apexcharts'), {
-  ssr: false,
-});
+import { ApexChartWrapper } from './wrapper/apex-chart-wrapper';
 
 type ChartTenState = {
   series: {
@@ -30,8 +27,6 @@ export const ChartTen: React.FC = () => {
       },
     ],
   });
-
-  const isClient = typeof window === 'object';
 
   // Update the state
   const updateState = (): void => {
@@ -165,14 +160,12 @@ export const ChartTen: React.FC = () => {
 
       <div className="px-7.5">
         <div id="chartTen" className="-ml-5">
-          {isClient && (
-            <ReactApexChart
-              options={options}
-              series={state.series}
-              type="bar"
-              height={318}
-            />
-          )}
+          <ApexChartWrapper
+            options={options}
+            series={state.series}
+            type="bar"
+            height={318}
+          />
         </div>
       </div>
     </div>

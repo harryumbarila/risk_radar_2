@@ -1,10 +1,7 @@
 import type { ApexOptions } from 'apexcharts';
-import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
 
-const ReactApexChart = dynamic(() => import('react-apexcharts'), {
-  ssr: false,
-});
+import { ApexChartWrapper } from './wrapper/apex-chart-wrapper';
 
 type ChartFourState = {
   series: { data: number[] }[];
@@ -22,8 +19,6 @@ export const ChartFour: React.FC = () => {
       },
     ],
   });
-
-  const isClient = typeof window === 'object';
 
   // Update the state
   const updateState = (): void => {
@@ -151,14 +146,12 @@ export const ChartFour: React.FC = () => {
 
       <div className="mb-2">
         <div id="chartFour" className="-ml-5">
-          {isClient && (
-            <ReactApexChart
-              options={options}
-              series={state.series}
-              type="bar"
-              height={350}
-            />
-          )}
+          <ApexChartWrapper
+            options={options}
+            series={state.series}
+            type="bar"
+            height={350}
+          />
         </div>
       </div>
     </div>
