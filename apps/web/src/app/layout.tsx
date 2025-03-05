@@ -9,7 +9,7 @@ import 'nouislider/dist/nouislider.css';
 import { FronteggAppProvider } from '@frontegg/nextjs/app';
 import type { FC, PropsWithChildren } from 'react';
 
-import { LoadingWrapper } from '@/components/LoadingWrapper/LoadingWrapper';
+import { LoadingWrapper } from '@/web/src/components/loading-wrapper/loading-wrapper';
 
 const RootLayout: FC<PropsWithChildren> = ({ children }) => {
   const authOptions = {

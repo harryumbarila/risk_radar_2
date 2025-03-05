@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { useLocalStorage } from './useLocalStorage';
+import { useLocalStorage } from './use-local-storage';
 
 type UseColorReturnType = [string, (value: string) => void];
 

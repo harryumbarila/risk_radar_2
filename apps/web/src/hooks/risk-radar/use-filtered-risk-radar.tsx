@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import useBaseApi from '@/hooks/useBaseApi';
 import type { RiskRadarResponseDto } from '@/shared/response';
+import useBaseApi from '@/web/src/hooks/use-base-api';
 
 export type FilterState = {
   from_date: string;
