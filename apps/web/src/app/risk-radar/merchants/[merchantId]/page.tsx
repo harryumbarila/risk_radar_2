@@ -1,9 +1,10 @@
 'use client';
 
-import { Breadcrumb, DefaultLayout } from '@denali/ui';
+import { Breadcrumb } from '@denali/ui';
 import { notFound } from 'next/navigation';
 import type { FC } from 'react';
 
+import { DefaultLayout } from '@/components/layouts/default-layout';
 import { useMerchant } from '@/hooks/risk-radar/useMerchant';
 
 type Props = {

@@ -1,12 +1,8 @@
-import {
-  Breadcrumb,
-  DefaultLayout,
-  ListOne,
-  ListThree,
-  ListTwo,
-} from '@denali/ui';
+import { Breadcrumb, ListOne, ListThree, ListTwo } from '@denali/ui';
 import type { Metadata } from 'next';
 import type { FC } from 'react';
+
+import { DefaultLayout } from '@/components/layouts/default-layout';
 
 export const metadata: Metadata = {
   title: 'Next.js List | TailAdmin - Next.js Dashboard Template',

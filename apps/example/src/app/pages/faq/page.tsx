@@ -1,6 +1,8 @@
-import { Breadcrumb, DefaultLayout, FaqOne } from '@denali/ui';
+import { Breadcrumb, FaqOne } from '@denali/ui';
 import type { Metadata } from 'next';
 import React from 'react';
+
+import { DefaultLayout } from '@/components/layouts/default-layout';
 
 export const metadata: Metadata = {
   title: "Next.js Faq's | TailAdmin - Next.js Dashboard Template",

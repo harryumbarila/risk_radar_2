@@ -1,11 +1,11 @@
 'use client';
 
 import type { FC, PropsWithChildren } from 'react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
+import { Sidebar } from '@/components/sidebar';
 import { Header } from '@/ui/common/header';
 import { NotificationsContainer } from '@/ui/common/notifications/notification-content';
-import { Sidebar } from '@/ui/common/sidebar';
 
 export const DefaultLayout: FC<PropsWithChildren> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);

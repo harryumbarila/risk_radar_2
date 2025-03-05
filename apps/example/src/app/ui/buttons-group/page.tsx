@@ -1,11 +1,8 @@
-import {
-  Breadcrumb,
-  ButtonsGroupOne,
-  ButtonsGroupTwo,
-  DefaultLayout,
-} from '@denali/ui';
+import { Breadcrumb, ButtonsGroupOne, ButtonsGroupTwo } from '@denali/ui';
 import type { Metadata } from 'next';
 import React from 'react';
+
+import { DefaultLayout } from '@/components/layouts/default-layout';
 
 export const metadata: Metadata = {
   title: 'Next.js Button Groups | TailAdmin - Next.js Dashboard Template',

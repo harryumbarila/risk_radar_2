@@ -1,7 +1,9 @@
-import { DefaultLayout, Popovers } from '@denali/ui';
+import { Popovers } from '@denali/ui';
 import type { Metadata } from 'next';
 import type { FC } from 'react';
 import React from 'react';
+
+import { DefaultLayout } from '@/components/layouts/default-layout';
 
 export const metadata: Metadata = {
   title: 'Next.js Popovers | TailAdmin - Next.js Dashboard Template',

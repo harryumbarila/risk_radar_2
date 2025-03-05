@@ -1,11 +1,12 @@
 'use client';
 
-import { NoAuthLayout } from '@denali/ui';
 import { useAuth, useLoginWithRedirect } from '@frontegg/nextjs';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React from 'react';
+
+import { NoAuthLayout } from '@/components/layouts/no-auth-layout';
 
 const Login: React.FC = () => {
   const { isAuthenticated } = useAuth();

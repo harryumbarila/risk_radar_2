@@ -10,7 +10,6 @@ module.exports = {
     // Allow the return keyword in else blocks to a easy code remove for the scripts
     'no-else-return': 'off',
     'unused-imports/no-unused-imports': 'error',
-    'import/no-default-export': 'off',
     'unused-imports/no-unused-vars': [
       'warn',
       {
@@ -36,8 +35,6 @@ module.exports = {
   },
   ignorePatterns: [
     'auth0-config.ts',
-    'dropzone.d.ts',
-    'jsvectormap.d.ts',
     'react-table-config.d.ts',
     'cypress.config.ts',
   ],

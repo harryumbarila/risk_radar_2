@@ -1,12 +1,13 @@
 import {
   Breadcrumb,
-  DefaultLayout,
   PaginationOne,
   PaginationThree,
   PaginationTwo,
 } from '@denali/ui';
 import type { Metadata } from 'next';
 import React from 'react';
+
+import { DefaultLayout } from '@/components/layouts/default-layout';
 
 export const metadata: Metadata = {
   title: 'Next.js Pagination | TailAdmin - Next.js Dashboard Template',

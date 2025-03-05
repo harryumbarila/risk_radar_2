@@ -1,6 +1,8 @@
-import { DefaultLayout, Inbox } from '@denali/ui';
+import { Inbox } from '@denali/ui';
 import type { Metadata } from 'next';
 import React from 'react';
+
+import { DefaultLayout } from '@/components/layouts/default-layout';
 
 export const metadata: Metadata = {
   title: 'Next.js Inbox | TailAdmin - Next.js Dashboard Template',

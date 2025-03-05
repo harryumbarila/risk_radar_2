@@ -1,6 +1,8 @@
-import { AvatarOne, AvatarTwo, Breadcrumb, DefaultLayout } from '@denali/ui';
+import { AvatarOne, AvatarTwo, Breadcrumb } from '@denali/ui';
 import type { Metadata } from 'next';
 import type { FC } from 'react';
+
+import { DefaultLayout } from '@/components/layouts/default-layout';
 
 export const metadata: Metadata = {
   title: 'Next.js Avatars | TailAdmin - Next.js Dashboard Template',
