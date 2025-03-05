@@ -1,5 +1,5 @@
-import { useApiSWR } from '@/hooks/useBaseApi';
 import type { ExceptionDataResponseDto } from '@/shared/response/legacy-dashboard-proxy';
+import { useApiSWR } from '@/web/src/hooks/use-base-api';
 
 type UseExceptionDataReturnType = {
   data: ExceptionDataResponseDto | undefined;

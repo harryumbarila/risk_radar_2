@@ -5,16 +5,16 @@ import { notFound } from 'next/navigation';
 import type { FC } from 'react';
 
 import { DefaultLayout } from '@/components/layouts/default-layout';
-import { useMerchant } from '@/hooks/risk-radar/useMerchant';
+import { useMerchant } from '@/hooks/risk-radar/use-merchant';
 
 type Props = {
   params: {
-    merchantId: string;
+    id: string;
   };
 };
 
 const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
-  const { merchantId } = params;
+  const { id: merchantId } = params;
 
   const { data, error, isLoading } = useMerchant(merchantId);
 

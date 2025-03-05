@@ -1,5 +1,5 @@
-import { useApiSWR } from '@/hooks/useBaseApi';
 import type { IrisFilteredUsersResponseDto } from '@/shared/response/iris-proxy';
+import { useApiSWR } from '@/web/src/hooks/use-base-api';
 
 type UseUsersDataReturnType = {
   data: IrisFilteredUsersResponseDto | undefined;

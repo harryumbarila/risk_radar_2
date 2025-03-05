@@ -35,6 +35,7 @@
     "@denali/eslint-config": "*",
     "@denali/shared": "*",
     "@denali/typescript-config": "*",
+    "@ls-lint/ls-lint": "^2.2.3",
     "cross-env": "^7.0.3",
     "cz-git": "^1.11.0",
     "git-cz": "^4.9.0",

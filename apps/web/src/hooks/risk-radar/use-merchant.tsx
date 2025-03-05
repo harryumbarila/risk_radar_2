@@ -1,4 +1,4 @@
-import { useApiSWR } from '@/hooks/useBaseApi';
+import { useApiSWR } from '@/hooks/use-base-api';
 import type { MerchantResponseDto } from '@/shared/response/legacy-dashboard-proxy';
 
 type UseMerchantReturnType = {

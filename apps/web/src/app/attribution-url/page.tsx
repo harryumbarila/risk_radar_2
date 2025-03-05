@@ -4,9 +4,9 @@ import { Breadcrumb, showNotification } from '@denali/ui';
 import React, { useState } from 'react';
 
 import { DefaultLayout } from '@/components/layouts/default-layout';
-import { useLeadSources } from '@/hooks/attribution-url/useLeadSources';
-import { useSourceMatcher } from '@/hooks/attribution-url/useSourceMatcher';
-import { useUsersData } from '@/hooks/attribution-url/useUsersData';
+import { useLeadSources } from '@/hooks/attribution-url/use-lead-sources';
+import { useSourceMatcher } from '@/hooks/attribution-url/use-source-matcher';
+import { useUsersData } from '@/hooks/attribution-url/use-users-data';
 
 const AttributionUrl: React.FC = () => {
   // Add hook
