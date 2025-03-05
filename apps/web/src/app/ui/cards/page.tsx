@@ -1,11 +1,12 @@
+import {
+  Breadcrumb,
+  CardsItemOne,
+  CardsItemThree,
+  CardsItemTwo,
+  DefaultLayout,
+} from '@denali/ui';
 import type { Metadata } from 'next';
 import React from 'react';
-
-import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
-import { CardsItemOne } from '@/components/cards/CardsItemOne';
-import { CardsItemThree } from '@/components/cards/CardsItemThree';
-import { CardsItemTwo } from '@/components/cards/CardsItemTwo';
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
   title: 'Next.js Cards | TailAdmin - Next.js Dashboard Template',

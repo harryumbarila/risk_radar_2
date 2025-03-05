@@ -1,11 +1,12 @@
+import {
+  Breadcrumb,
+  DefaultLayout,
+  NotificationsFour,
+  NotificationsThree,
+  NotificationsTwo,
+} from '@denali/ui';
 import type { Metadata } from 'next';
 import React from 'react';
-
-import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
-import { NotificationsFour } from '@/components/Notifications/NotificationsFour';
-import { NotificationsThree } from '@/components/Notifications/NotificationsThree';
-import { NotificationsTwo } from '@/components/Notifications/NotificationsTwo';
 
 export const metadata: Metadata = {
   title: 'Next.js Notifications | TailAdmin - Next.js Dashboard Template',

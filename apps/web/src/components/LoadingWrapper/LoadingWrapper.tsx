@@ -1,9 +1,8 @@
 'use client';
 
+import { Loader } from '@denali/ui';
 import type { FC, PropsWithChildren } from 'react';
-import React, { useEffect, useState } from 'react';
-
-import { Loader } from '@/components/common/Loader';
+import { useEffect, useState } from 'react';
 
 export const LoadingWrapper: FC<PropsWithChildren> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true);

@@ -1,10 +1,6 @@
+import { Breadcrumb, DefaultLayout, InvoiceOne, InVoiceTwo } from '@denali/ui';
 import type { Metadata } from 'next';
 import React from 'react';
-
-import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
-import { InvoiceOne } from '@/components/Invoice/InvoiceOne';
-import { InVoiceTwo } from '@/components/Invoice/InvoiceTwo';
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
   title: 'Next.js Invoice | TailAdmin - Next.js Dashboard Template',

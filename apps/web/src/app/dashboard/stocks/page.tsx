@@ -1,8 +1,6 @@
+import { DefaultLayout, Stocks } from '@denali/ui';
 import type { Metadata } from 'next';
 import type { FC } from 'react';
-
-import { Stocks } from '@/components/Dashboard/Stocks';
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
   title: 'Next.js Stocks Dashboard | TailAdmin - Next.js Dashboard Template',

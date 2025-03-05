@@ -1,8 +1,6 @@
+import { DefaultLayout, Marketing } from '@denali/ui';
 import type { Metadata } from 'next';
 import type { FC } from 'react';
-
-import { Marketing } from '@/components/Dashboard/Marketing';
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
   title:

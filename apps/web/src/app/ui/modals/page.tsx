@@ -1,8 +1,6 @@
+import { DefaultLayout, Modals } from '@denali/ui';
 import type { Metadata } from 'next';
 import type { FC } from 'react';
-
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
-import { Modals } from '@/components/Modals';
 
 export const metadata: Metadata = {
   title: 'Next.js Modals | TailAdmin - Next.js Dashboard Template',

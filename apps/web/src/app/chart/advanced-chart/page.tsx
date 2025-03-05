@@ -1,7 +1,5 @@
+import { AdvancedChart, DefaultLayout } from '@denali/ui';
 import type { Metadata } from 'next';
-
-import { AdvancedChart } from '@/components/Charts/AdvancedChart';
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
   title: 'Next.js Advanced Chart | TailAdmin - Next.js Dashboard Template',

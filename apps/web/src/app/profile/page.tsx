@@ -1,10 +1,8 @@
+import { Breadcrumb, DefaultLayout } from '@denali/ui';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { FC } from 'react';
-
-import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
   title: 'Next.js Profile | TailAdmin - Next.js Dashboard Template',

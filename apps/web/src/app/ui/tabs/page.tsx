@@ -1,8 +1,6 @@
+import { DefaultLayout, Tabs } from '@denali/ui';
 import type { Metadata } from 'next';
 import type { FC } from 'react';
-
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
-import { Tabs } from '@/components/Tabs';
 
 export const metadata: Metadata = {
   title: 'Next.js Tabs | TailAdmin - Next.js Dashboard Template',

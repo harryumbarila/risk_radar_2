@@ -1,8 +1,6 @@
+import { DefaultLayout, Dropdowns } from '@denali/ui';
 import type { Metadata } from 'next';
 import type { FC } from 'react';
-
-import { Dropdowns } from '@/components/Dropdowns';
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
   title: 'Next.js Dropdowns | TailAdmin - Next.js Dashboard Template',

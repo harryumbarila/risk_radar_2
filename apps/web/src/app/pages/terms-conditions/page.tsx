@@ -1,8 +1,6 @@
+import { Breadcrumb, DefaultLayout } from '@denali/ui';
 import type { Metadata } from 'next';
 import React from 'react';
-
-import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
 
 export const metadata: Metadata = {
   title: 'Next.js Terms & Conditions | TailAdmin - Next.js Dashboard Template',
