@@ -1,6 +1,10 @@
 import type { ApexOptions } from 'apexcharts';
-import React, { useState } from 'react';
-import ReactApexChart from 'react-apexcharts';
+import dynamic from 'next/dynamic';
+import React, { useEffect, useState } from 'react';
+
+const ReactApexChart = dynamic(() => import('react-apexcharts'), {
+  ssr: false,
+});
 
 const options: ApexOptions = {
   legend: {
@@ -137,12 +141,17 @@ export const ChartOne: React.FC = () => {
     ],
   });
 
+  const isClient = typeof window === 'object';
+
   const handleReset = (): void => {
     setState((prevState) => ({
       ...prevState,
     }));
   };
-  handleReset();
+
+  useEffect(() => {
+    handleReset();
+  }, []);
 
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-8">
@@ -193,12 +202,14 @@ export const ChartOne: React.FC = () => {
 
       <div>
         <div id="chartOne" className="-ml-5">
-          <ReactApexChart
-            options={options}
-            series={state.series}
-            type="area"
-            height={350}
-          />
+          {isClient && (
+            <ReactApexChart
+              options={options}
+              series={state.series}
+              type="area"
+              height={350}
+            />
+          )}
         </div>
       </div>
     </div>

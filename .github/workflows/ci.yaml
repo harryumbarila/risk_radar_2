@@ -33,9 +33,15 @@ jobs:
 
       - name: Run API build
         run: yarn turbo run build --filter=@denali/api
-# Not working skipping to fix it later
-#      - name: Run WEB build
-#        run: yarn turbo run build --filter=@denali/web
-#        env:
-#          CI: true
-#          FRONTEGG_ENCRYPTION_PASSWORD: "XXX"
+
+      - name: Run WEB build
+        run: yarn turbo run build --filter=@denali/web
+        env:
+          FRONTEGG_APP_URL: 'http://localhost:3000'
+          FRONTEGG_BASE_URL: 'https://app-XXX.frontegg.com'
+          FRONTEGG_CLIENT_ID: 'XXX-XXX-XXX-XXX-XXX'
+          FRONTEGG_APP_ID: 'XXX-XXX-XXX-XXX-XXX'
+          FRONTEGG_ENCRYPTION_PASSWORD: 'XXXXXXXXXXXXXXXXXXXXXXXX'
+          FRONTEGG_COOKIE_NAME: 'fe_session'
+          FRONTEGG_HOSTED_LOGIN: 'true'
+          FRONTEGG_LOG_LEVEL: 'debug'

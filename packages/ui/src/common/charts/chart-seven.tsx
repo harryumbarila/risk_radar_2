@@ -1,6 +1,10 @@
 import type { ApexOptions } from 'apexcharts';
-import React, { useState } from 'react';
-import ReactApexChart from 'react-apexcharts';
+import dynamic from 'next/dynamic';
+import React, { useEffect, useState } from 'react';
+
+const ReactApexChart = dynamic(() => import('react-apexcharts'), {
+  ssr: false,
+});
 
 type ChartSevenState = {
   series: {
@@ -23,6 +27,8 @@ export const ChartSeven: React.FC = () => {
     ],
   });
 
+  const isClient = typeof window === 'object';
+
   // Update the state
   const updateState = (): void => {
     setState((prevState) => ({
@@ -30,7 +36,10 @@ export const ChartSeven: React.FC = () => {
       // Update the desired properties
     }));
   };
-  updateState();
+
+  useEffect(() => {
+    updateState();
+  }, []);
 
   const options: ApexOptions = {
     legend: {
@@ -193,12 +202,14 @@ export const ChartSeven: React.FC = () => {
       </div>
       <div>
         <div id="chartSeven" className="-ml-5">
-          <ReactApexChart
-            options={options}
-            series={state.series}
-            type="area"
-            height={310}
-          />
+          {isClient && (
+            <ReactApexChart
+              options={options}
+              series={state.series}
+              type="area"
+              height={310}
+            />
+          )}
         </div>
       </div>
 

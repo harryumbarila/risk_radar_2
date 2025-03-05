@@ -1,8 +1,12 @@
 import type { ApexOptions } from 'apexcharts';
-import React, { useState } from 'react';
-import ReactApexChart from 'react-apexcharts';
+import dynamic from 'next/dynamic';
+import React, { useEffect, useState } from 'react';
 
 import { DropdownDefault } from '@/ui/common/dropdowns/dropdown-default';
+
+const ReactApexChart = dynamic(() => import('react-apexcharts'), {
+  ssr: false,
+});
 
 type ChartSixState = {
   series: {
@@ -26,6 +30,8 @@ export const ChartSix: React.FC = () => {
     ],
   });
 
+  const isClient = typeof window === 'object';
+
   // Update the state
   const updateState = (): void => {
     setState((prevState) => ({
@@ -33,7 +39,10 @@ export const ChartSix: React.FC = () => {
       // Update the desired properties
     }));
   };
-  updateState();
+
+  useEffect(() => {
+    updateState();
+  }, []);
 
   const options: ApexOptions = {
     legend: {
@@ -182,12 +191,14 @@ export const ChartSix: React.FC = () => {
       </div>
       <div>
         <div id="chartSix" className="-ml-5">
-          <ReactApexChart
-            options={options}
-            series={state.series}
-            type="area"
-            height={200}
-          />
+          {isClient && (
+            <ReactApexChart
+              options={options}
+              series={state.series}
+              type="area"
+              height={200}
+            />
+          )}
         </div>
       </div>
     </div>

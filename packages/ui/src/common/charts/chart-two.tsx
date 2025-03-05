@@ -1,6 +1,10 @@
 import type { ApexOptions } from 'apexcharts';
-import React, { useState } from 'react';
-import ReactApexChart from 'react-apexcharts';
+import dynamic from 'next/dynamic';
+import React, { useEffect, useState } from 'react';
+
+const ReactApexChart = dynamic(() => import('react-apexcharts'), {
+  ssr: false,
+});
 
 const options: ApexOptions = {
   colors: ['#3C50E0', '#80CAEE'],
@@ -79,12 +83,17 @@ export const ChartTwo: React.FC = () => {
     ],
   });
 
+  const isClient = typeof window === 'object';
+
   const handleReset = (): void => {
     setState((prevState) => ({
       ...prevState,
     }));
   };
-  handleReset();
+
+  useEffect(() => {
+    handleReset();
+  }, []);
 
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white p-7.5 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-4">
@@ -134,12 +143,14 @@ export const ChartTwo: React.FC = () => {
 
       <div>
         <div id="chartTwo" className="-mb-9 -ml-5">
-          <ReactApexChart
-            options={options}
-            series={state.series}
-            type="bar"
-            height={350}
-          />
+          {isClient && (
+            <ReactApexChart
+              options={options}
+              series={state.series}
+              type="bar"
+              height={350}
+            />
+          )}
         </div>
       </div>
     </div>
