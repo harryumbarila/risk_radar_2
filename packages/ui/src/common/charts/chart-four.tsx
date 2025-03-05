@@ -1,6 +1,7 @@
 import type { ApexOptions } from 'apexcharts';
-import React, { useState } from 'react';
-import ReactApexChart from 'react-apexcharts';
+import React, { useEffect, useState } from 'react';
+
+import { ApexChartWrapper } from './wrapper/apex-chart-wrapper';
 
 type ChartFourState = {
   series: { data: number[] }[];
@@ -26,7 +27,10 @@ export const ChartFour: React.FC = () => {
       // Update the desired properties
     }));
   };
-  updateState();
+
+  useEffect(() => {
+    updateState();
+  }, []);
 
   const options: ApexOptions = {
     colors: ['#3C50E0'],
@@ -142,7 +146,7 @@ export const ChartFour: React.FC = () => {
 
       <div className="mb-2">
         <div id="chartFour" className="-ml-5">
-          <ReactApexChart
+          <ApexChartWrapper
             options={options}
             series={state.series}
             type="bar"

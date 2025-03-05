@@ -9,12 +9,13 @@ export const useColorMode = (): UseColorReturnType => {
 
   useEffect(() => {
     const className = 'dark';
-    const bodyClass = window.document.body.classList;
+    const bodyClass =
+      typeof window !== 'undefined' ? window.document.body.classList : null;
 
     if (colorMode === 'dark') {
-      bodyClass.add(className);
+      bodyClass?.add(className);
     } else {
-      bodyClass.remove(className);
+      bodyClass?.remove(className);
     }
   }, [colorMode]);
 

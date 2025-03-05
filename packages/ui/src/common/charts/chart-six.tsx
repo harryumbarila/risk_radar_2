@@ -1,8 +1,9 @@
 import type { ApexOptions } from 'apexcharts';
-import React, { useState } from 'react';
-import ReactApexChart from 'react-apexcharts';
+import React, { useEffect, useState } from 'react';
 
 import { DropdownDefault } from '@/ui/common/dropdowns/dropdown-default';
+
+import { ApexChartWrapper } from './wrapper/apex-chart-wrapper';
 
 type ChartSixState = {
   series: {
@@ -33,7 +34,10 @@ export const ChartSix: React.FC = () => {
       // Update the desired properties
     }));
   };
-  updateState();
+
+  useEffect(() => {
+    updateState();
+  }, []);
 
   const options: ApexOptions = {
     legend: {
@@ -182,7 +186,7 @@ export const ChartSix: React.FC = () => {
       </div>
       <div>
         <div id="chartSix" className="-ml-5">
-          <ReactApexChart
+          <ApexChartWrapper
             options={options}
             series={state.series}
             type="area"

@@ -1,6 +1,7 @@
 import type { ApexOptions } from 'apexcharts';
-import React, { useState } from 'react';
-import ReactApexChart from 'react-apexcharts';
+import React, { useEffect, useState } from 'react';
+
+import { ApexChartWrapper } from './wrapper/apex-chart-wrapper';
 
 const options: ApexOptions = {
   colors: ['#3C50E0', '#80CAEE'],
@@ -84,7 +85,10 @@ export const ChartTwo: React.FC = () => {
       ...prevState,
     }));
   };
-  handleReset();
+
+  useEffect(() => {
+    handleReset();
+  }, []);
 
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white p-7.5 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-4">
@@ -134,7 +138,7 @@ export const ChartTwo: React.FC = () => {
 
       <div>
         <div id="chartTwo" className="-mb-9 -ml-5">
-          <ReactApexChart
+          <ApexChartWrapper
             options={options}
             series={state.series}
             type="bar"

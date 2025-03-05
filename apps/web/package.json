@@ -67,7 +67,7 @@
   },
   "private": true,
   "scripts": {
-    "build": "TSC_COMPILE_ON_ERROR=true next build",
+    "build": "cross-env TSC_COMPILE_ON_ERROR=true next build",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "dev": "next dev",

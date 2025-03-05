@@ -1,6 +1,7 @@
 import type { ApexOptions } from 'apexcharts';
-import React, { useState } from 'react';
-import ReactApexChart from 'react-apexcharts';
+import React, { useEffect, useState } from 'react';
+
+import { ApexChartWrapper } from './wrapper/apex-chart-wrapper';
 
 type ChartSevenState = {
   series: {
@@ -30,7 +31,10 @@ export const ChartSeven: React.FC = () => {
       // Update the desired properties
     }));
   };
-  updateState();
+
+  useEffect(() => {
+    updateState();
+  }, []);
 
   const options: ApexOptions = {
     legend: {
@@ -193,7 +197,7 @@ export const ChartSeven: React.FC = () => {
       </div>
       <div>
         <div id="chartSeven" className="-ml-5">
-          <ReactApexChart
+          <ApexChartWrapper
             options={options}
             series={state.series}
             type="area"

@@ -1,8 +1,9 @@
 'use client';
 
 import type { ApexOptions } from 'apexcharts';
-import React, { useState } from 'react';
-import ReactApexChart from 'react-apexcharts';
+import React, { useEffect, useState } from 'react';
+
+import { ApexChartWrapper } from './wrapper/apex-chart-wrapper';
 
 type ChartTwelveState = {
   series: {
@@ -259,7 +260,10 @@ export const ChartTwelve: React.FC = () => {
       // Update the desired properties
     }));
   };
-  updateState();
+
+  useEffect(() => {
+    updateState();
+  }, []);
 
   const options: ApexOptions = {
     colors: ['#3C50E0'],
@@ -419,7 +423,7 @@ export const ChartTwelve: React.FC = () => {
       </div>
       <div>
         <div id="chartThirteen" className="-ml-5">
-          <ReactApexChart
+          <ApexChartWrapper
             options={options}
             series={state.series}
             type="area"

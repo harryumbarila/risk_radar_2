@@ -1,6 +1,7 @@
 import type { ApexOptions } from 'apexcharts';
-import React, { useState } from 'react';
-import ReactApexChart from 'react-apexcharts';
+import React, { useEffect, useState } from 'react';
+
+import { ApexChartWrapper } from './wrapper/apex-chart-wrapper';
 
 type ChartEightState = {
   series: number[];
@@ -18,7 +19,10 @@ export const ChartEight: React.FC = () => {
       // Update the desired properties
     }));
   };
-  updateState();
+
+  useEffect(() => {
+    updateState();
+  }, []);
 
   const options: ApexOptions = {
     chart: {
@@ -107,7 +111,7 @@ export const ChartEight: React.FC = () => {
       </div>
       <div className="mb-2">
         <div id="chartEight" className="mx-auto flex justify-center">
-          <ReactApexChart
+          <ApexChartWrapper
             options={options}
             series={state.series}
             type="donut"
