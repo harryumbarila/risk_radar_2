@@ -5,11 +5,13 @@ import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
 
 import { IrisProxyController } from '@/api/module/iris-proxy/iris-proxy.controller';
+import { IrisProxyService } from '@/api/module/iris-proxy/iris-proxy.service';
 import { IrisClient } from '@/api/module/iris-proxy/webservice/iris.client';
 
 describe('IrisProxyController (e2e)', () => {
   let app: INestApplication;
   let irisClientMock: Partial<IrisClient>;
+  let irisProxyServiceMock: Partial<IrisProxyService>;
   let configServiceMock: Partial<ConfigService>;
 
   beforeEach(async () => {
@@ -75,6 +77,7 @@ describe('IrisProxyController (e2e)', () => {
       providers: [
         { provide: IrisClient, useValue: irisClientMock },
         { provide: ConfigService, useValue: configServiceMock },
+        { provide: IrisProxyService, useValue: irisProxyServiceMock },
       ],
     }).compile();
 
