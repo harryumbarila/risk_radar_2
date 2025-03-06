@@ -1,8 +1,7 @@
+import { CountDownTimer } from '@denali/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
-
-import { CountDownTimer } from '@/components/CountDownTimer';
 
 const ComingSoon: React.FC = () => {
   return (

@@ -15,7 +15,9 @@
     "class-validator": "^0.14.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
-    "spok": "^1.5.5"
+    "spok": "^1.5.5",
+    "@frontegg/client": "latest",
+    "compression": "^1.8.0"
   },
   "devDependencies": {
     "@darraghor/eslint-plugin-nestjs-typed": "^5.0.14",
@@ -67,7 +69,7 @@
     "dev": "nest start --watch",
     "lint": "eslint --ext .ts,.tsx --max-warnings=0 .",
     "lint:fix": "eslint --ext .ts,.tsx --max-warnings=0 --fix .",
-    "start": "node dist/main",
+    "start": "node dist/apps/api/src/main",
     "start:debug": "nest start --debug --watch",
     "start:nest": "nest start",
     "test": "jest",

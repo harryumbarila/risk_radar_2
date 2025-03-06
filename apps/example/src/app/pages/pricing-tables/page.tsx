@@ -1,0 +1,26 @@
+import { Breadcrumb, PricingTableOne, PricingTableTwo } from '@denali/ui';
+import type { Metadata } from 'next';
+import React from 'react';
+
+import { DefaultLayout } from '@/components/layouts/default-layout';
+
+export const metadata: Metadata = {
+  title: 'Next.js Pricing Table | TailAdmin - Next.js Dashboard Template',
+  description:
+    'This is Next.js Pricing Table page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
+};
+
+const PricingTables: React.FC = () => {
+  return (
+    <DefaultLayout>
+      <Breadcrumb pageName="Pricing Table" />
+
+      <div className="flex flex-col gap-5 md:gap-7 2xl:gap-10">
+        <PricingTableOne />
+        <PricingTableTwo />
+      </div>
+    </DefaultLayout>
+  );
+};
+
+export default PricingTables;
