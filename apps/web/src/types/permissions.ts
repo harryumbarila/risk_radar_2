@@ -35,7 +35,6 @@ export function permissions(
   const hasPermission = (permission: string): boolean => {
     // Check if the permission string exists in the user's permissions
     return userPermissions.some(
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       (p: ITeamUserPermission) => p.key === permission
     );
   };
