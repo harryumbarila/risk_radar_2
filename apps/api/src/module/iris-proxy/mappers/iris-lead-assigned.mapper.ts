@@ -145,7 +145,7 @@ export class LeadMapper implements Lead {
   @ApiPropertyOptional({
     description: 'Assigned users',
     type: AssignedByMapper,
-    isArray: true, // ✅ Fix applied
+    isArray: true,
   })
   public assignedUsers?: AssignedByMapper[];
 
@@ -191,7 +191,7 @@ export class LeadMapper implements Lead {
       name: lead.name,
       lead_url: lead.lead_url,
       assignedUsers: lead.assignedUsers
-        ? lead.assignedUsers.map((user) => AssignedByMapper.map(user)) // ✅ Fixed arrow function
+        ? lead.assignedUsers.map((user) => AssignedByMapper.map(user))
         : undefined,
       email: lead.email,
       address: lead.address ? AddressMapper.map(lead.address) : undefined,
@@ -214,7 +214,7 @@ export class LeadDataMapper implements LeadData {
   @ApiPropertyOptional({
     description: 'List of leads',
     type: LeadMapper,
-    isArray: true, // ✅ Fix applied
+    isArray: true,
   })
   public leads?: LeadMapper[];
 
@@ -227,7 +227,7 @@ export class LeadDataMapper implements LeadData {
       lead: data.lead ? LeadMapper.map(data.lead) : undefined,
       leads: data.leads
         ? data.leads.map((lead) => LeadMapper.map(lead))
-        : undefined, // ✅ Fixed arrow function
+        : undefined,
     });
   }
 }
