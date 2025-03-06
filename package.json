@@ -13,13 +13,15 @@
     "docs": "yarn workspace @denali/docs run dev-docs",
     "format": "prettier --write .",
     "lint": "turbo lint",
+    "lint:fix": "turbo lint:fix",
     "prepare": "husky",
     "start:api": "turbo run start --filter=@denali/api",
     "start:web": "turbo run start --filter=@denali/web",
     "sync-packages": "syncpack fix-mismatches",
     "test:e2e": "turbo run test:e2e",
     "test:unit": "turbo run test:unit",
-    "type-check": "turbo run type-check"
+    "type-check": "turbo run type-check",
+    "ui:example": "yarn workspace @denali/example run dev-example"
   },
   "config": {
     "commitizen": {
@@ -33,6 +35,7 @@
     "@denali/eslint-config": "*",
     "@denali/shared": "*",
     "@denali/typescript-config": "*",
+    "@ls-lint/ls-lint": "^2.2.3",
     "cross-env": "^7.0.3",
     "cz-git": "^1.11.0",
     "git-cz": "^4.9.0",

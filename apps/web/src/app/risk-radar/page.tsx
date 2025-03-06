@@ -1,15 +1,14 @@
 'use client';
 
+import { Breadcrumb, Loader } from '@denali/ui';
 import { useRouter } from 'next/navigation';
 import type { FC } from 'react';
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { Breadcrumb } from '@/components/Breadcrumbs/Breadcrumb';
-import { Loader } from '@/components/common/Loader';
-import { DefaultLayout } from '@/components/Layouts/DefaultLayout';
-import { RiskRadarTableComponent } from '@/components/RiskRadar/RiskRadarTable';
-import { useExceptionData } from '@/hooks/risk-radar/useExceptionData';
-import { useFilteredRiskRadar } from '@/hooks/risk-radar/useFilteredRiskRadar';
+import { DefaultLayout } from '@/components/layouts/default-layout';
+import { RiskRadarTableComponent } from '@/components/risk-radar/risk-radar-table';
+import { useExceptionData } from '@/hooks/risk-radar/use-exception-data';
+import { useFilteredRiskRadar } from '@/hooks/risk-radar/use-filtered-risk-radar';
 
 const RiskRadar: FC = () => {
   const router = useRouter();

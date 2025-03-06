@@ -1,1 +1,4 @@
-export * from './TestComponent';
+'use client';
+
+export * from './common';
+export * from './hooks';

@@ -1,0 +1,21 @@
+import { Analytics } from '@denali/ui';
+import type { Metadata } from 'next';
+import type { FC } from 'react';
+
+import { DefaultLayout } from '@/components/layouts/default-layout';
+
+export const metadata: Metadata = {
+  title: 'Next.js Analytics Dashboard | TailAdmin - Next.js Dashboard Template',
+  description:
+    'This is Next.js Analytics Dashboard page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
+};
+
+const AnalyticsPage: FC = () => {
+  return (
+    <DefaultLayout>
+      <Analytics />
+    </DefaultLayout>
+  );
+};
+
+export default AnalyticsPage;

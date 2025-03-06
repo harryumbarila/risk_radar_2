@@ -8,4 +8,5 @@ module.exports = {
     ignoreBuildErrors: !!process.env.CI,
     tsconfigPath: 'tsconfig.build.json',
   },
+  transpilePackages: ['@denali/shared', '@denali/ui'],
 };
