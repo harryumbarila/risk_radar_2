@@ -5,11 +5,11 @@ import type { FC } from 'react';
 
 import AttributionUrl from '@/app/attribution-url/page';
 import RiskRadar from '@/app/risk-radar/page';
-import { roles } from '@/types/roles';
+import { permissions } from '@/types/permissions';
 
 export const Home: FC = () => {
   const { user } = useAuth();
-  const { isSales } = roles(user);
+  const { forResource } = permissions(user);
 
-  return !isSales() ? <RiskRadar /> : <AttributionUrl />;
+  return forResource('RISK_RADAR').canRead ? <RiskRadar /> : <AttributionUrl />;
 };
