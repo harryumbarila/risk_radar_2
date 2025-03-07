@@ -3,7 +3,10 @@ import { ConfigService } from '@nestjs/config';
 
 import type { LeadDetailResponse } from '@/shared/response';
 
-import type { LeadUserAssignedDto } from './dto';
+import type {
+  LeadUserAssignedInputDto,
+  LeadUserAssignedOutputDto,
+} from './dto';
 import type { IrisProxyControllerConfig } from './iris-proxy.controller';
 import type { AssignedByMapper } from './mappers';
 import { IrisClient } from './webservice/iris.client';
@@ -17,7 +20,7 @@ export class IrisProxyService {
     private readonly configService: ConfigService<IrisProxyControllerConfig>
   ) {}
 
-  private findHighestPriorityUser = (
+  public findHighestPriorityUser = (
     users: AssignedByMapper[],
     priorityOrder: string[]
   ): AssignedByMapper | undefined => {
@@ -44,10 +47,15 @@ export class IrisProxyService {
   };
 
   public async leadAssignmentWebhook(
-    payload: LeadUserAssignedDto
-  ): Promise<{ success: boolean }> {
+    payload: LeadUserAssignedInputDto
+  ): Promise<LeadUserAssignedOutputDto> {
     try {
       const { lead } = payload.data;
+
+      if (!lead.id) {
+        throw new Error('Lead ID is required');
+      }
+
       const { assignedUsers } = lead;
 
       // Define priority order for each category

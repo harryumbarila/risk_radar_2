@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+import { Public } from '@/api/shared/auth/decorator/public.decorator';
 import type {
   IrisChannelsResponseDto,
   IrisFilteredUsersResponseDto,
@@ -12,7 +13,8 @@ import {
   IrisPartnersResponseDto,
 } from '@/shared/response/iris-proxy';
 
-import { LeadUserAssignedDto } from './dto';
+import type { LeadUserAssignedOutputDto } from './dto';
+import { LeadUserAssignedInputDto } from './dto';
 import { IrisProxyService } from './iris-proxy.service';
 import { IrisClient } from './webservice/iris.client';
 
@@ -57,8 +59,11 @@ export class IrisProxyController {
     operationId: 'lead-assigned-webhook',
     summary: 'Webhook for assigned leads',
   })
+  @Public()
   @Post('lead-assigned-webhook')
-  public async leadAssignedWebhook(@Body() payload: LeadUserAssignedDto) {
+  public async leadAssignedWebhook(
+    @Body() payload: LeadUserAssignedInputDto
+  ): Promise<LeadUserAssignedOutputDto> {
     return this.irisProxyService.leadAssignmentWebhook(payload);
   }
 

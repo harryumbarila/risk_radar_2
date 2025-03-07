@@ -7,7 +7,7 @@ import {
   LeadDataMapper,
 } from '@/api/module/iris-proxy/mappers/iris-lead-assigned.mapper';
 
-export class LeadUserAssignedDto {
+export class LeadUserAssignedInputDto {
   @ApiProperty({
     description: 'Hook information',
     type: HookMapper,
@@ -25,4 +25,14 @@ export class LeadUserAssignedDto {
   @IsDefined()
   @Type(() => LeadDataMapper)
   public data: LeadDataMapper;
+}
+
+export class LeadUserAssignedOutputDto {
+  @ApiProperty({
+    description: 'Hook information',
+    type: HookMapper,
+    required: false,
+  })
+  @Type(() => Boolean)
+  public success: boolean;
 }

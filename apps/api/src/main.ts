@@ -1,4 +1,4 @@
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as compression from 'compression';
@@ -58,9 +58,6 @@ async function bootstrap() {
   }
 
   await app.listen(process.env.PORT ?? 3001);
-
-  const url = await app.getUrl();
-  Logger.log(`🚀 Application is running on port: ${url}`);
 }
 
 // eslint-disable-next-line no-console
