@@ -1,15 +1,19 @@
 'use client';
 
 import { Breadcrumb, showNotification } from '@denali/ui';
+import { useAuth } from '@frontegg/nextjs';
 import React, { useState } from 'react';
 
 import { DefaultLayout } from '@/components/layouts/default-layout';
 import { useLeadSources } from '@/hooks/attribution-url/use-lead-sources';
 import { useSourceMatcher } from '@/hooks/attribution-url/use-source-matcher';
 import { useUsersData } from '@/hooks/attribution-url/use-users-data';
+import { permissions } from '@/types/permissions';
 
 const AttributionUrl: React.FC = () => {
-  // Add hook
+  const { user } = useAuth();
+  const { forResource } = permissions(user);
+
   const { findMatchingSourceNameForReferralPartner } = useSourceMatcher();
 
   const { data: usersData, isLoading: usersLoading } = useUsersData();
@@ -36,6 +40,17 @@ const AttributionUrl: React.FC = () => {
 
   const handleGenerateLink = (): void => {
     // 1. Validation
+
+    if (!forResource('ATTRIBUTION_LINK').canWrite) {
+      showNotification({
+        title: 'Permission Denied',
+        message: 'You do not have permission to generate attribution links',
+        type: 'error',
+        bgColor: '#FF0000',
+      });
+      return;
+    }
+
     if (!irisUser || !channel) {
       showNotification({
         title: 'Validation Error',
@@ -129,7 +144,7 @@ const AttributionUrl: React.FC = () => {
 
     // Find the selected user
     const selectedUser = usersData?.data?.find(
-      (user) => user.value === parseInt(selectedValue, 10)
+      (filteredUser) => filteredUser.value === parseInt(selectedValue, 10)
     );
 
     if (selectedUser) {
@@ -176,9 +191,9 @@ const AttributionUrl: React.FC = () => {
                   className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                 >
                   <option value="">Select IRIS User</option>
-                  {usersData?.data?.map((user) => (
-                    <option key={user.value} value={user.value}>
-                      {user.label}
+                  {usersData?.data?.map((filteredUser) => (
+                    <option key={filteredUser.value} value={filteredUser.value}>
+                      {filteredUser.label}
                     </option>
                   ))}
                 </select>
@@ -258,7 +273,12 @@ const AttributionUrl: React.FC = () => {
           </div>
           <button
             onClick={handleGenerateLink}
-            className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90"
+            className={`flex w-full justify-center rounded p-3 font-medium text-gray ${
+              forResource('ATTRIBUTION_LINK').canWrite
+                ? 'bg-primary hover:bg-opacity-90'
+                : 'bg-gray-400 cursor-not-allowed'
+            }`}
+            disabled={!forResource('ATTRIBUTION_LINK').canWrite}
             type="button"
           >
             Generate Link
