@@ -139,7 +139,7 @@ export const Sidebar: FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
                         href="/"
                         className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
                           (pathname === '/' ||
-                            pathname.includes('dashboard')) &&
+                            pathname.includes('attribution-url')) &&
                           'bg-graydark dark:bg-meta-4'
                         }`}
                         onClick={(e) => {
@@ -202,28 +202,41 @@ export const Sidebar: FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
                         }`}
                       >
                         <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
+                          <li>
+                            <Link
+                              href="/"
+                              className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                pathname === '/' && 'text-white'
+                              }`}
+                            >
+                              Home
+                            </Link>
+                          </li>
                           {forResource('RISK_RADAR').canRead && (
                             <li>
                               <Link
-                                href="/"
+                                href="/risk-radar"
                                 className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                  pathname === '/' && 'text-white'
+                                  pathname === '/risk-radar' && 'text-white'
                                 }`}
                               >
                                 Risk Radar
                               </Link>
                             </li>
                           )}
-                          <li>
-                            <Link
-                              href="/attribution-url"
-                              className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                pathname === '/attribution-url' && 'text-white'
-                              }`}
-                            >
-                              Attribution URL
-                            </Link>
-                          </li>
+                          {forResource('ATTRIBUTION_LINK').canRead && (
+                            <li>
+                              <Link
+                                href="/attribution-url"
+                                className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                  pathname === '/attribution-url' &&
+                                  'text-white'
+                                }`}
+                              >
+                                Attribution URL
+                              </Link>
+                            </li>
+                          )}
                         </ul>
                       </div>
                       {/* <!-- Dropdown Menu End --> */}
