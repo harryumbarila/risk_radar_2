@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import type { LeadDetailResponse } from '@/shared/response';
@@ -6,6 +6,7 @@ import type { LeadDetailResponse } from '@/shared/response';
 import type {
   LeadUserAssignedInputDto,
   LeadUserAssignedOutputDto,
+  LeadUserAssignedSource,
 } from './dto';
 import type { IrisProxyControllerConfig } from './iris-proxy.controller';
 import type { AssignedByMapper } from './mappers';
@@ -45,6 +46,25 @@ export class IrisProxyService {
       undefined
     );
   };
+
+  public async getLeadSource(
+    leadId: number
+  ): Promise<LeadUserAssignedSource | null> {
+    try {
+      const req = await this.client.get<LeadDetailResponse>(
+        `/api/v1/leads/${leadId}`
+      );
+      const source = req.data?.general?.source?.name;
+      const keywords = ['Referral Partner -', 'FI -'];
+
+      return source && keywords.some((keyword) => source.includes(keyword))
+        ? { name: source }
+        : null;
+    } catch (error) {
+      this.logger.error(error);
+    }
+    return null;
+  }
 
   public async leadAssignmentWebhook(
     payload: LeadUserAssignedInputDto
@@ -96,20 +116,9 @@ export class IrisProxyService {
       );
       const isvUser = this.findHighestPriorityUser(assignedUsers, isvPriority);
 
+      // If the referral partner is not found in the assigned users, try to fetch it from the lead details and get from the source
       if (!referralPartnerUser?.name) {
-        try {
-          const req = await this.client.get<LeadDetailResponse>(
-            `/api/v1/leads/${lead.id}`
-          );
-          const source = req.data?.general?.source?.name;
-          referralPartnerUser =
-            source &&
-            (source.includes('Referral Partner -') || source.includes('FI -'))
-              ? { name: source }
-              : null;
-        } catch (error) {
-          this.logger.error(error);
-        }
+        referralPartnerUser = await this.getLeadSource(lead.id);
       }
 
       this.logger.log({
@@ -163,7 +172,7 @@ export class IrisProxyService {
       return { success: true };
     } catch (error) {
       Logger.error(error);
-      throw new Error('Failed to update lead');
+      throw new HttpException('Failed to update lead', HttpStatus.FORBIDDEN);
     }
   }
 }

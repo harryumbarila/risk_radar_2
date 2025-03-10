@@ -56,7 +56,9 @@ describe('IrisProxyService', () => {
           lead: {
             id: 123,
             assignedUsers: [
-              { id: 1, userClass: 'Int - ISC', name: 'John Doe' },
+              { id: 1, userClass: 'Int - Disabled SC', name: 'Marie Doe' },
+              { id: 2, userClass: 'Int - ISC', name: 'John Doe' },
+              { id: 3, userClass: 'Int - ISC', name: 'John Doe 2' },
             ],
           },
         },
@@ -134,9 +136,9 @@ describe('IrisProxyService', () => {
   describe('findHighestPriorityUser', () => {
     it('should return the highest priority user based on priority order', () => {
       const users = [
+        { id: 3, userClass: 'Int - SC $', name: 'Jane Doe' },
+        { id: 2, userClass: 'Int - Disabled SC', name: 'Alice' },
         { id: 1, userClass: 'Int - ISC', name: 'John Doe' },
-        { id: 2, userClass: 'Int - SC $', name: 'Jane Doe' },
-        { id: 3, userClass: 'Int - Disabled SC', name: 'Alice' },
       ];
 
       const priorityOrder = ['Int - ISC', 'Int - SC $', 'Int - Disabled SC'];

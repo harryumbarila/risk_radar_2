@@ -36,3 +36,7 @@ export class LeadUserAssignedOutputDto {
   @Type(() => Boolean)
   public success: boolean;
 }
+
+export class LeadUserAssignedSource {
+  public name?: string;
+}
