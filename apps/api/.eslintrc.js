@@ -14,6 +14,7 @@ module.exports = {
     // Disable function explicit return type
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/unbound-method': 'off',
 
     // Classes management
     'max-classes-per-file': 'off',

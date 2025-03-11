@@ -1,7 +1,8 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+import { Public } from '@/api/shared/auth/decorator/public.decorator';
 import type {
   IrisChannelsResponseDto,
   IrisFilteredUsersResponseDto,
@@ -12,6 +13,9 @@ import {
   IrisPartnersResponseDto,
 } from '@/shared/response/iris-proxy';
 
+import type { LeadUserAssignedOutputDto } from './dto';
+import { LeadUserAssignedInputDto } from './dto';
+import { IrisProxyService } from './iris-proxy.service';
 import { IrisClient } from './webservice/iris.client';
 
 export type IrisProxyControllerConfig = {
@@ -22,7 +26,8 @@ export type IrisProxyControllerConfig = {
 export class IrisProxyController {
   public constructor(
     private readonly client: IrisClient,
-    private readonly configService: ConfigService<IrisProxyControllerConfig>
+    private readonly configService: ConfigService<IrisProxyControllerConfig>,
+    private readonly irisProxyService: IrisProxyService
   ) {}
 
   @ApiResponse({
@@ -44,6 +49,26 @@ export class IrisProxyController {
   @Get('lead-sources')
   public async leadSources(): Promise<IrisLeadSourcesResponseDto> {
     return this.client.getLeadSources();
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'The lead sources response.',
+  })
+  @ApiOperation({
+    operationId: 'lead-assigned-webhook',
+    summary: 'Webhook for assigned leads',
+  })
+  @Public()
+  @Post('lead-assigned-webhook')
+  public async leadAssignedWebhook(
+    @Body() payload: LeadUserAssignedInputDto
+  ): Promise<LeadUserAssignedOutputDto> {
+    // Iris health check
+    if (payload?.hook?.event === 'subscription.test') {
+      return { success: true };
+    }
+    return this.irisProxyService.leadAssignmentWebhook(payload);
   }
 
   /**

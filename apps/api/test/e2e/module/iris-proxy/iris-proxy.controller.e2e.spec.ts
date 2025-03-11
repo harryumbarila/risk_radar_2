@@ -1,19 +1,28 @@
 import type { INestApplication } from '@nestjs/common';
+import { HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
 
+import type { LeadUserAssignedInputDto } from '@/api/module/iris-proxy/dto';
 import { IrisProxyController } from '@/api/module/iris-proxy/iris-proxy.controller';
+import { IrisProxyService } from '@/api/module/iris-proxy/iris-proxy.service';
 import { IrisClient } from '@/api/module/iris-proxy/webservice/iris.client';
 
 describe('IrisProxyController (e2e)', () => {
   let app: INestApplication;
   let irisClientMock: Partial<IrisClient>;
+  let irisProxyServiceMock: Partial<IrisProxyService>;
   let configServiceMock: Partial<ConfigService>;
 
   beforeEach(async () => {
     // Mock the IrisClient with proper response structure
+
+    irisProxyServiceMock = {
+      leadAssignmentWebhook: jest.fn().mockResolvedValue({ success: true }),
+    };
+
     irisClientMock = {
       getUsers: jest.fn().mockResolvedValue({
         data: [
@@ -73,8 +82,10 @@ describe('IrisProxyController (e2e)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [IrisProxyController],
       providers: [
+        IrisProxyService,
         { provide: IrisClient, useValue: irisClientMock },
         { provide: ConfigService, useValue: configServiceMock },
+        { provide: IrisProxyService, useValue: irisProxyServiceMock },
       ],
     }).compile();
 
@@ -158,6 +169,81 @@ describe('IrisProxyController (e2e)', () => {
       expect(response.body.data[0]).toHaveProperty(
         'name',
         'Default Referral Partner'
+      );
+    });
+  });
+  describe('/v1/iris_proxy/lead-assigned-webhook (POST)', () => {
+    beforeEach(() => {
+      irisClientMock = {
+        get: jest.fn().mockResolvedValue({
+          data: {
+            general: {
+              source: {
+                name: 'Referral Partner - ABC',
+              },
+            },
+          },
+        }),
+        patch: jest.fn().mockResolvedValue({}),
+      };
+    });
+
+    it('should process lead assignment webhook and return success', async () => {
+      const payload: LeadUserAssignedInputDto = {
+        data: {
+          lead: {
+            id: 123,
+            assignedUsers: [
+              { id: 1, userClass: 'Int - ISC', name: 'John Doe' },
+            ],
+          },
+        },
+        hook: {
+          event: 'lead.assigned',
+          requestId: 123,
+        },
+      };
+
+      const response = await request(app.getHttpServer())
+        .post('/v1/iris_proxy/lead-assigned-webhook')
+        .send(payload)
+        .expect(201);
+
+      expect(response.body).toEqual({ success: true });
+      expect(irisProxyServiceMock.leadAssignmentWebhook).toHaveBeenCalledWith(
+        payload
+      );
+    });
+
+    it('should handle errors during lead assignment webhook processing', async () => {
+      const payload = {
+        data: {
+          lead: {
+            id: '123',
+            assignedUsers: [
+              { id: 1, userClass: 'Int - ISC', name: 'John Doe' },
+              { id: 2, userClass: 'Bank Partner $', name: 'Jane Doe' },
+            ],
+          },
+        },
+      };
+
+      irisProxyServiceMock.leadAssignmentWebhook = jest
+        .fn()
+        .mockRejectedValue(new Error('Failed to update lead'));
+
+      const response = await request(app.getHttpServer())
+        .post('/v1/iris_proxy/lead-assigned-webhook')
+        .send(payload)
+        .expect(500);
+
+      expect(response.body).toEqual({
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Internal server error',
+      });
+
+      expect(irisProxyServiceMock.leadAssignmentWebhook).toHaveBeenCalledWith(
+        payload
       );
     });
   });
