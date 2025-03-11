@@ -39,8 +39,7 @@ This will launch the **NestJS** server, making your API available at
 
 This will launch swagger documentation
 
-`http://localhost:3001/api/swagger`.
----
+## `http://localhost:3001/api/swagger`.
 
 ### 🏗️ Building for Production
 
