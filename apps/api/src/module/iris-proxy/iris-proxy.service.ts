@@ -78,6 +78,10 @@ export class IrisProxyService {
 
       const { assignedUsers } = lead;
 
+      if (!(assignedUsers?.length > 0)) {
+        throw new Error('Lead does not have any assigned users');
+      }
+
       // Define priority order for each category
       const solutionConsultantPriority = [
         'Int - ISC',
@@ -172,7 +176,10 @@ export class IrisProxyService {
       return { success: true };
     } catch (error) {
       Logger.error(error);
-      throw new HttpException('Failed to update lead', HttpStatus.FORBIDDEN);
+      throw new HttpException(
+        'Failed to update lead: An internal server error occurred.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 }
