@@ -64,6 +64,10 @@ export class IrisProxyController {
   public async leadAssignedWebhook(
     @Body() payload: LeadUserAssignedInputDto
   ): Promise<LeadUserAssignedOutputDto> {
+    // Iris health check
+    if (payload?.hook?.event === 'subscription.test') {
+      return { success: true };
+    }
     return this.irisProxyService.leadAssignmentWebhook(payload);
   }
 

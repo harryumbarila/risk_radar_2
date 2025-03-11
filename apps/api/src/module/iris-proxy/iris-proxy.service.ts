@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import axios from 'axios';
 
 import type { LeadDetailResponse } from '@/shared/response';
 
@@ -70,7 +71,7 @@ export class IrisProxyService {
     payload: LeadUserAssignedInputDto
   ): Promise<LeadUserAssignedOutputDto> {
     try {
-      const { lead } = payload.data;
+      const lead = payload?.data?.lead || payload?.data?.leads?.[0];
 
       if (!lead.id) {
         throw new Error('Lead ID is required');
@@ -176,8 +177,21 @@ export class IrisProxyService {
       return { success: true };
     } catch (error) {
       Logger.error(error);
+
+      if (error instanceof Error) {
+        throw new HttpException(
+          `Failed to update lead: ${error.message}.`,
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      }
+      if (axios.isAxiosError(error)) {
+        throw new HttpException(
+          `Failed to get lead: ${error.message}.`,
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      }
       throw new HttpException(
-        `Failed to update lead: ${error.message}.`,
+        `Failed to get lead: ${error}`,
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
