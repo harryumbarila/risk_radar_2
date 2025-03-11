@@ -177,7 +177,7 @@ export class IrisProxyService {
     } catch (error) {
       Logger.error(error);
       throw new HttpException(
-        'Failed to update lead: An internal server error occurred.',
+        `Failed to update lead: ${error.message}.`,
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
