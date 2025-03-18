@@ -4,10 +4,10 @@ import type { PaginationResponse } from '../../types/pagination';
 
 export type DataTableProps<BaseModel> = {
   title?: string;
-  isLoading: boolean;
-  data: PaginationResponse<BaseModel>;
-  columns: ColumnDef<BaseModel>[];
-  onSelectRow?: (arg: BaseModel) => void;
-  onSetPagination: (arg: PaginationState) => void;
+  isLoading: boolean; // Loading
+  data: PaginationResponse<BaseModel>; // Row Data
+  columns: ColumnDef<BaseModel>[]; // Columns definitions
+  onSelectRow?: (arg: BaseModel) => void; // On row selection
+  onSetPagination: (arg: PaginationState) => void; // Pagination
   initialItemsPerPage: number;
 };

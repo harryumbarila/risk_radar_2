@@ -35,7 +35,7 @@ export const DataTable = <Entry extends BaseModel>(
     });
 
   React.useEffect(() => {
-    onSetPagination({ pageIndex, pageSize });
+    onSetPagination?.({ pageIndex, pageSize });
   }, [pageIndex, pageSize, onSetPagination]);
 
   const pagination = React.useMemo(
