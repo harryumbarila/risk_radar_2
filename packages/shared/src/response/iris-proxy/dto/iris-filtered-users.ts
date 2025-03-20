@@ -35,30 +35,42 @@ export interface IrisFilteredUsersResponseDto {
 }
 
 export class FilteredUsersFactory {
-  // Define class IDs as static properties based on environment
+  // These are use class IDs on IRIS for different environments
+  // "manages" array from IRIS user API is for referral partners
   private static readonly MANAGES_CLASS_IDS = {
     staging: [41, 30],
     production: [71, 30],
+    default: [71, 30], // Default to production values
   };
 
+  // "reports_to" array from IRIS user API is for RSL class
   private static readonly REPORTS_TO_CLASS_IDS = {
     staging: [53],
     production: [25, 95],
+    default: [25, 95], // Default to production values
   };
 
   public static create(
     data: IrisUsersResponseDto,
-    environment: 'staging' | 'production' = 'production'
+    environment: string = 'production'
   ): IrisFilteredUsersResponseDto {
+    // Normalize environment to ensure we have a valid key
+    const normalizedEnv = this.normalizeEnvironment(environment);
+
     const filteredUsers = data.data.map((user) => ({
       label: user.full_name,
       value: user.id,
-      rsl: this.createReportsTo(user.reports_to, environment),
+      rsl: this.createReportsTo(user.reports_to, normalizedEnv),
       channels: this.createChannels(user.groups),
-      manages: this.createManages(user.manages, environment),
+      manages: this.createManages(user.manages, normalizedEnv),
     }));
 
     return { data: filteredUsers };
+  }
+
+  private static normalizeEnvironment(env: string): 'staging' | 'production' {
+    // Convert any environment string to our supported types
+    return env === 'staging' ? 'staging' : 'production';
   }
 
   private static createReportsTo(
@@ -66,7 +78,9 @@ export class FilteredUsersFactory {
     environment: 'staging' | 'production'
   ): BaseObject[] {
     // Get the appropriate class IDs for the environment
-    const validClassIds = this.REPORTS_TO_CLASS_IDS[environment];
+    const validClassIds =
+      this.REPORTS_TO_CLASS_IDS[environment] ||
+      this.REPORTS_TO_CLASS_IDS.default;
 
     // Filter based on environment and class id
     const filteredReports = reports.filter(
@@ -91,7 +105,8 @@ export class FilteredUsersFactory {
     environment: 'staging' | 'production'
   ): IrisFilteredUserData['manages'] {
     // Get the appropriate class IDs for the environment
-    const validClassIds = this.MANAGES_CLASS_IDS[environment];
+    const validClassIds =
+      this.MANAGES_CLASS_IDS[environment] || this.MANAGES_CLASS_IDS.default;
 
     // Filter based on environment and class id
     const filteredManages = manages.filter(
