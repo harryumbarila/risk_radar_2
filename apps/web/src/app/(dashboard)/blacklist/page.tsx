@@ -1,6 +1,6 @@
 'use client';
 
-import { DataTable, DynamicCell } from '@denali/ui';
+import { Breadcrumb, DataTable, DynamicCell } from '@denali/ui';
 import type { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import React from 'react';
@@ -84,16 +84,18 @@ const BlackListPage: React.FC = () => {
   }
 
   return (
-    <main>
-      <h1>BlackListPage</h1>
-      <DataTable
-        columns={columns}
-        data={data}
-        isLoading={loading}
-        initialItemsPerPage={ITEMS_PER_PAGE}
-        onSetPagination={setPagination}
-      />
-    </main>
+    <>
+      <Breadcrumb pageName="BlackList ACH Page" />
+      <main>
+        <DataTable
+          columns={columns}
+          data={data}
+          isLoading={loading}
+          initialItemsPerPage={ITEMS_PER_PAGE}
+          onSetPagination={setPagination}
+        />
+      </main>
+    </>
   );
 };
 
