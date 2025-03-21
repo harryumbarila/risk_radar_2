@@ -16,6 +16,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import clsx from 'clsx';
 import React from 'react';
 
 import type { BaseModel } from '@/ui/types';
@@ -164,8 +165,8 @@ export const DataTable = <Entry extends BaseModel>(
         >
           <span className="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">
             <span className="font-semibold text-gray-900 dark:text-white">
-              {pageIndex * pageSize + 1}-
-              {pageSize > data.count ? data.count : pageSize}
+              {table.getState().pagination.pageIndex + 1} of{' '}
+              {table.getPageCount().toLocaleString()}
             </span>{' '}
           </span>
 
@@ -192,10 +193,19 @@ export const DataTable = <Entry extends BaseModel>(
             <div className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-5 self-center">
               <button
                 type="button"
-                className="flex items-center justify-center ms-0 w-6 h-5 leading-tight text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 select-none cursor-pointer"
+                className={clsx(
+                  'w-6 h-5 leading-tight border rounded-lg select-none',
+                  pageIndex !== 0 &&
+                    'text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700',
+                  pageIndex === 0 &&
+                    'text-gray-300 bg-gray-100 cursor-not-allowed'
+                )}
                 disabled={pageIndex === 0}
+                aria-disabled={pageIndex === 0}
                 onClick={() => {
-                  table.setPageIndex(pageIndex - 1);
+                  if (pageIndex > 0) {
+                    table.setPageIndex(pageIndex - 1);
+                  }
                 }}
               >
                 <ChevronLeftIcon className="size-4" />
@@ -205,10 +215,9 @@ export const DataTable = <Entry extends BaseModel>(
               </span>
               <button
                 type="button"
-                className="flex items-center justify-center ms-0 w-6 h-5 leading-tight text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 select-none cursor-pointer"
-                onClick={() => {
-                  table.setPageIndex(pageIndex + 1);
-                }}
+                className="w-6 h-5 leading-tight text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white select-none"
+                disabled={pageIndex >= table.getPageCount() - 1}
+                onClick={() => table.setPageIndex(pageIndex + 1)}
               >
                 <ChevronRightIcon className="size-4" />
               </button>
