@@ -1,4 +1,3 @@
-import { DataTables } from '@denali/ui';
 import type { Metadata } from 'next';
 import type { FC } from 'react';
 
@@ -14,7 +13,7 @@ export const metadata: Metadata = {
 const DataTablesPage: FC = () => {
   return (
     <DefaultLayout>
-      <DataTables />
+      <div />
     </DefaultLayout>
   );
 };

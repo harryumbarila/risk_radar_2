@@ -1,7 +1,6 @@
 import React from 'react';
 
-import type { BaseModel } from '../../types/base';
-import type { PaginationResponse } from '../../types/pagination';
+import type { BaseModel, PaginationResponse } from '@/ui/types';
 
 export type BlacklistedEntry = {
   returnCode: string;
@@ -46,7 +45,16 @@ export const getBlacklistedEntries = (
   });
 };
 
-export const useBlacklistedEntries = (page: number, pageSize: number) => {
+type BlackListEntries = {
+  data: PaginationResponse<BlacklistedEntry> | null;
+  loading: boolean;
+  error: Error | null;
+};
+
+export const useBlacklistedEntries = (
+  page: number,
+  pageSize: number
+): BlackListEntries => {
   const [data, setData] =
     React.useState<PaginationResponse<BlacklistedEntry> | null>(null);
   const [loading, setLoading] = React.useState<boolean>(true);
@@ -56,7 +64,10 @@ export const useBlacklistedEntries = (page: number, pageSize: number) => {
     const fetchData = async (): Promise<void> => {
       setLoading(true);
       try {
-        const response = await getBlacklistedEntries(page, pageSize);
+        const response = await getBlacklistedEntries(
+          page > 0 ? page : 1,
+          pageSize
+        );
         setData(response);
       } catch (err) {
         setError(err as Error);

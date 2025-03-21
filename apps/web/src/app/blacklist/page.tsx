@@ -1,81 +1,83 @@
 'use client';
 
+import { DataTable, DynamicCell } from '@denali/ui';
+import type { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import React from 'react';
 
-import { DataTable } from '../../components/data-table';
-import type { BlacklistedEntry } from '../../hooks/blacklist/use-get-blacklist';
-import { useBlacklistedEntries } from '../../hooks/blacklist/use-get-blacklist';
+import type { BlacklistedEntry } from '@/hooks/blacklist/use-get-blacklist';
+import { useBlacklistedEntries } from '@/hooks/blacklist/use-get-blacklist';
 
 const ITEMS_PER_PAGE = 20;
-
-const TextCell = ({ value }: { value: string | number }) => (
-  <span className="text-sm font-medium text-gray-900">{value}</span>
-);
-
-const DateCell = ({ value }: { value: string }) => (
-  <span className="text-sm text-gray-700">
-    {new Intl.DateTimeFormat('en-US').format(new Date(value))}
-  </span>
-);
-
-const StatusCell = ({ value }: { value: boolean }) => {
-  const status = value ? 'Removed' : 'Active';
-  const color = value ? 'text-red-600' : 'text-green-600';
-  return <span className={`text-sm font-medium ${color}`}>{status}</span>;
-};
 
 const columnHelper = createColumnHelper<BlacklistedEntry>();
 
 const columns = [
   columnHelper.accessor('id', {
     header: () => 'MID',
-    cell: (info) => <TextCell value={info.getValue()} />,
-    footer: (info) => info.column.id,
-    enableSorting: true,
-  }),
-  columnHelper.accessor('createdAt', {
-    header: () => 'Created At',
-    cell: (info) => <DateCell value={info.getValue()} />,
-    footer: (info) => info.column.id,
-    enableSorting: true,
-  }),
-  columnHelper.accessor('returnCode', {
-    header: () => 'Return Code',
-    cell: (info) => <TextCell value={info.getValue()} />,
-    footer: (info) => info.column.id,
-    enableSorting: true,
-  }),
-  columnHelper.accessor('route', {
-    header: () => 'Route',
-    cell: (info) => <TextCell value={info.getValue()} />,
+    cell: (info) => <DynamicCell type="text" value={info.getValue()} />,
     footer: (info) => info.column.id,
     enableSorting: true,
   }),
   columnHelper.accessor('account', {
     header: () => 'Account',
-    cell: (info) => <TextCell value={info.getValue()} />,
+    cell: (info) => <DynamicCell type="text" value={info.getValue()} />,
     footer: (info) => info.column.id,
     enableSorting: true,
   }),
-  columnHelper.accessor('count', {
-    header: () => 'MID/ISA Count',
-    cell: (info) => <TextCell value={info.getValue()} />,
+  columnHelper.accessor('returnCode', {
+    header: () => 'Return Code',
+    cell: (info) => <DynamicCell type="text" value={info.getValue()} />,
+    footer: (info) => info.column.id,
+    enableSorting: true,
+  }),
+  columnHelper.accessor('route', {
+    header: () => 'Route',
+    cell: (info) => <DynamicCell type="text" value={info.getValue()} />,
     footer: (info) => info.column.id,
     enableSorting: true,
   }),
   columnHelper.accessor('removed', {
     header: () => 'Status',
-    cell: (info) => <StatusCell value={info.getValue()} />,
+    cell: (info) => <DynamicCell type="status" value={info.getValue()} />,
     footer: (info) => info.column.id,
     enableSorting: true,
   }),
-];
+  columnHelper.accessor('count', {
+    header: () => 'MID/ISA Count',
+    cell: (info) => <DynamicCell type="text" value={info.getValue()} />,
+    footer: (info) => info.column.id,
+    enableSorting: true,
+  }),
+  columnHelper.accessor('createdAt', {
+    header: () => 'Created At',
+    cell: (info) => <DynamicCell type="date" value={info.getValue()} />,
+    footer: (info) => info.column.id,
+    enableSorting: true,
+  }),
+  columnHelper.display({
+    id: 'actions',
+    header: () => 'Actions',
+    cell: (props) => (
+      <DynamicCell
+        type="actions"
+        row={props.row}
+        iconOnly
+        onEdit={() => {}}
+        onDelete={() => {}}
+      />
+    ),
+  }),
+] as ColumnDef<BlacklistedEntry>[];
 
 const BlackListPage: React.FC = () => {
-  const { data, loading } = useBlacklistedEntries(1, 20);
+  const [{ pageIndex, pageSize }, setPagination] =
+    React.useState<PaginationState>({
+      pageIndex: 1,
+      pageSize: ITEMS_PER_PAGE,
+    });
 
-  // Define the columns
+  const { data, loading } = useBlacklistedEntries(pageIndex, pageSize);
 
   if (!data) {
     return <div>Not found</div>;
@@ -84,12 +86,12 @@ const BlackListPage: React.FC = () => {
   return (
     <main>
       <h1>BlackListPage</h1>
-
       <DataTable
         columns={columns}
         data={data}
         isLoading={loading}
         initialItemsPerPage={ITEMS_PER_PAGE}
+        onSetPagination={setPagination}
       />
     </main>
   );

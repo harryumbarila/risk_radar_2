@@ -1,6 +1,6 @@
 import type { ColumnDef, PaginationState } from '@tanstack/react-table';
 
-import type { PaginationResponse } from '../../types/pagination';
+import type { PaginationResponse } from '@/ui/types';
 
 export type DataTableProps<BaseModel> = {
   title?: string;
