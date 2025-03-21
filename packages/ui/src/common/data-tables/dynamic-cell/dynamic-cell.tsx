@@ -62,7 +62,7 @@ export const DynamicCell = <T,>(
               onClick={() => props.onEdit(props.row.original)}
             >
               {props.iconOnly ? (
-                <PencilSquareIcon className="size-6 text-green-600" />
+                <PencilSquareIcon className="h-6 w-6 text-green-600" />
               ) : (
                 'Edit'
               )}
