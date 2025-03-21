@@ -74,7 +74,7 @@ export const DynamicCell = <T,>(
               onClick={() => props.onDelete(props.row.original)}
             >
               {props.iconOnly ? (
-                <TrashIcon className="size-6 text-red-600" />
+                <TrashIcon className="h-6 w-6 text-red-600" />
               ) : (
                 'Delete'
               )}
