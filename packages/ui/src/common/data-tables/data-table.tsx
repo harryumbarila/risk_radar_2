@@ -164,7 +164,7 @@ export const DataTable = <Entry extends BaseModel>(
         >
           <span className="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">
             <span className="font-semibold text-gray-900 dark:text-white">
-              {10 * pageIndex + 1}-
+              {pageIndex * pageSize + 1}-
               {pageSize > data.count ? data.count : pageSize}
             </span>{' '}
           </span>
