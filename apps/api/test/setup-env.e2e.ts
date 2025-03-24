@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-properties */
 /**
  * Retrieves the name of the database from the environment variables.
  *

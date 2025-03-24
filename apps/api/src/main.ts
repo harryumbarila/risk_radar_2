@@ -5,6 +5,7 @@ import * as compression from 'compression';
 import { writeFileSync } from 'fs';
 
 import { AppModule } from './app.module';
+import { config } from './config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,7 +21,7 @@ async function bootstrap() {
     })
   );
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (config.node.env === 'production') {
     const options = new DocumentBuilder()
       .setTitle('TalusPay Dashboard API')
       .setVersion('v1')
@@ -57,7 +58,7 @@ async function bootstrap() {
     SwaggerModule.setup('api/swagger', app, document);
   }
 
-  await app.listen(process.env.PORT ?? 3001);
+  await app.listen(config.app.port);
 }
 
 // eslint-disable-next-line no-console

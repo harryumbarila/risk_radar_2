@@ -5,6 +5,7 @@ import { useAuth } from '@frontegg/nextjs';
 import React, { useState } from 'react';
 
 import { DefaultLayout } from '@/components/layouts/default-layout';
+import { clientConfig } from '@/config/client';
 import { useLeadSources } from '@/hooks/attribution-url/use-lead-sources';
 import { useSourceMatcher } from '@/hooks/attribution-url/use-source-matcher';
 import { useUsersData } from '@/hooks/attribution-url/use-users-data';
@@ -89,7 +90,7 @@ const AttributionUrl: React.FC = () => {
     const encodedData = btoa(JSON.stringify(attributionData));
 
     // 4. Construct the final URL
-    const link = `${process.env.NEXT_PUBLIC_MERCHANT_BASE_URL}/attr/${encodedData}`;
+    const link = `${clientConfig.merchant.app.url}/attr/${encodedData}`;
 
     setGeneratedLink(link);
 

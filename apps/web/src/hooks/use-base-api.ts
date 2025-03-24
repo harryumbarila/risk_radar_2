@@ -2,7 +2,7 @@ import { useAuth } from '@frontegg/nextjs';
 import type { SWRConfiguration, SWRResponse } from 'swr';
 import useSWR from 'swr';
 
-const BACKEND_BASE_URL = 'https://dashboard-api.taluspay-staging.com';
+import { clientConfig } from '@/config/client';
 
 // eslint-disable-next-line import/no-default-export
 export default function useBaseApi(): {
@@ -19,7 +19,7 @@ export default function useBaseApi(): {
   ): Promise<T> => {
     const fullUrl = url.startsWith('http')
       ? url
-      : `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL || BACKEND_BASE_URL}${url}`;
+      : `${clientConfig.api.url}${url}`;
 
     const requestOptions: RequestInit = {
       ...options,
