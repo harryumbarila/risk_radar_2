@@ -7,13 +7,19 @@ import type { ExceptionFiltersDto } from '@/api/module/legacy-dashboard-proxy/le
 import type {
   ExceptionDataResponseDto,
   KpiStatisticsResponseDto,
+  MerchantChargebacksResponseDto,
+  MerchantContactResponseDto,
+  MerchantNetSettlementResponseDto,
+  MerchantNotesResponseDto,
   MerchantResponseDto,
   RiskRadarResponseDto,
+  TransactionExceptionResponseDto,
 } from '@/shared/response/legacy-dashboard-proxy';
 import { kpiStatisticsResponseDto } from '@/shared/response/legacy-dashboard-proxy';
 
 export type LegacyDashboardProxyClientConfig = {
   LEGACY_DASHBOARD_URL: string;
+  LEGACY_DASHBOARD_API_KEY: string;
 };
 
 @Injectable()
@@ -28,6 +34,9 @@ export class LegacyDashboardProxyClient {
     this.client = axios.create({
       baseURL: configService.get('LEGACY_DASHBOARD_URL'),
       timeout: 10000,
+      headers: {
+        'x-api-key': configService.get<string>('LEGACY_DASHBOARD_API_KEY'),
+      },
     });
 
     // Add request interceptor for logging
@@ -80,329 +89,273 @@ export class LegacyDashboardProxyClient {
     return response.data;
   }
 
-  public getMerchant(mid: string): MerchantResponseDto {
-    // const response = await this.get<MerchantResponseDto>(
-    //   `/api/v1/dashboard/riskradar/merchant-data-path?mid=${mid}`,
-    // );
-    // return response.data;
-
-    this.logger.debug('Merchant MID:', mid);
-
-    return {
-      merchant_profile: [
-        {
-          pk: 5,
-          sMId: '5611000000126910',
-          sDBAName: 'Volcano inn',
-          sDBAAddress: '19 390 old volcano',
-          sDBACity: 'volcano',
-          sDBAState: 'HI',
-          sDBAZip: '695663',
-          sOwnershipType: 'LLC (TSYS AND FD)',
-          sSIC: '7011',
-          sSICDesc: 'Lodging - Hotels',
-          sSelfgen: 'No',
-          sMerchantType: 'Lodging',
-          sActivationDate: '1/8/2024',
-          iMV$: 3360,
-          iAT$: 320,
-          iHT$: 0,
-          iSwipeVolPerc: 0,
-          iCB: 0,
-          iRR: 0,
-          bDivert: false,
-          sCashAdvEnrolled: '0',
-          bRiskWatch: false,
-          dNetSettlementBal: 0.0,
-          iSwipedPercBasedOnTransCntCurrMonth: null,
-          sChannel: 'Direct channel',
-          sReseller: '200',
-          sReferralPartner: '100',
-          sISA: '300',
-          iUWApprMV: 500,
-          iUWApprAT: 0,
-          iUWApprSwipeVolPerc: 200,
-          bAutoHoldWhiteLabel: true,
-          iUWApprHT: 100,
-          dtCreated: '2025-02-18T07:15:37.277',
-          dtLastUpdated: '2025-02-18T07:15:37.277',
-          sPreferredContact: '',
-          bIsTalusPayMerchant: false,
-          sSolutionConsultant: '',
-          iUWApprCB: 0,
-        },
-        {
-          pk: 7,
-          sMId: '5611000000126910',
-          sDBAName: 'Volcano inn',
-          sDBAAddress: '19 390 old volcano',
-          sDBACity: 'volcano',
-          sDBAState: 'HI',
-          sDBAZip: '695663',
-          sOwnershipType: 'LLC (TSYS AND FD)',
-          sSIC: '7011',
-          sSICDesc: 'Lodging - Hotels',
-          sSelfgen: 'No',
-          sMerchantType: 'Lodging',
-          sActivationDate: '1/8/2024',
-          iMV$: 3360,
-          iAT$: 320,
-          iHT$: 0,
-          iSwipeVolPerc: 0,
-          iCB: 0,
-          iRR: 0,
-          bDivert: false,
-          sCashAdvEnrolled: '0',
-          bRiskWatch: false,
-          dNetSettlementBal: 0.0,
-          iSwipedPercBasedOnTransCntCurrMonth: null,
-          sChannel: 'Direct channel',
-          sReseller: '200',
-          sReferralPartner: '100',
-          sISA: '300',
-          iUWApprMV: 500,
-          iUWApprAT: 0,
-          iUWApprSwipeVolPerc: 200,
-          bAutoHoldWhiteLabel: true,
-          iUWApprHT: 100,
-          dtCreated: '2025-02-18T07:18:43.013',
-          dtLastUpdated: '2025-02-18T07:18:43.013',
-          sPreferredContact: '',
-          bIsTalusPayMerchant: false,
-          sSolutionConsultant: '',
-          iUWApprCB: 0,
-        },
-      ],
-      volume: [
-        {
-          pk: 1,
-          sMId: '5611000000126910',
-          iYear: 2025,
-          iMonth: 2,
-          sMonth: 'Feb',
-          dVol: 1333144.45,
-          dAvgTkt: 454.84,
-          dSwipedPercBasedOnTransCnt: 0.0,
-          dHighestTkt: 13978.1,
-          dTotCB: 2476.61,
-          dVCBPerc: 4.67,
-          dMCCBPerc: 95.33,
-          dDCBPerc: 0.0,
-          dACBPerc: 0.0,
-        },
-        {
-          pk: 5,
-          sMId: '5611000000126910',
-          iYear: 2025,
-          iMonth: 1,
-          sMonth: 'Jan',
-          dVol: 2714367.34,
-          dAvgTkt: 442.84,
-          dSwipedPercBasedOnTransCnt: 0.0,
-          dHighestTkt: 20554.27,
-          dTotCB: 7194.2,
-          dVCBPerc: 0.0,
-          dMCCBPerc: 10.1,
-          dDCBPerc: 0.0,
-          dACBPerc: 0.0,
-        },
-      ],
-      exception_type_legend: [],
-      risk_exception: [],
-    };
+  public async getRiskRadarUsers(): Promise<ExceptionDataResponseDto> {
+    const response = await this.get<ExceptionDataResponseDto>(
+      '/api/v1/dashboard/riskradar/risk-radar-users'
+    );
+    return response.data;
   }
 
-  public riskRadar(filters: ExceptionFiltersDto): RiskRadarResponseDto {
-    // const response = await this.get<RiskRadarResponseDto>(
-    //   '/api/v1/dashboard/riskradar/exception-list',
-    //   { params: filters },
-    // );
-    // return response.data;
+  public async getCardHistory(
+    cardNumber: string
+  ): Promise<ExceptionDataResponseDto> {
+    const response = await this.get<ExceptionDataResponseDto>(
+      `/api/v1/dashboard/riskradar/card-history?cardNumber=${cardNumber}`
+    );
+    return response.data;
+  }
 
+  public async getEmailtemplates(): Promise<ExceptionDataResponseDto> {
+    const response = await this.get<ExceptionDataResponseDto>(
+      `/api/v1/dashboard/riskradar/email-templates`
+    );
+    return response.data;
+  }
+
+  public async pushNoteToIris(
+    noteId: string
+  ): Promise<ExceptionDataResponseDto> {
+    const response = await this.post<ExceptionDataResponseDto>(
+      `/api/v1/dashboard/riskradar/push-note-to-iris?noteId=${noteId}`,
+      {}
+    );
+
+    return response.data;
+  }
+
+  public async saveNewNetSettlement(
+    category: string,
+    tranDate: string,
+    tranAmt: number,
+    balAmt: number,
+    pendingAmt: number,
+    writeOffAmt: number,
+    reason: string,
+    createdBy: string,
+    mid: string
+  ) {
+    const response = await this.post<ExceptionDataResponseDto>(
+      `/api/v1/dashboard/riskradar/save-net-settlement`,
+      {
+        category,
+        tranDate,
+        tranAmt,
+        balAmt,
+        pendingAmt,
+        writeOffAmt,
+        reason,
+        createdBy,
+        mid,
+      }
+    );
+
+    return response.data;
+  }
+
+  public async saveMerchantData(
+    mid: string,
+    note: string,
+    isPinned: boolean,
+    bbbRating: string,
+    author: string,
+    preferredContact: string
+  ): Promise<ExceptionDataResponseDto> {
+    const response = await this.post<ExceptionDataResponseDto>(
+      `/api/v1/dashboard/riskradar/save-merchant-data?mid=${mid}`,
+      {
+        preferredContact,
+        note,
+        isPinned,
+        bbbRating,
+        author,
+      }
+    );
+
+    return response.data;
+  }
+
+  public async getMerchantContactInfo(
+    mid: string
+  ): Promise<MerchantContactResponseDto> {
+    this.logger.debug('Merchant MID:', mid);
+
+    const response = await this.get<MerchantContactResponseDto>(
+      `/api/v1/dashboard/riskradar/merchant-tab/contact?mid=${mid}`
+    );
+    return response.data;
+  }
+
+  public async postExecuteDivertCommand(
+    exceptionsId: number[]
+  ): Promise<MerchantContactResponseDto> {
+    this.logger.debug('exceptionIds:', exceptionsId);
+
+    const response = await this.post<MerchantContactResponseDto>(
+      `/api/v1/dashboard/riskradar/execute-command/divert`,
+      {
+        riskExceptionIds: exceptionsId,
+      }
+    );
+    return response.data;
+  }
+
+  public async postExecuteManagersQueueCommand(
+    exceptionsId: number[]
+  ): Promise<MerchantContactResponseDto> {
+    this.logger.debug('exceptionIds:', exceptionsId);
+
+    const response = await this.post<MerchantContactResponseDto>(
+      `/api/v1/dashboard/riskradar/execute-command/mgrq`,
+      {
+        riskExceptionIds: exceptionsId,
+      }
+    );
+    return response.data;
+  }
+
+  public async postReviewException(
+    exceptionsId: number[],
+    reviewerUsername: string
+  ): Promise<MerchantContactResponseDto> {
+    this.logger.debug('exceptionIds:', exceptionsId);
+
+    const response = await this.post<MerchantContactResponseDto>(
+      `/api/v1/dashboard/riskradar/execute-command/reviewed`,
+      {
+        riskExceptionIds: exceptionsId,
+        reviewerUsername,
+      }
+    );
+    return response.data;
+  }
+
+  public async postSentToManagersQueue(
+    exceptionsId: number[]
+  ): Promise<MerchantContactResponseDto> {
+    this.logger.debug('exceptionIds:', exceptionsId);
+
+    const response = await this.post<MerchantContactResponseDto>(
+      `/api/v1/dashboard/riskradar/execute-command/mgrq`,
+      {
+        riskExceptionIds: exceptionsId,
+      }
+    );
+    return response.data;
+  }
+
+  public async postAssignExceptionToUser(
+    exceptionsId: number[],
+    riskUserId: string
+  ): Promise<MerchantContactResponseDto> {
+    this.logger.debug('exceptionIds:', exceptionsId);
+
+    const response = await this.post<MerchantContactResponseDto>(
+      `/api/v1/dashboard/riskradar/assign-exception-to-user`,
+      {
+        riskExceptionsIds: exceptionsId,
+        userId: riskUserId,
+      }
+    );
+    return response.data;
+  }
+
+  public async putExecuteAutoHoldWhiteLabelCommand(
+    exceptionsId: number[],
+    isActive: boolean
+  ): Promise<MerchantContactResponseDto> {
+    this.logger.debug('exceptionIds:', exceptionsId);
+
+    const response = await this.put<MerchantContactResponseDto>(
+      `/api/v1/dashboard/riskradar/execute-command/bAutoHoldWhiteLabel`,
+      {
+        riskExceptionIds: exceptionsId,
+        isActive,
+      }
+    );
+    return response.data;
+  }
+
+  public async putExecuteRiskWatchCommand(
+    exceptionsId: number[],
+    isActive: boolean
+  ): Promise<MerchantContactResponseDto> {
+    this.logger.debug('exceptionIds:', exceptionsId);
+
+    const response = await this.put<MerchantContactResponseDto>(
+      `/api/v1/dashboard/riskradar/execute-command/bRiskWatch`,
+      {
+        riskExceptionIds: exceptionsId,
+        isActive,
+      }
+    );
+    return response.data;
+  }
+
+  public async getTransactionExceptions(
+    mid: string
+  ): Promise<TransactionExceptionResponseDto> {
+    this.logger.debug('Merchant MID:', mid);
+
+    const response = await this.get<TransactionExceptionResponseDto>(
+      `/api/v1/dashboard/riskradar/merchant-tab/exceptions?mid=${mid}`
+    );
+    return response.data;
+  }
+
+  public async getMerchantNotes(
+    mid: string
+  ): Promise<MerchantNotesResponseDto> {
+    this.logger.debug('Merchant MID:', mid);
+
+    const response = await this.get<MerchantNotesResponseDto>(
+      `/api/v1/dashboard/riskradar/merchant-tab/notes?mid=${mid}`
+    );
+    return response.data;
+  }
+
+  public async getMerchantChargebacks(
+    mid: string
+  ): Promise<MerchantChargebacksResponseDto> {
+    this.logger.debug('Merchant MID:', mid);
+
+    const response = await this.get<MerchantChargebacksResponseDto>(
+      `/api/v1/dashboard/riskradar/merchant-tab/chargebacks?mid=${mid}`
+    );
+    return response.data;
+  }
+
+  public async getMerchantNetSettlement(
+    mid: string
+  ): Promise<MerchantNetSettlementResponseDto> {
+    this.logger.debug('Merchant MID:', mid);
+
+    const response = await this.get<MerchantNetSettlementResponseDto>(
+      `/api/v1/dashboard/riskradar/merchant-tab/netsettlement?mid=${mid}`
+    );
+    return response.data;
+  }
+
+  public async getMerchant(
+    mid: string,
+    exceptionId: string
+  ): Promise<MerchantResponseDto> {
+    this.logger.debug('Merchant MID:', mid);
+
+    const response = await this.get<MerchantResponseDto>(
+      `/api/v1/dashboard/riskradar/merchant-data-path?mid=${mid}&exceptionId=${exceptionId}`
+    );
+    return response.data;
+  }
+
+  public async riskRadar(
+    filters: ExceptionFiltersDto
+  ): Promise<RiskRadarResponseDto> {
     this.logger.debug('Risk Radar filters:', filters);
-
-    const obj = {
-      data: [
-        {
-          net_dep_amt: '1200.00',
-          fsp_appr_auth_tot_amt: '',
-          auth_decline_amt: '',
-          dba: 'KRAZY KATS EMBROIDERY',
-          activation_datetime: '',
-          channel: '',
-          reseller: '',
-          referral_partner: '',
-          solution_consultant: '',
-          Auto_Approved_date: '',
-          risk_watch: '   ',
-          new_account: '',
-          avg_ticket_score: '14',
-          high_ticket_score: '',
-          credit_score: '',
-          channel_score: '',
-          keyed_perc_score: '',
-          monthly_vol_score: '',
-          avg_batch_score: '20',
-          dup_card_score: '',
-          dup_bin_score: '',
-          late_post_score: '',
-          foreign_keyed_score: '',
-          chbk_ret_req_score: '',
-          next_day_funding: '',
-          divert: '',
-          divert_balance_amt: '',
-          amex_opt_blue: '',
-          moto_avs_score: '',
-          settle_30perc_more_than_auth_score: '',
-          no_auth_score: '',
-          auth_decline_score: '',
-          neg_batch_score: '',
-          auto_hold_score: '',
-          funding_exception_score: '',
-          total_score: '34',
-          user_reviewed: 'jtoth',
-          exception_created_datetime: 'Feb  5 2025  8:18AM',
-          exception_id: '3',
-          mid: '5611000000158980',
-        },
-        {
-          net_dep_amt: '2064.19',
-          fsp_appr_auth_tot_amt: '',
-          auth_decline_amt: '',
-          dba: 'LAMP LIGHTER INN',
-          activation_datetime: '',
-          channel: '',
-          reseller: '',
-          referral_partner: '',
-          solution_consultant: '',
-          Auto_Approved_date: '',
-          risk_watch: '   ',
-          new_account: '',
-          avg_ticket_score: '7',
-          high_ticket_score: '5',
-          credit_score: '',
-          channel_score: '',
-          keyed_perc_score: '',
-          monthly_vol_score: '',
-          avg_batch_score: '15',
-          dup_card_score: '',
-          dup_bin_score: '',
-          late_post_score: '',
-          foreign_keyed_score: '',
-          chbk_ret_req_score: '',
-          next_day_funding: '',
-          divert: '',
-          divert_balance_amt: '',
-          amex_opt_blue: '',
-          moto_avs_score: '',
-          settle_30perc_more_than_auth_score: '',
-          no_auth_score: '',
-          auth_decline_score: '',
-          neg_batch_score: '',
-          auto_hold_score: '',
-          funding_exception_score: '',
-          total_score: '27',
-          user_reviewed: 'jtoth',
-          exception_created_datetime: 'Feb  5 2025  8:18AM',
-          exception_id: '5',
-          mid: '5611000000127837',
-        },
-        {
-          net_dep_amt: '4501.00',
-          fsp_appr_auth_tot_amt: '',
-          auth_decline_amt: '',
-          dba: 'WESTPAW FENCING',
-          activation_datetime: '',
-          channel: '',
-          reseller: '',
-          referral_partner: '',
-          solution_consultant: '',
-          Auto_Approved_date: '',
-          risk_watch: '   ',
-          new_account: 'Yes',
-          avg_ticket_score: '11',
-          high_ticket_score: '7',
-          credit_score: '',
-          channel_score: '',
-          keyed_perc_score: '',
-          monthly_vol_score: '',
-          avg_batch_score: '20',
-          dup_card_score: '',
-          dup_bin_score: '',
-          late_post_score: '',
-          foreign_keyed_score: '',
-          chbk_ret_req_score: '',
-          next_day_funding: '',
-          divert: '',
-          divert_balance_amt: '',
-          amex_opt_blue: '',
-          moto_avs_score: '',
-          settle_30perc_more_than_auth_score: '',
-          no_auth_score: '',
-          auth_decline_score: '',
-          neg_batch_score: '',
-          auto_hold_score: '',
-          funding_exception_score: '',
-          total_score: '38',
-          user_reviewed: '',
-          exception_created_datetime: 'Feb  5 2025  8:18AM',
-          exception_id: '6',
-          mid: '5611000000159145',
-        },
-        {
-          net_dep_amt: '21933.52',
-          fsp_appr_auth_tot_amt: '',
-          auth_decline_amt: '',
-          dba: 'Avani Marble and Granite',
-          activation_datetime: '',
-          channel: '',
-          reseller: '',
-          referral_partner: '',
-          solution_consultant: '',
-          Auto_Approved_date: '',
-          risk_watch: '   ',
-          new_account: '',
-          avg_ticket_score: '24',
-          high_ticket_score: '14',
-          credit_score: '',
-          channel_score: '',
-          keyed_perc_score: '',
-          monthly_vol_score: '',
-          avg_batch_score: '5',
-          dup_card_score: '',
-          dup_bin_score: '',
-          late_post_score: '',
-          foreign_keyed_score: '',
-          chbk_ret_req_score: '',
-          next_day_funding: '',
-          divert: '',
-          divert_balance_amt: '',
-          amex_opt_blue: '',
-          moto_avs_score: '',
-          settle_30perc_more_than_auth_score: '',
-          no_auth_score: '',
-          auth_decline_score: '',
-          neg_batch_score: '',
-          auto_hold_score: '',
-          funding_exception_score: '',
-          total_score: '43',
-          user_reviewed: 'rparrott',
-          exception_created_datetime: 'Feb  5 2025  8:18AM',
-          exception_id: '7',
-          mid: '5611000000169573',
-        },
-      ],
-      meta: {
-        records_per_page: 4,
-        current_page: 1,
-        last_page: 3,
-        from_record: 1,
-        to_record: 4,
-        total_records: 11,
-      },
-    };
-
-    return obj;
+    const response = await this.get<RiskRadarResponseDto>(
+      '/api/v1/dashboard/riskradar/exception-list',
+      { params: filters }
+    );
+    return response.data;
   }
 
   public async get<T>(url: string, config = {}) {
