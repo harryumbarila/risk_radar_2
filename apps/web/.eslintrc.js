@@ -27,7 +27,24 @@ module.exports = {
         leadingUnderscore: 'allow',
       },
     ],
+    'no-restricted-properties': [
+      'error',
+      {
+        object: 'process',
+        property: 'env',
+        message:
+          'Avoid using process.env directly. Use @/config/* files instead.',
+      },
+    ],
   },
+  overrides: [
+    {
+      files: ['src/config/env.ts'],
+      rules: {
+        'no-restricted-properties': 'off',
+      },
+    },
+  ],
   settings: {
     tailwindcss: {
       config: require('./tailwind.config.js'),

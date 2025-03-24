@@ -21,6 +21,7 @@ import { IrisClient } from './webservice/iris.client';
 export type IrisProxyControllerConfig = {
   IRIS_ENV: string;
 };
+
 @ApiTags('Iris Proxy')
 @Controller('/v1/iris_proxy')
 export class IrisProxyController {
