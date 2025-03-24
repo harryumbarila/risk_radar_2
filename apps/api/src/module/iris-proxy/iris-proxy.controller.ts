@@ -39,7 +39,11 @@ export class IrisProxyController {
   @Get('users')
   public async users(): Promise<IrisFilteredUsersResponseDto> {
     const data = await this.client.getUsers();
-    return FilteredUsersFactory.create(data);
+    const environment =
+      this.configService.get('IRIS_ENV') === 'staging'
+        ? 'staging'
+        : 'production';
+    return FilteredUsersFactory.create(data, environment);
   }
 
   @ApiResponse({

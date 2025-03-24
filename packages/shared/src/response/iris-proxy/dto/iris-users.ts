@@ -36,10 +36,12 @@ interface UserReport {
   user_id: number;
   username: string;
   full_name: string;
+  class: UserClass;
 }
 
 interface UserManage {
   user_id: number;
   username: string;
   full_name: string;
+  class: UserClass;
 }

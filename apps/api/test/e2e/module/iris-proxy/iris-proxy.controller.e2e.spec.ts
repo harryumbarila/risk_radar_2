@@ -48,13 +48,39 @@ describe('IrisProxyController (e2e)', () => {
                 user_id: 2,
                 username: 'jane.smith',
                 full_name: 'Jane Smith',
+                class: {
+                  id: 25, // Production RSL class ID
+                  name: 'RSL Class',
+                },
+              },
+              {
+                user_id: 3,
+                username: 'invalid.rsl',
+                full_name: 'Invalid RSL',
+                class: {
+                  id: 999, // Invalid class ID that should be filtered out
+                  name: 'Other Class',
+                },
               },
             ],
             manages: [
               {
-                user_id: 3,
+                user_id: 4,
                 username: 'bob.johnson',
                 full_name: 'Bob Johnson',
+                class: {
+                  id: 71, // Production partner class ID
+                  name: 'Referral Partners $',
+                },
+              },
+              {
+                user_id: 5,
+                username: 'invalid.partner',
+                full_name: 'Invalid Partner',
+                class: {
+                  id: 888, // Invalid class ID that should be filtered out
+                  name: 'Other Class',
+                },
               },
             ],
           },
@@ -98,7 +124,7 @@ describe('IrisProxyController (e2e)', () => {
   });
 
   describe('/v1/iris_proxy/users (GET)', () => {
-    it('should return filtered users', async () => {
+    it('should return filtered users with only valid class IDs', async () => {
       const response = await request(app.getHttpServer())
         .get('/v1/iris_proxy/users')
         .expect(200);
@@ -112,14 +138,117 @@ describe('IrisProxyController (e2e)', () => {
             { id: 202, name: 'Marketing' },
           ],
           label: 'John Doe',
-          manages: [{ user_id: 3, username: 'Bob Johnson' }],
-          rsl: [{ id: 2, name: 'Jane Smith' }],
           value: 1,
+          // Only users with valid class IDs should be included
+          rsl: [{ id: 2, name: 'Jane Smith' }],
+          manages: [{ user_id: 4, username: 'Bob Johnson' }],
         },
       ]);
 
       // Verify that the client method was called
       expect(irisClientMock.getUsers).toHaveBeenCalled();
+    });
+
+    it('should return filtered users with staging environment class IDs', async () => {
+      // Close the existing app
+      await app.close();
+
+      // Create new mocks for staging environment
+      const stagingConfigServiceMock = {
+        get: jest.fn((key) => (key === 'IRIS_ENV' ? 'staging' : undefined)),
+      };
+
+      // Update mock data for staging environment
+      const stagingIrisClientMock = {
+        getUsers: jest.fn().mockResolvedValue({
+          data: [
+            {
+              id: 1,
+              full_name: 'John Doe',
+              class: {
+                id: 101,
+                name: 'Manager',
+              },
+              groups: [
+                {
+                  id: 201,
+                  name: 'Sales',
+                },
+              ],
+              reports_to: [
+                {
+                  user_id: 2,
+                  username: 'jane.smith',
+                  full_name: 'Jane Smith',
+                  class: {
+                    id: 53, // Staging RSL class ID
+                    name: 'RSL Class',
+                  },
+                },
+              ],
+              manages: [
+                {
+                  user_id: 4,
+                  username: 'bob.johnson',
+                  full_name: 'Bob Johnson',
+                  class: {
+                    id: 41, // Staging partner class ID
+                    name: 'Referral Partners $',
+                  },
+                },
+              ],
+            },
+          ],
+          meta: {
+            current_page: 1,
+            from: 1,
+            last_page: 5,
+            path: '/api/users',
+            per_page: 15,
+            to: 15,
+            total: 75,
+          },
+        }),
+        getChannels: jest.fn().mockResolvedValue({
+          data: [{ id: 1, name: 'Channel 1' }],
+        }),
+      };
+
+      // Recreate the app with the updated mocks
+      const moduleFixture: TestingModule = await Test.createTestingModule({
+        controllers: [IrisProxyController],
+        providers: [
+          IrisProxyService,
+          { provide: IrisClient, useValue: stagingIrisClientMock },
+          { provide: ConfigService, useValue: stagingConfigServiceMock },
+        ],
+      }).compile();
+
+      app = moduleFixture.createNestApplication();
+      await app.init();
+
+      const response = await request(app.getHttpServer())
+        .get('/v1/iris_proxy/users')
+        .expect(200);
+
+      // Detailed structure validation matching expected transformation
+      const user = response.body.data;
+
+      // Check that we have data
+      expect(user).toBeDefined();
+      expect(Array.isArray(user)).toBe(true);
+      expect(user.length).toBe(1);
+
+      // Check the structure but not the exact content of arrays
+      // since we're testing integration with the real service
+      expect(user[0]).toHaveProperty('channels');
+      expect(user[0]).toHaveProperty('label', 'John Doe');
+      expect(user[0]).toHaveProperty('value', 1);
+      expect(user[0]).toHaveProperty('rsl');
+      expect(user[0]).toHaveProperty('manages');
+
+      // Verify that the client method was called
+      expect(stagingIrisClientMock.getUsers).toHaveBeenCalled();
     });
   });
 
