@@ -19,6 +19,17 @@ module.exports = {
     // Classes management
     'max-classes-per-file': 'off',
     'class-methods-use-this': 'off',
+
+    // Env
+    'no-restricted-properties': [
+      'error',
+      {
+        object: 'process',
+        property: 'env',
+        message:
+          'Avoid using process.env directly. Use @/config/* files instead.',
+      },
+    ],
   },
   settings: {
     'import/resolver': {
@@ -43,6 +54,12 @@ module.exports = {
         '@typescript-eslint/no-unsafe-member-access': 'off',
         '@typescript-eslint/no-unsafe-return': 'off',
         '@typescript-eslint/no-unsafe-call': 'off',
+      },
+    },
+    {
+      files: ['src/config/env.ts'],
+      rules: {
+        'no-restricted-properties': 'off',
       },
     },
   ],

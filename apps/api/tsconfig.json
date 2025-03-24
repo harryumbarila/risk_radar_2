@@ -12,6 +12,8 @@
     "baseUrl": "./",
     "paths": {
       "@/api/*": ["./src/*"],
+      "@/config/*": ["./src/config/env.ts"],
+
       "@/shared/*": ["../../packages/shared/src/*"]
     },
     "incremental": true,
