@@ -106,6 +106,7 @@ export class LegacyDashboardProxyClient {
           sActivationDate: '1/8/2024',
           iMV$: 3360,
           iAT$: 320,
+          iHT$: 0,
           iSwipeVolPerc: 0,
           iCB: 0,
           iRR: 0,
@@ -125,6 +126,10 @@ export class LegacyDashboardProxyClient {
           iUWApprHT: 100,
           dtCreated: '2025-02-18T07:15:37.277',
           dtLastUpdated: '2025-02-18T07:15:37.277',
+          sPreferredContact: '',
+          bIsTalusPayMerchant: false,
+          sSolutionConsultant: '',
+          iUWApprCB: 0,
         },
         {
           pk: 7,
@@ -142,6 +147,7 @@ export class LegacyDashboardProxyClient {
           sActivationDate: '1/8/2024',
           iMV$: 3360,
           iAT$: 320,
+          iHT$: 0,
           iSwipeVolPerc: 0,
           iCB: 0,
           iRR: 0,
@@ -161,6 +167,10 @@ export class LegacyDashboardProxyClient {
           iUWApprHT: 100,
           dtCreated: '2025-02-18T07:18:43.013',
           dtLastUpdated: '2025-02-18T07:18:43.013',
+          sPreferredContact: '',
+          bIsTalusPayMerchant: false,
+          sSolutionConsultant: '',
+          iUWApprCB: 0,
         },
       ],
       volume: [
@@ -197,6 +207,8 @@ export class LegacyDashboardProxyClient {
           dACBPerc: 0.0,
         },
       ],
+      exception_type_legend: [],
+      risk_exception: [],
     };
   }
 
@@ -210,7 +222,7 @@ export class LegacyDashboardProxyClient {
     this.logger.debug('Risk Radar filters:', filters);
 
     const obj = {
-      DATA: [
+      data: [
         {
           net_dep_amt: '1200.00',
           fsp_appr_auth_tot_amt: '',
@@ -380,7 +392,7 @@ export class LegacyDashboardProxyClient {
           mid: '5611000000169573',
         },
       ],
-      META: {
+      meta: {
         records_per_page: 4,
         current_page: 1,
         last_page: 3,

@@ -1,6 +1,6 @@
 export interface RiskRadarResponseDto {
-  DATA: RiskRadarData[];
-  META: RiskRadarMeta;
+  data: RiskRadarData[];
+  meta: RiskRadarMeta;
 }
 
 export interface RiskRadarData {
@@ -44,6 +44,7 @@ export interface RiskRadarData {
   exception_created_datetime: string;
   exception_id: string;
   mid: string;
+  reviewButton?: string;
 }
 
 export interface RiskRadarMeta {
