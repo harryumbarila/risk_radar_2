@@ -7,8 +7,14 @@ export const env = createEnv({
       .string()
       .url()
       .default('https://dashboard-api.taluspay-staging.com'),
-    NEXT_PUBLIC_RISK_RADAR_BASE_URL: z.string().url(),
-    NEXT_PUBLIC_MERCHANT_BASE_URL: z.string().url(),
+    NEXT_PUBLIC_RISK_RADAR_BASE_URL: z
+      .string()
+      .url()
+      .default('http://localhost:3001'),
+    NEXT_PUBLIC_MERCHANT_BASE_URL: z
+      .string()
+      .url()
+      .default('https://taluspay-staging.com'),
   },
 
   server: {
@@ -17,11 +23,12 @@ export const env = createEnv({
     FRONTEGG_CLIENT_ID: z.string().min(1),
     FRONTEGG_APP_ID: z.string().min(1),
     FRONTEGG_ENCRYPTION_PASSWORD: z.string().min(1),
-    FRONTEGG_COOKIE_NAME: z.string().min(1),
+    FRONTEGG_COOKIE_NAME: z.string().min(1).default('fe_session'),
     FRONTEGG_HOSTED_LOGIN: z
       .enum(['true', 'false'])
-      .transform((val) => val === 'true'),
-    FRONTEGG_LOG_LEVEL: z.enum(['debug', 'info', 'error']),
+      .transform((val) => val === 'true')
+      .default('true'),
+    FRONTEGG_LOG_LEVEL: z.enum(['debug', 'info', 'error']).default('error'),
     FRONTEGG_JWT_PUBLIC_KEY: z.string().min(1).optional(), // Not required yet
   },
 
