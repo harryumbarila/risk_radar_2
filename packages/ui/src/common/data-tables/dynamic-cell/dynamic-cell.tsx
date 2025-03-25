@@ -1,3 +1,5 @@
+/* eslint-disable react/destructuring-assignment */
+
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/solid';
 
 import type { DynamicCellProps } from './dynamic-cell-model';

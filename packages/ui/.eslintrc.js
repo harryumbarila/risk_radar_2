@@ -15,7 +15,6 @@ module.exports = {
   plugins: ['unused-imports'],
   rules: {
     'unused-imports/no-unused-imports': 'error',
-    'react/destructuring-assignment': 'off',
     'unused-imports/no-unused-vars': [
       'warn',
       {

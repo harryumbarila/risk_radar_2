@@ -56,7 +56,7 @@ export const DataTable = <Entry extends BaseModel>(
   const table = useReactTable({
     data: data.data,
     columns,
-    pageCount: props.data?.pageCount ?? -1,
+    pageCount: data?.pageCount ?? -1,
     state: {
       sorting,
       pagination,
