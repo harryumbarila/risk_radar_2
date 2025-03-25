@@ -1,8 +1,8 @@
 export interface MerchantNotesResponseDto {
-  notes: MetchantNote[];
+  notes: MerchantNote[];
 }
 
-export interface MetchantNote {
+export interface MerchantNote {
   pkNotes: number;
   sMID: string;
   sNotes: string;
