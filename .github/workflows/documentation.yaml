@@ -29,6 +29,9 @@ jobs:
         with:
           node-version: 22
 
+      - name: Load repository name
+        run: echo "REPO_NAME=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
+
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
@@ -46,6 +49,8 @@ jobs:
         run: |
           cd apps/docs
           yarn build
+        env:
+          REPO_NAME: ${{ env.REPO_NAME }}
 
       - name: Upload artifact for deployment
         uses: actions/upload-pages-artifact@v3

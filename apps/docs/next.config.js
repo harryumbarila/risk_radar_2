@@ -7,6 +7,8 @@ const withNextra = require('nextra')({
   },
 });
 
+const repoName = process.env.REPO_NAME || '';
+
 module.exports = withNextra({
   reactStrictMode: true,
   output: 'export', // Ensures static export
@@ -14,6 +16,6 @@ module.exports = withNextra({
   images: {
     unoptimized: true, // Required for GitHub Pages
   },
-  basePath: '/Denali',
-  assetPrefix: '/Denali/',
+  basePath: repoName ? `/${repoName}` : '',
+  assetPrefix: repoName ? `/${repoName}/` : '',
 });
