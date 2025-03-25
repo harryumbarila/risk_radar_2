@@ -1,11 +1,11 @@
 import useBaseApi from '@/web/src/hooks/use-base-api';
 
-type UseAssigneExceptionToUserReturnType = {
+type UseAssignExceptionToUserReturnType = {
   assignException: (id: number[], riskUserId: string) => Promise<unknown>;
 };
 
 export const useAssignExceptionToUser =
-  (): UseAssigneExceptionToUserReturnType => {
+  (): UseAssignExceptionToUserReturnType => {
     const { makeRequest } = useBaseApi();
 
     const assignException = async (
