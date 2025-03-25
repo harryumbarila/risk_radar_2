@@ -9,4 +9,11 @@ const withNextra = require('nextra')({
 
 module.exports = withNextra({
   reactStrictMode: true,
+  output: 'export', // Ensures static export
+  distDir: 'out',
+  images: {
+    unoptimized: true, // Required for GitHub Pages
+  },
+  basePath: '/Denali',
+  assetPrefix: '/Denali/',
 });
