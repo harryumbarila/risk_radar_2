@@ -55,3 +55,12 @@ export interface RiskRadarMeta {
   to_record: number;
   total_records: number;
 }
+
+export interface RiskUser {
+  user_id: number;
+  username: string;
+}
+
+export interface RiskRadarUsersResponseDto {
+  risk_users: RiskUser[];
+}
