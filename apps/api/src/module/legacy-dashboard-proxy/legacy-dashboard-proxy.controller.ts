@@ -112,7 +112,7 @@ export class LegacyDashboardProxyController {
     description: 'The risk radar users response.',
   })
   @Get('risk_radar_users')
-  public async getRiskRadarUsers(): Promise<ExceptionDataResponseDto> {
+  public async getRiskRadarUsers(): Promise<RiskRadarResponseDto> {
     return this.client.getRiskRadarUsers();
   }
 
