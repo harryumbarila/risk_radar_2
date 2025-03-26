@@ -112,7 +112,7 @@ export class LegacyDashboardProxyController {
     description: 'The risk radar users response.',
   })
   @Get('risk_radar_users')
-  public async getRiskRadarUsers(): Promise<ExceptionDataResponseDto> {
+  public async getRiskRadarUsers(): Promise<RiskRadarResponseDto> {
     return this.client.getRiskRadarUsers();
   }
 
@@ -241,25 +241,12 @@ export class LegacyDashboardProxyController {
   @ApiOkResponse({ type: Object })
   @Post('toggle_managers_queue')
   public async postManagersQueue(
-    @Query('mid') mid: string,
     @Body()
     body: {
-      mid: string;
-      note: string;
-      isPinned: boolean;
-      bbbRating: string;
-      author: string;
-      preferredContact: string;
+      exceptionsId: number[];
     }
   ): Promise<unknown> {
-    return this.client.saveMerchantData(
-      mid,
-      body?.note,
-      body?.isPinned,
-      body?.bbbRating,
-      body?.author,
-      body?.preferredContact
-    );
+    return this.client.postSentToManagersQueue(body?.exceptionsId);
   }
 
   @ApiOkResponse({ type: Object })
