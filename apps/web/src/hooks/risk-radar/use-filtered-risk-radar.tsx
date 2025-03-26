@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import type { RiskRadarResponseDto } from '@/shared/response';
 import useBaseApi from '@/web/src/hooks/use-base-api';
@@ -23,16 +23,16 @@ type UseFilteredRiskRadarReturnType = {
   data: RiskRadarResponseDto | null;
   isLoading: boolean;
   error: Error | null;
+  fetchData: () => void;
 };
 
 export const useFilteredRiskRadar = (): UseFilteredRiskRadarReturnType => {
   const { makeRequest } = useBaseApi();
-
   const [filters, setFilters] = useState<FilterState>({
-    from_date: '',
-    to_date: '',
-    status: '',
-    assigned_to: '',
+    from_date: new Date().toISOString().split('T')[0]!,
+    to_date: new Date().toISOString().split('T')[0]!,
+    status: '0',
+    assigned_to: '0',
     MID: null,
     dba_or_sic: null,
     exception_type: [],
@@ -45,44 +45,36 @@ export const useFilteredRiskRadar = (): UseFilteredRiskRadarReturnType => {
   const [data, setData] = useState<RiskRadarResponseDto | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  const [isInitialized, setIsInitialized] = useState(false);
 
-  useEffect(() => {
-    if (!isInitialized && filters.exception_type.length === 0) {
-      return;
+  const fetchData = async (): Promise<void> => {
+    setIsLoading(true);
+    try {
+      const queryParams = new URLSearchParams({
+        from_date: filters.from_date,
+        to_date: filters.to_date,
+        status: filters.status,
+        assigned_to: filters.assigned_to,
+        MID: filters.MID || 'null',
+        dba_or_sic: filters.dba_or_sic || 'null',
+        exception_type: filters.exception_type.join(', '),
+        view_all_exceptions: filters.view_all_exceptions ? '1' : '0',
+        source_type: filters.source_type,
+        current_page: filters.current_page.toString(),
+        records_per_page: filters.records_per_page.toString(),
+      });
+
+      const result = await makeRequest<RiskRadarResponseDto>(
+        `/v1/legacy_dashboard_proxy/risk_radar?${queryParams.toString()}`
+      );
+
+      setData(result);
+      setError(null);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    const fetchData = async (): Promise<void> => {
-      setIsLoading(true);
-      try {
-        const queryParams = new URLSearchParams({
-          from_date: filters.from_date,
-          to_date: filters.to_date,
-          status: filters.status,
-          assigned_to: filters.assigned_to,
-          MID: filters.MID || 'null',
-          dba_or_sic: filters.dba_or_sic || 'null',
-          exception_type: filters.exception_type.join(', '),
-          view_all_exceptions: filters.view_all_exceptions ? '1' : '0',
-          source_type: filters.source_type,
-          current_page: filters.current_page.toString(),
-          records_per_page: filters.records_per_page.toString(),
-        });
-
-        const result = await makeRequest<RiskRadarResponseDto>(
-          `/v1/legacy_dashboard_proxy/risk_radar?${queryParams.toString()}`
-        );
-        setData(result);
-        setIsInitialized(true);
-      } catch (err) {
-        setError(err as Error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData().catch(() => {});
-  }, [filters, isInitialized, makeRequest]);
-
-  return { filters, setFilters, data, isLoading, error };
+  return { filters, setFilters, data, isLoading, error, fetchData };
 };
