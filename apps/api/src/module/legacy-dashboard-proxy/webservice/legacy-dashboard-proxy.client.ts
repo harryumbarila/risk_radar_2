@@ -89,8 +89,8 @@ export class LegacyDashboardProxyClient {
     return response.data;
   }
 
-  public async getRiskRadarUsers(): Promise<ExceptionDataResponseDto> {
-    const response = await this.get<ExceptionDataResponseDto>(
+  public async getRiskRadarUsers(): Promise<RiskRadarResponseDto> {
+    const response = await this.get<RiskRadarResponseDto>(
       '/api/v1/dashboard/riskradar/risk-radar-users'
     );
     return response.data;
