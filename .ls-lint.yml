@@ -9,7 +9,7 @@ ls:
     .d.ts: kebab-case
   # nextjs pages dir
   apps/*/src/app:
-    .dir: kebab-case | regex:[\[\(][a-z0-9]+[\]\)] | regex:[\[\(]\.\.\.([a-z0-9]+)[\]\)]
+    .dir: kebab-case | regex:[\[\(][a-z0-9-]+[\]\)] | regex:[\[\(]\.\.\.([a-z0-9-]+)[\]\)]
     .js: kebab-case
     .ts: kebab-case | regex:_app | regex:_document | regex:_error | regex:\[[a-z0-9]+\] | regex:\[\.\.\.[a-z0-9]+\]
     .d.ts: kebab-case
