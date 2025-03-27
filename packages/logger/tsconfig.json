@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@denali/typescript-config/node.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "./dist",
+    "paths": {
+      "@/logger": ["./src"],
+      "@/logger/*": ["./src/*"]
+    }
+  },
+  "include": ["src", "tests", "jest.config.ts"]
+}
