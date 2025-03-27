@@ -1,20 +1,17 @@
+import type { DataSourceOptions } from 'typeorm';
 import { DataSource } from 'typeorm';
 
+import { config } from '../config/config';
 import * as entities from '../entities';
-import { config } from './config';
 
-export const AppDataSource = new DataSource({
+export const database1Config: DataSourceOptions = {
   type: 'postgres',
   host: config.db.host,
   port: config.db.port,
   username: config.db.username,
   password: config.db.pass,
-  database: config.db.name,
   entities,
   migrations: ['migrations/*.js'],
+};
 
-  // options: {
-  //   encrypt: config.db.ssl,
-  //   trustServerCertificate: true,
-  // },
-});
+export const CliDataSource = new DataSource(database1Config);

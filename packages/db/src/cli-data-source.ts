@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 
-import * as entities from '../entities';
-import { config } from './config';
+import { config } from './config/config';
+import * as entities from './entities';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -11,10 +11,10 @@ export const AppDataSource = new DataSource({
   password: config.db.pass,
   database: config.db.name,
   entities,
-  migrations: ['migrations/*.js'],
-
   // options: {
   //   encrypt: config.db.ssl,
   //   trustServerCertificate: true,
   // },
 });
+// eslint-disable-next-line import/no-default-export
+// export default AppDataSource;

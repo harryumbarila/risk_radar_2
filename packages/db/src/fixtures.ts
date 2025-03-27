@@ -1,5 +1,4 @@
 /* eslint-disable no-await-in-loop */
-import { logger } from '@denali/logger';
 import * as path from 'path';
 import {
   Builder,
@@ -8,6 +7,8 @@ import {
   Parser,
   Resolver,
 } from 'typeorm-fixtures-cli';
+
+import { logger } from '@/logger/index';
 
 import { config as dbConfig } from './config/config';
 import type { DBConfig } from './db-connection';

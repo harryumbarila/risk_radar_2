@@ -1,7 +1,8 @@
-import { logger } from '@denali/logger';
 import path from 'path';
 import type { DataSourceOptions, LoggerOptions } from 'typeorm';
 import { DataSource } from 'typeorm';
+
+import { logger } from '@/logger/index';
 
 import * as entities from './entities';
 

@@ -1,7 +1,10 @@
 {
-  "name": "@denali/db",
-  "description": "TypeORM database integration",
-  "version": "1.0.0",
+  "name": "@denali/example-db",
+  "description": "TypeORM Example database integration",
+  "version": "0.0.0",
+  "types": "./src/index.ts",
+  "main": "./src/index.ts",
+  "private": true,
   "dependencies": {
     "@denali/logger": "*",
     "@nestjs/typeorm": "^11.0.0",
@@ -32,18 +35,13 @@
     "eslint-plugin-simple-import-sort": "^10.0.0",
     "typescript": "^5.3.3"
   },
-  "main": "./src/index.ts",
-  "private": true,
   "scripts": {
-    "fixtures": "ts-node --loader ts-node/esm -r tsconfig-paths/register src/fixtures.ts",
-    "fixtures2": "fixtures-ts-node-commonjs --dataSource=./src/cli-data-source.ts load ./fixtures --sync --require=@denali/db",
-    "fixtures3": "yarn fixtures load ./fixtures --dataSource=./cli-data-source.ts --sync --require=ts-node/register --require=tsconfig-paths/register",
     "lint": "eslint --ext .ts --max-warnings=0 .",
     "type-check": "tsc --noEmit",
-    "typeorm": "node --require ts-node/register ../../node_modules/typeorm/cli.js",
-    "typeorm:migration:generate": "cross-env TYPEORM_MIGRATIONS_DIR=db/migrations npm run typeorm -- migration:generate -o -d ./src/config/cli-data-source.ts",
-    "typeorm:migration:run": "npm run typeorm -- migration:run -d ./src/config/cli-data-source.ts",
-    "typeorm:migration:revert": "npm run typeorm -- migration:revert -d ./src/config/cli-data-source.ts"
-  },
-  "types": "./src/index.ts"
+    "typeorm": "dotenv -e ../apps/api/.env -- node --require ts-node/register ../../node_modules/typeorm/cli.js",
+    "db:fixtures": "fixtures-ts-node-commonjs --dataSource=./src/connection/cli-data-source.ts load ./fixtures --sync --require=@denali/example-db",
+    "db:generate": "dotenv -e ../apps/api/.env -- npm run typeorm -- migration:generate -o -d ./src/connection/cli-data-source.ts",
+    "db:migrate": "dotenv -e ../apps/api/.env -- npm run typeorm -- migration:run -d ./src/connection/cli-data-source.ts",
+    "db:revert": "dotenv -e ../apps/api/.env -- npm run typeorm -- migration:revert -d ./src/connection/cli-data-source.ts"
+  }
 }

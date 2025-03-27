@@ -4,15 +4,12 @@
   "workspaces": [
     "apps/*",
     "packages/*",
-    "configs/*"
+    "configs/*",
+    "db/*"
   ],
   "scripts": {
     "build": "turbo build",
     "commit": "git-cz",
-    "db:create-migration": "dotenv -e apps/api/.env -- yarn workspace @denali/db typeorm:create-migration",
-    "db:fixtures": "dotenv -e apps/api/.env -- yarn workspace @denali/db fixtures",
-    "db:migrate": "dotenv -e apps/api/.env -- yarn workspace @denali/db typeorm:migrate",
-    "db:revert-migration": "dotenv -e apps/api/.env -- yarn workspace @denali/db typeorm:revert-migration",
     "dev": "turbo dev",
     "docs": "yarn workspace @denali/docs run dev-docs",
     "format": "prettier --write .",

@@ -1,6 +1,6 @@
 entity: ExampleEntity
 items:
-  model1:
+  example1:
     name: '{{person.firstName}}'
-  model{2..3}:
+  example{2..5}:
     name: '{{person.firstName}}'
