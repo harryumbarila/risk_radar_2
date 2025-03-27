@@ -1,0 +1,13 @@
+{
+  "extends": "@denali/typescript-config/node.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/db/*": ["./src/*"]
+    },
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false
+  },
+  "include": ["src", "tests", "jest.config.ts", "jest.setup.ts"],
+  "exclude": ["node_modules"]
+}

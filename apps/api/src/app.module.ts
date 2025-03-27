@@ -13,6 +13,7 @@ import { rootConfig } from './shared/config/root.config';
 @Module({
   imports: [
     ConfigModule.forRoot(rootConfig),
+    // TypeOrmModule.forRoot(nestjsDatabaseConfig),
     GlobalModule,
     LegacyDashboardProxyModule,
     IrisProxyModule,

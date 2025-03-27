@@ -1,0 +1,6 @@
+entity: Company
+items:
+  model1:
+    name: '{{company.name}}'
+  model{2..3}:
+    name: '{{company.name}}'
