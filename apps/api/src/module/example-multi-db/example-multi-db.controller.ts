@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 
 import { Public } from '@/api/shared/auth/decorator/public.decorator';
 import { CrescentViewEntity } from '@/crescent-view-db/entities';
-import { FinanceEntity } from '@/finance-db/entities';
+import { RiskRadarUserEntity } from '@/finance-db/entities/risk-radar-user.entity';
 
 export type IrisProxyControllerConfig = {
   IRIS_ENV: string;
@@ -18,8 +18,8 @@ export class ExampleMultiDbController {
     @InjectRepository(CrescentViewEntity, 'crescent-view')
     private readonly crescentViewRepo: Repository<CrescentViewEntity>,
 
-    @InjectRepository(FinanceEntity, 'finance')
-    private readonly financeRepo: Repository<FinanceEntity>
+    @InjectRepository(RiskRadarUserEntity, 'finance')
+    private readonly financeRepo: Repository<RiskRadarUserEntity>
   ) {}
 
   @ApiResponse({
