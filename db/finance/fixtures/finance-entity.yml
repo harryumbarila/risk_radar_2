@@ -1,0 +1,8 @@
+entity: FinanceEntity
+items:
+  finance1:
+    name: '{{company.name}}'
+    description: '{{lorem.sentence}}'
+  finance{2..3}:
+    name: '{{company.name}}'
+    description: '{{lorem.sentence}}'
