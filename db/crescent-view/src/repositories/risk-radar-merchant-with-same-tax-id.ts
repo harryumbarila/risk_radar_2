@@ -1,9 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { InjectDataSource } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
 import { Repository } from 'typeorm';
 
 import { MerchantTIN } from '../entities/merchant-tin';
-import { InjectDataSource } from '@nestjs/typeorm';
 
 @Injectable()
 export class RiskRadarMerchantTaxIdRepository extends Repository<MerchantTIN> {

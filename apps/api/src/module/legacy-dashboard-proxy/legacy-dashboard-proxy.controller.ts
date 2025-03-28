@@ -14,6 +14,7 @@ import {
   IsString,
 } from 'class-validator';
 
+import { RiskRadarExceptionStatusRepository } from '@/finance-db/repositories';
 import type {
   ExceptionDataResponseDto,
   MerchantChargebacksResponseDto,
@@ -27,8 +28,6 @@ import type {
 import { KpiStatisticsResponseDto } from '@/shared/response/legacy-dashboard-proxy';
 
 import { LegacyDashboardProxyClient } from './webservice/legacy-dashboard-proxy.client';
-import { RiskRadarExceptionStatusRepository } from '@/finance-db/repositories';
-
 
 export class ExceptionFiltersDto {
   @IsString()
@@ -86,7 +85,7 @@ export class ExceptionFiltersDto {
 export class LegacyDashboardProxyController {
   public constructor(
     private readonly client: LegacyDashboardProxyClient,
-    private readonly exceptionStatusRepo: RiskRadarExceptionStatusRepository,
+    private readonly exceptionStatusRepo: RiskRadarExceptionStatusRepository
   ) {}
 
   @ApiResponse({
@@ -109,15 +108,16 @@ export class LegacyDashboardProxyController {
   })
   @Get('exception_data')
   public async getExceptionData(): Promise<ExceptionDataResponseDto> {
-    const exceptionStatuses = await this.exceptionStatusRepo.getActiveExceptionStatuses();
+    const exceptionStatuses =
+      await this.exceptionStatusRepo.getActiveExceptionStatuses();
     return {
       source_type: [],
-      status: exceptionStatuses.map(status => ({
+      status: exceptionStatuses.map((status) => ({
         pkRiskRadarExceptionStatus: status.id,
         sExceptionStatusDesc: status.description,
         iSortOrder: 0,
         bHidden: false,
-        dtCreated: new Date().toISOString()
+        dtCreated: new Date().toISOString(),
       })),
       exception_type: [],
       risk_user: [],
