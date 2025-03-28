@@ -27,6 +27,8 @@ import type {
 import { KpiStatisticsResponseDto } from '@/shared/response/legacy-dashboard-proxy';
 
 import { LegacyDashboardProxyClient } from './webservice/legacy-dashboard-proxy.client';
+import { RiskRadarExceptionStatusRepository } from '@/finance-db/repositories';
+
 
 export class ExceptionFiltersDto {
   @IsString()
@@ -82,7 +84,10 @@ export class ExceptionFiltersDto {
 @ApiTags('Legacy dashboard proxy')
 @Controller('/v1/legacy_dashboard_proxy')
 export class LegacyDashboardProxyController {
-  public constructor(private readonly client: LegacyDashboardProxyClient) {}
+  public constructor(
+    private readonly client: LegacyDashboardProxyClient,
+    private readonly exceptionStatusRepo: RiskRadarExceptionStatusRepository,
+  ) {}
 
   @ApiResponse({
     status: 200,
@@ -104,7 +109,19 @@ export class LegacyDashboardProxyController {
   })
   @Get('exception_data')
   public async getExceptionData(): Promise<ExceptionDataResponseDto> {
-    return this.client.getExceptionData();
+    const exceptionStatuses = await this.exceptionStatusRepo.getActiveExceptionStatuses();
+    return {
+      source_type: [],
+      status: exceptionStatuses.map(status => ({
+        pkRiskRadarExceptionStatus: status.id,
+        sExceptionStatusDesc: status.description,
+        iSortOrder: 0,
+        bHidden: false,
+        dtCreated: new Date().toISOString()
+      })),
+      exception_type: [],
+      risk_user: [],
+    };
   }
 
   @ApiResponse({

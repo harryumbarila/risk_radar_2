@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { CrescentViewEntity } from '@/crescent-view-db/entities';
+import { CrescentViewEntity, MerchantTIN } from '@/crescent-view-db/entities';
 import { FinanceEntity } from '@/finance-db/entities';
+import { RiskRadarMerchantTaxIdRepository } from '@/crescent-view-db/repositories';
+import { RiskRadarExceptionStatusRepository } from '@/finance-db/repositories';
 
 import { ExampleMultiDbController } from './example-multi-db.controller';
 
@@ -10,8 +12,12 @@ import { ExampleMultiDbController } from './example-multi-db.controller';
   imports: [
     TypeOrmModule.forFeature([CrescentViewEntity], 'crescent-view'),
     TypeOrmModule.forFeature([FinanceEntity], 'finance'),
+    TypeOrmModule.forFeature([MerchantTIN], 'crescent-view')
   ],
-  providers: [],
+  providers: [
+    RiskRadarMerchantTaxIdRepository,
+    RiskRadarExceptionStatusRepository,
+  ],
   controllers: [ExampleMultiDbController],
 })
 export class ExampleMultiDbModule {}
