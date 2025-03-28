@@ -1,9 +1,7 @@
-import { env } from './env';
-
 export const config = {
   db: {
     connectionString:
-      'postgresql://postgres:crescent@localhost:5433/crescent-view',
-    ssl: env.DB_SSL,
+      'mssql://code-user:STG7W>&!9Sy_gH@10.9.220.66/CrescentView?encrypt=true&trustServerCertificate=true&validateConnection=false',
+    ssl: false,
   },
 };
