@@ -1,0 +1,8 @@
+entity: CrescentViewEntity
+items:
+  crescentView1:
+    name: '{{person.firstName}}'
+    isActive: true
+  crescentView{2..10}:
+    name: '{{person.firstName}}'
+    isActive: false

@@ -4,8 +4,11 @@ import { APP_GUARD } from '@nestjs/core';
 
 import { GlobalModule } from '@/api/module/global/global.module';
 import { JwtAuthGuard } from '@/api/shared/auth/guard/jwt-auth.guard';
+import { DbTypeORMModule as CrescentViewDbTypeOrmModule } from '@/crescent-view-db/connection/nestjs-module';
+import { DbTypeORMModule as FinanceDbTypeOrmModule } from '@/finance-db/connection/nestjs-module';
 
 import { AppController } from './app.controller';
+import { ExampleMultiDbModule } from './module/example-multi-db/example-multi-db.module';
 import { IrisProxyModule } from './module/iris-proxy/iris-proxy.module';
 import { LegacyDashboardProxyModule } from './module/legacy-dashboard-proxy/legacy-dashboard-proxy.module';
 import { rootConfig } from './shared/config/root.config';
@@ -13,10 +16,12 @@ import { rootConfig } from './shared/config/root.config';
 @Module({
   imports: [
     ConfigModule.forRoot(rootConfig),
-    // TypeOrmModule.forRoot(nestjsDatabaseConfig),
+    CrescentViewDbTypeOrmModule,
+    FinanceDbTypeOrmModule,
     GlobalModule,
     LegacyDashboardProxyModule,
     IrisProxyModule,
+    ExampleMultiDbModule,
   ],
   controllers: [AppController],
   providers: [
