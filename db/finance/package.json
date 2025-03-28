@@ -7,6 +7,7 @@
   "private": true,
   "dependencies": {
     "@denali/logger": "*",
+    "@nestjs/common": "^10.0.0",
     "@nestjs/typeorm": "^11.0.0",
     "@t3-oss/env-core": "^0.6.1",
     "mssql": "^11.0.1",

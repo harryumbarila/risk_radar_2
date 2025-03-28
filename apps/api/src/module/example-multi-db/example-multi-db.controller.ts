@@ -5,8 +5,8 @@ import { Repository } from 'typeorm';
 
 import { Public } from '@/api/shared/auth/decorator/public.decorator';
 import { CrescentViewEntity } from '@/crescent-view-db/entities';
-import { FinanceEntity } from '@/finance-db/entities';
 import { RiskRadarMerchantTaxIdRepository } from '@/crescent-view-db/repositories';
+import { RiskRadarUserEntity } from '@/finance-db/entities/risk-radar-user.entity';
 
 export type IrisProxyControllerConfig = {
   IRIS_ENV: string;
@@ -18,12 +18,8 @@ export class ExampleMultiDbController {
   public constructor(
     @InjectRepository(CrescentViewEntity, 'crescent-view')
     private readonly crescentViewRepo: Repository<CrescentViewEntity>,
-
-    @InjectRepository(FinanceEntity, 'finance')
-    private readonly financeRepo: Repository<FinanceEntity>,
-
 //    @InjectRepository(RiskRadarMerchantTaxIdRepository, 'crescent-view')
-    private readonly merchantTINRepo: RiskRadarMerchantTaxIdRepository,
+    private readonly merchantTINRepo: RiskRadarMerchantTaxIdRepository,    
   ) {}
 
   @ApiResponse({
@@ -34,12 +30,7 @@ export class ExampleMultiDbController {
   @Public()
   @Get('data')
   public async data(): Promise<unknown> {
-    const crescentView = await this.crescentViewRepo.findBy({
-      isActive: false,
-    });
-    const financeData = await this.financeRepo.findBy({ name: 'Test' });
-
-    return { crescentView, financeData };
+    return {  };
   }
 
   @ApiOperation({ operationId: 'merchantTIN', summary: 'Get Merchant TIN' })

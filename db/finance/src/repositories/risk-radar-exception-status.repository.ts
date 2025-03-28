@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
-import { RiskRadarExceptionStatusEntity } from '../entities/risk-radar-exception-status.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
+import type { DataSource } from 'typeorm';
+import { Repository } from 'typeorm';
+
+import { RiskRadarExceptionStatusEntity } from '../entities/risk-radar-exception-status.entity';
 
 @Injectable()
 export class RiskRadarExceptionStatusRepository extends Repository<RiskRadarExceptionStatusEntity> {
