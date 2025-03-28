@@ -4,6 +4,9 @@
   "version": "0.0.1",
   "author": "",
   "dependencies": {
+    "@denali/connector-db": "*",
+    "@denali/data-warehouse-db": "*",
+    "@denali/iris-db": "*",
     "@denali/crescent-view-db": "*",
     "@denali/finance-db": "*",
     "@denali/shared": "*",
