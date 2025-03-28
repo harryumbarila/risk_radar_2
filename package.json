@@ -22,7 +22,8 @@
     "test:e2e": "turbo run test:e2e",
     "test:unit": "turbo run test:unit",
     "type-check": "turbo run type-check",
-    "ui:example": "yarn workspace @denali/example run dev-example"
+    "ui:example": "yarn workspace @denali/example run dev-example",
+    "create-db-pkg": "node configs/toolkit/add-db-package.js"
   },
   "config": {
     "commitizen": {
@@ -42,6 +43,7 @@
     "dotenv-cli": "^8.0.0",
     "git-cz": "^4.9.0",
     "husky": "^9.0.11",
+    "jscodeshift": "^17.3.0",
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
     "rimraf": "^5.0.5",
