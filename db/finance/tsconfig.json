@@ -10,6 +10,6 @@
     "experimentalDecorators": true,
     "strictPropertyInitialization": false
   },
-  "include": ["src", "tests", "jest.config.ts", "jest.setup.ts"],
+  "include": ["src", "tests", "jest.config.ts", "jest.setup.ts", "../../apps/api/src/module/finance/services", "../../apps/api/src/module/finance/dtos/risk-radar-exception-list.dto.ts", "../../apps/api/src/module/finance/dtos/assign-risk-radar-exceptions-review.dto.ts"],
   "exclude": ["node_modules"]
 }
