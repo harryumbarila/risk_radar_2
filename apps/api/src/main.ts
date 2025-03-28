@@ -9,7 +9,13 @@ import { config } from './config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
+  app.enableCors({
+    origin: [
+      'https://dashboard.taluspay-staging.com',
+      'https://dashboard.taluspay.com',
+    ],
+    credentials: true,
+  });
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   app.use(compression());
