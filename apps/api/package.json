@@ -4,6 +4,8 @@
   "version": "0.0.1",
   "author": "",
   "dependencies": {
+    "@denali/crescent-view-db": "*",
+    "@denali/finance-db": "*",
     "@denali/shared": "*",
     "@frontegg/client": "latest",
     "@nestjs/common": "^10.0.0",

@@ -3,7 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { connectionOptions } from './connection-options';
 
-const nestjsModuleOptions: TypeOrmModuleOptions = {
+export const nestjsModuleOptions: TypeOrmModuleOptions = {
+  name: 'finance',
   ...connectionOptions,
 };
 

@@ -15,7 +15,8 @@
       "@/config/*": ["./src/config/env.ts"],
 
       "@/shared/*": ["../../packages/shared/src/*"],
-      "@/db/*": ["../../packages/db/src/*"]
+      "@/finance-db/*": ["../../db/finance/src/*"],
+      "@/crescent-view-db/*": ["../../db/crescent-view/src/*"]
     },
     "incremental": true,
     "skipLibCheck": true,

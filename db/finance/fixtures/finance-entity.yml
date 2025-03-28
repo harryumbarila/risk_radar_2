@@ -3,6 +3,9 @@ items:
   finance1:
     name: '{{company.name}}'
     description: '{{lorem.sentence}}'
-  finance{2..3}:
+  finance2:
+    name: 'Test'
+    description: '{{lorem.sentence}}'
+  finance{3..4}:
     name: '{{company.name}}'
     description: '{{lorem.sentence}}'
