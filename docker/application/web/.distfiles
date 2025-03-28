@@ -2,6 +2,7 @@
 
 packages/
 apps/
+db/
 configs/
 .prettierrc
 .prettierignore
