@@ -4,11 +4,11 @@ import { config } from '../config/db';
 import * as entities from '../entities';
 
 export const connectionOptions: DataSourceOptions = {
-  type: 'postgres',
+  type: 'mssql',
   url: config.db.connectionString,
-  entities,
-  // options: {
-  //   encrypt: config.db.ssl,
-  //   trustServerCertificate: true,
-  // },
+  entities: [...Object.values(entities)],
+  options: {
+    encrypt: config.db.ssl,
+    trustServerCertificate: true,
+  },
 };
