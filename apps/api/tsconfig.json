@@ -16,7 +16,7 @@
 
       "@/shared/*": ["../../packages/shared/src/*"],
       "@/finance-db/*": ["../../db/finance/src/*"],
-      "@/crescent-view-db/*": ["../../db/crescent-view/src/*"],
+      "@/crescent-view-db/*": ["../../db/crescent-view/src/*"]
     },
     "incremental": true,
     "skipLibCheck": true,
