@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
+import type { DataSource } from 'typeorm';
+import { Repository } from 'typeorm';
+
 import { RiskRadarEMailTemplateEntity } from '../entities/risk-radar-email-template.entity';
 
 @Injectable()
 export class RiskRadarEMailTemplateRepository extends Repository<RiskRadarEMailTemplateEntity> {
-  constructor(dataSource: DataSource) {
+  public constructor(dataSource: DataSource) {
     super(RiskRadarEMailTemplateEntity, dataSource.createEntityManager());
   }
 
   /**
    * @migrated dbo.uspRiskRadarEMailTemplateList.StoredProcedure.sql
    */
-  async getActiveEmailTemplates(): Promise<
+  public async getActiveEmailTemplates(): Promise<
     Pick<RiskRadarEMailTemplateEntity, 'id' | 'templateName'>[]
   > {
     return this.createQueryBuilder('template')

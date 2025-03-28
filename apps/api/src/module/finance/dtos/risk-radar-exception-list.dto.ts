@@ -7,6 +7,8 @@ export class RiskRadarExceptionListRequestDto {
 
 export class RiskRadarExceptionListResponseDto {
   public id: number;
+
   public description: string;
+
   public isSelected: boolean;
 }

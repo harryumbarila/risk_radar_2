@@ -1,14 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
+import type { DataSource } from 'typeorm';
+import { Repository } from 'typeorm';
+
 import { RiskRadarNotesEntity } from '../entities/risk-radar-notes.entity';
 
 @Injectable()
 export class RiskRadarNotesRepository extends Repository<RiskRadarNotesEntity> {
-  constructor(dataSource: DataSource) {
+  public constructor(dataSource: DataSource) {
     super(RiskRadarNotesEntity, dataSource.createEntityManager());
   }
 
-  async createAssignmentNotes(
+  public async createAssignmentNotes(
     mid: string,
     assignedTo: string,
     userCreated: string
@@ -29,7 +31,10 @@ export class RiskRadarNotesRepository extends Repository<RiskRadarNotesEntity> {
   /**
    * @migrated dbo.uspAssignRiskRadarExceptionsReview.StoredProcedure.sql
    */
-  async createReviewNotes(mid: string, userCreated: string): Promise<void> {
+  public async createReviewNotes(
+    mid: string,
+    userCreated: string
+  ): Promise<void> {
     await this.createQueryBuilder()
       .insert()
       .into(RiskRadarNotesEntity)

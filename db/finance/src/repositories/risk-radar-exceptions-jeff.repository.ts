@@ -1,28 +1,30 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
+import type { DataSource } from 'typeorm';
+import { Repository } from 'typeorm';
+
 import { RiskRadarExceptionsJeffEntity } from '../entities/risk-radar-exceptions-jeff.entity';
 
 @Injectable()
 export class RiskRadarExceptionsJeffRepository extends Repository<RiskRadarExceptionsJeffEntity> {
-  constructor(dataSource: DataSource) {
+  public constructor(dataSource: DataSource) {
     super(RiskRadarExceptionsJeffEntity, dataSource.createEntityManager());
   }
 
-  async assignExceptions(
+  public async assignExceptions(
     exceptionIds: number[],
     assignedUserId: number
   ): Promise<void> {
     await this.createQueryBuilder()
       .update(RiskRadarExceptionsJeffEntity)
       .set({
-        assignedUserId: assignedUserId,
+        assignedUserId,
         exceptionStatusId: 4,
       })
       .where('id IN (:...ids)', { ids: exceptionIds })
       .execute();
   }
 
-  async getExceptionsByMIDs(
+  public async getExceptionsByMIDs(
     exceptionIds: number[]
   ): Promise<Pick<RiskRadarExceptionsJeffEntity, 'id' | 'mid'>[]> {
     return this.createQueryBuilder('exception')
@@ -35,7 +37,10 @@ export class RiskRadarExceptionsJeffRepository extends Repository<RiskRadarExcep
   /**
    * @migrated dbo.uspAssignRiskRadarExceptionsReview.StoredProcedure.sql
    */
-  async reviewExceptions(exceptionIds: number[], user: string): Promise<void> {
+  public async reviewExceptions(
+    exceptionIds: number[],
+    user: string
+  ): Promise<void> {
     await this.createQueryBuilder()
       .update(RiskRadarExceptionsJeffEntity)
       .set({
@@ -49,7 +54,7 @@ export class RiskRadarExceptionsJeffRepository extends Repository<RiskRadarExcep
       .execute();
   }
 
-  async getDistinctMIDsForReview(
+  public async getDistinctMIDsForReview(
     exceptionIds: number[]
   ): Promise<Pick<RiskRadarExceptionsJeffEntity, 'mid'>[]> {
     return this.createQueryBuilder('exception')

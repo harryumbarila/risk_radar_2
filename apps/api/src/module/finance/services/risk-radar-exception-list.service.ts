@@ -1,26 +1,27 @@
-import { Injectable } from '@nestjs/common';
 import { RiskRadarExceptionListLookupRepository } from '@denali/finance-db/src/repositories/risk-radar-exception-list-lookup.repository';
-import {
+import { Injectable } from '@nestjs/common';
+
+import type {
   RiskRadarExceptionListRequestDto,
   RiskRadarExceptionListResponseDto,
-} from '../dtos/risk-radar-exception-list.dto';
+} from '@/api/module/finance/dtos/risk-radar-exception-list.dto';
 
 @Injectable()
 export class RiskRadarExceptionListService {
-  constructor(
+  public constructor(
     private readonly lookupRepository: RiskRadarExceptionListLookupRepository
   ) {}
 
   /**
    * @migrated dbo.uspRiskRadarExceptionList.StoredProcedure.sql
    */
-  async getExceptionList(
+  public async getExceptionList(
     dto: RiskRadarExceptionListRequestDto
   ): Promise<RiskRadarExceptionListResponseDto[]> {
     const selectedIds = dto.exceptionList
       .split(',')
       .map((id) => parseInt(id.trim(), 10))
-      .filter((id) => !isNaN(id));
+      .filter((id) => !Number.isNaN(id));
 
     return this.lookupRepository.getExceptionListWithSelection(selectedIds);
   }

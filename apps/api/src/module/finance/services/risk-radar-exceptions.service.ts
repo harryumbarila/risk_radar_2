@@ -1,12 +1,13 @@
-import { Injectable } from '@nestjs/common';
 import { RiskRadarExceptionsJeffRepository } from '@denali/finance-db/src/repositories/risk-radar-exceptions-jeff.repository';
 import { RiskRadarNotesRepository } from '@denali/finance-db/src/repositories/risk-radar-notes.repository';
 import { RiskRadarUserRepository } from '@denali/finance-db/src/repositories/risk-radar-user.repository';
-import { AssignRiskRadarExceptionsDto } from '../dtos/assign-risk-radar-exceptions.dto';
+import { Injectable } from '@nestjs/common';
+
+import type { AssignRiskRadarExceptionsDto } from '@/api/module/finance/dtos/assign-risk-radar-exceptions.dto';
 
 @Injectable()
 export class RiskRadarExceptionsService {
-  constructor(
+  public constructor(
     private readonly exceptionsRepository: RiskRadarExceptionsJeffRepository,
     private readonly notesRepository: RiskRadarNotesRepository,
     private readonly userRepository: RiskRadarUserRepository
@@ -15,7 +16,9 @@ export class RiskRadarExceptionsService {
   /**
    * @migrated dbo.uspAssignRiskRadarExceptions-rr.StoredProcedure.sql
    */
-  async assignExceptions(dto: AssignRiskRadarExceptionsDto): Promise<void> {
+  public async assignExceptions(
+    dto: AssignRiskRadarExceptionsDto
+  ): Promise<void> {
     const assignedTo =
       (await this.userRepository.getNTUserID(dto.assignedUserId)) || '';
 
@@ -31,12 +34,10 @@ export class RiskRadarExceptionsService {
     );
 
     // Create notes for each exception
-    for (const exception of exceptions) {
-      await this.notesRepository.createAssignmentNotes(
-        exception.mid,
-        assignedTo,
-        dto.user
-      );
-    }
+    await Promise.all(
+      exceptions.map((e) =>
+        this.notesRepository.createAssignmentNotes(e.mid, assignedTo, dto.user)
+      )
+    );
   }
 }

@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
+import type { DataSource } from 'typeorm';
+import { Repository } from 'typeorm';
+
 import { RiskRadarExceptionListLookupEntity } from '../entities/risk-radar-exception-list-lookup.entity';
 
 @Injectable()
 export class RiskRadarExceptionListLookupRepository extends Repository<RiskRadarExceptionListLookupEntity> {
-  constructor(dataSource: DataSource) {
+  public constructor(dataSource: DataSource) {
     super(RiskRadarExceptionListLookupEntity, dataSource.createEntityManager());
   }
 
   /**
    * @migrated dbo.uspRiskRadarExceptionList.StoredProcedure.sql
    */
-  async getExceptionListWithSelection(selectedIds: number[]): Promise<
+  public async getExceptionListWithSelection(selectedIds: number[]): Promise<
     Array<{
       id: number;
       description: string;
