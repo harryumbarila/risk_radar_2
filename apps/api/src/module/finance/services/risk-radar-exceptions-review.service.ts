@@ -1,10 +1,11 @@
-import { RiskRadarExceptionsJeffRepository } from '@denali/finance-db/src/repositories/risk-radar-exceptions-jeff.repository';
-import { RiskRadarNotesRepository } from '@denali/finance-db/src/repositories/risk-radar-notes.repository';
 import { Injectable } from '@nestjs/common';
 
 import type { AssignRiskRadarExceptionsReviewDto } from '@/api/module/finance/dtos/assign-risk-radar-exceptions-review.dto';
+import { RiskRadarExceptionsJeffRepository } from '@/finance-db/repositories/risk-radar-exceptions-jeff.repository';
+import { RiskRadarNotesRepository } from '@/finance-db/repositories/risk-radar-notes.repository';
 
 @Injectable()
+// eslint-disable-next-line @darraghor/nestjs-typed/injectable-should-be-provided
 export class RiskRadarExceptionsReviewService {
   public constructor(
     private readonly exceptionsRepository: RiskRadarExceptionsJeffRepository,
