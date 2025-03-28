@@ -1,6 +1,10 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('tblRiskRadarExceptionStatus')
+@Entity({
+  name: 'tblRiskRadarExceptionStatus',
+  schema: 'dbo',
+  database: 'Finance',
+})
 export class RiskRadarExceptionStatusEntity {
   @PrimaryGeneratedColumn({ name: 'pkRiskRadarExceptionStatus' })
   public id: number;

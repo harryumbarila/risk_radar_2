@@ -1,11 +1,11 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { Public } from '@/api/shared/auth/decorator/public.decorator';
 import { CrescentViewEntity } from '@/crescent-view-db/entities';
-import { RiskRadarUserEntity } from '@/finance-db/entities/risk-radar-user.entity';
+import { RiskRadarMerchantTaxIdRepository } from '@/crescent-view-db/repositories';
 
 export type IrisProxyControllerConfig = {
   IRIS_ENV: string;
@@ -17,9 +17,8 @@ export class ExampleMultiDbController {
   public constructor(
     @InjectRepository(CrescentViewEntity, 'crescent-view')
     private readonly crescentViewRepo: Repository<CrescentViewEntity>,
-
-    @InjectRepository(RiskRadarUserEntity, 'finance')
-    private readonly financeRepo: Repository<RiskRadarUserEntity>
+    //    @InjectRepository(RiskRadarMerchantTaxIdRepository, 'crescent-view')
+    private readonly merchantTINRepo: RiskRadarMerchantTaxIdRepository
   ) {}
 
   @ApiResponse({
@@ -29,12 +28,18 @@ export class ExampleMultiDbController {
   @ApiOperation({ operationId: 'users', summary: 'Get filtered users' })
   @Public()
   @Get('data')
-  public async data(): Promise<unknown> {
-    const crescentView = await this.crescentViewRepo.findBy({
-      isActive: false,
-    });
-    const financeData = await this.financeRepo.findBy({ name: 'Test' });
+  public data(): unknown {
+    return {};
+  }
 
-    return { crescentView, financeData };
+  @ApiOperation({ operationId: 'merchantTIN', summary: 'Get Merchant TIN' })
+  @Public()
+  @Get('get-merchant-tin')
+  @ApiResponse({}) // TODO: Define type
+  public async getMerchantTIN(@Query('mid') mid: string): Promise<unknown> {
+    const merchantTIN =
+      await this.merchantTINRepo.getMerchantWithSameTaxID(mid);
+
+    return { merchantTIN };
   }
 }
