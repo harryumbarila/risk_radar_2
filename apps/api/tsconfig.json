@@ -13,10 +13,12 @@
     "paths": {
       "@/api/*": ["./src/*"],
       "@/config/*": ["./src/config/env.ts"],
-
       "@/shared/*": ["../../packages/shared/src/*"],
       "@/finance-db/*": ["../../db/finance/src/*"],
-      "@/crescent-view-db/*": ["../../db/crescent-view/src/*"]
+      "@/crescent-view-db/*": ["../../db/crescent-view/src/*"],
+      "@/iris-db/*": ["../../db/iris/src/*"],
+      "@/data-warehouse-db/*": ["../../db/data-warehouse/src/*"],
+      "@/connector-db/*": ["../../db/connector/src/*"]
     },
     "incremental": true,
     "skipLibCheck": true,
