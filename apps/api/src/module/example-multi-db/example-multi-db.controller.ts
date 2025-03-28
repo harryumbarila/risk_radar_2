@@ -30,7 +30,9 @@ export class ExampleMultiDbController {
   @Public()
   @Get('data')
   public async data(): Promise<unknown> {
-    const crescentView = await this.crescentViewRepo.findBy({ isActive: true });
+    const crescentView = await this.crescentViewRepo.findBy({
+      isActive: false,
+    });
     const financeData = await this.financeRepo.findBy({ name: 'Test' });
 
     return { crescentView, financeData };

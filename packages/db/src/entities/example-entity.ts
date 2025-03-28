@@ -1,9 +1,0 @@
-import { Column, Entity } from 'typeorm';
-
-import { BaseEntity } from '../models';
-
-@Entity({ database: 'myDb' })
-export class ExampleEntity extends BaseEntity {
-  @Column({ type: 'varchar' })
-  public name: string;
-}

@@ -1,6 +1,0 @@
-entity: ExampleEntity
-items:
-  model1:
-    name: '{{person.firstName}}'
-  model{2..3}:
-    name: '{{person.firstName}}'
