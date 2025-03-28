@@ -1,5 +1,3 @@
-import { env } from './env';
-
 export const config = {
   db: {
     connectionString:
@@ -7,13 +5,3 @@ export const config = {
     ssl: false,
   },
 };
-
-
-
-/*
-IRIS_SERVER=STG-VM-DB01
-IRIS_USER=code-user
-IRIS_PASSWORD=STG7W>&!9Sy_gH
-IRIS_DATABASE_NAME=MarketPlace
-IRIS_SSL=
-*/
