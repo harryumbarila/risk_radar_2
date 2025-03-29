@@ -17,10 +17,10 @@ export class RiskRadarExceptionStatusRepository extends Repository<RiskRadarExce
   public async getActiveExceptionStatuses(): Promise<
     Pick<RiskRadarExceptionStatusEntity, 'id' | 'description'>[]
   > {
-    return this.createQueryBuilder('status')
-      .select(['status.id', 'status.description'])
-      .where('status.isHidden = :isHidden', { isHidden: false })
-      .orderBy('status.sortOrder', 'ASC')
-      .getMany();
+    return this.find({
+      select: ['id', 'description'],
+      where: { isHidden: false },
+      order: { sortOrder: 'ASC' },
+    });
   }
 }
