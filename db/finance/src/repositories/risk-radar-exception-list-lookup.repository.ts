@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { InjectDataSource } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
 import { Repository } from 'typeorm';
 
@@ -6,7 +7,7 @@ import { RiskRadarExceptionListLookupEntity } from '../entities/risk-radar-excep
 
 @Injectable()
 export class RiskRadarExceptionListLookupRepository extends Repository<RiskRadarExceptionListLookupEntity> {
-  public constructor(dataSource: DataSource) {
+  public constructor(@InjectDataSource('finance') dataSource: DataSource) {
     super(RiskRadarExceptionListLookupEntity, dataSource.createEntityManager());
   }
 

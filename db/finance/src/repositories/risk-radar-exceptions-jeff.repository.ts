@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import { InjectDataSource } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 import { RiskRadarExceptionsJeffEntity } from '../entities/risk-radar-exceptions-jeff.entity';
 
 @Injectable()
 export class RiskRadarExceptionsJeffRepository extends Repository<RiskRadarExceptionsJeffEntity> {
-  public constructor(dataSource: DataSource) {
+  public constructor(@InjectDataSource('finance') dataSource: DataSource) {
     super(RiskRadarExceptionsJeffEntity, dataSource.createEntityManager());
   }
 
@@ -14,24 +15,29 @@ export class RiskRadarExceptionsJeffRepository extends Repository<RiskRadarExcep
     exceptionIds: number[],
     assignedUserId: number
   ): Promise<void> {
-    await this.createQueryBuilder()
-      .update(RiskRadarExceptionsJeffEntity)
-      .set({
+    if (exceptionIds.length === 0) return;
+
+    await this.update(
+      { id: In(exceptionIds) },
+      {
         assignedUserId,
         exceptionStatusId: 4,
-      })
-      .where('id IN (:...ids)', { ids: exceptionIds })
-      .execute();
+      }
+    );
   }
 
   public async getExceptionsByMIDs(
     exceptionIds: number[]
   ): Promise<Pick<RiskRadarExceptionsJeffEntity, 'id' | 'mid'>[]> {
-    return this.createQueryBuilder('exception')
-      .select(['exception.id', 'exception.mid'])
-      .where('exception.id IN (:...ids)', { ids: exceptionIds })
-      .andWhere('exception.exceptionStatusId = :statusId', { statusId: 4 })
-      .getMany();
+    if (exceptionIds.length === 0) return [];
+
+    return this.find({
+      select: ['id', 'mid'],
+      where: {
+        id: In(exceptionIds),
+        exceptionStatusId: 4,
+      },
+    });
   }
 
   /**
@@ -41,25 +47,37 @@ export class RiskRadarExceptionsJeffRepository extends Repository<RiskRadarExcep
     exceptionIds: number[],
     user: string
   ): Promise<void> {
-    await this.createQueryBuilder()
-      .update(RiskRadarExceptionsJeffEntity)
-      .set({
+    if (exceptionIds.length === 0) return;
+
+    await this.update(
+      {
+        id: In(exceptionIds),
+        exceptionStatusId: In([1, 2, 3, 4]),
+      },
+      {
         exceptionStatusId: 2,
         userReviewed: user,
-      })
-      .where('id IN (:...ids)', { ids: exceptionIds })
-      .andWhere('exceptionStatusId IN (:...statusIds)', {
-        statusIds: [1, 2, 3, 4],
-      })
-      .execute();
+      }
+    );
   }
 
   public async getDistinctMIDsForReview(
     exceptionIds: number[]
   ): Promise<Pick<RiskRadarExceptionsJeffEntity, 'mid'>[]> {
-    return this.createQueryBuilder('exception')
-      .select('DISTINCT exception.mid', 'mid')
-      .where('exception.id IN (:...ids)', { ids: exceptionIds })
-      .getRawMany();
+    if (exceptionIds.length === 0) {
+      return [];
+    }
+
+    const result = await this.find({
+      select: ['mid'],
+      where: { id: In(exceptionIds) },
+    });
+
+    // Manually remove duplicates since TypeORM `find()` doesn't support DISTINCT
+    const uniqueMIDs = Array.from(new Set(result.map((r) => r.mid))).map(
+      (mid) => ({ mid })
+    );
+
+    return uniqueMIDs;
   }
 }

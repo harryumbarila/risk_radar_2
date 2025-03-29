@@ -1,25 +1,28 @@
 import { Injectable } from '@nestjs/common';
+import { InjectDataSource } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
 import { Repository } from 'typeorm';
 
-import { RiskRadarEMailTemplateEntity } from '../entities/risk-radar-email-template.entity';
+import { RiskRadarEmailTemplateEntity } from '../entities/risk-radar-email-template.entity';
 
 @Injectable()
-export class RiskRadarEMailTemplateRepository extends Repository<RiskRadarEMailTemplateEntity> {
-  public constructor(dataSource: DataSource) {
-    super(RiskRadarEMailTemplateEntity, dataSource.createEntityManager());
+export class RiskRadarEmailTemplateRepository extends Repository<RiskRadarEmailTemplateEntity> {
+  public constructor(@InjectDataSource('finance') dataSource: DataSource) {
+    super(RiskRadarEmailTemplateEntity, dataSource.createEntityManager());
   }
 
   /**
    * @migrated dbo.uspRiskRadarEMailTemplateList.StoredProcedure.sql
    */
   public async getActiveEmailTemplates(): Promise<
-    Pick<RiskRadarEMailTemplateEntity, 'id' | 'templateName'>[]
+    Pick<RiskRadarEmailTemplateEntity, 'id' | 'templateName'>[]
   > {
-    return this.createQueryBuilder('template')
-      .select(['template.id', 'template.templateName'])
-      .where('template.isHidden = :isHidden', { isHidden: false })
-      .orderBy('template.templateName', 'ASC')
-      .getMany();
+    return this.find({
+      select: ['id', 'templateName'],
+      where: {
+        isHidden: false,
+      },
+      order: { templateName: 'ASC' },
+    });
   }
 }
