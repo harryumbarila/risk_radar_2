@@ -3,22 +3,22 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 @Entity('tblRiskRadarBatch', { schema: 'finance' })
 export class RiskRadarBatch {
   @PrimaryColumn({ name: 'pkDFT256Batch', type: 'int' })
-  pkDFT256Batch: number;
+  public pkDFT256Batch: number;
 
   @Column({ name: 'sBankNum', type: 'varchar', length: 4, nullable: true })
-  sBankNum: string;
+  public sBankNum: string;
 
   @Column({ name: 'dtTransmission', type: 'datetime', nullable: true })
-  dtTransmission: Date;
+  public dtTransmission: Date;
 
   @Column({ name: 'iTransmissionNum', type: 'int', nullable: true })
-  iTransmissionNum: number;
+  public iTransmissionNum: number;
 
   @Column({ name: 'iBatchNum', type: 'int', nullable: true })
-  iBatchNum: number;
+  public iBatchNum: number;
 
   @Column({ name: 'iBatchSeqNum', type: 'int', nullable: true })
-  iBatchSeqNum: number;
+  public iBatchSeqNum: number;
 
   @Column({
     name: 'dNetDepAmt',
@@ -27,16 +27,16 @@ export class RiskRadarBatch {
     scale: 2,
     nullable: true,
   })
-  dNetDepAmt: number;
+  public dNetDepAmt: number;
 
   @Column({ name: 'sMID', type: 'varchar', length: 16, nullable: true })
-  sMID: string;
+  public sMID: string;
 
   @Column({ name: 'sMCC', type: 'varchar', length: 4, nullable: true })
-  sMCC: string;
+  public sMCC: string;
 
   @Column({ name: 'sTID', type: 'varchar', length: 8, nullable: true })
-  sTID: string;
+  public sTID: string;
 
   @Column({
     name: 'sAMEXOptBlueInd',
@@ -44,35 +44,35 @@ export class RiskRadarBatch {
     length: 1,
     nullable: true,
   })
-  sAMEXOptBlueInd: string;
+  public sAMEXOptBlueInd: string;
 
   @Column({ name: 'dtCreated', type: 'datetime' })
-  dtCreated: Date;
+  public dtCreated: Date;
 
   @Column({ name: 'iKeyedPoints', type: 'int', nullable: true })
-  iKeyedPoints: number;
+  public iKeyedPoints: number;
 
   @Column({ name: 'iExceedMVPoints', type: 'int', nullable: true })
-  iExceedMVPoints: number;
+  public iExceedMVPoints: number;
 
   @Column({ name: 'bNewAcct', type: 'bit' })
-  bNewAcct: boolean;
+  public bNewAcct: boolean;
 
   @Column({ name: 'iChbkExceedPoints', type: 'int', nullable: true })
-  iChbkExceedPoints: number;
+  public iChbkExceedPoints: number;
 
   @Column({ name: 'bNextDayFundingBatch', type: 'bit' })
-  bNextDayFundingBatch: boolean;
+  public bNextDayFundingBatch: boolean;
 
   @Column({ name: 'iAutoHoldPoints', type: 'int', nullable: true })
-  iAutoHoldPoints: number;
+  public iAutoHoldPoints: number;
 
   @Column({ name: 'sFileName', type: 'varchar', length: 75, nullable: true })
-  sFileName: string;
+  public sFileName: string;
 
   @Column({ name: 'sCycle', type: 'varchar', length: 2, nullable: true })
-  sCycle: string;
+  public sCycle: string;
 
   @Column({ name: 'dtCreated_getdate', type: 'datetime', nullable: true })
-  dtCreatedGetdate: Date;
+  public dtCreatedGetdate: Date;
 }
