@@ -2,18 +2,14 @@ version: '3.8'
 
 services:
   db:
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    platform: linux/amd64
     container_name: sql-server-db
-    environment:
-      ACCEPT_EULA: 'Y'
-      SA_PASSWORD: 'Denali123!'
-      MSSQL_PID: 'Express' # This enables SQL Server Express edition
-      MSSQL_AGENT_ENABLED: 'true'
-      MSSQL_TCP_PORT: '1433'
     ports:
       - '1433:1433'
     volumes:
-      - ./init-db:/docker-entrypoint-initdb.d
       - mssql_data:/var/opt/mssql
     networks:
       - denali-network
