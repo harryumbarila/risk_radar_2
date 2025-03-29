@@ -1,0 +1,16 @@
+name: DENALI CI (PRs)
+
+on: [pull_request]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-commits:
+    name: Lint commits
+    uses: ./.github/workflows/_lint_commits.yaml
+
+  code-checks:
+    name: Run code quality tools
+    uses: ./.github/workflows/_code_checks.yaml

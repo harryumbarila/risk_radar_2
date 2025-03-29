@@ -1,0 +1,66 @@
+name: Create notes & Github Pre-Release
+
+on:
+  workflow_call:
+    inputs:
+      build-number:
+        description: Build number from version
+        required: false
+        type: string
+      environment:
+        description: 'The deploy environment'
+        required: true
+        type: string
+    secrets:
+      github-token:
+        description: 'GitHub token used to create the release'
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+
+      - name: Generate Release Notes from Git Commits
+        id: release_notes
+        run: |
+          # Fetch all pre-release tags (tags containing '-rc-')
+          PRE_RELEASE_TAGS=$(git tag --list "v*-rc-*")
+
+          if [[ -z "$PRE_RELEASE_TAGS" ]]; then
+            echo "No previous pre-release tag found. Marking this as the first pre-release."
+            echo "### First Pre-Release Version" > release_body.md
+            echo "This is the first pre-release version. Future releases will include commit changes." >> release_body.md
+          else
+            # Get the latest pre-release tag (sorted by version)
+            LAST_TAG=$(git tag --list "v*-rc-*" | sort -V | tail -n 1)
+            echo "Fetching commits since last pre-release tag: $LAST_TAG"
+
+            COMMIT_LOG=$(git log "$LAST_TAG"..HEAD --pretty=format:"- %h %s" --no-merges)
+
+            echo "### Changes in this release:" > release_body.md
+            echo "$COMMIT_LOG" >> release_body.md
+          fi
+
+          echo "::set-output name=body::$(cat release_body.md)"
+
+      - name: Create a GitHub Pre-Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.github-token }}
+          IMAGE_TAG: ${{ inputs.build-number }}
+        run: |
+          gh release create "v${IMAGE_TAG}" \
+            --title "Release v${IMAGE_TAG}" \
+            --notes-file release_body.md \
+            --prerelease

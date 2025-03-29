@@ -1,115 +1,67 @@
 name: DENALI CD (Deploy Production)
 
 on:
-  workflow_run:
-    workflows: ['DENALI CI']
-    branches: master
-    types:
-      - completed
-    # Allows manual trigger from the Actions tab
-    workflow_dispatch:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
 
 jobs:
-  deploy-production:
-    name: Deploy DENALI to Production
-    runs-on: ubuntu-latest
-    environment: Production
+  code-checks:
+    name: Run code quality tools
+    uses: ./.github/workflows/_code_checks.yaml
 
+  versioning:
+    name: Generate build number
+    uses: ./.github/workflows/_versioning.yaml
+
+  deploy-docs:
+    name: Deploy DENALI Docs to Github Pages
+    uses: ./.github/workflows/_deploy_docs.yaml
+
+  deploy-web:
+    name: Deploy DENALI Web to AWS
+    needs: [versioning]
+    uses: ./.github/workflows/_deploy_web.yaml
+    with:
+      build-number: ${{ needs.versioning.outputs.build-number }}
+      environment: Production
+    secrets:
+      # TODO: We might need to move this to GH Actions secrets
+      role-to-assume: arn:aws:iam::257498453293:role/jobox-github-action-production-denali
+      aws-region: us-west-2
+      ecr-repository: denali/web
+
+  deploy-api:
+    name: Deploy DENALI API to AWS
+    needs: [versioning]
+    uses: ./.github/workflows/_deploy_api.yaml
+    with:
+      build-number: ${{ needs.versioning.outputs.build-number }}
+      environment: Production
+    secrets:
+      # TODO: We might need to move this to GH Actions secrets
+      role-to-assume: arn:aws:iam::257498453293:role/jobox-github-action-production-denali
+      aws-region: us-west-2
+      ecr-repository: denali/api
+
+  release:
+    name: Create Github release & release notes
+    needs: [deploy-web, deploy-api]
+    uses: ./.github/workflows/_release.yaml
+    with:
+      build-number: ${{ needs.versioning.outputs.build-number }}
+      environment: Production
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  restart-production:
+    runs-on: ubuntu-latest
+    needs: [deploy-web, deploy-api]
     permissions:
       id-token: write
-      contents: write
-      pull-requests: write
-
+      contents: read
     steps:
-      - name: Check out the code
-        uses: actions/checkout@v4
-        with:
-          ref: 'master'
-          fetch-depth: '0'
-
-      - name: Create version number (Stable Release)
-        id: version
-        env:
-          RUN_NUMBER: ${{ github.run_number }}
-        run: |
-          echo "Checking commit count..."
-          current_commit_count=$(git rev-list HEAD --count)
-          if [ -z "${RUN_NUMBER}" ]; then
-            echo "Github.run_number is empty!"
-            exit 1
-          fi
-
-          # Version format: v<run_number>.<commit_count>
-          next_version="${RUN_NUMBER}.${current_commit_count}"
-
-          echo "::set-output name=build_number::$next_version"
-
-      - name: Configure AWS credentials for Production
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::257498453293:role/jobox-github-action-production-denali
-          aws-region: us-west-2
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build docker image, and Push image to Amazon ECR API
-        id: build-image-api
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: denali/api
-          IMAGE_TAG: ${{ steps.version.outputs.build_number }}
-        run: |
-          cd docker/application/api
-          make VERSION=$IMAGE_TAG build
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-
-      - name: Build docker image, and Push image to Amazon ECR WEB
-        id: build-image-web
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: denali/web
-          IMAGE_TAG: ${{ steps.version.outputs.build_number }}
-        run: |
-          cd docker/application/web
-          make VERSION=$IMAGE_TAG build
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-
-      - name: Generate Release Notes from Git Commits
-        id: release_notes
-        run: |
-          # Fetch all production release tags (excluding pre-release tags)
-          PROD_RELEASE_TAGS=$(git tag --list "v*.*")
-
-          if [[ -z "$PROD_RELEASE_TAGS" ]]; then
-            echo "No previous production release tag found. Marking this as the first stable release."
-            echo "### First Production Release" > release_body.md
-            echo "This is the first production release. Future releases will include commit changes." >> release_body.md
-          else
-            # Get the latest stable production release tag
-            LAST_TAG=$(git tag --list "v*.*" | sort -V | tail -n 1)
-            echo "Fetching commits since last production release: $LAST_TAG"
-
-            COMMIT_LOG=$(git log "$LAST_TAG"..HEAD --pretty=format:"- %h %s" --no-merges)
-            echo "### Changes in this release:" > release_body.md
-            echo "$COMMIT_LOG" >> release_body.md
-          fi
-
-      - name: Create a GitHub Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          IMAGE_TAG: ${{ steps.version.outputs.build_number }}
-        run: |
-          gh release create "v${IMAGE_TAG}" \
-            --title "Release v${IMAGE_TAG}" \
-            --notes-file release_body.md \
-            --latest
-
-      - name: Deploy image to staging
+      - name: Restart Production API
         run: |
           aws ssm send-command --document-name "AWS-RunShellScript" --document-version "1" --targets '[{"Key":"InstanceIds","Values":["i-0de9370e9b06eab16"]}]' --parameters '{"commands":["runuser -l ec2-user -c /opt/webapps/scripts/pull_and_restart_api.sh"],"workingDirectory":[""],"executionTimeout":["3600"]}' --timeout-seconds 600 --max-concurrency "50" --max-errors "0" --cloud-watch-output-config '{"CloudWatchLogGroupName":"prd-denali-api-deployment","CloudWatchOutputEnabled":true}' --region us-west-2
