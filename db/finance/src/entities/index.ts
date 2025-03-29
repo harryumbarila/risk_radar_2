@@ -5,3 +5,7 @@ export * from './risk-radar-exception-status.entity';
 export * from './risk-radar-exceptions-jeff.entity';
 export * from './risk-radar-notes.entity';
 export * from './risk-radar-user.entity';
+export * from './RiskRadarBatch.entity';
+export * from './RiskRadarExceptionsJeff.entity';
+export * from './RiskRadarMerchAdjParam.entity';
+export * from './RiskRadarUser.entity';

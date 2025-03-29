@@ -5,3 +5,5 @@ export * from './risk-radar-exception-status.repository';
 export * from './risk-radar-exceptions-jeff.repository';
 export * from './risk-radar-notes.repository';
 export * from './risk-radar-user.repository';
+export * from './risk-radar-batch.repository';
+export * from './risk-radar-merch-adj-param.repository';

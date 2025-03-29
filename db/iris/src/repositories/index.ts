@@ -1,0 +1,1 @@
+export * from './partner-and-sales-agent-identification.repository'; 
