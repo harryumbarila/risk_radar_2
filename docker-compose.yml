@@ -2,27 +2,31 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:13
-    container_name: postgres-db
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sql-server-db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: denali
-      POSTGRES_DB: denali
+      ACCEPT_EULA: 'Y'
+      SA_PASSWORD: 'Denali123!'
+      MSSQL_PID: 'Express' # This enables SQL Server Express edition
+      MSSQL_AGENT_ENABLED: 'true'
+      MSSQL_TCP_PORT: '1433'
     ports:
-      - '5432:5432'
+      - '1433:1433'
+    volumes:
+      - ./init-db:/docker-entrypoint-initdb.d
+      - mssql_data:/var/opt/mssql
     networks:
       - denali-network
-  db-2:
-    image: postgres:13
-    container_name: crescent-view-db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: crescent
-      POSTGRES_DB: crescent-view
-    ports:
-      - '5433:5432'
-    networks:
-      - denali-network
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "Denali123!" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
 networks:
   denali-network:
     driver: bridge
+
+volumes:
+  mssql_data:
