@@ -13,4 +13,4 @@ export class SnapShotvwLeadsStatusActive {
 
   @Column({ name: 'dtCreated', type: 'datetime' })
   public createdDate: Date;
-} 
+}

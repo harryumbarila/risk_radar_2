@@ -8,9 +8,15 @@ export class SnapShotvwNetSettlementBalanceActive {
   @Column({ name: 'sMID', type: 'varchar', length: 16, nullable: true })
   public merchantId: string | null;
 
-  @Column({ name: 'dSettlementBalance', type: 'decimal', precision: 18, scale: 2, nullable: true })
+  @Column({
+    name: 'dSettlementBalance',
+    type: 'decimal',
+    precision: 18,
+    scale: 2,
+    nullable: true,
+  })
   public settlementBalance: number | null;
 
   @Column({ name: 'dtCreated', type: 'datetime' })
   public createdDate: Date;
-} 
+}

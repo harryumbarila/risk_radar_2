@@ -1,4 +1,5 @@
 import { DataSource } from 'typeorm';
+
 import { SnapShotvwLeadsStatusActive } from './entities/SnapShotvwLeadsStatusActive.entity';
 import { SnapShotvwNetSettlementBalanceActive } from './entities/SnapShotvwNetSettlementBalanceActive.entity';
 
@@ -16,7 +17,7 @@ const connectorDataSource = new DataSource({
   username: process.env.CONNECTOR_DB_USERNAME,
   password: process.env.CONNECTOR_DB_PASSWORD,
   database: process.env.CONNECTOR_DB_NAME,
-  entities: entities,
+  entities,
   synchronize: false, // Set to false for production
   logging: ['error', 'warn'],
 });
