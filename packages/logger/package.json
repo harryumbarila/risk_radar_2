@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "dependencies": {
     "pino": "^9.6.0",
+    "pino-http": "^10.4.0",
     "pino-pretty": "^11.2.2"
   },
   "devDependencies": {

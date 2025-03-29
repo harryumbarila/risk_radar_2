@@ -3,11 +3,11 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
 import { Repository } from 'typeorm';
 
-import { LeadEntity } from '../entities';
+import { LeadsBusinessInformationEntity } from '../entities/lead-business-information.entity';
 
 @Injectable()
-export class LeadRepository extends Repository<LeadEntity> {
+export class LeadsBusinessInformationRepository extends Repository<LeadsBusinessInformationEntity> {
   public constructor(@InjectDataSource('iris') dataSource: DataSource) {
-    super(LeadEntity, dataSource.createEntityManager());
+    super(LeadsBusinessInformationEntity, dataSource.createEntityManager());
   }
 }

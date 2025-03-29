@@ -2,7 +2,7 @@ import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
 @Entity('Leads')
 @Unique(['irisLeadId'])
-export class LeadsEntity {
+export class LeadEntity {
   @PrimaryGeneratedColumn('increment', { name: 'Id' })
   public id: number;
 
@@ -42,6 +42,6 @@ export class LeadsEntity {
   @Column({ name: 'UpdatedDate', type: 'datetime', nullable: true })
   public updatedDate: Date | null;
 
-  @Column({ name: 'IsArchived', type: 'boolean', default: false })
+  @Column({ name: 'IsArchived', type: 'bit', default: false })
   public isArchived: boolean;
 }

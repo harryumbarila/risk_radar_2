@@ -1,25 +1,37 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { LeadsBusinessInformationRepository } from '@/finance-db/repositories/leads-business-information.repository';
+import {
+  RiskRadarEmailTemplateEntity,
+  RiskRadarUserEntity,
+} from '@/finance-db/entities';
 import { RiskRadarEmailTemplateRepository } from '@/finance-db/repositories/risk-radar-email-template.repository';
 import { RiskRadarUserRepository } from '@/finance-db/repositories/risk-radar-user.repository';
-import { LeadsEntity } from '@/iris-db/entities';
-import { LeadsRepository } from '@/iris-db/repositories/';
+import { LeadEntity, LeadsBusinessInformationEntity } from '@/iris-db/entities';
+import { LeadRepository } from '@/iris-db/repositories/';
+import { LeadsBusinessInformationRepository } from '@/iris-db/repositories/leads-business-information.repository';
 
 import { RiskRadarController } from './risk-radar.controller';
 import { RiskRadarService } from './risk-radar.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      RiskRadarUserRepository,
-      RiskRadarEmailTemplateRepository,
-      LeadsBusinessInformationRepository,
-    ]),
-    TypeOrmModule.forFeature([LeadsEntity]),
+    TypeOrmModule.forFeature(
+      [RiskRadarUserEntity, RiskRadarEmailTemplateEntity],
+      'finance'
+    ),
+    TypeOrmModule.forFeature(
+      [LeadEntity, LeadsBusinessInformationEntity],
+      'iris'
+    ),
   ],
   controllers: [RiskRadarController],
-  providers: [RiskRadarService, LeadsRepository],
+  providers: [
+    LeadRepository,
+    RiskRadarUserRepository,
+    RiskRadarEmailTemplateRepository,
+    LeadsBusinessInformationRepository,
+    RiskRadarService,
+  ],
 })
 export class RiskRadarModule {}

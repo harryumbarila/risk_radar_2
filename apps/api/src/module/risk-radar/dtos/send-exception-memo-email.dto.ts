@@ -2,8 +2,8 @@ import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class SendExceptionMemoEmailDto {
   @IsNotEmpty()
-  @IsString()
-  public mid: string;
+  @IsNumber()
+  public mid: number;
 
   @IsNotEmpty()
   @IsString()

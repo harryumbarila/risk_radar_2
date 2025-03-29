@@ -2,11 +2,10 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectPinoLogger } from 'nestjs-pino';
 import { Logger } from 'pino';
 
-import { RiskRadarNotesRepository } from '@/finance-db/repositories';
-import { LeadsBusinessInformationRepository } from '@/finance-db/repositories/leads-business-information.repository';
 import { RiskRadarEmailTemplateRepository } from '@/finance-db/repositories/risk-radar-email-template.repository';
 import { RiskRadarUserRepository } from '@/finance-db/repositories/risk-radar-user.repository';
-import { LeadsRepository } from '@/iris-db/repositories';
+import { LeadRepository } from '@/iris-db/repositories';
+import { LeadsBusinessInformationRepository } from '@/iris-db/repositories/leads-business-information.repository';
 
 import type { SendExceptionMemoEmailDto } from './dtos/send-exception-memo-email.dto';
 
@@ -16,8 +15,8 @@ export class RiskRadarService {
     private readonly riskRadarUserRepository: RiskRadarUserRepository,
     private readonly riskRadarEmailTemplateRepository: RiskRadarEmailTemplateRepository,
     private readonly leadsBusinessInfoRepository: LeadsBusinessInformationRepository,
-    private readonly leadsRepository: LeadsRepository,
-    private readonly riskRadarNotesRepository: RiskRadarNotesRepository,
+    private readonly leadsRepository: LeadRepository,
+    // private readonly riskRadarNotesRepository: RiskRadarNotesRepository,
 
     @InjectPinoLogger(RiskRadarService.name) private readonly logger: Logger
   ) {}
@@ -27,22 +26,38 @@ export class RiskRadarService {
 
     // Find data
     const lead = await this.leadsRepository.findOneBy({
-      id: +mid,
+      id: mid,
       isArchived: false,
     });
+
+    if (!lead) {
+      throw new BadRequestException('Lead not found or is archived');
+    }
 
     const leadBusinessInfo = await this.leadsBusinessInfoRepository.findOneBy({
       leadId: lead.id,
     });
+
+    if (!leadBusinessInfo) {
+      throw new BadRequestException('Lead Business Information not found');
+    }
 
     const riskRadarUser = await this.riskRadarUserRepository.findOneBy({
       ntUserId: user,
       isHidden: false,
     });
 
+    if (!riskRadarUser) {
+      throw new BadRequestException('Risk Radar User not found or is hidden');
+    }
+
     const template = await this.riskRadarEmailTemplateRepository.findOneBy({
       id: emailTemplateId,
     });
+
+    if (!template) {
+      throw new BadRequestException('Email Template not found');
+    }
 
     // Prepare email
     const subject =

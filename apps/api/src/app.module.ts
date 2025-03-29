@@ -1,4 +1,3 @@
-import { logger } from '@denali/logger';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
@@ -11,6 +10,7 @@ import { DbTypeORMModule as CrescentViewDbTypeOrmModule } from '@/crescent-view-
 import { DbTypeORMModule as DataWarehouseDbTypeOrmModule } from '@/data-warehouse-db/connection/nestjs-module';
 import { DbTypeORMModule as FinanceDbTypeOrmModule } from '@/finance-db/connection/nestjs-module';
 import { DbTypeORMModule as IrisDbTypeOrmModule } from '@/iris-db/connection/nestjs-module';
+import { logger } from '@/logger/index';
 
 import { AppController } from './app.controller';
 import { ExampleMultiDbModule } from './module/example-multi-db/example-multi-db.module';
@@ -22,14 +22,16 @@ import { rootConfig } from './shared/config/root.config';
 @Module({
   imports: [
     ConfigModule.forRoot(rootConfig),
-    IrisDbTypeOrmModule,
     DataWarehouseDbTypeOrmModule,
     ConnectorDbTypeOrmModule,
     CrescentViewDbTypeOrmModule,
     FinanceDbTypeOrmModule,
+    IrisDbTypeOrmModule,
     LoggerModule.forRoot({
       pinoHttp: {
         logger,
+        // Disable req logging (We can configure later)
+        enabled: false,
       },
     }),
     GlobalModule,
