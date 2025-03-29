@@ -1,7 +1,10 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'tblDFT256TransactionFromLegacySystem' })
 export class DFT256TransactionFromLegacySystem {
+  @PrimaryColumn()
+  public id: number;
+
   @Column({ name: 'sMID', type: 'varchar', length: 16, nullable: true })
   public merchantId?: string;
 

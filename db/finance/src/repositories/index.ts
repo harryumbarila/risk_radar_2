@@ -7,6 +7,7 @@ export * from './risk-radar-email-template.repository';
 export * from './risk-radar-exception-list-lookup.repository';
 export * from './risk-radar-exception-status.repository';
 export * from './risk-radar-exceptions-jeff.repository';
+export * from './risk-radar-issuing-bank.repository';
 export * from './risk-radar-merch-adj-param.repository';
 export * from './risk-radar-notes.repository';
 export * from './risk-radar-user.repository';

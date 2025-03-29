@@ -1,7 +1,10 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: '.CLXReportingSearch' })
 export class CLXReportingSearch {
+  @PrimaryColumn()
+  public id: number;
+
   @Column({ name: 'SiteID', length: 25 })
   public siteId: string;
 

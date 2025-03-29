@@ -5,6 +5,11 @@ import {
   RiskRadarEmailTemplateEntity,
   RiskRadarUserEntity,
 } from '@/finance-db/entities';
+import {
+  DFT256BatchRepository,
+  DFT256TransactionFromLegacySystemRepository,
+  DFT256TransactionRepository,
+} from '@/finance-db/repositories';
 import { RiskRadarEmailTemplateRepository } from '@/finance-db/repositories/risk-radar-email-template.repository';
 import { RiskRadarUserRepository } from '@/finance-db/repositories/risk-radar-user.repository';
 import { LeadEntity, LeadsBusinessInformationEntity } from '@/iris-db/entities';
@@ -13,7 +18,7 @@ import { LeadsBusinessInformationRepository } from '@/iris-db/repositories/leads
 
 import { RiskRadarController } from './risk-radar.controller';
 import { RiskRadarService } from './risk-radar.service';
-import { MerchantCardNumHistoryService } from './services/merchant-card-num-history.service';
+import { MerchantCardNumHistoryService } from './services/merchant-card-num-history/merchant-card-num-history.service';
 
 @Module({
   imports: [
@@ -33,6 +38,9 @@ import { MerchantCardNumHistoryService } from './services/merchant-card-num-hist
     RiskRadarUserRepository,
     RiskRadarEmailTemplateRepository,
     LeadsBusinessInformationRepository,
+    DFT256BatchRepository,
+    DFT256TransactionRepository,
+    DFT256TransactionFromLegacySystemRepository,
     // Services
     RiskRadarService,
     MerchantCardNumHistoryService,
