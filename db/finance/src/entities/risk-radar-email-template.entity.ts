@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('tblRiskRadarEMailTemplate')
-export class RiskRadarEMailTemplateEntity {
+export class RiskRadarEmailTemplateEntity {
   @PrimaryGeneratedColumn({ name: 'pkRiskRadarEMailTemplate' })
   public id: number;
 
