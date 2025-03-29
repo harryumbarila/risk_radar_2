@@ -1,15 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource } from '@nestjs/typeorm';
+import type { DataSource } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
-import { PartnerAndSalesAgentIdentification } from '../entities/PartnerAndSalesAgentIdentification.entity';
+import { PartnerAndSalesAgentIdentification } from '../entities/partner-and-sales-agent-identification.entity';
 
 @Injectable()
-export class PartnerAndSalesAgentIdentificationRepository {
-  public constructor(
-    @InjectRepository(PartnerAndSalesAgentIdentification, 'iris')
-    private readonly repository: Repository<PartnerAndSalesAgentIdentification>
-  ) {}
+export class PartnerAndSalesAgentIdentificationRepository extends Repository<PartnerAndSalesAgentIdentification> {
+  // export class LeadsBusinessInformationRepository extends Repository<PartnerAndSalesAgentIdentification> {
+  public constructor(@InjectDataSource('iris') dataSource: DataSource) {
+    super(PartnerAndSalesAgentIdentification, dataSource.createEntityManager());
+  }
 
   /**
    * Find partner and sales agent information for a list of merchant IDs
@@ -21,8 +22,10 @@ export class PartnerAndSalesAgentIdentificationRepository {
       return [];
     }
 
-    return this.repository.createQueryBuilder('partner')
-      .where('partner.merchantId IN (:...merchantIds)', { merchantIds })
-      .getMany();
+    return this.find({
+      where: {
+        merchantId: In(merchantIds),
+      },
+    });
   }
-} 
+}

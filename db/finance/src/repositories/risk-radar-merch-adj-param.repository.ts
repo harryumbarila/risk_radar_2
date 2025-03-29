@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import type { Repository } from 'typeorm';
 
-import { RiskRadarMerchAdjParam } from '../entities/RiskRadarMerchAdjParam.entity';
+import { RiskRadarMerchAdjParam } from '../entities/risk-radar-merch-adj-param.entity';
 
 @Injectable()
 export class RiskRadarMerchAdjParamRepository {
@@ -14,7 +14,9 @@ export class RiskRadarMerchAdjParamRepository {
   /**
    * Find merchant parameters by MID
    */
-  public async findByMerchantId(merchantId: string): Promise<RiskRadarMerchAdjParam | null> {
+  public async findByMerchantId(
+    merchantId: string
+  ): Promise<RiskRadarMerchAdjParam | null> {
     return this.repository.findOne({
       where: { merchantId },
     });

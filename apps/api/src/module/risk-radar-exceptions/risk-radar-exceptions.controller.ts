@@ -2,8 +2,9 @@ import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { Public } from '@/api/shared/auth/decorator/public.decorator';
+
+import type { RiskRadarExceptionsListResultDto } from './dto/risk-radar-exceptions-list-result.dto';
 import { RiskRadarExceptionsService } from './risk-radar-exceptions.service';
-import type { RiskRadarExceptionsListParams, RiskRadarExceptionsListResult } from '@/finance-db/queries/risk-radar-exceptions-list';
 
 @ApiTags('Risk Radar Exceptions')
 @Controller('/v1/risk-radar-exceptions')
@@ -16,9 +17,10 @@ export class RiskRadarExceptionsController {
     status: 200,
     description: 'Get risk radar exceptions list.',
   })
-  @ApiOperation({ 
-    operationId: 'getRiskRadarExceptionsList', 
-    summary: 'Get risk radar exceptions list with filtering and sorting options' 
+  @ApiOperation({
+    operationId: 'getRiskRadarExceptionsList',
+    summary:
+      'Get risk radar exceptions list with filtering and sorting options',
   })
   @Public()
   @Get('list')
@@ -33,7 +35,7 @@ export class RiskRadarExceptionsController {
     @Query('bViewAll') bViewAll: boolean,
     @Query('iSortBy') iSortBy: number,
     @Query('iProcessor') iProcessor: number
-  ): Promise<RiskRadarExceptionsListResult[]> {
+  ): Promise<RiskRadarExceptionsListResultDto[]> {
     return this.riskRadarExceptionsService.getExceptionsList({
       dtStart,
       dtEnd,
@@ -44,7 +46,7 @@ export class RiskRadarExceptionsController {
       sExceptionList,
       bViewAll,
       iSortBy,
-      iProcessor
+      iProcessor,
     });
   }
-} 
+}

@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('tblRiskRadarMerchAdjParam')
 export class RiskRadarMerchAdjParam {
@@ -26,7 +26,12 @@ export class RiskRadarMerchAdjParam {
   @Column({ name: 'bDivert', type: 'bit' })
   public isDivert: boolean;
 
-  @Column({ name: 'sPreferredContact', type: 'varchar', length: 100, nullable: true })
+  @Column({
+    name: 'sPreferredContact',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
   public preferredContact: string | null;
 
   @Column({ name: 'dtCreated', type: 'datetime' })
@@ -58,4 +63,4 @@ export class RiskRadarMerchAdjParam {
 
   @Column({ name: 'iNewAccountBatchDays', type: 'int', nullable: true })
   public newAccountBatchDays: number | null;
-} 
+}
