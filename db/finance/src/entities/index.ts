@@ -5,3 +5,7 @@ export * from './risk-radar-exception-status.entity';
 export * from './risk-radar-exceptions-jeff.entity';
 export * from './risk-radar-notes.entity';
 export * from './risk-radar-user.entity';
+export * from './fsp-risk-radar-exception-points.entity';
+export * from './risk-radar-batch.entity';
+export * from './risk-radar-merchant-adj-param.entity';
+export * from './tsys-divert-flag-update.entity';

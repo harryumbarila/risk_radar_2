@@ -23,7 +23,6 @@ services:
       - '5433:5432'
     networks:
       - denali-network
-
 networks:
   denali-network:
     driver: bridge
