@@ -1,3 +1,6 @@
+export * from './dft-256-batch.repository';
+export * from './dft-256-transaction.repository';
+export * from './dft-256-transaction-from-legacy-system.repository';
 export * from './risk-radar-batch.repository';
 export * from './risk-radar-chargebacks-and-retrieval-reason-code-lookup.repository';
 export * from './risk-radar-email-template.repository';

@@ -1,4 +1,7 @@
 export * from './chargebacks-and-retrieval-reason-code-lookup.entity';
+export * from './dft-256-batch';
+export * from './dft-256-transaction';
+export * from './dft-256-transaction-from-legacy-system.entity';
 export * from './fsp-risk-radar-exception-points.entity';
 export * from './risk-radar-batch.entity';
 export * from './risk-radar-email-template.entity';

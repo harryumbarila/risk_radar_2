@@ -13,6 +13,7 @@ import { LeadsBusinessInformationRepository } from '@/iris-db/repositories/leads
 
 import { RiskRadarController } from './risk-radar.controller';
 import { RiskRadarService } from './risk-radar.service';
+import { MerchantCardNumHistoryService } from './services/merchant-card-num-history.service';
 
 @Module({
   imports: [
@@ -27,11 +28,14 @@ import { RiskRadarService } from './risk-radar.service';
   ],
   controllers: [RiskRadarController],
   providers: [
+    // Entity repos
     LeadRepository,
     RiskRadarUserRepository,
     RiskRadarEmailTemplateRepository,
     LeadsBusinessInformationRepository,
+    // Services
     RiskRadarService,
+    MerchantCardNumHistoryService,
   ],
 })
 export class RiskRadarModule {}
