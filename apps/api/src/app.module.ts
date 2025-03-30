@@ -19,7 +19,6 @@ import { ExampleMultiDbModule } from './module/example-multi-db/example-multi-db
 import { IrisProxyModule } from './module/iris-proxy/iris-proxy.module';
 import { LegacyDashboardProxyModule } from './module/legacy-dashboard-proxy/legacy-dashboard-proxy.module';
 import { RiskRadarModule } from './module/risk-radar/risk-radar.module';
-import { RiskRadarExceptionsModule } from './module/risk-radar-exceptions/risk-radar-exceptions.module';
 import { rootConfig } from './shared/config/root.config';
 
 // Load dotenv only in development mode (DBs)
@@ -48,7 +47,6 @@ if (process.env.NODE_ENV !== 'production') {
     IrisProxyModule,
     ExampleMultiDbModule,
     RiskRadarModule,
-    RiskRadarExceptionsModule,
   ],
   controllers: [AppController],
   providers: [

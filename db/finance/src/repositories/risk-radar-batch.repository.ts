@@ -16,10 +16,10 @@ export class RiskRadarBatchRepository extends Repository<RiskRadarBatch> {
    */
   public async hasAMEXOptBlue(merchantId: string): Promise<boolean> {
     const batch = await this.createQueryBuilder('batch')
-      .select('batch.amexOptBlueInd')
-      .where('batch.merchantId = :merchantId', { merchantId })
-      .andWhere('batch.amexOptBlueInd = :indicator', { indicator: 'Y' })
-      .orderBy('batch.id', 'DESC')
+      .select('batch.sAMEXOptBlueInd')
+      .where('batch.sMID = :merchantId', { merchantId })
+      .andWhere('batch.sAMEXOptBlueInd = :indicator', { indicator: 'Y' })
+      .orderBy('batch.pkDFT256Batch', 'DESC')
       .take(1)
       .getOne();
     return !!batch;
@@ -29,9 +29,9 @@ export class RiskRadarBatchRepository extends Repository<RiskRadarBatch> {
     merchantIds: string[]
   ): Promise<string[]> {
     const merchants = await this.createQueryBuilder('batch')
-      .select('DISTINCT batch.merchantId', 'merchantId')
-      .where('batch.merchantId IN (:...merchantIds)', { merchantIds })
-      .andWhere('batch.amexOptBlueInd = :indicator', { indicator: 'Y' })
+      .select('DISTINCT batch.sMID', 'merchantId')
+      .where('batch.sMID IN (:...merchantIds)', { merchantIds })
+      .andWhere('batch.sAMEXOptBlueInd = :indicator', { indicator: 'Y' })
       .getRawMany();
     return merchants.map((m: { merchantId: string }) => m.merchantId);
   }

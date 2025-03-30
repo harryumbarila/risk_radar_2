@@ -12,8 +12,9 @@ import {
 } from '@/finance-db/repositories';
 import { PartnerAndSalesAgentIdentificationRepository } from '@/iris-db/repositories';
 
-import type { RiskRadarExceptionsListDto } from './dto/risk-radar-exception-list.dto';
-import type { RiskRadarExceptionsListResultDto } from './dto/risk-radar-exceptions-list-result.dto';
+import type { RiskRadarExceptionsListDto } from '../../risk-radar-exceptions/dto/risk-radar-exception-list.dto';
+import type { RiskRadarExceptionsListResultDto } from '../../risk-radar-exceptions/dto/risk-radar-exceptions-list-result.dto';
+import { object, unknown } from 'zod';
 
 @Injectable()
 export class RiskRadarExceptionsService {
@@ -169,15 +170,16 @@ export class RiskRadarExceptionsService {
     const queryExecStart = Date.now();
 
     // Add limit to query to retrieve only 100 records for better performance
-    // query.take(10);
+    query.take(10);
     this.logger.info('PROFILING: Limited query to 100 records');
 
     const exceptions = await query.getMany();
 
     profile['4-QueryExecution'] = Date.now() - queryExecStart;
     this.logger.info(
-      `PROFILING: 4-QueryExecution complete in ${profile['4-QueryExecution']}ms (found ${exceptions.length} exceptions, limited to 100)`
+      `PROFILING: 4-QueryExecution complete in ${profile['4-QueryExecution']}ms (found ${exceptions.length} exceptions, limited to 10)`
     );
+    // Return the raw exceptions directly to avoid processing issues
 
     // 6. Create a map for faster lookups
     const mapCreationStart = Date.now();
@@ -203,12 +205,23 @@ export class RiskRadarExceptionsService {
     );
     // 7. Process and transform the results
     const transformStart = Date.now();
+
     let results = await Promise.all(
       exceptions.map(async (exception) => {
         // Check for AMEX OptBlue indicator
+            profile['5.4-MapCreation'] = Date.now() - mapCreationStart;
+
+          this.logger.info(
+            `PROFILING: 5.4-MapCreation complete in ${profile['5.4-MapCreation']}ms`
+          );
+        
         const hasAmexOptBlue = await this.batchRepo.hasAMEXOptBlue(
           exception.mid
         );
+
+         this.logger.info(
+      `PROFILING: 5.5-MapCreation complete in ${profile['5.5-MapCreation']}ms`
+    );
 
         // Calculate total points based on exception flags
         const totalPoints =
@@ -354,6 +367,11 @@ export class RiskRadarExceptionsService {
       // Map partner info to results
       const partnerMap = new Map(
         partnerInfo.map((info) => [info.mid, info])
+      );
+
+       profile['6.5-PartnerInfo'] = Date.now() - partnerInfoStart;
+      this.logger.info(
+        `PROFILING: 6.5-PartnerInfo complete in ${profile['6.5-PartnerInfo']}ms`
       );
 
       results = results.map((result) => {
@@ -642,5 +660,6 @@ export class RiskRadarExceptionsService {
     });
 
     return results;
+
   }
 }

@@ -3,3 +3,9 @@ export * from './divert-queue-fsp.entity';
 export * from './lead.entity';
 export * from './lead-business-information.entity';
 export * from './partner-and-sales-agent-identification.entity';
+export * from './source.entity';
+export * from './leads-owner.entity';
+export * from './leads-services.entity';
+export * from './leads-underwriting.entity';
+export * from './leads-financial-profile.entity';
+

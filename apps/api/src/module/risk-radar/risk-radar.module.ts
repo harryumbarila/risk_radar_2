@@ -8,14 +8,17 @@ import {
   RiskRadarExceptionsJeffEntity,
   RiskRadarMerchantAdjParamEntity,
   ChargeBacksEntity,
-  RiskRadarExceptionListLookupEntity
+  RiskRadarExceptionListLookupEntity,
+  RiskRadarBatch
 } from '@/finance-db/entities';
 import { 
   RiskRadarEmailTemplateRepository,
   RiskRadarUserRepository,
   RiskRadarExceptionsJeffRepository,
   MerchantExceptionDetailRepository,
-  RiskRadarMerchantAdjParamRepository
+  RiskRadarMerchAdjParamRepository,
+  RiskRadarBatchRepository,
+  RiskRadarNotesRepository
 } from '@/finance-db/repositories';
 
 import { 
@@ -40,20 +43,19 @@ import {
 } from '@/iris-db/repositories';
 
 import { GetSubscriptionsQueueService } from './services/get-subscriptions-queue.service';
-import { MerchantExceptionDetailController } from './controllers/merchant-exception-detail.controller';
 import { MerchantExceptionDetailService } from './services/merchant-exception-detail.service';
 import {
   DFT256BatchRepository,
   DFT256TransactionFromLegacySystemRepository,
   DFT256TransactionRepository,
   RiskRadarIssuingBankRepository,
-  RiskRadarNotesRepository,
 } from '@/finance-db/repositories';
 
 import { RiskRadarController } from './risk-radar.controller';
 import { RiskRadarService } from './risk-radar.service';
 import { AssignExceptionReviewService } from './services/assign-exception-review/assign-exception-review.service';
 import { MerchantCardNumHistoryService } from './services/merchant-card-num-history/merchant-card-num-history.service';
+import { RiskRadarExceptionsService } from './services/risk-radar-exceptions.service';
 
 @Module({
   imports: [
@@ -64,7 +66,8 @@ import { MerchantCardNumHistoryService } from './services/merchant-card-num-hist
         RiskRadarExceptionsJeffEntity,
         RiskRadarMerchantAdjParamEntity,
         ChargeBacksEntity,
-        RiskRadarExceptionListLookupEntity
+        RiskRadarExceptionListLookupEntity,
+        RiskRadarBatch
       ],
       'finance'
     ),
@@ -81,8 +84,9 @@ import { MerchantCardNumHistoryService } from './services/merchant-card-num-hist
       ],
       'iris'
     ),
+    TypeOrmModule.forFeature([], 'connector'),
   ],
-  controllers: [RiskRadarController, MerchantExceptionDetailController],
+  controllers: [RiskRadarController],
   providers: [
     // Entity repos
     LeadRepository,
@@ -98,7 +102,9 @@ import { MerchantCardNumHistoryService } from './services/merchant-card-num-hist
     RiskRadarEmailTemplateRepository,
     RiskRadarExceptionsJeffRepository,
     MerchantExceptionDetailRepository,
-    RiskRadarMerchantAdjParamRepository,
+    RiskRadarMerchAdjParamRepository,
+    RiskRadarBatchRepository,
+    RiskRadarNotesRepository,
     
     RiskRadarService,
     GetSubscriptionsQueueService,
@@ -115,6 +121,7 @@ import { MerchantCardNumHistoryService } from './services/merchant-card-num-hist
     RiskRadarService,
     MerchantCardNumHistoryService,
     AssignExceptionReviewService,
+    RiskRadarExceptionsService,
   ],
 })
 export class RiskRadarModule {}

@@ -5,7 +5,7 @@ import { Logger } from 'pino';
 import { DataSource, Not, IsNull } from 'typeorm';
 
 import { LeadRepository, LeadsBusinessInformationRepository, LeadsServicesRepository, LeadsUnderwritingRepository, LeadsFinancialProfileRepository, SourceRepository, LeadsOwnerRepository, PartnerAndSalesAgentIdentificationRepository } from '@/iris-db/repositories';
-import { MerchantExceptionDetailRepository, RiskRadarExceptionsJeffRepository, RiskRadarMerchantAdjParamRepository } from '@/finance-db/repositories';
+import { MerchantExceptionDetailRepository, RiskRadarExceptionsJeffRepository, RiskRadarMerchAdjParamRepository } from '@/finance-db/repositories';
 import { MonthlyProcessingSummary, MerchantInfo } from '@/finance-db/repositories/merchant-exception-detail.repository';
 
 import {
@@ -30,7 +30,7 @@ export class MerchantExceptionDetailService {
     private readonly partnerRepository: PartnerAndSalesAgentIdentificationRepository,
     private readonly merchantExceptionDetailRepository: MerchantExceptionDetailRepository,
     private readonly riskRadarExceptionsRepository: RiskRadarExceptionsJeffRepository,
-    private readonly riskRadarMerchantAdjParamRepository: RiskRadarMerchantAdjParamRepository,
+    private readonly riskRadarMerchAdjParamRepository: RiskRadarMerchAdjParamRepository,
     
     @InjectDataSource('iris') 
     private readonly irisDataSource: DataSource,
@@ -130,7 +130,7 @@ export class MerchantExceptionDetailService {
     });
 
     // Get merchant adjust parameters
-    const merchAdjParam = await this.riskRadarMerchantAdjParamRepository.findOne({
+    const merchAdjParam = await this.riskRadarMerchAdjParamRepository.findOne({
       where: { mid: sMID },
     });
 

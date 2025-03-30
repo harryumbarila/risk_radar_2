@@ -18,6 +18,8 @@ import { AssignExceptionReviewService } from './services/assign-exception-review
 import { AssignExceptionReviewInputDto } from './services/assign-exception-review/dto/assign-exception-review-input.dto';
 import { MerchantCardNumHistoryQueryDto } from './services/merchant-card-num-history/dto/get-merchant-card-num.dto';
 import { MerchantCardNumHistoryService } from './services/merchant-card-num-history/merchant-card-num-history.service';
+import { RiskRadarExceptionsListResultDto } from '../risk-radar-exceptions/dto/risk-radar-exceptions-list-result.dto';
+import { RiskRadarExceptionsService } from './services/risk-radar-exceptions.service';
 
 @ApiTags('risk-radar')
 @Controller('v1/risk-radar')
@@ -26,7 +28,8 @@ export class RiskRadarController {
     private readonly riskRadarService: RiskRadarService,
     private readonly merchantExceptionDetailService: MerchantExceptionDetailService,
     private readonly merchantCardNumHistoryService: MerchantCardNumHistoryService,
-    private readonly assignExceptionReviewService: AssignExceptionReviewService
+    private readonly assignExceptionReviewService: AssignExceptionReviewService,
+    private readonly riskRadarExceptionsService: RiskRadarExceptionsService
   ) {}
 
   @Public()
@@ -63,6 +66,43 @@ export class RiskRadarController {
     @Query(ValidationPipe) query: MerchantCardNumHistoryQueryDto
   ) {
     return this.merchantCardNumHistoryService.getMerchantCardNumHistory(query);
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'Get risk radar exceptions list.',
+  })
+  @ApiOperation({
+    operationId: 'getRiskRadarExceptionsList',
+    summary:
+      'Get risk radar exceptions list with filtering and sorting options',
+  })
+  @Public()
+  @Get('list')
+  public async getExceptionsList(
+    @Query('dtStart') dtStart: Date,
+    @Query('dtEnd') dtEnd: Date,
+    @Query('pkRiskRadarExceptionStatus') pkRiskRadarExceptionStatus: number,
+    @Query('pkRiskRadarUserAssigned') pkRiskRadarUserAssigned: number,
+    @Query('sMIDSearch') sMIDSearch: string,
+    @Query('sGeneralSearch') sGeneralSearch: string,
+    @Query('sExceptionList') sExceptionList: string,
+    @Query('bViewAll') bViewAll: boolean,
+    @Query('iSortBy') iSortBy: number,
+    @Query('iProcessor') iProcessor: number
+  ): Promise<RiskRadarExceptionsListResultDto[]> {
+    return this.riskRadarExceptionsService.getExceptionsList({
+      dtStart,
+      dtEnd,
+      pkRiskRadarExceptionStatus,
+      pkRiskRadarUserAssigned,
+      sMIDSearch,
+      sGeneralSearch,
+      sExceptionList,
+      bViewAll,
+      iSortBy,
+      iProcessor,
+    });
   }
 
   @Public()
