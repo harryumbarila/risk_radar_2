@@ -31,6 +31,8 @@ import { MerchantCardNumHistoryQueryDto } from './services/merchant-card-num-his
 import { MerchantCardNumHistoryService } from './services/merchant-card-num-history/merchant-card-num-history.service';
 import { MerchantExceptionDetailService } from './services/merchant-exception-detail.service';
 import { RiskRadarExceptionsService } from './services/risk-radar-exceptions.service';
+import { MerchantExceptionTransactionsInputDto } from './services/merchant-exception-transactions/dto/merchant-exception-transactions.dto';
+import { MerchantExceptionTransactionsService } from './services/merchant-exception-transactions/merchant-exception-transactions.service';
 import { RiskRadarSaveInputDto } from './services/risk-radar-save/dto/risk-radar-save-input.dto';
 import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save.service';
 
@@ -45,7 +47,8 @@ export class RiskRadarController {
     private readonly riskRadarExceptionsService: RiskRadarExceptionsService,
     private readonly riskRadarSaveService: RiskRadarSaveService,
     private readonly exceptionStatusRepo: RiskRadarExceptionStatusRepository,
-    private readonly riskRadarUserRepository: RiskRadarUserRepository
+    private readonly riskRadarUserRepository: RiskRadarUserRepository,
+    private readonly merchantExceptionTransactionsService: MerchantExceptionTransactionsService
   ) {}
 
   @Public()
@@ -225,5 +228,16 @@ export class RiskRadarController {
   @ApiOkResponse()
   public async saveRiskRadar(@Body() data: RiskRadarSaveInputDto) {
     return this.riskRadarSaveService.saveRiskRadar(data);
+  }
+
+  @Public()
+  @Get('merchant-exception-transaction')
+  @ApiOkResponse()
+  public async getMerchantExceptionTransactions(
+    @Body() data: MerchantExceptionTransactionsInputDto
+  ) {
+    return this.merchantExceptionTransactionsService.getExceptionTransactions(
+      data
+    );
   }
 }
