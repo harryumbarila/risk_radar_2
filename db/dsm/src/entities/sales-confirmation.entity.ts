@@ -6,7 +6,7 @@ export class DSMSalesConfirmation {
   public appointmentId!: string;
 
   @Column('varchar', { length: 16, name: 'sMID' })
-  public smid!: string;
+  public mid!: string;
 
   @Column('bit', { name: 'bRiskWatch' })
   public riskWatch!: boolean;

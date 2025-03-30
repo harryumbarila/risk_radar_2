@@ -1,5 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
+import { DSMSalesConfirmationRepository } from '@/dsm-db/repositories';
+import { EZEnrollGenAccountRepository } from '@/ez-enroll-db/repositories';
+import { EZEnrollPccGenAccountRepository } from '@/ez-enroll-pcc-db/repositories';
 import type { RiskRadarMerchantAdjParamEntity } from '@/finance-db/entities';
 import {
   RiskRadarExceptionsJeffRepository,
@@ -11,6 +14,7 @@ import {
   DivertQueueFSPRepository,
   DivertQueueRepository,
 } from '@/iris-db/repositories';
+import { SnapPccSalesConfirmationRepository } from '@/snap-pcc-db/repositories';
 
 import type { RiskRadarSaveInputDto } from './dto/risk-radar-save-input.dto';
 
@@ -22,7 +26,11 @@ export class RiskRadarSaveService {
     private readonly notesRepository: RiskRadarNotesRepository,
     private readonly flagUpdateRepository: TSYSDivertFlagUpdateRepository,
     private readonly divertQueueRepository: DivertQueueRepository,
-    private readonly divertQueueFspRepository: DivertQueueFSPRepository
+    private readonly divertQueueFspRepository: DivertQueueFSPRepository,
+    private readonly ezEnrollGenAccountRepository: EZEnrollGenAccountRepository,
+    private readonly ezEnrollPccGenAccountRepository: EZEnrollPccGenAccountRepository,
+    private readonly dsmSalesConfirmationRepository: DSMSalesConfirmationRepository,
+    private readonly snapSalesConfirmationRepository: SnapPccSalesConfirmationRepository
   ) {}
 
   public async saveRiskRadar(data: RiskRadarSaveInputDto) {
@@ -34,7 +42,7 @@ export class RiskRadarSaveService {
       averageTicket,
       swipePercentage,
       isDiverted,
-      // website,
+      website,
       preferredContact,
       notes,
       isPinnedNote,
@@ -87,6 +95,38 @@ export class RiskRadarSaveService {
       }
     );
 
+    // Updates
+    await this.ezEnrollGenAccountRepository.update(
+      { mid16: merchantId },
+      {
+        website,
+        riskWatch: isRiskWatch,
+      }
+    );
+
+    await this.ezEnrollPccGenAccountRepository.update(
+      { mid16: merchantId },
+      {
+        website,
+        riskWatch: isRiskWatch,
+      }
+    );
+
+    await this.dsmSalesConfirmationRepository.update(
+      { mid: merchantId },
+      {
+        riskWatch: isRiskWatch,
+      }
+    );
+
+    await this.snapSalesConfirmationRepository.update(
+      { mid: merchantId },
+      {
+        riskWatch: isRiskWatch,
+      }
+    );
+
+    // Notes
     await this.checkAndCreateChangedNotes(data, merchAdj);
 
     // Divert

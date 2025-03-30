@@ -2,6 +2,9 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ClxReportingRepository } from '@/data-warehouse-db/repositories';
+import { DSMSalesConfirmationRepository } from '@/dsm-db/repositories';
+import { EZEnrollGenAccountRepository } from '@/ez-enroll-db/repositories';
+import { EZEnrollPccGenAccountRepository } from '@/ez-enroll-pcc-db/repositories';
 import {
   RiskRadarEmailTemplateEntity,
   RiskRadarUserEntity,
@@ -25,6 +28,7 @@ import {
   LeadRepository,
 } from '@/iris-db/repositories/';
 import { LeadsBusinessInformationRepository } from '@/iris-db/repositories/leads-business-information.repository';
+import { SnapPccSalesConfirmationRepository } from '@/snap-pcc-db/repositories';
 
 import { RiskRadarController } from './risk-radar.controller';
 import { RiskRadarService } from './risk-radar.service';
@@ -63,6 +67,10 @@ import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save
     TSYSDivertFlagUpdateRepository,
     DivertQueueRepository,
     DivertQueueFSPRepository,
+    EZEnrollGenAccountRepository,
+    EZEnrollPccGenAccountRepository,
+    DSMSalesConfirmationRepository,
+    SnapPccSalesConfirmationRepository,
     // Services
     RiskRadarService,
     MerchantCardNumHistoryService,
