@@ -23,7 +23,7 @@ ls:
   apps/api/src:
     .ts: kebab-case | regex:[a-z-]+\.[a-z-]+ | regex:[a-z-]+\.[a-z-]+\.[a-z-]+
   db/*/src:
-    .ts: kebab-case | regex:[a-z-]+\.[a-z-]+ | regex:[a-z-]+\.[a-z-]+\.[a-z-]+
+    .ts: kebab-case | regex:[a-z0-9-]+\.[a-z0-9-]+ | regex:[a-z0-9-]+\.[a-z0-9-]+\.[a-z0-9-]+
 
 ignore:
   - .git

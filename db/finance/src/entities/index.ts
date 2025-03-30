@@ -8,6 +8,7 @@ export * from './risk-radar-email-template.entity';
 export * from './risk-radar-exception-list-lookup.entity';
 export * from './risk-radar-exception-status.entity';
 export * from './risk-radar-exceptions-jeff.entity';
+export * from './risk-radar-issuing-banks.entity';
 export * from './risk-radar-merch-adj-param.entity';
 export * from './risk-radar-merchant-adj-param.entity';
 export * from './risk-radar-notes.entity';

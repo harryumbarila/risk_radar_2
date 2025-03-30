@@ -1,8 +1,8 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity({ name: '.CLXReportingSearch' })
+@Entity({ name: 'clx.CLXReportingSearch' })
 export class CLXReportingSearch {
-  @PrimaryColumn()
+  @PrimaryColumn({ name: 'Id' })
   public id: number;
 
   @Column({ name: 'SiteID', length: 25 })
