@@ -57,7 +57,7 @@ export class RiskRadarController {
   }
 
   @Public()
-  @Post()
+  @Post('save')
   @ApiOkResponse()
   public async saveRiskRadar(@Body() data: RiskRadarSaveInputDto) {
     return this.riskRadarSaveService.saveRiskRadar(data);

@@ -12,12 +12,18 @@ import {
   DFT256TransactionRepository,
   RiskRadarExceptionsJeffRepository,
   RiskRadarIssuingBankRepository,
+  RiskRadarMerchAdjParamRepository,
   RiskRadarNotesRepository,
+  TSYSDivertFlagUpdateRepository,
 } from '@/finance-db/repositories';
 import { RiskRadarEmailTemplateRepository } from '@/finance-db/repositories/risk-radar-email-template.repository';
 import { RiskRadarUserRepository } from '@/finance-db/repositories/risk-radar-user.repository';
 import { LeadEntity, LeadsBusinessInformationEntity } from '@/iris-db/entities';
-import { LeadRepository } from '@/iris-db/repositories/';
+import {
+  DivertQueueFSPRepository,
+  DivertQueueRepository,
+  LeadRepository,
+} from '@/iris-db/repositories/';
 import { LeadsBusinessInformationRepository } from '@/iris-db/repositories/leads-business-information.repository';
 
 import { RiskRadarController } from './risk-radar.controller';
@@ -51,6 +57,12 @@ import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save
     DFT256TransactionFromLegacySystemRepository,
     RiskRadarExceptionsJeffRepository,
     RiskRadarNotesRepository,
+    RiskRadarMerchAdjParamRepository,
+    RiskRadarExceptionsJeffRepository,
+    RiskRadarNotesRepository,
+    TSYSDivertFlagUpdateRepository,
+    DivertQueueRepository,
+    DivertQueueFSPRepository,
     // Services
     RiskRadarService,
     MerchantCardNumHistoryService,

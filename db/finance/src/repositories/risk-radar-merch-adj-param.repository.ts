@@ -3,12 +3,12 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
 import { Repository } from 'typeorm';
 
-import { RiskRadarMerchAdjParam } from '../entities/risk-radar-merch-adj-param.entity';
+import { RiskRadarMerchantAdjParamEntity } from '../entities';
 
 @Injectable()
-export class RiskRadarMerchAdjParamRepository extends Repository<RiskRadarMerchAdjParam> {
+export class RiskRadarMerchAdjParamRepository extends Repository<RiskRadarMerchantAdjParamEntity> {
   public constructor(@InjectDataSource('finance') dataSource: DataSource) {
-    super(RiskRadarMerchAdjParam, dataSource.createEntityManager());
+    super(RiskRadarMerchantAdjParamEntity, dataSource.createEntityManager());
   }
 
   /**
@@ -16,9 +16,9 @@ export class RiskRadarMerchAdjParamRepository extends Repository<RiskRadarMerchA
    */
   public async findByMerchantId(
     merchantId: string
-  ): Promise<RiskRadarMerchAdjParam | null> {
+  ): Promise<RiskRadarMerchantAdjParamEntity | null> {
     return this.findOne({
-      where: { merchantId },
+      where: { mid: merchantId },
     });
   }
 }
