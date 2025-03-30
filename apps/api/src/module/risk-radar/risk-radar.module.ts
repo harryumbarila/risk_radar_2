@@ -24,6 +24,7 @@ import { RiskRadarController } from './risk-radar.controller';
 import { RiskRadarService } from './risk-radar.service';
 import { AssignExceptionReviewService } from './services/assign-exception-review/assign-exception-review.service';
 import { MerchantCardNumHistoryService } from './services/merchant-card-num-history/merchant-card-num-history.service';
+import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save.service';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { MerchantCardNumHistoryService } from './services/merchant-card-num-hist
     RiskRadarService,
     MerchantCardNumHistoryService,
     AssignExceptionReviewService,
+    RiskRadarSaveService,
   ],
 })
 export class RiskRadarModule {}
