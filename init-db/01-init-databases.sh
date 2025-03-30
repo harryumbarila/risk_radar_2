@@ -22,7 +22,7 @@ function execute_sql() {
 }
 
 # Create each database with retries
-databases=("connector" "crescent-view" "data-warehouse" "iris" "finance")
+databases=("connector" "crescent-view" "data-warehouse" "iris" "finance", "ez-enroll", 'ez-enroll-pcc', "dsm", "snap-pcc")
 
 for db in "${databases[@]}"; do
     echo "Creating database: $db"
