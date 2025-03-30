@@ -13,7 +13,7 @@ ls:
     .js: kebab-case
     .ts: kebab-case | regex:_app | regex:_document | regex:_error | regex:\[[a-z0-9]+\] | regex:\[\.\.\.[a-z0-9]+\]
     .d.ts: kebab-case
-  '{apps,configs,packages}/*/tests':
+  '{apps,configs,packages,db}/*/tests':
     .dir: kebab-case | regex:__snapshots__
     .js: kebab-case
     .ts: kebab-case
@@ -22,6 +22,8 @@ ls:
     .spec.tsx: kebab-case
   apps/api/src:
     .ts: kebab-case | regex:[a-z-]+\.[a-z-]+ | regex:[a-z-]+\.[a-z-]+\.[a-z-]+
+  db/*/src:
+    .ts: kebab-case | regex:[a-z0-9-]+\.[a-z0-9-]+ | regex:[a-z0-9-]+\.[a-z0-9-]+\.[a-z0-9-]+
 
 ignore:
   - .git

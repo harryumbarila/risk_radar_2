@@ -5,7 +5,6 @@ import { Logger } from 'pino';
 import { DataSource, Not, IsNull } from 'typeorm';
 
 import { LeadRepository, LeadsBusinessInformationRepository, LeadsServicesRepository, LeadsUnderwritingRepository, LeadsFinancialProfileRepository, SourceRepository, LeadsOwnerRepository, PartnerAndSalesAgentIdentificationRepository } from '@/iris-db/repositories';
-import { SubscriptionQueueRequestEventJsonSourceEntity } from '@/iris-db/entities';
 import { MerchantExceptionDetailRepository, RiskRadarExceptionsJeffRepository, RiskRadarMerchantAdjParamRepository } from '@/finance-db/repositories';
 import { MonthlyProcessingSummary, MerchantInfo } from '@/finance-db/repositories/merchant-exception-detail.repository';
 
@@ -63,19 +62,33 @@ export class MerchantExceptionDetailService {
       where: { id: pkRiskRadarExceptions },
     });
 
+    this.logger.info(
+        {
+          exceptionId: pkRiskRadarExceptions,
+          mid: sMID,
+          user: sUser,
+        },
+        'Getting chargebacks count'
+      );
     // Get chargebacks count
     const chargebacks = await this.merchantExceptionDetailRepository.getChargebacksCount(sMID);
 
-    // Check if UW New Account Hold is set
-    // Using TypeORM to check for UW New Account Hold
-    const uwNewAccountHoldQuery = await this.irisDataSource.getRepository(SubscriptionQueueRequestEventJsonSourceEntity).findOne({
-      where: {
-        irisMId: sMID,
-        uwNewAccountHoldOnDivertCapturedInTalusDBDate: Not(IsNull()),
-        uwNewAccountHoldOffDivertCapturedInTalusDBDate: IsNull(),
-      },
-    });
-    const uwNewAccountHoldAllowRiskToEdit = !uwNewAccountHoldQuery;
+    this.logger.info(
+        {
+          exceptionId: pkRiskRadarExceptions,
+          mid: sMID,
+          user: sUser,
+        },
+        'Getting UW New Account Hold allow risk to edit'
+      );
+    const uwNewAccountHoldQuery = await this.irisDataSource.query(`
+      SELECT 1 
+      FROM Iris.dbo.SubscriptionQueueRequestEventJsonSource 
+      WHERE irisMId = @0
+        AND dtUW_NewAccountHold_OnDivertCapturedInTalusDB IS NOT NULL
+        AND dtUW_NewAccountHold_OffDivertCapturedInTalusDB IS NULL
+    `, [sMID]);
+    const uwNewAccountHoldAllowRiskToEdit = !uwNewAccountHoldQuery.length;
 
     // Get lead information
     const lead = await this.leadRepository.findOne({
