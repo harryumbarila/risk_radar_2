@@ -2,6 +2,9 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ClxReportingRepository } from '@/data-warehouse-db/repositories';
+import { DSMSalesConfirmationRepository } from '@/dsm-db/repositories';
+import { EZEnrollGenAccountRepository } from '@/ez-enroll-db/repositories';
+import { EZEnrollPccGenAccountRepository } from '@/ez-enroll-pcc-db/repositories';
 import {
   RiskRadarEmailTemplateEntity,
   RiskRadarUserEntity,
@@ -18,7 +21,12 @@ import {
   MerchantExceptionDetailRepository,
   RiskRadarMerchAdjParamRepository,
   RiskRadarBatchRepository,
-  RiskRadarNotesRepository
+  RiskRadarNotesRepository,
+  DFT256BatchRepository,
+  DFT256TransactionFromLegacySystemRepository,
+  DFT256TransactionRepository,
+  RiskRadarIssuingBankRepository,
+  TSYSDivertFlagUpdateRepository
 } from '@/finance-db/repositories';
 
 import { 
@@ -44,18 +52,19 @@ import {
 
 import { GetSubscriptionsQueueService } from './services/get-subscriptions-queue.service';
 import { MerchantExceptionDetailService } from './services/merchant-exception-detail.service';
+
 import {
-  DFT256BatchRepository,
-  DFT256TransactionFromLegacySystemRepository,
-  DFT256TransactionRepository,
-  RiskRadarIssuingBankRepository,
-} from '@/finance-db/repositories';
+  DivertQueueFSPRepository,
+  DivertQueueRepository,
+} from '@/iris-db/repositories/';
+import { SnapPccSalesConfirmationRepository } from '@/snap-pcc-db/repositories';
 
 import { RiskRadarController } from './risk-radar.controller';
 import { RiskRadarService } from './risk-radar.service';
 import { AssignExceptionReviewService } from './services/assign-exception-review/assign-exception-review.service';
 import { MerchantCardNumHistoryService } from './services/merchant-card-num-history/merchant-card-num-history.service';
 import { RiskRadarExceptionsService } from './services/risk-radar-exceptions.service';
+import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save.service';
 
 @Module({
   imports: [
@@ -117,11 +126,22 @@ import { RiskRadarExceptionsService } from './services/risk-radar-exceptions.ser
     DFT256TransactionFromLegacySystemRepository,
     RiskRadarExceptionsJeffRepository,
     RiskRadarNotesRepository,
+    RiskRadarMerchAdjParamRepository,
+    RiskRadarExceptionsJeffRepository,
+    RiskRadarNotesRepository,
+    TSYSDivertFlagUpdateRepository,
+    DivertQueueRepository,
+    DivertQueueFSPRepository,
+    EZEnrollGenAccountRepository,
+    EZEnrollPccGenAccountRepository,
+    DSMSalesConfirmationRepository,
+    SnapPccSalesConfirmationRepository,
     // Services
     RiskRadarService,
     MerchantCardNumHistoryService,
     AssignExceptionReviewService,
     RiskRadarExceptionsService,
+    RiskRadarSaveService,
   ],
 })
 export class RiskRadarModule {}

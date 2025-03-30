@@ -19,7 +19,11 @@
       "@/crescent-view-db/*": ["../../db/crescent-view/src/*"],
       "@/iris-db/*": ["../../db/iris/src/*"],
       "@/data-warehouse-db/*": ["../../db/data-warehouse/src/*"],
-      "@/connector-db/*": ["../../db/connector/src/*"]
+      "@/connector-db/*": ["../../db/connector/src/*"],
+      "@/ez-enroll-db/*": ["../../db/ez-enroll/src/*"],
+      "@/ez-enroll-pcc-db/*": ["../../db/ez-enroll-pcc/src/*"],
+      "@/dsm-db/*": ["../../db/dsm/src/*"],
+      "@/snap-pcc-db/*": ["../../db/snap-pcc/src/*"]
     },
     "incremental": true,
     "skipLibCheck": true,

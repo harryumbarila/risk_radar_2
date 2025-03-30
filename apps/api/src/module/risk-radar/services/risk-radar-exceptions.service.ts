@@ -342,7 +342,7 @@ export class RiskRadarExceptionsService {
           exception.mid
         );
         if (merchParams) {
-          result.bDivert = merchParams.isDivert ? 'Yes' : null;
+          result.bDivert = merchParams.isDiverted ? 'Yes' : null;
           result.bRiskWatch = merchParams.isRiskWatch ? 'Yes' : null;
         }
 
