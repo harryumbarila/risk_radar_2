@@ -10,9 +10,13 @@ import { JwtAuthGuard } from '@/api/shared/auth/guard/jwt-auth.guard';
 import { DbTypeORMModule as ConnectorDbTypeOrmModule } from '@/connector-db/connection/nestjs-module';
 import { DbTypeORMModule as CrescentViewDbTypeOrmModule } from '@/crescent-view-db/connection/nestjs-module';
 import { DbTypeORMModule as DataWarehouseDbTypeOrmModule } from '@/data-warehouse-db/connection/nestjs-module';
+import { DbTypeORMModule as DsmDbTypeOrmModule } from '@/dsm-db/connection/nestjs-module';
+import { DbTypeORMModule as EzEnrollDbTypeOrmModule } from '@/ez-enroll-db/connection/nestjs-module';
+import { DbTypeORMModule as EzEnrollPccTypeOrmModule } from '@/ez-enroll-pcc-db/connection/nestjs-module';
 import { DbTypeORMModule as FinanceDbTypeOrmModule } from '@/finance-db/connection/nestjs-module';
 import { DbTypeORMModule as IrisDbTypeOrmModule } from '@/iris-db/connection/nestjs-module';
 import { logger } from '@/logger/index';
+import { DbTypeORMModule as SnapPccTypeOrmModule } from '@/snap-pcc-db/connection/nestjs-module';
 
 import { AppController } from './app.controller';
 import { ExampleMultiDbModule } from './module/example-multi-db/example-multi-db.module';
@@ -36,6 +40,10 @@ if (process.env.NODE_ENV !== 'production') {
     CrescentViewDbTypeOrmModule,
     FinanceDbTypeOrmModule,
     IrisDbTypeOrmModule,
+    DsmDbTypeOrmModule,
+    EzEnrollDbTypeOrmModule,
+    EzEnrollPccTypeOrmModule,
+    SnapPccTypeOrmModule,
     LoggerModule.forRoot({
       pinoHttp: {
         logger,
