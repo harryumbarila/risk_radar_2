@@ -10,7 +10,9 @@ import {
   DFT256BatchRepository,
   DFT256TransactionFromLegacySystemRepository,
   DFT256TransactionRepository,
+  RiskRadarExceptionsJeffRepository,
   RiskRadarIssuingBankRepository,
+  RiskRadarNotesRepository,
 } from '@/finance-db/repositories';
 import { RiskRadarEmailTemplateRepository } from '@/finance-db/repositories/risk-radar-email-template.repository';
 import { RiskRadarUserRepository } from '@/finance-db/repositories/risk-radar-user.repository';
@@ -20,6 +22,7 @@ import { LeadsBusinessInformationRepository } from '@/iris-db/repositories/leads
 
 import { RiskRadarController } from './risk-radar.controller';
 import { RiskRadarService } from './risk-radar.service';
+import { AssignExceptionReviewService } from './services/assign-exception-review/assign-exception-review.service';
 import { MerchantCardNumHistoryService } from './services/merchant-card-num-history/merchant-card-num-history.service';
 
 @Module({
@@ -45,9 +48,12 @@ import { MerchantCardNumHistoryService } from './services/merchant-card-num-hist
     DFT256BatchRepository,
     DFT256TransactionRepository,
     DFT256TransactionFromLegacySystemRepository,
+    RiskRadarExceptionsJeffRepository,
+    RiskRadarNotesRepository,
     // Services
     RiskRadarService,
     MerchantCardNumHistoryService,
+    AssignExceptionReviewService,
   ],
 })
 export class RiskRadarModule {}

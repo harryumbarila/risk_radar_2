@@ -12,6 +12,8 @@ import { Public } from '@/api/shared/auth/decorator/public.decorator';
 
 import { SendExceptionMemoEmailDto } from './dtos/send-exception-memo-email.dto';
 import { RiskRadarService } from './risk-radar.service';
+import { AssignExceptionReviewService } from './services/assign-exception-review/assign-exception-review.service';
+import { AssignExceptionReviewInputDto } from './services/assign-exception-review/dto/assign-exception-review-input.dto';
 import { MerchantCardNumHistoryQueryDto } from './services/merchant-card-num-history/dto/get-merchant-card-num.dto';
 import { MerchantCardNumHistoryService } from './services/merchant-card-num-history/merchant-card-num-history.service';
 
@@ -20,7 +22,8 @@ import { MerchantCardNumHistoryService } from './services/merchant-card-num-hist
 export class RiskRadarController {
   public constructor(
     private readonly riskRadarService: RiskRadarService,
-    private readonly merchantCardNumHistoryService: MerchantCardNumHistoryService
+    private readonly merchantCardNumHistoryService: MerchantCardNumHistoryService,
+    private readonly assignExceptionReviewService: AssignExceptionReviewService
   ) {}
 
   @Public()
@@ -41,5 +44,12 @@ export class RiskRadarController {
     @Query(ValidationPipe) query: MerchantCardNumHistoryQueryDto
   ) {
     return this.merchantCardNumHistoryService.getMerchantCardNumHistory(query);
+  }
+
+  @Public()
+  @Post('assign-exception-review')
+  @ApiOkResponse()
+  public assignExceptionReview(@Body() data: AssignExceptionReviewInputDto) {
+    return this.assignExceptionReviewService.assignExceptionReview(data);
   }
 }
