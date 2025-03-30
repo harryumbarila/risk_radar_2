@@ -1,1 +1,1 @@
-export * from './example-entity';
+export * from './clx-reporting-search.entity';

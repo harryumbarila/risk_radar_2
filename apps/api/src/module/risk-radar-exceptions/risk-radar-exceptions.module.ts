@@ -9,7 +9,9 @@ import {
 } from '@/finance-db/entities';
 import {
   RiskRadarBatchRepository,
+  RiskRadarExceptionsJeffRepository,
   RiskRadarMerchAdjParamRepository,
+  RiskRadarUserRepository,
 } from '@/finance-db/repositories';
 import { PartnerAndSalesAgentIdentification } from '@/iris-db/entities';
 import { PartnerAndSalesAgentIdentificationRepository } from '@/iris-db/repositories';
@@ -35,6 +37,8 @@ import { RiskRadarExceptionsService } from './risk-radar-exceptions.service';
   providers: [
     RiskRadarExceptionsService,
     RiskRadarBatchRepository,
+    RiskRadarExceptionsJeffRepository,
+    RiskRadarUserRepository,
     RiskRadarMerchAdjParamRepository,
     PartnerAndSalesAgentIdentificationRepository,
   ],
