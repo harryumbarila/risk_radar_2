@@ -12,4 +12,18 @@ export class ClxReportingRepository extends Repository<CLXReportingSearch> {
   ) {
     super(CLXReportingSearch, dataSource.createEntityManager());
   }
+
+  public async getReportingForCard(
+    first6Digits: string,
+    last4Digits: string
+  ): Promise<CLXReportingSearch[]> {
+    return this.createQueryBuilder('clx')
+      .where('clx.accountNumber LIKE :sCardNumF6', {
+        sCardNumF6: `${first6Digits}%`,
+      })
+      .andWhere('clx.accountNumber LIKE :sCardNumL4', {
+        sCardNumL4: `%${last4Digits}`,
+      })
+      .getMany();
+  }
 }

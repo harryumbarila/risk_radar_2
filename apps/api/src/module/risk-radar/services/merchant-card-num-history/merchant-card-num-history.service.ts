@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { MoreThan } from 'typeorm';
 
 import type { CLXReportingSearch } from '@/data-warehouse-db/entities';
 import { ClxReportingRepository } from '@/data-warehouse-db/repositories';
@@ -10,7 +9,6 @@ import type {
 import {
   DFT256TransactionFromLegacySystemRepository,
   DFT256TransactionRepository,
-  RiskRadarIssuingBankRepository,
 } from '@/finance-db/repositories';
 import { SortType } from '@/shared/request';
 import type {
@@ -23,7 +21,6 @@ import type { MerchantCardNumHistoryQueryDto } from './dto/get-merchant-card-num
 @Injectable()
 export class MerchantCardNumHistoryService {
   public constructor(
-    private readonly issuingBanksRepository: RiskRadarIssuingBankRepository,
     private readonly dft256TransactionRepository: DFT256TransactionRepository,
     private readonly clxReportingSearchRepository: ClxReportingRepository,
     private readonly legacyTransactionRepository: DFT256TransactionFromLegacySystemRepository
@@ -37,39 +34,23 @@ export class MerchantCardNumHistoryService {
     const first6Digits = cardNumber.slice(0, 6);
     const last4Digits = cardNumber.slice(-4);
 
-    const transactionData = await this.dft256TransactionRepository.find({
-      where: {
-        cardLast4Digits: last4Digits,
-        cardFirst6Digits: first6Digits,
-      },
-      relations: {
-        batch: true,
-      },
-    });
+    const transactionData =
+      await this.dft256TransactionRepository.getTransactionsForCard(
+        first6Digits,
+        last4Digits
+      );
 
-    // We use raw Query Builder due to the TypeORM limitations ()
-    const reportingSearch = await this.clxReportingSearchRepository
-      .createQueryBuilder('clx')
-      .where('clx.accountNumber LIKE :sCardNumF6', {
-        sCardNumF6: `${first6Digits}%`,
-      })
-      .andWhere('clx.accountNumber LIKE :sCardNumL4', {
-        sCardNumL4: `%${last4Digits}`,
-      })
-      .getMany();
+    const reportingSearch =
+      await this.clxReportingSearchRepository.getReportingForCard(
+        first6Digits,
+        last4Digits
+      );
 
-    // Calculate the date 366 days ago
-    const pastDate = new Date();
-    pastDate.setDate(pastDate.getDate() - 366);
-
-    const legacyTransactions = await this.legacyTransactionRepository.find({
-      where: {
-        cardFirstSix: first6Digits,
-        cardLastFour: last4Digits,
-        // @ts-expect-error Fix
-        transactionDate: MoreThan(pastDate),
-      },
-    });
+    const legacyTransactions =
+      await this.legacyTransactionRepository.getTransactionsForCard(
+        first6Digits,
+        last4Digits
+      );
 
     // Format data to keep consistency
     const maskedCardNumber = `${first6Digits}******${last4Digits}`;
@@ -86,17 +67,13 @@ export class MerchantCardNumHistoryService {
     );
 
     // Sort transactions
-    const data = this.sortTransactions(
-      [
-        ...formattedTransactions,
-        ...formattedReportings,
-        ...formattedLegacyTransaction,
-      ],
-      sortBy,
-      sortType
-    );
+    const groupedTransactions = [
+      ...formattedTransactions,
+      ...formattedReportings,
+      ...formattedLegacyTransaction,
+    ];
 
-    return data;
+    return this.sortTransactions(groupedTransactions, sortBy, sortType);
   }
 
   private formatTransaction(
