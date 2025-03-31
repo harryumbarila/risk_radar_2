@@ -20,5 +20,6 @@ export * from './risk-radar-issuing-banks.entity';
 export * from './risk-radar-merch-adj-param.entity';
 export * from './risk-radar-merchant-adj-param.entity';
 export * from './risk-radar-notes.entity';
+export * from './risk-radar-transaction.entity';
 export * from './risk-radar-user.entity';
 export * from './tsys-divert-flag-update.entity';
