@@ -30,9 +30,9 @@ import { AssignExceptionReviewInputDto } from './services/assign-exception-revie
 import { MerchantCardNumHistoryQueryDto } from './services/merchant-card-num-history/dto/get-merchant-card-num.dto';
 import { MerchantCardNumHistoryService } from './services/merchant-card-num-history/merchant-card-num-history.service';
 import { MerchantExceptionDetailService } from './services/merchant-exception-detail.service';
-import { RiskRadarExceptionsService } from './services/risk-radar-exceptions.service';
 import { MerchantExceptionTransactionsInputDto } from './services/merchant-exception-transactions/dto/merchant-exception-transactions.dto';
 import { MerchantExceptionTransactionsService } from './services/merchant-exception-transactions/merchant-exception-transactions.service';
+import { RiskRadarExceptionsService } from './services/risk-radar-exceptions.service';
 import { RiskRadarSaveInputDto } from './services/risk-radar-save/dto/risk-radar-save-input.dto';
 import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save.service';
 
