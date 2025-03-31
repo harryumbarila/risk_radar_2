@@ -1,7 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { ClxReportingRepository } from '@/data-warehouse-db/repositories';
+import {
+  ClxReportingRepository,
+  CLXReportingSearchAVSResponseLookupRepository,
+  CLXReportingSearchPaymentMethodLookupRepository,
+} from '@/data-warehouse-db/repositories';
 import { DSMSalesConfirmationRepository } from '@/dsm-db/repositories';
 import { EZEnrollGenAccountRepository } from '@/ez-enroll-db/repositories';
 import { EZEnrollPccGenAccountRepository } from '@/ez-enroll-pcc-db/repositories';
@@ -16,11 +20,16 @@ import {
   RiskRadarUserEntity,
 } from '@/finance-db/entities';
 import {
+  AuthResponseLookupRepository,
+  DailyDetailRepository,
   DFT256BatchRepository,
   DFT256TransactionFromLegacySystemRepository,
   DFT256TransactionRepository,
+  FSPRiskRadarExceptionPointsRepository,
   MerchantExceptionDetailRepository,
+  POSEntryModesADFRepository,
   RiskRadarBatchRepository,
+  RiskRadarCycleTimeMonitorRepository,
   RiskRadarEmailTemplateRepository,
   RiskRadarExceptionsJeffRepository,
   RiskRadarExceptionStatusRepository,
@@ -60,6 +69,7 @@ import { AssignExceptionReviewService } from './services/assign-exception-review
 import { GetSubscriptionsQueueService } from './services/get-subscriptions-queue.service';
 import { MerchantCardNumHistoryService } from './services/merchant-card-num-history/merchant-card-num-history.service';
 import { MerchantExceptionDetailService } from './services/merchant-exception-detail.service';
+import { MerchantExceptionTransactionsService } from './services/merchant-exception-transactions/merchant-exception-transactions.service';
 import { RiskRadarExceptionsService } from './services/risk-radar-exceptions.service';
 import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save.service';
 
@@ -94,6 +104,7 @@ import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save
     TypeOrmModule.forFeature([], 'connector'),
   ],
   controllers: [RiskRadarController],
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   providers: [
     // Entity repos
     LeadRepository,
@@ -135,12 +146,20 @@ import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save
     EZEnrollPccGenAccountRepository,
     DSMSalesConfirmationRepository,
     SnapPccSalesConfirmationRepository,
+    CLXReportingSearchAVSResponseLookupRepository,
+    CLXReportingSearchPaymentMethodLookupRepository,
+    AuthResponseLookupRepository,
+    DailyDetailRepository,
+    POSEntryModesADFRepository,
+    RiskRadarCycleTimeMonitorRepository,
+    FSPRiskRadarExceptionPointsRepository,
     // Services
     RiskRadarService,
     MerchantCardNumHistoryService,
     AssignExceptionReviewService,
     RiskRadarExceptionsService,
     RiskRadarSaveService,
+    MerchantExceptionTransactionsService,
   ],
 })
 export class RiskRadarModule {}
