@@ -33,6 +33,22 @@ import {
 
 import type { MerchantExceptionTransactionsInputDto } from './dto/merchant-exception-transactions.dto';
 
+type TransactionResult = {
+  transactionDate: Date;
+  transactionAmount: number;
+  posEntryMode: string;
+  avsResponseCode: string;
+  authCode: string;
+  cardNumber: string;
+  debitNetworkIdentifier: string;
+  transactionId: string;
+  authAmount: number;
+  exceptionList: string;
+  exceptionTitle: string;
+  authResponseDescription: string;
+  binSearchMatchFlag: boolean;
+};
+
 @Injectable()
 export class MerchantExceptionTransactionsService {
   public constructor(
@@ -52,8 +68,12 @@ export class MerchantExceptionTransactionsService {
 
   public async getExceptionTransactions(
     data: MerchantExceptionTransactionsInputDto
-  ) {
-    const { riskRadarExceptionId } = data;
+  ): Promise<TransactionResult[]> {
+    const { riskRadarExceptionId, binSearch, sortBy } = data;
+
+    if (Math.abs(sortBy) > 9) {
+      throw new Error('Invalid sortBy value. Must be between -9 and 9');
+    }
 
     const exception = await this.riskRadarExceptionsJeff.findOne({
       where: { id: riskRadarExceptionId },
@@ -65,42 +85,200 @@ export class MerchantExceptionTransactionsService {
     }
 
     const dayOfTheFunding = format(exception.fundingDate, 'EEE');
+    const { dtStartAuth, dtEndAuth } = this.determineAuthTimes(
+      exception.createdAt
+    );
 
+    // Get cycle files to process
     const cycleFiles = await this.getCycleFilesToProcess(
       dayOfTheFunding,
       exception.achFundingTime,
       exception.fundingDate
     );
 
+    // Get batches for the cycle files
+    const cycleBatches = await this.getBatchesForCycleFiles(
+      exception.mid,
+      cycleFiles
+    );
+
+    // Get transactions from risk radar
+    const riskRadarTransactions = await this.getRiskRadarTransactions(
+      cycleBatches,
+      binSearch
+    );
+
+    // Get declined auth transactions
+    const declinedAuthTransactions = await this.getDeclinedAuthTransactions(
+      exception.mid,
+      dtStartAuth,
+      dtEndAuth,
+      binSearch
+    );
+
+    // Get CLX transactions
+    const clxTransactions = this
+      .getCLXTransactions
+      // exception.mid,
+      // dtStartAuth,
+      // dtEndAuth,
+      // exception.fundingDate,
+      // exception.achFundingTime,
+      // binSearch
+      ();
+
+    // Combine all transactions
+    const allTransactions = [
+      ...riskRadarTransactions,
+      ...declinedAuthTransactions,
+      ...clxTransactions,
+    ];
+
+    // Sort transactions
+    return this.sortTransactions(allTransactions, sortBy);
+  }
+
+  private async getBatchesForCycleFiles(
+    mid: string,
+    cycleFiles: { transmissionDate: Date; cycle: string }[]
+  ) {
     const cycleFilesDates = cycleFiles.map((e) => e.transmissionDate);
     const cycleFilesCycles = cycleFiles.map((e) => e.cycle);
 
-    const cycleBatches =
-      await this.batchRepository.getBatchIdsForDatesAndCycles(
-        exception.mid,
-        cycleFilesDates,
-        cycleFilesCycles
+    return this.batchRepository.getBatchIdsForDatesAndCycles(
+      mid,
+      cycleFilesDates,
+      cycleFilesCycles
+    );
+  }
+
+  private async getRiskRadarTransactions(
+    batches: RiskRadarBatch[],
+    binSearch: string
+  ): Promise<TransactionResult[]> {
+    const batchIds = batches.map((b) => b.pkDFT256Batch);
+
+    const [batchDetails, transactions] = await Promise.all([
+      this.batchRepository.getBatches(batchIds),
+      this.transactionRepository.getTransactionForBatchIds(batchIds),
+    ]);
+
+    return transactions.map((transaction) => {
+      const batch = batchDetails.find(
+        (b) => b.pkDFT256Batch === transaction.batchId
+      );
+      const exceptionInfo = this.getExceptionListForBatchAndTransaction(
+        batch,
+        transaction
       );
 
-    const batchIds = cycleBatches.map((b) => b.pkDFT256Batch);
-    const batches = await this.batchRepository.getBatches(batchIds);
+      return {
+        transactionDate: transaction.transactionDate,
+        transactionAmount: transaction.transactionAmount,
+        posEntryMode: transaction.posEntryMode,
+        avsResponseCode:
+          transaction.avsResponseCode || transaction.diaAvsResponseCode || '',
+        authCode: transaction.authorizationCode || '',
+        cardNumber: `${transaction.cardFirstSixDigits}******${transaction.cardLastFourDigits}`,
+        debitNetworkIdentifier: transaction.debitNetworkIdentifier || '',
+        transactionId: transaction.transactionIdentifier?.slice(-4) || '',
+        authAmount: transaction.authorizationAmount || 0,
+        exceptionList: exceptionInfo.exceptionList,
+        exceptionTitle: exceptionInfo.exceptionTitle,
+        authResponseDescription: '',
+        binSearchMatchFlag: (transaction.cardFirstSixDigits || '').startsWith(
+          binSearch
+        ),
+      };
+    });
+  }
+
+  private async getDeclinedAuthTransactions(
+    mid: string,
+    startDate: Date,
+    endDate: Date,
+    binSearch: string
+  ): Promise<TransactionResult[]> {
     const transactions =
-      await this.transactionRepository.getTransactionForBatchIds(batchIds);
+      await this.dailyDetailRepository.findDeclinedAuthTransactions(
+        mid,
+        startDate,
+        endDate
+      );
 
-    return { batches, transactions };
+    return transactions.map((tr) => ({
+      transactionDate: tr.transactionDate,
+      transactionAmount: tr.transactionAmount || 0,
+      posEntryMode: tr.posMode || '',
+      avsResponseCode: '',
+      authCode: tr.authorizationNumber || '',
+      cardNumber: tr.truncatedCardNumber?.replace(/x/g, '*') || '',
+      debitNetworkIdentifier: '',
+      transactionId: tr.transactionIdentifier?.slice(-4) || '',
+      authAmount: tr.authorizationAmount || 0,
+      exceptionList: '3',
+      exceptionTitle: 'Auth Decl',
+      authResponseDescription: '',
+      binSearchMatchFlag: (tr.truncatedCardNumber || '').startsWith(binSearch),
+    }));
+  }
 
-    // const trData = this.transformBatchesAndTransactions(batches, transactions);
+  private getCLXTransactions() // mid: string,
+  // startDate: Date,
+  // endDate: Date,
+  // fundingDate: Date,
+  // achFundingTime: string,
+  // binSearch: string
+  : TransactionResult[] {
+    // Implementation for CLX transactions would go here
+    // This would involve querying the CLX reporting search tables
+    return [] as TransactionResult[];
+  }
+
+  private sortTransactions(
+    transactions: TransactionResult[],
+    sortBy: number
+  ): TransactionResult[] {
+    const sortField = Math.abs(sortBy);
+    const sortDirection = sortBy >= 0 ? 'asc' : 'desc';
+
+    const fieldMap = {
+      1: 'transactionDate',
+      2: 'transactionAmount',
+      3: 'posEntryMode',
+      4: 'avsResponseCode',
+      5: 'authCode',
+      6: 'cardNumber',
+      7: 'debitNetworkIdentifier',
+      8: 'transactionId',
+      9: 'authAmount',
+    };
+
+    const field = fieldMap[sortField] as keyof TransactionResult;
+    if (!field) return transactions;
+
+    return [...transactions].sort((a, b) => {
+      const aVal = a[field];
+      const bVal = b[field];
+      if (sortDirection === 'asc') {
+        if (aVal < bVal) return -1;
+        if (aVal > bVal) return 1;
+        return 0;
+      }
+      if (bVal < aVal) return -1;
+      if (bVal > aVal) return 1;
+      return 0;
+    });
   }
 
   public determineAuthTimes(dtExceptionCreated: Date) {
-    const day = getDay(dtExceptionCreated); // Sunday = 0, Monday = 1, ..., Saturday = 6
+    const day = getDay(dtExceptionCreated);
     const hour = getHours(dtExceptionCreated);
 
     let dtStartAuth: Date;
     let dtEndAuth: Date;
 
     if ([2, 3, 4, 5].includes(day) && hour >= 8 && hour <= 16) {
-      // Tue - Fri
       dtStartAuth = setSeconds(
         setMinutes(setHours(subDays(dtExceptionCreated, 1), 20), 45),
         0
@@ -110,7 +288,6 @@ export class MerchantExceptionTransactionsService {
         0
       );
     } else if (day === 1 && hour >= 8 && hour <= 16) {
-      // Monday
       dtStartAuth = setSeconds(
         setMinutes(setHours(subDays(dtExceptionCreated, 1), 7), 30),
         0
@@ -120,7 +297,6 @@ export class MerchantExceptionTransactionsService {
         0
       );
     } else if (day === 0) {
-      // Sunday
       dtStartAuth = setSeconds(
         setMinutes(setHours(subDays(dtExceptionCreated, 2), 20), 45),
         0
@@ -130,7 +306,6 @@ export class MerchantExceptionTransactionsService {
         0
       );
     } else if ([1, 2, 3, 4, 5].includes(day) && hour >= 17 && hour <= 19) {
-      // Mon - Fri (17-19)
       dtStartAuth = setSeconds(
         setMinutes(setHours(dtExceptionCreated, 8), 0),
         0
@@ -140,7 +315,6 @@ export class MerchantExceptionTransactionsService {
         0
       );
     } else if ([1, 2, 3, 4, 5].includes(day) && hour >= 20 && hour <= 23) {
-      // Mon - Fri (20-23)
       dtStartAuth = setSeconds(
         setMinutes(setHours(dtExceptionCreated, 17), 50),
         0
@@ -161,7 +335,6 @@ export class MerchantExceptionTransactionsService {
     achFundingTime: string,
     fundingDate: Date
   ) {
-    // Fetch data from DB
     const records = await this.cycleTimeMonitorRepository.find({
       where: {
         dayOfTheFunding,
@@ -170,8 +343,7 @@ export class MerchantExceptionTransactionsService {
       select: ['dateDiffFundingVsTransmissionCycle', 'cycle', 'accountType'],
     });
 
-    // Process data
-    const processedData = records.map((record) => ({
+    return records.map((record) => ({
       transmissionDate: addDays(
         fundingDate,
         record.dateDiffFundingVsTransmissionCycle
@@ -179,8 +351,6 @@ export class MerchantExceptionTransactionsService {
       cycle: record.cycle,
       accountType: record.accountType,
     }));
-
-    return processedData;
   }
 
   public getExceptionListForBatchAndTransaction(
@@ -199,35 +369,26 @@ export class MerchantExceptionTransactionsService {
       transaction.noAuthorizationTransactionPoints ? '18 ' : '',
       transaction.authCaptureAmountLargeVariationPoints ? '21' : '',
     ]
-      .filter(Boolean) // Remove empty strings
-      .join(''); // Join them into a single string
+      .filter(Boolean)
+      .join(' ');
 
-    return exceptionList;
+    const exceptionTitle = [
+      transaction.atPoints ? 'AT' : '',
+      batch.iChbkExceedPoints ? 'CB/RR' : '',
+      transaction.duplicateBinPoints ? 'Dupl BIN' : '',
+      transaction.duplicateCardPoints ? 'Dupl Card' : '',
+      transaction.foreignKeyedTransactionPoints ? 'Foreign Keyed' : '',
+      batch.iKeyedPoints ? 'Keyed %' : '',
+      transaction.latePostedTransactionPoints ? 'Late Post' : '',
+      transaction.motoIoAvsPoints ? 'MOTO AVS' : '',
+      transaction.noAuthorizationTransactionPoints ? 'No Auth' : '',
+      transaction.authCaptureAmountLargeVariationPoints
+        ? 'Settle Amt more than 20% of Auth Amt'
+        : '',
+    ]
+      .filter(Boolean)
+      .join(' - ');
+
+    return { exceptionList, exceptionTitle };
   }
-
-  // public transformBatchesAndTransactions(
-  //   batches: RiskRadarBatch[],
-  //   transactions: RiskRadarTransaction[]
-  // ) {
-  //   const sExceptionList = [
-  //     transaction.atPoints ? '2 ' : '',
-  //     batch.chbkExceedPoints ? '5 ' : '',
-  //     transaction.duplBINPoints ? '7 ' : '',
-  //     transaction.duplCardPoints ? '8 ' : '',
-  //     transaction.fgnkeyedTransPoints ? '9 ' : '',
-  //     batch.keyedPoints ? '10 ' : '',
-  //     transaction.latePostTransPoints ? '11 ' : '',
-  //     transaction.motoIoAVSPoints ? '12 ' : '',
-  //     transaction.noAuthTransPoints ? '18 ' : '',
-  //     transaction.authCaptureAmtLargeVariationPoints ? '21' : '',
-  //   ]
-  //     .filter(Boolean) // Remove empty strings
-  //     .join(''); // Join them into a single string
-
-  //   console.log(sExceptionList);
-  // }
-
-  // public async sortData(sortBy: number, sortOrder: SortType) {
-  //   //
-  // }
 }
