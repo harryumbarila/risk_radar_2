@@ -42,4 +42,12 @@ export class RiskRadarExceptionsListDto {
 
   @IsInt()
   public iProcessor: number;
+
+  @IsOptional()
+  @IsInt()
+  public recordsPerPage?: number = 25;
+
+  @IsOptional()
+  @IsInt()
+  public currentPage?: number = 1;
 }

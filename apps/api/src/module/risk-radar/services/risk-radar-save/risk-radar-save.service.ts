@@ -3,7 +3,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { DSMSalesConfirmationRepository } from '@/dsm-db/repositories';
 import { EZEnrollGenAccountRepository } from '@/ez-enroll-db/repositories';
 import { EZEnrollPccGenAccountRepository } from '@/ez-enroll-pcc-db/repositories';
-import type { RiskRadarMerchantAdjParamEntity } from '@/finance-db/entities';
+import type { RiskRadarMerchAdjParamEntity } from '@/finance-db/entities';
 import {
   RiskRadarExceptionsJeffRepository,
   RiskRadarMerchAdjParamRepository,
@@ -57,9 +57,9 @@ export class RiskRadarSaveService {
       select: [
         'bbb',
         'monthlyVolumeCalcMonthly',
-        'averageTicketCalcMonthly',
+        'avgTicketCalcMonthly',
         'swipePercentCalcMonthly',
-        'isDiverted',
+        'isDivert',
         'isAutoHoldWhiteLabel',
       ],
       where: { mid: merchantId },
@@ -86,9 +86,9 @@ export class RiskRadarSaveService {
       {
         bbb,
         monthlyVolumeCalcMonthly: monthlyVolume,
-        averageTicketCalcMonthly: averageTicket,
+        avgTicketCalcMonthly: averageTicket,
         swipePercentCalcMonthly: swipePercentage,
-        isDiverted,
+        isDivert: isDiverted,
         preferredContact,
         isRiskWatch,
         isAutoHoldWhiteLabel: isAutoHoldEnabled,
@@ -130,7 +130,7 @@ export class RiskRadarSaveService {
     await this.checkAndCreateChangedNotes(data, merchAdj);
 
     // Divert
-    if (isDiverted !== merchAdj.isDiverted) {
+    if (isDiverted !== merchAdj.isDivert) {
       if (isDiverted) {
         await this.handleIsDiverted(data);
       } else {
@@ -168,7 +168,7 @@ export class RiskRadarSaveService {
 
   private async checkAndCreateChangedNotes(
     input: RiskRadarSaveInputDto,
-    merchAdj: RiskRadarMerchantAdjParamEntity
+    merchAdj: RiskRadarMerchAdjParamEntity
   ) {
     const {
       merchantId,
@@ -191,10 +191,10 @@ export class RiskRadarSaveService {
     }
 
     // Average ticket value changed
-    if (averageTicket !== merchAdj.averageTicketCalcMonthly) {
+    if (averageTicket !== merchAdj.avgTicketCalcMonthly) {
       await this.notesRepository.createAverageTicketChangedNotes(
         merchantId,
-        merchAdj.averageTicketCalcMonthly,
+        merchAdj.avgTicketCalcMonthly,
         averageTicket,
         createdBy
       );
@@ -220,7 +220,7 @@ export class RiskRadarSaveService {
       );
     }
 
-    if (isDiverted !== merchAdj.isDiverted) {
+    if (isDiverted !== merchAdj.isDivert) {
       await this.notesRepository.createDivertChangedNotes(
         merchantId,
         isDiverted,

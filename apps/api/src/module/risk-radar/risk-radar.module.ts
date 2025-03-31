@@ -6,53 +6,117 @@ import { DSMSalesConfirmationRepository } from '@/dsm-db/repositories';
 import { EZEnrollGenAccountRepository } from '@/ez-enroll-db/repositories';
 import { EZEnrollPccGenAccountRepository } from '@/ez-enroll-pcc-db/repositories';
 import {
+  ChargeBacksEntity,
+  RiskRadarBatch,
   RiskRadarEmailTemplateEntity,
+  RiskRadarExceptionListLookupEntity,
+  RiskRadarExceptionsJeffEntity,
+  RiskRadarExceptionStatusEntity,
+  RiskRadarMerchantAdjParamEntity,
   RiskRadarUserEntity,
 } from '@/finance-db/entities';
 import {
   DFT256BatchRepository,
   DFT256TransactionFromLegacySystemRepository,
   DFT256TransactionRepository,
+  MerchantExceptionDetailRepository,
+  RiskRadarBatchRepository,
+  RiskRadarEmailTemplateRepository,
   RiskRadarExceptionsJeffRepository,
+  RiskRadarExceptionStatusRepository,
   RiskRadarIssuingBankRepository,
   RiskRadarMerchAdjParamRepository,
   RiskRadarNotesRepository,
+  RiskRadarUserRepository,
   TSYSDivertFlagUpdateRepository,
 } from '@/finance-db/repositories';
-import { RiskRadarEmailTemplateRepository } from '@/finance-db/repositories/risk-radar-email-template.repository';
-import { RiskRadarUserRepository } from '@/finance-db/repositories/risk-radar-user.repository';
-import { LeadEntity, LeadsBusinessInformationEntity } from '@/iris-db/entities';
+import {
+  LeadEntity,
+  LeadsBusinessInformationEntity,
+  LeadsFinancialProfileEntity,
+  LeadsOwnerEntity,
+  LeadsServicesEntity,
+  LeadsUnderwritingEntity,
+  PartnerAndSalesAgentIdentificationEntity,
+  SourceEntity,
+} from '@/iris-db/entities';
 import {
   DivertQueueFSPRepository,
   DivertQueueRepository,
   LeadRepository,
-} from '@/iris-db/repositories/';
-import { LeadsBusinessInformationRepository } from '@/iris-db/repositories/leads-business-information.repository';
+  LeadsBusinessInformationRepository,
+  LeadsFinancialProfileRepository,
+  LeadsOwnerRepository,
+  LeadsServicesRepository,
+  LeadsUnderwritingRepository,
+  PartnerAndSalesAgentIdentificationRepository,
+  SourceRepository,
+} from '@/iris-db/repositories';
 import { SnapPccSalesConfirmationRepository } from '@/snap-pcc-db/repositories';
 
 import { RiskRadarController } from './risk-radar.controller';
 import { RiskRadarService } from './risk-radar.service';
 import { AssignExceptionReviewService } from './services/assign-exception-review/assign-exception-review.service';
+import { GetSubscriptionsQueueService } from './services/get-subscriptions-queue.service';
 import { MerchantCardNumHistoryService } from './services/merchant-card-num-history/merchant-card-num-history.service';
+import { MerchantExceptionDetailService } from './services/merchant-exception-detail.service';
+import { RiskRadarExceptionsService } from './services/risk-radar-exceptions.service';
 import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature(
-      [RiskRadarUserEntity, RiskRadarEmailTemplateEntity],
+      [
+        RiskRadarUserEntity,
+        RiskRadarEmailTemplateEntity,
+        RiskRadarExceptionsJeffEntity,
+        RiskRadarMerchantAdjParamEntity,
+        ChargeBacksEntity,
+        RiskRadarExceptionListLookupEntity,
+        RiskRadarBatch,
+        RiskRadarExceptionStatusEntity,
+      ],
       'finance'
     ),
     TypeOrmModule.forFeature(
-      [LeadEntity, LeadsBusinessInformationEntity],
+      [
+        LeadEntity,
+        LeadsBusinessInformationEntity,
+        LeadsServicesEntity,
+        LeadsUnderwritingEntity,
+        LeadsFinancialProfileEntity,
+        SourceEntity,
+        LeadsOwnerEntity,
+        PartnerAndSalesAgentIdentificationEntity,
+      ],
       'iris'
     ),
+    TypeOrmModule.forFeature([], 'connector'),
   ],
   controllers: [RiskRadarController],
   providers: [
     // Entity repos
     LeadRepository,
+    LeadsBusinessInformationRepository,
+    LeadsServicesRepository,
+    LeadsUnderwritingRepository,
+    LeadsFinancialProfileRepository,
+    SourceRepository,
+    LeadsOwnerRepository,
+    PartnerAndSalesAgentIdentificationRepository,
+
     RiskRadarUserRepository,
     RiskRadarEmailTemplateRepository,
+    RiskRadarExceptionsJeffRepository,
+    MerchantExceptionDetailRepository,
+    RiskRadarMerchAdjParamRepository,
+    RiskRadarBatchRepository,
+    RiskRadarNotesRepository,
+    RiskRadarExceptionStatusRepository,
+
+    RiskRadarService,
+    GetSubscriptionsQueueService,
+    MerchantExceptionDetailService,
     LeadsBusinessInformationRepository,
     RiskRadarIssuingBankRepository,
     ClxReportingRepository,
@@ -75,6 +139,7 @@ import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save
     RiskRadarService,
     MerchantCardNumHistoryService,
     AssignExceptionReviewService,
+    RiskRadarExceptionsService,
     RiskRadarSaveService,
   ],
 })

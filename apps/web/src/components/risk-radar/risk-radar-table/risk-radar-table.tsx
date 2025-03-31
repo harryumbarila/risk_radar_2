@@ -15,13 +15,71 @@ import type {
 } from 'react-table';
 import { useFilters, usePagination, useSortBy, useTable } from 'react-table';
 
-import type {
-  RiskRadarResponseDto,
-  RiskUser,
-} from '@/shared/response/legacy-dashboard-proxy';
-import { useAssignExceptionToUser } from '@/web/src/hooks/risk-radar/use-assign-exception-to-user';
-import type { FilterState } from '@/web/src/hooks/risk-radar/use-filtered-risk-radar';
-import { useReviewExceptionByUsername } from '@/web/src/hooks/risk-radar/use-review-exception-by-username';
+import { useAssignExceptionToUser } from '@/hooks/risk-radar/use-assign-exception-to-user';
+import type { FilterState } from '@/hooks/risk-radar/use-filtered-risk-radar';
+import { useReviewExceptionByUsername } from '@/hooks/risk-radar/use-review-exception-by-username';
+import type { RiskUser } from '@/shared/response/legacy-dashboard-proxy';
+
+// Define the types for the paginated API response
+type PaginationMetaDto = {
+  records_per_page: number;
+  current_page: number;
+  last_page: number;
+  from_record: number;
+  to_record: number;
+};
+
+type RiskRadarExceptionsListResultDto = {
+  pkRiskRadarExceptions: number;
+  dNetDepAmt?: number;
+  sDBA?: string;
+  sSolutionConsultant?: string;
+  bSelfGen?: string;
+  iTransAmtAboveLimit?: number;
+  iNumOfKeyedTransAboveLimit?: number;
+  iBatchVolAboveLimit?: number;
+  iDupCard?: number;
+  bNewAcct?: string;
+  iDupBin?: number;
+  iLatePostTrans?: number;
+  iFgnkeyedTrans?: number;
+  iNoAuthTrans?: number;
+  iChbkOrIRR?: number;
+  bNextDayFundingAcct?: string;
+  sMID: string;
+  sNTUserID?: string;
+  dtTransmission?: Date;
+  bDivert?: string;
+  sAMEXOptBlueInd?: string;
+  iAuthCaptureAmtLargeVariation?: number;
+  bRiskWatch?: string;
+  dSettlementBalance?: number;
+  iAvgBatch?: number;
+  iNegDailyBatches?: number;
+  iMototIoAVS?: number;
+  iAuthDecline?: number;
+  iTotalPoints?: number;
+  dAuthDeclineAmt: number;
+  sUserReviewed?: string;
+  dtActivated?: Date;
+  dtCreated: Date;
+  sChannel: string;
+  iAutoHold?: number;
+  dtAutoApproved?: Date;
+  iTransAmtAboveHighTicketLimit?: number;
+  iCreditRule?: number;
+  iSalesChannelRule?: number;
+  iFundingExclusionAndException?: number;
+  dAuthNonDeclinedAmt: number;
+  sReseller: string;
+  sReferralPartner: string;
+  sISV: string;
+};
+
+type PaginatedRiskRadarExceptionsDto = {
+  data: RiskRadarExceptionsListResultDto[];
+  meta: PaginationMetaDto;
+};
 
 type RiskRadarData = {
   dba: string;
@@ -63,7 +121,7 @@ type RiskRadarData = {
 };
 
 type RiskRadarTableProps = {
-  data: RiskRadarResponseDto;
+  data: PaginatedRiskRadarExceptionsDto;
   setFilters: React.Dispatch<React.SetStateAction<FilterState>>;
   status: number;
   riskUsers: { risk_users: RiskUser[] };
@@ -72,6 +130,7 @@ type RiskRadarTableProps = {
 
 type CustomColumn = Column<RiskRadarData>;
 
+// Update the TableInstance type to include pagination properties
 type TableInstanceWithPagination<T extends object = RiskRadarData> =
   TableInstance<T> & {
     page: Row<T>[];
@@ -425,51 +484,70 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
     handleAssignedCheckboxChange,
   ]);
 
-  const transformedData = useMemo(
-    () =>
-      data.data.map((item) => ({
-        ...item,
-        net_dep_amt: Number(item.net_dep_amt),
-        fsp_appr_auth_tot_amt: Number(item.fsp_appr_auth_tot_amt),
-        auth_decline_amt: Number(item.auth_decline_amt),
-        keyed_perc_score: Number(item.keyed_perc_score),
-        avg_ticket_score: Number(item.avg_ticket_score),
-        high_ticket_score: Number(item.high_ticket_score),
-        credit_score: Number(item.credit_score),
-        channel_score: Number(item.channel_score),
-        monthly_vol_score: Number(item.monthly_vol_score),
-        avg_batch_score: Number(item.avg_batch_score),
-        dup_card_score: Number(item.dup_card_score),
-        dup_bin_score: Number(item.dup_bin_score),
-        late_post_score: Number(item.late_post_score),
-        foreign_keyed_score: Number(item.foreign_keyed_score),
-        chbk_ret_req_score: Number(item.chbk_ret_req_score),
-        divert_balance_amt: Number(item.divert_balance_amt),
-        moto_avs_score: Number(item.moto_avs_score),
-        settle_30perc_more_than_auth_score: Number(
-          item.settle_30perc_more_than_auth_score
-        ),
-        no_auth_score: Number(item.no_auth_score),
-        auth_decline_score: Number(item.auth_decline_score),
-        neg_batch_score: Number(item.neg_batch_score),
-        auto_hold_score: Number(item.auto_hold_score),
-        funding_exception_score: Number(item.funding_exception_score),
-        risk_watch: item.risk_watch === 'true',
-        new_account: item.new_account === 'true',
-        divert: item.divert === 'true',
-        amex_opt_blue: item.amex_opt_blue === 'true',
-      })),
-    [data.data]
-  );
+  const transformedData = useMemo(() => {
+    // Check if data exists and has the expected structure
+    if (!data || !data.data || !Array.isArray(data.data)) {
+      return [];
+    }
+
+    return data.data.map((item: RiskRadarExceptionsListResultDto) => ({
+      dba: item.sDBA || '',
+      net_dep_amt: Number(item.dNetDepAmt || 0),
+      fsp_appr_auth_tot_amt: 0, // This field doesn't seem to exist in the API response
+      auth_decline_amt: Number(item.dAuthDeclineAmt || 0),
+      activation_datetime: item.dtActivated
+        ? new Date(item.dtActivated).toISOString()
+        : '',
+      channel: item.sChannel || '',
+      reseller: item.sReseller || '',
+      risk_watch: item.bRiskWatch === 'Yes',
+      new_account: item.bNewAcct === 'Yes',
+      exception_id: String(item.pkRiskRadarExceptions),
+      assigned_user_id: undefined, // We'll need to map this from somewhere if needed
+      user_reviewed: item.sUserReviewed,
+      keyed_perc_score: Number(item.iNumOfKeyedTransAboveLimit || 0),
+      avg_ticket_score: 0, // Not in the API response
+      high_ticket_score: Number(item.iTransAmtAboveHighTicketLimit || 0),
+      credit_score: Number(item.iCreditRule || 0),
+      channel_score: Number(item.iSalesChannelRule || 0),
+      monthly_vol_score: Number(item.iBatchVolAboveLimit || 0),
+      avg_batch_score: Number(item.iAvgBatch || 0),
+      dup_card_score: Number(item.iDupCard || 0),
+      dup_bin_score: Number(item.iDupBin || 0),
+      late_post_score: Number(item.iLatePostTrans || 0),
+      foreign_keyed_score: Number(item.iFgnkeyedTrans || 0),
+      chbk_ret_req_score: Number(item.iChbkOrIRR || 0),
+      divert: item.bDivert === 'Yes',
+      divert_balance_amt: Number(item.dSettlementBalance || 0),
+      amex_opt_blue: item.sAMEXOptBlueInd === 'Yes',
+      moto_avs_score: Number(item.iMototIoAVS || 0),
+      settle_30perc_more_than_auth_score: Number(
+        item.iAuthCaptureAmtLargeVariation || 0
+      ),
+      no_auth_score: Number(item.iNoAuthTrans || 0),
+      auth_decline_score: Number(item.iAuthDecline || 0),
+      neg_batch_score: Number(item.iNegDailyBatches || 0),
+      auto_hold_score: Number(item.iAutoHold || 0),
+      funding_exception_score: Number(item.iFundingExclusionAndException || 0),
+      exception_created_datetime: item.dtCreated
+        ? new Date(item.dtCreated).toISOString()
+        : '',
+      mid: item.sMID,
+    }));
+  }, [data]);
 
   const tableInstance = useTable<RiskRadarData>(
     {
       columns,
       data: transformedData,
       initialState: {
-        pageSize: filters.records_per_page,
-        pageIndex: filters.current_page - 1,
+        pageSize: data?.meta?.records_per_page || 25,
+        pageIndex: (data?.meta?.current_page || 1) - 1,
       } as Partial<TableState<RiskRadarData>>,
+      // Tell the table we'll handle pagination ourselves
+      // @ts-expect-error - manualPagination is supported but TypeScript definitions might be outdated
+      manualPagination: true,
+      pageCount: data?.meta?.last_page || 1,
     },
     useFilters,
     useSortBy,
@@ -487,7 +565,7 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
     previousPage,
     canNextPage,
     canPreviousPage,
-    pageOptions,
+    // pageOptions,
     setPageSize,
     gotoPage,
   } = tableInstance;
@@ -535,6 +613,15 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
     },
     [router]
   );
+
+  // Display a message if no data is available
+  if (!data || !data.data || data.data.length === 0) {
+    return (
+      <div className="rounded-sm border border-stroke bg-white py-6 px-8 shadow-default dark:border-strokedark dark:bg-boxdark">
+        <p className="text-center">No data available</p>
+      </div>
+    );
+  }
 
   return (
     <section className="data-table-common data-table-two rounded-sm border border-stroke bg-white py-4 text-xs shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -592,7 +679,7 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
                   }
                 >
                   {row.cells.map((cell: Cell<RiskRadarData>) => (
-                    <td {...cell.getCellProps()} key={cell.row.id}>
+                    <td {...cell.getCellProps()} key={cell.column.id}>
                       {cell.render('Cell') as React.ReactNode}
                     </td>
                   ))}
@@ -605,7 +692,8 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
 
       <div className="flex justify-between border-t border-stroke px-8 pt-5 dark:border-strokedark">
         <p className="font-medium">
-          Showing {state.pageIndex + 1} of {pageOptions.length} pages
+          Showing {data.meta.from_record} to {data.meta.to_record} of{' '}
+          {data.meta.current_page * data.meta.records_per_page} entries
         </p>
         <div className="flex">
           <button
@@ -632,18 +720,20 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
             </svg>
           </button>
 
-          {pageOptions.map((_page: number, index: number) => (
-            <button
-              key={_page}
-              onClick={() => handlePageChange(index)}
-              className={`${
-                state.pageIndex === index && 'bg-primary text-white'
-              } mx-1 flex cursor-pointer items-center justify-center rounded-md p-1 px-3 hover:bg-primary hover:text-white`}
-              type="button"
-            >
-              {index + 1}
-            </button>
-          ))}
+          {Array.from({ length: data.meta.last_page }, (_, i) => i).map(
+            (page) => (
+              <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                className={`${
+                  state.pageIndex === page && 'bg-primary text-white'
+                } mx-1 flex cursor-pointer items-center justify-center rounded-md p-1 px-3 hover:bg-primary hover:text-white`}
+                type="button"
+              >
+                {page + 1}
+              </button>
+            )
+          )}
 
           <button
             className="flex cursor-pointer items-center justify-center rounded-md p-1 px-2 hover:bg-primary hover:text-white"

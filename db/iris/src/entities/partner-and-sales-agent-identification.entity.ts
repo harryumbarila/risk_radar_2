@@ -1,9 +1,15 @@
 import { Column, Entity } from 'typeorm';
 
-@Entity('tblPartnerAndSalesAgentIdentification')
-export class PartnerAndSalesAgentIdentification {
-  @Column({ name: 'sMId', type: 'varchar', length: 20, primary: true })
-  public merchantId: string;
+@Entity('tblPartnerAndSalesAgentIdentification', { schema: 'Iris.dbo' })
+export class PartnerAndSalesAgentIdentificationEntity {
+  @Column({
+    name: 'sMId',
+    type: 'varchar',
+    length: 20,
+    nullable: true,
+    primary: true,
+  })
+  public mid: string | null;
 
   @Column({ name: 'sChannel', type: 'varchar', length: 255, nullable: true })
   public channel: string | null;

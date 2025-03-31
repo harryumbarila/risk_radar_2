@@ -4,6 +4,9 @@ import { InjectPinoLogger } from 'nestjs-pino';
 import { Logger } from 'pino';
 import { DataSource } from 'typeorm';
 
+import type { RiskRadarExceptionsListDto } from '@/api/module/risk-radar-exceptions/dto/risk-radar-exception-list.dto';
+import type { RiskRadarExceptionsListResultDto } from '@/api/module/risk-radar-exceptions/dto/risk-radar-exceptions-list-result.dto';
+import type { PaginatedRiskRadarExceptionsDto } from '@/api/module/risk-radar-exceptions/dto/risk-radar-exceptions-pagination.dto';
 import {
   RiskRadarBatchRepository,
   RiskRadarExceptionsJeffRepository,
@@ -12,10 +15,8 @@ import {
 } from '@/finance-db/repositories';
 import { PartnerAndSalesAgentIdentificationRepository } from '@/iris-db/repositories';
 
-import type { RiskRadarExceptionsListDto } from './dto/risk-radar-exception-list.dto';
-import type { RiskRadarExceptionsListResultDto } from './dto/risk-radar-exceptions-list-result.dto';
-
 @Injectable()
+// eslint-disable-next-line @darraghor/nestjs-typed/injectable-should-be-provided
 export class RiskRadarExceptionsService {
   public constructor(
     @InjectPinoLogger(RiskRadarExceptionsService.name)
@@ -36,7 +37,7 @@ export class RiskRadarExceptionsService {
    */
   public async getExceptionsList(
     params: RiskRadarExceptionsListDto
-  ): Promise<RiskRadarExceptionsListResultDto[]> {
+  ): Promise<PaginatedRiskRadarExceptionsDto> {
     // Start profiling
     const profileStart = Date.now();
     const profile: Record<string, number> = {};
@@ -169,15 +170,16 @@ export class RiskRadarExceptionsService {
     const queryExecStart = Date.now();
 
     // Add limit to query to retrieve only 100 records for better performance
-    // query.take(10);
+    query.take(100);
     this.logger.info('PROFILING: Limited query to 100 records');
 
     const exceptions = await query.getMany();
 
     profile['4-QueryExecution'] = Date.now() - queryExecStart;
     this.logger.info(
-      `PROFILING: 4-QueryExecution complete in ${profile['4-QueryExecution']}ms (found ${exceptions.length} exceptions, limited to 100)`
+      `PROFILING: 4-QueryExecution complete in ${profile['4-QueryExecution']}ms (found ${exceptions.length} exceptions, limited to 10)`
     );
+    // Return the raw exceptions directly to avoid processing issues
 
     // 6. Create a map for faster lookups
     const mapCreationStart = Date.now();
@@ -203,11 +205,22 @@ export class RiskRadarExceptionsService {
     );
     // 7. Process and transform the results
     const transformStart = Date.now();
+
     let results = await Promise.all(
       exceptions.map(async (exception) => {
         // Check for AMEX OptBlue indicator
+        profile['5.4-MapCreation'] = Date.now() - mapCreationStart;
+
+        this.logger.info(
+          `PROFILING: 5.4-MapCreation complete in ${profile['5.4-MapCreation']}ms`
+        );
+
         const hasAmexOptBlue = await this.batchRepo.hasAMEXOptBlue(
           exception.mid
+        );
+
+        this.logger.info(
+          `PROFILING: 5.5-MapCreation complete in ${profile['5.5-MapCreation']}ms`
         );
 
         // Calculate total points based on exception flags
@@ -329,7 +342,7 @@ export class RiskRadarExceptionsService {
           exception.mid
         );
         if (merchParams) {
-          result.bDivert = merchParams.isDiverted ? 'Yes' : null;
+          result.bDivert = merchParams.isDivert ? 'Yes' : null;
           result.bRiskWatch = merchParams.isRiskWatch ? 'Yes' : null;
         }
 
@@ -352,8 +365,11 @@ export class RiskRadarExceptionsService {
       const partnerInfo = await this.partnerRepo.findForMerchants(mids);
 
       // Map partner info to results
-      const partnerMap = new Map(
-        partnerInfo.map((info) => [info.merchantId, info])
+      const partnerMap = new Map(partnerInfo.map((info) => [info.mid, info]));
+
+      profile['6.5-PartnerInfo'] = Date.now() - partnerInfoStart;
+      this.logger.info(
+        `PROFILING: 6.5-PartnerInfo complete in ${profile['6.5-PartnerInfo']}ms`
       );
 
       results = results.map((result) => {
@@ -629,6 +645,19 @@ export class RiskRadarExceptionsService {
       `PROFILING: 9-Sorting complete in ${profile['9-Sorting']}ms (sorted by field ${sortField} in ${sortDirection} order)`
     );
 
+    // Set default pagination values if not provided
+    const recordsPerPage = params.recordsPerPage || 25;
+    const currentPage = params.currentPage || 1;
+
+    // Calculate pagination metadata
+    const totalRecords = results.length;
+    const lastPage = Math.ceil(totalRecords / recordsPerPage);
+    const from = (currentPage - 1) * recordsPerPage + 1;
+    const to = Math.min(currentPage * recordsPerPage, totalRecords);
+
+    // Apply pagination to results
+    const paginatedResults = results.slice(from - 1, to);
+
     // Total execution time
     const totalTime = Date.now() - profileStart;
     this.logger.info('PROFILING SUMMARY:');
@@ -641,6 +670,15 @@ export class RiskRadarExceptionsService {
       this.logger.info(`- ${step}: ${time}ms (${percentage}%)`);
     });
 
-    return results;
+    return {
+      data: paginatedResults,
+      meta: {
+        records_per_page: recordsPerPage,
+        current_page: currentPage,
+        last_page: lastPage,
+        from_record: from,
+        to_record: to,
+      },
+    };
   }
 }

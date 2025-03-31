@@ -3,13 +3,16 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
 import { In, Repository } from 'typeorm';
 
-import { PartnerAndSalesAgentIdentification } from '../entities/partner-and-sales-agent-identification.entity';
+import { PartnerAndSalesAgentIdentificationEntity } from '../entities/partner-and-sales-agent-identification.entity';
 
 @Injectable()
-export class PartnerAndSalesAgentIdentificationRepository extends Repository<PartnerAndSalesAgentIdentification> {
+export class PartnerAndSalesAgentIdentificationRepository extends Repository<PartnerAndSalesAgentIdentificationEntity> {
   // export class LeadsBusinessInformationRepository extends Repository<PartnerAndSalesAgentIdentification> {
   public constructor(@InjectDataSource('iris') dataSource: DataSource) {
-    super(PartnerAndSalesAgentIdentification, dataSource.createEntityManager());
+    super(
+      PartnerAndSalesAgentIdentificationEntity,
+      dataSource.createEntityManager()
+    );
   }
 
   /**
@@ -17,14 +20,14 @@ export class PartnerAndSalesAgentIdentificationRepository extends Repository<Par
    */
   public async findForMerchants(
     merchantIds: string[]
-  ): Promise<PartnerAndSalesAgentIdentification[]> {
+  ): Promise<PartnerAndSalesAgentIdentificationEntity[]> {
     if (!merchantIds.length) {
       return [];
     }
 
     return this.find({
       where: {
-        merchantId: In(merchantIds),
+        mid: In(merchantIds),
       },
     });
   }

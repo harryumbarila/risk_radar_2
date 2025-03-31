@@ -1,29 +1,29 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('tblRiskRadarMerchAdjParam')
-export class RiskRadarMerchAdjParam {
+@Entity('tblRiskRadarMerchAdjParam', { schema: 'Finance.dbo' })
+export class RiskRadarMerchAdjParamEntity {
   @PrimaryGeneratedColumn({ name: 'pkRiskRadarMerchAdjParam' })
   public id: number;
 
-  @Column({ name: 'sMID', type: 'varchar', length: 16 })
-  public merchantId: string;
+  @Column({ name: 'sMID', type: 'varchar', length: 16, nullable: false })
+  public mid: string;
 
-  @Column({ name: 'iAvgTkt', type: 'int' })
-  public averageTicket: number;
+  @Column({ name: 'iAvgTkt', type: 'int', nullable: false })
+  public avgTicket: number;
 
-  @Column({ name: 'iHighTkt', type: 'int' })
+  @Column({ name: 'iHighTkt', type: 'int', nullable: false })
   public highTicket: number;
 
-  @Column({ name: 'iMonVol', type: 'int' })
+  @Column({ name: 'iMonVol', type: 'int', nullable: false })
   public monthlyVolume: number;
 
-  @Column({ name: 'iSwipePercent', type: 'int' })
+  @Column({ name: 'iSwipePercent', type: 'int', nullable: false })
   public swipePercent: number;
 
   @Column({ name: 'sBBB', type: 'varchar', length: 1, nullable: true })
-  public bbbRating: string | null;
+  public bbb: string | null;
 
-  @Column({ name: 'bDivert', type: 'bit' })
+  @Column({ name: 'bDivert', type: 'bit', nullable: false })
   public isDivert: boolean;
 
   @Column({
@@ -34,14 +34,14 @@ export class RiskRadarMerchAdjParam {
   })
   public preferredContact: string | null;
 
-  @Column({ name: 'dtCreated', type: 'datetime' })
+  @Column({ name: 'dtCreated', type: 'datetime', nullable: false })
   public createdDate: Date;
 
-  @Column({ name: 'bNewAccount', type: 'bit' })
+  @Column({ name: 'bNewAccount', type: 'bit', nullable: false })
   public isNewAccount: boolean;
 
   @Column({ name: 'iAvgTkt_CalcMonthly', type: 'int', nullable: true })
-  public averageTicketCalcMonthly: number | null;
+  public avgTicketCalcMonthly: number | null;
 
   @Column({ name: 'iMonVol_CalcMonthly', type: 'int', nullable: true })
   public monthlyVolumeCalcMonthly: number | null;
@@ -49,13 +49,13 @@ export class RiskRadarMerchAdjParam {
   @Column({ name: 'iSwipePercent_CalcMonthly', type: 'int', nullable: true })
   public swipePercentCalcMonthly: number | null;
 
-  @Column({ name: 'bRiskWatch', type: 'bit' })
+  @Column({ name: 'bRiskWatch', type: 'bit', nullable: false })
   public isRiskWatch: boolean;
 
-  @Column({ name: 'bNextDayFundingAcct', type: 'bit' })
-  public isNextDayFundingAccount: boolean;
+  @Column({ name: 'bNextDayFundingAcct', type: 'bit', nullable: false })
+  public isNextDayFundingAcct: boolean;
 
-  @Column({ name: 'bAutoHoldWhiteLabel', type: 'bit' })
+  @Column({ name: 'bAutoHoldWhiteLabel', type: 'bit', nullable: false })
   public isAutoHoldWhiteLabel: boolean;
 
   @Column({ name: 'dtNewAccount', type: 'datetime', nullable: true })

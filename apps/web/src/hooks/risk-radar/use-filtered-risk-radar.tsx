@@ -64,7 +64,7 @@ export const useFilteredRiskRadar = (): UseFilteredRiskRadarReturnType => {
       });
 
       const result = await makeRequest<RiskRadarResponseDto>(
-        `/v1/legacy_dashboard_proxy/risk_radar?${queryParams.toString()}`
+        `/v1/risk-radar/list?${queryParams.toString()}`
       );
 
       setData(result);
