@@ -1,7 +1,6 @@
 export * from './auth-response-lookup.entity';
 export * from './charge-backs.entity';
 export * from './chargebacks-and-retrieval-reason-code-lookup.entity';
-export * from './chargebacks-and-retrieval-reason-code-lookup.entity';
 export * from './daily-detail.entity';
 export * from './ddt-monthly-processing-summary.entity';
 export * from './dft-256-batch';
