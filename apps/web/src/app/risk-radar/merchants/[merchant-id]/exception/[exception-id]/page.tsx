@@ -19,7 +19,6 @@ import { useEmailTemplates } from '@/web/src/hooks/risk-radar/use-email-template
 import { useCardHistory } from '@/web/src/hooks/risk-radar/use-get-card-history';
 import { useMerchant } from '@/web/src/hooks/risk-radar/use-merchant';
 import { useMerchantChargebacks } from '@/web/src/hooks/risk-radar/use-merchant-chargebacks';
-import { useMerchantContactInfo } from '@/web/src/hooks/risk-radar/use-merchant-contact-info';
 import { useMerchantNetSettlement } from '@/web/src/hooks/risk-radar/use-merchant-net-settlement';
 import { useMerchantNotes } from '@/web/src/hooks/risk-radar/use-merchant-notes';
 import { usePushNoteToIris } from '@/web/src/hooks/risk-radar/use-push-note-to-iris';
@@ -31,6 +30,77 @@ import { useTransactionExceptions } from '@/web/src/hooks/risk-radar/use-transac
 import { useTriggerExceptionAsAutoHold } from '@/web/src/hooks/risk-radar/use-trigger-exception-as-auto-hold';
 import { useTriggerExceptionAsDivert } from '@/web/src/hooks/risk-radar/use-trigger-exception-as-divert';
 import { useTriggerExceptionAsRiskWatch } from '@/web/src/hooks/risk-radar/use-trigger-exception-asr-risk-watch';
+
+type MerchantContactResponse = {
+  businessInfo: {
+    dbaName: string;
+    dbaAddress: string;
+    dbaCity: string;
+    dbaState: string;
+    dbaZip: string;
+    contactPhoneNumber: string;
+    dbaFax: string;
+    contactEmail: string;
+    website: string;
+    legalName: string;
+    legalAddress: string;
+    legalCity: string;
+    legalState: string;
+    legalZip: string;
+    ownershipType: string;
+    mccCode: string;
+    selfGenerated: string;
+    businessType: string;
+    activatedDate: string | null;
+    monthlyVolume: number;
+    averageTicket: number;
+    swipedPercentage: number;
+    chargebackCount: number;
+    irrCount: number;
+    isDivert: boolean;
+    preferredContact: string;
+    exceptionStatusId: number;
+    hasCashAdvance: string;
+    isRiskWatch: boolean;
+    netSettlementBalance: number;
+    swipedPercentageTransCount: number;
+    channel: string;
+    isa: string;
+    averageMonthlySalesVolume: number;
+    storeFrontSwiped: number;
+    isAutoHoldWhiteLabel: boolean;
+    highestTicket: number;
+    uwNewAccountHoldAllowRiskToEdit: boolean;
+    reseller: string;
+    referralPartner: string;
+    talusPayAccountIndicator: string;
+    isv: string;
+  };
+  owners: Array<{
+    name: string;
+    ssn4: string;
+    dob: string;
+    ownerCode: string;
+  }>;
+  processingSummaries: Array<{
+    year: number;
+    month: string;
+    volume: number;
+    averageTicket: number;
+    swipedPercentage: number;
+    highestTicket: number;
+    chargebackAmount: number;
+    totalChargebacks: number;
+    visaChargebackPercentage: number;
+    mastercardChargebackPercentage: number;
+    discoverChargebackPercentage: number;
+    amexChargebackPercentage: number;
+  }>;
+  exceptionTypes: Array<{
+    id: number;
+    description: string;
+  }>;
+};
 
 type Props = {
   params: {
@@ -68,36 +138,6 @@ type EmailTemplate = {
   sTemplateEMailBody: string;
 };
 
-type MerchantProfile = {
-  sMId: string;
-  sDBAName: string;
-  sDBAAddress: string;
-  sDBACity: string;
-  sDBAState: string;
-  sDBAZip: string;
-  sActivationDate: string;
-  sOwnershipType: string;
-  sSIC: string;
-  sSICDesc: string;
-  sReseller: string;
-  sMerchantType: string;
-  bIsTalusPayMerchant?: boolean;
-  sChannel: string;
-  sReferralPartner: string;
-  sSolutionConsultant?: string;
-  iMV$: number;
-  iAT$: number;
-  iHT$: number;
-  ht?: number;
-  iSwipeVolPerc: number;
-  iUWApprMV: number;
-  iUWApprAT: number;
-  iUWApprHT: number;
-  iUWApprSwipeVolPerc: number;
-  iSwipedPercBasedOnTransCntCurrMonth: number;
-  sPreferredContact?: string;
-};
-
 const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const { 'merchant-id': merchantId, 'exception-id': exceptionId } = params;
   const { user } = useAuth();
@@ -124,8 +164,14 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const { data, error, isLoading, refetch } = useMerchant(
     merchantId,
     exceptionId
-  );
-  const { data: contactData } = useMerchantContactInfo(merchantId);
+  ) as {
+    data: MerchantContactResponse | undefined;
+    error: unknown;
+    isLoading: boolean;
+    refetch: () => void;
+  };
+
+  // No longer need to make a separate call to useMerchantContactInfo since data is now in the same format
   const { data: transactionExceptionsData } =
     useTransactionExceptions(merchantId);
   const { data: merchantNotesData, refetch: notesRefetch } =
@@ -317,7 +363,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     if (data) {
       setMerchantUpdateRequest((prev) => ({
         ...prev,
-        preferredContact: data?.merchant_profile?.[0]?.sPreferredContact ?? '',
+        preferredContact: data?.businessInfo?.preferredContact ?? '',
       }));
     }
   }, [data]);
@@ -334,14 +380,44 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     return <div>Error loading merchant data</div>;
   }
 
-  const merchantProfile = data?.merchant_profile
-    ? data?.merchant_profile[0]
-    : ({} as MerchantProfile);
-  const merchantContactInfo = contactData?.merchant_profile
-    ? contactData?.merchant_profile[0]
-    : null;
-  const exceptionLegends = data?.exception_type_legend;
-  const riskException = data?.risk_exception ? data?.risk_exception[0] : null;
+  const merchantProfile = {
+    sMId: merchantId,
+    sDBAName: data?.businessInfo?.dbaName || '',
+    sDBAAddress: data?.businessInfo?.dbaAddress || '',
+    sDBACity: data?.businessInfo?.dbaCity || '',
+    sDBAState: data?.businessInfo?.dbaState || '',
+    sDBAZip: data?.businessInfo?.dbaZip || '',
+    sActivationDate: data?.businessInfo?.activatedDate || '',
+    sOwnershipType: data?.businessInfo?.ownershipType || '',
+    sSIC: data?.businessInfo?.mccCode?.split(' ')[0] || '',
+    sSICDesc:
+      data?.businessInfo?.mccCode?.split(' ')[1]?.replace(/[()]/g, '') || '',
+    sReseller: data?.businessInfo?.reseller || '',
+    sMerchantType: data?.businessInfo?.businessType || '',
+    bIsTalusPayMerchant: data?.businessInfo?.talusPayAccountIndicator === 'Yes',
+    sChannel: data?.businessInfo?.channel || '',
+    sReferralPartner: data?.businessInfo?.referralPartner || '',
+    sSolutionConsultant: data?.businessInfo?.isv || '',
+    iMV$: data?.businessInfo?.monthlyVolume || 0,
+    iAT$: data?.businessInfo?.averageTicket || 0,
+    iHT$: data?.businessInfo?.highestTicket || 0,
+    iSwipeVolPerc: data?.businessInfo?.swipedPercentage || 0,
+    iUWApprMV: 0,
+    iUWApprAT: 0,
+    iUWApprHT: 0,
+    iUWApprSwipeVolPerc: 0,
+    iSwipedPercBasedOnTransCntCurrMonth:
+      data?.businessInfo?.swipedPercentageTransCount || 0,
+    sPreferredContact: data?.businessInfo?.preferredContact || '',
+  };
+
+  const merchantContactInfo = data?.businessInfo || null;
+  const riskException = {
+    bDivert: data?.businessInfo?.isDivert || false,
+    bRiskWatch: data?.businessInfo?.isRiskWatch || false,
+    bAutoHoldWhite: data?.businessInfo?.isAutoHoldWhiteLabel || false,
+    fkRiskExceptionStatus: data?.businessInfo?.exceptionStatusId || 0,
+  };
   const transactionExceptions = transactionExceptionsData?.trans_exceptions;
   const merchantNotes = merchantNotesData?.notes;
   const merchantChargebacks = merchantChargebacksData?.chargebacks;
@@ -548,19 +624,23 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         {/* Column 1 */}
         <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
           <p className="text-black dark:text-white">
-            <strong>DBA Name:</strong> {merchantProfile?.sDBAName}
+            <strong>DBA Name:</strong> {merchantContactInfo?.dbaName}
           </p>
           <p className="text-black dark:text-white">
-            <strong>Address:</strong> {merchantProfile?.sDBAAddress}
+            <strong>Address:</strong>{' '}
+            {merchantProfile?.sDBAAddress || merchantContactInfo?.dbaAddress}
           </p>
           <p className="text-black dark:text-white">
-            <strong>City:</strong> {merchantProfile?.sDBACity}
+            <strong>City:</strong>{' '}
+            {merchantProfile?.sDBACity || merchantContactInfo?.dbaCity}
           </p>
           <p className="text-black dark:text-white">
-            <strong>State:</strong> {merchantProfile?.sDBAState}
+            <strong>State:</strong>{' '}
+            {merchantProfile?.sDBAState || merchantContactInfo?.dbaState}
           </p>
           <p className="text-black dark:text-white">
-            <strong>ZIP:</strong> {merchantProfile?.sDBAZip}
+            <strong>ZIP:</strong>{' '}
+            {merchantProfile?.sDBAZip || merchantContactInfo?.dbaZip}
           </p>
           <p className="text-black dark:text-white">
             <strong>Divert:</strong>
@@ -783,7 +863,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <div className="flex items-center min-h-[50px]">
                 <p className="text-black dark:text-white">
                   <strong>Contact Name:</strong>{' '}
-                  {merchantContactInfo?.contact_name}
+                  {data?.owners?.[0]?.name || 'N/A'}
                 </p>
               </div>
 
@@ -791,7 +871,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <div className="flex items-center min-h-[50px]">
                 <p className="text-black dark:text-white">
                   <strong>Contact Email address:</strong>{' '}
-                  {merchantContactInfo?.contact_email_address}
+                  {merchantContactInfo?.contactEmail || 'N/A'}
                 </p>
               </div>
 
@@ -799,7 +879,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <div className="flex items-center min-h-[50px]">
                 <p className="text-black dark:text-white">
                   <strong>Contact phone number:</strong>{' '}
-                  {merchantContactInfo?.contact_phone_number}
+                  {merchantContactInfo?.contactPhoneNumber || 'N/A'}
                 </p>
               </div>
 
@@ -910,11 +990,11 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                             .map((exceptionNumber) => (
                               <Tooltip
                                 text={
-                                  exceptionLegends?.filter(
-                                    (exceptionLegend) =>
-                                      exceptionLegend.ID ===
+                                  data?.exceptionTypes?.filter(
+                                    (exceptionType) =>
+                                      exceptionType.id ===
                                       parseInt(exceptionNumber, 10)
-                                  )[0]?.Exception ?? ''
+                                  )[0]?.description ?? ''
                                 }
                               >
                                 <span className="cursor-pointer m-[4px] text-blue-600 underline">
@@ -1312,43 +1392,58 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                 </tr>
               </thead>
               <tbody>
-                {data?.volume?.map((vol) => (
-                  <tr
-                    key={`${vol.iYear}-${vol.iMonth}`}
-                    className="text-center"
-                  >
-                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                      {vol.sMonth} {vol.iYear}
-                    </td>
-                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                      ${vol.dVol.toLocaleString()}
-                    </td>
-                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                      ${vol.dAvgTkt.toLocaleString()}
-                    </td>
-                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                      {vol.dSwipedPercBasedOnTransCnt.toFixed(2)}%
-                    </td>
-                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                      ${vol.dHighestTkt.toLocaleString()}
-                    </td>
-                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                      ${vol.dTotCB.toLocaleString()}
-                    </td>
-                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                      {vol.dVCBPerc.toFixed(2)}%
-                    </td>
-                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                      {vol.dMCCBPerc.toFixed(2)}%
-                    </td>
-                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                      {vol.dDCBPerc.toFixed(2)}%
-                    </td>
-                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                      {vol.dACBPerc.toFixed(2)}%
-                    </td>
-                  </tr>
-                ))}
+                {data?.processingSummaries?.map(
+                  (vol: {
+                    year: number;
+                    month: string;
+                    volume: number;
+                    averageTicket: number;
+                    swipedPercentage: number;
+                    highestTicket: number;
+                    chargebackAmount: number;
+                    totalChargebacks: number;
+                    visaChargebackPercentage: number;
+                    mastercardChargebackPercentage: number;
+                    discoverChargebackPercentage: number;
+                    amexChargebackPercentage: number;
+                  }) => (
+                    <tr
+                      key={`${vol.year}-${vol.month}`}
+                      className="text-center"
+                    >
+                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        {vol.month} {vol.year}
+                      </td>
+                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        ${vol.volume.toLocaleString()}
+                      </td>
+                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        ${vol.averageTicket.toLocaleString()}
+                      </td>
+                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        {vol.swipedPercentage.toFixed(2)}%
+                      </td>
+                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        ${vol.highestTicket.toLocaleString()}
+                      </td>
+                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        ${vol.totalChargebacks.toLocaleString()}
+                      </td>
+                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        {vol.visaChargebackPercentage.toFixed(2)}%
+                      </td>
+                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        {vol.mastercardChargebackPercentage.toFixed(2)}%
+                      </td>
+                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        {vol.discoverChargebackPercentage.toFixed(2)}%
+                      </td>
+                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        {vol.amexChargebackPercentage.toFixed(2)}%
+                      </td>
+                    </tr>
+                  )
+                )}
               </tbody>
             </table>
           </div>
@@ -1377,15 +1472,15 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {(exceptionLegends ?? [])
-                      .filter((_, index) => index % 4 === colIndex)
+                    {(data?.exceptionTypes ?? [])
+                      .filter((_, index: number) => index % 4 === colIndex)
                       .map((legend) => (
-                        <tr key={legend.ID} className="text-center">
+                        <tr key={legend.id} className="text-center">
                           <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                            {legend.ID}
+                            {legend.id}
                           </td>
                           <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                            {legend.Exception}
+                            {legend.description}
                           </td>
                         </tr>
                       ))}
