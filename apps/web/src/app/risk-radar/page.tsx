@@ -58,15 +58,6 @@ const RiskRadar: FC = () => {
     }
   }, [exceptionData, setFilters]);
 
-  const handleMIDInputChange = (
-    event: React.KeyboardEvent<HTMLInputElement>
-  ): void => {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      const merchantId = event.currentTarget.value;
-      router.push(`/risk-radar/merchants/${merchantId}`);
-    }
-  };
 
   const filterComponent = useMemo((): JSX.Element => {
     if (filterLoading) {
@@ -376,7 +367,12 @@ const RiskRadar: FC = () => {
                     type="text"
                     placeholder="Enter MID"
                     className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    onKeyDown={handleMIDInputChange}
+                    onChange={(e) => {
+                      setFilters((prev: FilterState) => ({
+                        ...prev,
+                        MID: e.target.value,
+                      }));
+                    }}
                   />
                 </div>
 
@@ -384,6 +380,12 @@ const RiskRadar: FC = () => {
                   <input
                     type="text"
                     placeholder="Enter DBA/SIC"
+                    onChange={(e) => {
+                      setFilters((prev: FilterState) => ({
+                        ...prev,
+                        dba_or_sic: e.target.value,
+                      }));
+                    }}
                     className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                   />
                 </div>

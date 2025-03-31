@@ -14,6 +14,7 @@ import { PartnerAndSalesAgentIdentificationRepository } from '@/iris-db/reposito
 
 import type { RiskRadarExceptionsListDto } from '../../risk-radar-exceptions/dto/risk-radar-exception-list.dto';
 import type { RiskRadarExceptionsListResultDto } from '../../risk-radar-exceptions/dto/risk-radar-exceptions-list-result.dto';
+import { PaginatedRiskRadarExceptionsDto } from '../../risk-radar-exceptions/dto/risk-radar-exceptions-pagination.dto';
 import { object, unknown } from 'zod';
 
 @Injectable()
@@ -37,7 +38,7 @@ export class RiskRadarExceptionsService {
    */
   public async getExceptionsList(
     params: RiskRadarExceptionsListDto
-  ): Promise<RiskRadarExceptionsListResultDto[]> {
+  ): Promise<PaginatedRiskRadarExceptionsDto> {
     // Start profiling
     const profileStart = Date.now();
     const profile: Record<string, number> = {};
@@ -170,7 +171,7 @@ export class RiskRadarExceptionsService {
     const queryExecStart = Date.now();
 
     // Add limit to query to retrieve only 100 records for better performance
-    query.take(10);
+    query.take(100);
     this.logger.info('PROFILING: Limited query to 100 records');
 
     const exceptions = await query.getMany();
@@ -342,7 +343,7 @@ export class RiskRadarExceptionsService {
           exception.mid
         );
         if (merchParams) {
-          result.bDivert = merchParams.isDiverted ? 'Yes' : null;
+          result.bDivert = merchParams.isDivert ? 'Yes' : null;
           result.bRiskWatch = merchParams.isRiskWatch ? 'Yes' : null;
         }
 
@@ -647,6 +648,19 @@ export class RiskRadarExceptionsService {
       `PROFILING: 9-Sorting complete in ${profile['9-Sorting']}ms (sorted by field ${sortField} in ${sortDirection} order)`
     );
 
+    // Set default pagination values if not provided
+    const recordsPerPage = params.recordsPerPage || 25;
+    const currentPage = params.currentPage || 1;
+    
+    // Calculate pagination metadata
+    const totalRecords = results.length;
+    const lastPage = Math.ceil(totalRecords / recordsPerPage);
+    const from = (currentPage - 1) * recordsPerPage + 1;
+    const to = Math.min(currentPage * recordsPerPage, totalRecords);
+    
+    // Apply pagination to results
+    const paginatedResults = results.slice(from - 1, to);
+
     // Total execution time
     const totalTime = Date.now() - profileStart;
     this.logger.info('PROFILING SUMMARY:');
@@ -659,7 +673,15 @@ export class RiskRadarExceptionsService {
       this.logger.info(`- ${step}: ${time}ms (${percentage}%)`);
     });
 
-    return results;
-
+    return {
+      data: paginatedResults,
+      meta: {
+        records_per_page: recordsPerPage,
+        current_page: currentPage,
+        last_page: lastPage,
+        from_record: from,
+        to_record: to,
+      }
+    };
   }
 }

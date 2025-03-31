@@ -12,7 +12,8 @@ import {
   RiskRadarMerchantAdjParamEntity,
   ChargeBacksEntity,
   RiskRadarExceptionListLookupEntity,
-  RiskRadarBatch
+  RiskRadarBatch,
+  RiskRadarExceptionStatusEntity
 } from '@/finance-db/entities';
 import { 
   RiskRadarEmailTemplateRepository,
@@ -26,7 +27,8 @@ import {
   DFT256TransactionFromLegacySystemRepository,
   DFT256TransactionRepository,
   RiskRadarIssuingBankRepository,
-  TSYSDivertFlagUpdateRepository
+  TSYSDivertFlagUpdateRepository,
+  RiskRadarExceptionStatusRepository
 } from '@/finance-db/repositories';
 
 import { 
@@ -76,7 +78,8 @@ import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save
         RiskRadarMerchantAdjParamEntity,
         ChargeBacksEntity,
         RiskRadarExceptionListLookupEntity,
-        RiskRadarBatch
+        RiskRadarBatch,
+        RiskRadarExceptionStatusEntity
       ],
       'finance'
     ),
@@ -114,6 +117,7 @@ import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save
     RiskRadarMerchAdjParamRepository,
     RiskRadarBatchRepository,
     RiskRadarNotesRepository,
+    RiskRadarExceptionStatusRepository,
     
     RiskRadarService,
     GetSubscriptionsQueueService,

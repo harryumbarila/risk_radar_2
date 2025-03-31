@@ -24,7 +24,7 @@ export class RiskRadarMerchantAdjParamEntity {
   public bbb: string;
 
   @Column({ name: 'bDivert', type: 'bit', nullable: false })
-  public isDiverted: boolean;
+  public isDivert: boolean;
 
   @Column({
     name: 'sPreferredContact',
@@ -35,13 +35,13 @@ export class RiskRadarMerchantAdjParamEntity {
   public preferredContact: string;
 
   @Column({ name: 'dtCreated', type: 'datetime', nullable: false })
-  public createdAt: Date;
+  public createdDate: Date;
 
   @Column({ name: 'bNewAccount', type: 'bit', nullable: false })
   public isNewAccount: boolean;
 
   @Column({ name: 'iAvgTkt_CalcMonthly', type: 'int', nullable: true })
-  public averageTicketCalcMonthly: number;
+  public avgTicketCalcMonthly: number;
 
   @Column({ name: 'iMonVol_CalcMonthly', type: 'int', nullable: true })
   public monthlyVolumeCalcMonthly: number;
