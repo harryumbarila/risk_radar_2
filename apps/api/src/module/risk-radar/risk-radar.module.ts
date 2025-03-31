@@ -36,6 +36,7 @@ import {
   RiskRadarIssuingBankRepository,
   RiskRadarMerchAdjParamRepository,
   RiskRadarNotesRepository,
+  RiskRadarTransactionRepository,
   RiskRadarUserRepository,
   TSYSDivertFlagUpdateRepository,
 } from '@/finance-db/repositories';
@@ -153,6 +154,7 @@ import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save
     POSEntryModesADFRepository,
     RiskRadarCycleTimeMonitorRepository,
     FSPRiskRadarExceptionPointsRepository,
+    RiskRadarTransactionRepository,
     // Services
     RiskRadarService,
     MerchantCardNumHistoryService,
