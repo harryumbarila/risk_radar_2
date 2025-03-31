@@ -13,7 +13,7 @@ export const useMerchant = (
   exceptionId: string
 ): UseMerchantReturnType => {
   const { data, error, isLoading, mutate } = useApiSWR<MerchantResponseDto>(
-    `/v1/legacy_dashboard_proxy/merchant?mid=${mid}&exceptionId=${exceptionId}`
+    `/v1/risk-radar/merchant-exception-detail?merchantId=${mid}&exceptionId=${exceptionId}`
   );
 
   return { data, error, isLoading, refetch: () => mutate() };

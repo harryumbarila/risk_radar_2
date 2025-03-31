@@ -69,7 +69,13 @@ export function useApiSWR<Data = never, Error = never>(
   return useSWR<Data, Error>(
     key,
     key ? (url) => fetcher<Data>(url, options) : null,
-    swrOptions
+    {
+      refreshInterval: 0,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 10000, // Deduplicate requests within 10 seconds
+      ...swrOptions,
+    }
   );
   /* eslint-enable */
 }
