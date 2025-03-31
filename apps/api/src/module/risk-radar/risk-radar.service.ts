@@ -16,7 +16,7 @@ export class RiskRadarService {
     private readonly riskRadarEmailTemplateRepository: RiskRadarEmailTemplateRepository,
     private readonly leadsBusinessInfoRepository: LeadsBusinessInformationRepository,
     private readonly leadsRepository: LeadRepository,
-    
+
     // private readonly riskRadarNotesRepository: RiskRadarNotesRepository,
 
     @InjectPinoLogger(RiskRadarService.name) private readonly logger: Logger

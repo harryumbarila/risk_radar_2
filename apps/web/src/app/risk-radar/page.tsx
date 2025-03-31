@@ -1,9 +1,8 @@
 'use client';
 
 import { Breadcrumb, Loader } from '@denali/ui';
-import { useRouter } from 'next/navigation';
 import type { FC } from 'react';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { DefaultLayout } from '@/components/layouts/default-layout';
 import { RiskRadarTableComponent } from '@/components/risk-radar/risk-radar-table';
@@ -29,7 +28,6 @@ type RiskUser = {
 };
 
 const RiskRadar: FC = () => {
-  const router = useRouter();
   const [selectedStatus, setSelectedStatus] = useState<string>('');
 
   const { data: exceptionData } = useExceptionData();
@@ -57,7 +55,6 @@ const RiskRadar: FC = () => {
       }));
     }
   }, [exceptionData, setFilters]);
-
 
   const filterComponent = useMemo((): JSX.Element => {
     if (filterLoading) {

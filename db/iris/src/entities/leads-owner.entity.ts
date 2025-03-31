@@ -14,7 +14,12 @@ export class LeadsOwnerEntity {
   @Column({ name: 'LastName', type: 'varchar', length: 100, nullable: true })
   public lastName: string | null;
 
-  @Column({ name: 'SocialSecurityNumber', type: 'varchar', length: 11, nullable: true })
+  @Column({
+    name: 'SocialSecurityNumber',
+    type: 'varchar',
+    length: 11,
+    nullable: true,
+  })
   public socialSecurityNumber: string | null;
 
   @Column({ name: 'DOB', type: 'datetime', nullable: true })
@@ -25,4 +30,4 @@ export class LeadsOwnerEntity {
 
   @Column({ name: 'AuthorizedSigner', type: 'bit', nullable: true })
   public authorizedSigner: boolean | null;
-} 
+}

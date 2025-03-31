@@ -32,25 +32,25 @@ export class MerchantOwnerDto {
     description: 'Owner name',
     example: 'John Doe',
   })
-  name: string;
+  public name: string;
 
   @ApiProperty({
     description: 'Last 4 digits of SSN',
     example: '1234',
   })
-  ssn4: string;
+  public ssn4: string;
 
   @ApiProperty({
     description: 'Date of birth',
     example: '01/01/1980',
   })
-  dob: string;
+  public dob: string;
 
   @ApiProperty({
     description: 'Owner code',
     example: '99999999999',
   })
-  ownerCode: string;
+  public ownerCode: string;
 }
 
 export class MerchantProcessingSummaryDto {
@@ -58,67 +58,67 @@ export class MerchantProcessingSummaryDto {
     description: 'Year',
     example: 2023,
   })
-  year: number;
+  public year: number;
 
   @ApiProperty({
     description: 'Month abbreviation',
     example: 'Jan',
   })
-  month: string;
+  public month: string;
 
   @ApiProperty({
     description: 'Volume',
-    example: 10000.00,
+    example: 10000.0,
   })
-  volume: number;
+  public volume: number;
 
   @ApiProperty({
     description: 'Average ticket',
-    example: 150.00,
+    example: 150.0,
   })
-  averageTicket: number;
+  public averageTicket: number;
 
   @ApiProperty({
     description: 'Swiped percentage',
     example: 85,
   })
-  swipedPercentage: number;
+  public swipedPercentage: number;
 
   @ApiProperty({
     description: 'Highest ticket',
-    example: 500.00,
+    example: 500.0,
   })
-  highestTicket: number;
+  public highestTicket: number;
 
   @ApiProperty({
     description: 'Total chargebacks amount',
-    example: 250.00,
+    example: 250.0,
   })
-  chargebackAmount: number;
+  public chargebackAmount: number;
 
   @ApiProperty({
     description: 'Visa chargeback percentage',
     example: 40,
   })
-  visaChargebackPercentage: number;
+  public visaChargebackPercentage: number;
 
   @ApiProperty({
     description: 'Mastercard chargeback percentage',
     example: 30,
   })
-  mastercardChargebackPercentage: number;
+  public mastercardChargebackPercentage: number;
 
   @ApiProperty({
     description: 'Discover chargeback percentage',
     example: 20,
   })
-  discoverChargebackPercentage: number;
+  public discoverChargebackPercentage: number;
 
   @ApiProperty({
     description: 'Amex chargeback percentage',
     example: 10,
   })
-  amexChargebackPercentage: number;
+  public amexChargebackPercentage: number;
 }
 
 export class ExceptionTypeDto {
@@ -126,13 +126,13 @@ export class ExceptionTypeDto {
     description: 'Exception type ID',
     example: 1,
   })
-  id: number;
+  public id: number;
 
   @ApiProperty({
     description: 'Exception description',
     example: 'High risk transaction',
   })
-  description: string;
+  public description: string;
 }
 
 export class MerchantBusinessInfoDto {
@@ -140,253 +140,254 @@ export class MerchantBusinessInfoDto {
     description: 'DBA Name',
     example: 'Acme Corp',
   })
-  dbaName: string;
+  public dbaName: string;
 
   @ApiProperty({
     description: 'DBA Address',
     example: '123 Main St',
   })
-  dbaAddress: string;
+  public dbaAddress: string;
 
   @ApiProperty({
     description: 'DBA City',
     example: 'New York',
   })
-  dbaCity: string;
+  public dbaCity: string;
 
   @ApiProperty({
     description: 'DBA State',
     example: 'NY',
   })
-  dbaState: string;
+  public dbaState: string;
 
   @ApiProperty({
     description: 'DBA Zip',
     example: '10001',
   })
-  dbaZip: string;
+  public dbaZip: string;
 
   @ApiProperty({
     description: 'Contact phone number',
     example: '555-123-4567',
   })
-  contactPhoneNumber: string;
+  public contactPhoneNumber: string;
 
   @ApiProperty({
     description: 'DBA fax',
     example: '555-123-4568',
   })
-  dbaFax: string;
+  public dbaFax: string;
 
   @ApiProperty({
     description: 'Contact email',
     example: 'contact@acme.com',
   })
-  contactEmail: string;
+  public contactEmail: string;
 
   @ApiProperty({
     description: 'Website',
     example: 'www.acme.com',
   })
-  website: string;
+  public website: string;
 
   @ApiProperty({
     description: 'Legal name',
     example: 'Acme Corporation Inc.',
   })
-  legalName: string;
+  public legalName: string;
 
   @ApiProperty({
     description: 'Legal address',
     example: '456 Business Ave',
   })
-  legalAddress: string;
+  public legalAddress: string;
 
   @ApiProperty({
     description: 'Legal city',
     example: 'New York',
   })
-  legalCity: string;
+  public legalCity: string;
 
   @ApiProperty({
     description: 'Legal state',
     example: 'NY',
   })
-  legalState: string;
+  public legalState: string;
 
   @ApiProperty({
     description: 'Legal zip',
     example: '10002',
   })
-  legalZip: string;
+  public legalZip: string;
 
   @ApiProperty({
     description: 'Ownership type',
     example: 'Corporation',
   })
-  ownershipType: string;
+  public ownershipType: string;
 
   @ApiProperty({
     description: 'MCC code with description',
     example: '5411 (Grocery Stores)',
   })
-  mccCode: string;
+  public mccCode: string;
 
   @ApiProperty({
     description: 'Self-generated',
     example: 'Yes',
   })
-  selfGenerated: string;
+  public selfGenerated: string;
 
   @ApiProperty({
     description: 'Business type',
     example: 'Retail',
   })
-  businessType: string;
+  public businessType: string;
 
   @ApiProperty({
     description: 'Activated date',
     example: '2023-01-01T00:00:00.000Z',
   })
-  activatedDate: Date | null;
+  public activatedDate: Date | null;
 
   @ApiProperty({
     description: 'Monthly volume',
     example: 100000,
   })
-  monthlyVolume: number;
+  public monthlyVolume: number;
 
   @ApiProperty({
     description: 'Average ticket',
     example: 150,
   })
-  averageTicket: number;
+  public averageTicket: number;
 
   @ApiProperty({
     description: 'Swiped percentage',
     example: 85,
   })
-  swipedPercentage: number;
+  public swipedPercentage: number;
 
   @ApiProperty({
     description: 'Chargeback count',
     example: 5,
   })
-  chargebackCount: number;
+  public chargebackCount: number;
 
   @ApiProperty({
     description: 'IRR count',
     example: 2,
   })
-  irrCount: number;
+  public irrCount: number;
 
   @ApiProperty({
     description: 'Divert flag',
     example: true,
   })
-  isDivert: boolean;
+  public isDivert: boolean;
 
   @ApiProperty({
     description: 'Preferred contact',
     example: 'Email',
   })
-  preferredContact: string;
+  public preferredContact: string;
 
   @ApiProperty({
     description: 'Exception status ID',
     example: 1,
   })
-  exceptionStatusId: number;
+  public exceptionStatusId: number;
 
   @ApiProperty({
     description: 'Has cash advance',
     example: 'Yes',
   })
-  hasCashAdvance: string;
+  public hasCashAdvance: string;
 
   @ApiProperty({
     description: 'Risk watch',
     example: true,
   })
-  isRiskWatch: boolean;
+  public isRiskWatch: boolean;
 
   @ApiProperty({
     description: 'Net settlement balance',
-    example: 5000.00,
+    example: 5000.0,
   })
-  netSettlementBalance: number;
+  public netSettlementBalance: number;
 
   @ApiProperty({
-    description: 'Swiped percentage based on transaction count for current month',
+    description:
+      'Swiped percentage based on transaction count for current month',
     example: 83,
   })
-  swipedPercentageTransCount: number;
+  public swipedPercentageTransCount: number;
 
   @ApiProperty({
     description: 'Channel',
     example: 'Retail',
   })
-  channel: string;
+  public channel: string;
 
   @ApiProperty({
     description: 'ISA',
     example: 'John Smith',
   })
-  isa: string;
+  public isa: string;
 
   @ApiProperty({
     description: 'Average monthly sales volume',
     example: 95000,
   })
-  averageMonthlySalesVolume: number;
+  public averageMonthlySalesVolume: number;
 
   @ApiProperty({
     description: 'Store front swiped percentage',
     example: 78,
   })
-  storeFrontSwiped: number;
+  public storeFrontSwiped: number;
 
   @ApiProperty({
     description: 'Auto hold white label',
     example: false,
   })
-  isAutoHoldWhiteLabel: boolean;
+  public isAutoHoldWhiteLabel: boolean;
 
   @ApiProperty({
     description: 'Highest ticket amount',
     example: 750,
   })
-  highestTicket: number;
+  public highestTicket: number;
 
   @ApiProperty({
     description: 'Whether risk can edit UW new account hold',
     example: true,
   })
-  uwNewAccountHoldAllowRiskToEdit: boolean;
+  public uwNewAccountHoldAllowRiskToEdit: boolean;
 
   @ApiProperty({
     description: 'Reseller',
     example: 'ABC Reseller',
   })
-  reseller: string;
+  public reseller: string;
 
   @ApiProperty({
     description: 'Referral partner',
     example: 'XYZ Partner',
   })
-  referralPartner: string;
+  public referralPartner: string;
 
   @ApiProperty({
     description: 'TalusPay account indicator',
     example: 'Yes',
   })
-  talusPayAccountIndicator: string;
+  public talusPayAccountIndicator: string;
 
   @ApiProperty({
     description: 'ISV',
     example: 'ISV Provider',
   })
-  isv: string;
+  public isv: string;
 }
 
 export class MerchantExceptionDetailResponseDto {
@@ -394,23 +395,26 @@ export class MerchantExceptionDetailResponseDto {
     description: 'Merchant business information',
     type: MerchantBusinessInfoDto,
   })
-  businessInfo: MerchantBusinessInfoDto;
+  public businessInfo: MerchantBusinessInfoDto;
 
   @ApiProperty({
     description: 'Merchant owners',
     type: [MerchantOwnerDto],
+    isArray: true,
   })
-  owners: MerchantOwnerDto[];
+  public owners: MerchantOwnerDto[];
 
   @ApiProperty({
     description: 'Monthly processing summaries',
     type: [MerchantProcessingSummaryDto],
+    isArray: true,
   })
-  processingSummaries: MerchantProcessingSummaryDto[];
+  public processingSummaries: MerchantProcessingSummaryDto[];
 
   @ApiProperty({
     description: 'Exception types',
     type: [ExceptionTypeDto],
+    isArray: true,
   })
-  exceptionTypes: ExceptionTypeDto[];
-} 
+  public exceptionTypes: ExceptionTypeDto[];
+}

@@ -32,7 +32,11 @@ export class SubscriptionQueueRequestEventJsonSourceEntity {
   @Column({ name: 'IrisMId', type: 'varchar', length: 20, nullable: true })
   public irisMId: string | null;
 
-  @Column({ name: 'dtTurboAppApproved', type: 'datetimeoffset', nullable: true })
+  @Column({
+    name: 'dtTurboAppApproved',
+    type: 'datetimeoffset',
+    nullable: true,
+  })
   public turboAppApprovedDate: Date | null;
 
   @Column({
@@ -57,16 +61,31 @@ export class SubscriptionQueueRequestEventJsonSourceEntity {
   @Column({ name: 'sBI_MCC', type: 'varchar', length: 10, nullable: true })
   public biMcc: string | null;
 
-  @Column({ name: 'sUW_NewAccountHold', type: 'varchar', length: 5, nullable: true })
+  @Column({
+    name: 'sUW_NewAccountHold',
+    type: 'varchar',
+    length: 5,
+    nullable: true,
+  })
   public uwNewAccountHold: string | null;
 
   @Column({ name: 'sUW_MCC', type: 'varchar', length: 10, nullable: true })
   public uwMcc: string | null;
 
-  @Column({ name: 'sPE_TalusPayApp', type: 'varchar', length: 5, nullable: true })
+  @Column({
+    name: 'sPE_TalusPayApp',
+    type: 'varchar',
+    length: 5,
+    nullable: true,
+  })
   public peTalusPayApp: string | null;
 
-  @Column({ name: 'sRI_MerchantApplType', type: 'varchar', length: 25, nullable: true })
+  @Column({
+    name: 'sRI_MerchantApplType',
+    type: 'varchar',
+    length: 25,
+    nullable: true,
+  })
   public riMerchantApplType: string | null;
 
   @Column({
@@ -100,7 +119,12 @@ export class SubscriptionQueueRequestEventJsonSourceEntity {
   })
   public uwNewAccountHoldOffDivertCapturedInTalusDBDate: Date | null;
 
-  @Column({ name: 'sOW_AllOwnersSigned', type: 'varchar', length: 5, nullable: true })
+  @Column({
+    name: 'sOW_AllOwnersSigned',
+    type: 'varchar',
+    length: 5,
+    nullable: true,
+  })
   public owAllOwnersSigned: string | null;
 
   @Column({ name: 'bDeleted', type: 'bit', nullable: false })
@@ -114,4 +138,4 @@ export class SubscriptionQueueRequestEventJsonSourceEntity {
 
   @Column({ name: 'dtLastUpdated', type: 'datetime', nullable: true })
   public lastUpdatedDate: Date | null;
-} 
+}

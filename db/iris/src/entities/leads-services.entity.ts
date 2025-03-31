@@ -26,10 +26,20 @@ export class LeadsServicesEntity {
   @Column({ name: 'DiscoverDebit', type: 'bit', nullable: true })
   public discoverDebit: boolean | null;
 
-  @Column({ name: 'DiscoverDirectNumber', type: 'varchar', length: 45, nullable: true })
+  @Column({
+    name: 'DiscoverDirectNumber',
+    type: 'varchar',
+    length: 45,
+    nullable: true,
+  })
   public discoverDirectNumber: string | null;
 
-  @Column({ name: 'AmexESANumber', type: 'varchar', length: 30, nullable: true })
+  @Column({
+    name: 'AmexESANumber',
+    type: 'varchar',
+    length: 30,
+    nullable: true,
+  })
   public amexEsaNumber: string | null;
 
   @Column({ name: 'PINDebit', type: 'bit', nullable: true })
@@ -53,22 +63,49 @@ export class LeadsServicesEntity {
   @Column({ name: 'GiftCard', type: 'varchar', length: 100, nullable: true })
   public giftCard: string | null;
 
-  @Column({ name: 'CheckServices', type: 'varchar', length: 100, nullable: true })
+  @Column({
+    name: 'CheckServices',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
   public checkServices: string | null;
 
-  @Column({ name: 'MerchantCashAdvance', type: 'varchar', length: 100, nullable: true })
+  @Column({
+    name: 'MerchantCashAdvance',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
   public merchantCashAdvance: string | null;
 
-  @Column({ name: 'MerchantCashAdvancePercentage', type: 'decimal', precision: 20, scale: 4, nullable: true })
+  @Column({
+    name: 'MerchantCashAdvancePercentage',
+    type: 'decimal',
+    precision: 20,
+    scale: 4,
+    nullable: true,
+  })
   public merchantCashAdvancePercentage: number | null;
 
-  @Column({ name: 'MerchantCashAdvanceAmount', type: 'decimal', precision: 20, scale: 4, nullable: true })
+  @Column({
+    name: 'MerchantCashAdvanceAmount',
+    type: 'decimal',
+    precision: 20,
+    scale: 4,
+    nullable: true,
+  })
   public merchantCashAdvanceAmount: number | null;
 
   @Column({ name: 'ZupplerHidden', type: 'bit', nullable: true })
   public zupplerHidden: boolean | null;
 
-  @Column({ name: 'BuyNowPayLaterHidden', type: 'varchar', length: 100, nullable: true })
+  @Column({
+    name: 'BuyNowPayLaterHidden',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
   public buyNowPayLaterHidden: string | null;
 
   @Column({ name: 'ImportedDate', type: 'datetime', nullable: true })
@@ -77,7 +114,12 @@ export class LeadsServicesEntity {
   @Column({ name: 'UpdatedDate', type: 'datetime', nullable: true })
   public updatedDate: Date | null;
 
-  @Column({ name: 'AmericanExpress', type: 'varchar', length: 100, nullable: true })
+  @Column({
+    name: 'AmericanExpress',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
   public americanExpress: string | null;
 
   @Column({ name: 'Discover', type: 'varchar', length: 100, nullable: true })
@@ -98,7 +140,13 @@ export class LeadsServicesEntity {
   @Column({ name: 'PayPal', type: 'bit', nullable: true })
   public payPal: boolean | null;
 
-  @Column({ name: 'OneTimeEquipmentFee', type: 'decimal', precision: 6, scale: 2, nullable: true })
+  @Column({
+    name: 'OneTimeEquipmentFee',
+    type: 'decimal',
+    precision: 6,
+    scale: 2,
+    nullable: true,
+  })
   public oneTimeEquipmentFee: number | null;
 
   @Column({ name: 'ACHAndCheckServices', type: 'bit', nullable: true })
@@ -113,6 +161,11 @@ export class LeadsServicesEntity {
   @Column({ name: 'TalusPayApp', type: 'bit', nullable: true })
   public talusPayApp: boolean | null;
 
-  @Column({ name: 'FluidpayPartner', type: 'varchar', length: 100, nullable: true })
+  @Column({
+    name: 'FluidpayPartner',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
   public fluidpayPartner: string | null;
-} 
+}

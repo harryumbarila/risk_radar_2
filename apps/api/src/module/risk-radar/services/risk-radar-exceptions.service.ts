@@ -4,6 +4,9 @@ import { InjectPinoLogger } from 'nestjs-pino';
 import { Logger } from 'pino';
 import { DataSource } from 'typeorm';
 
+import type { RiskRadarExceptionsListDto } from '@/api/module/risk-radar-exceptions/dto/risk-radar-exception-list.dto';
+import type { RiskRadarExceptionsListResultDto } from '@/api/module/risk-radar-exceptions/dto/risk-radar-exceptions-list-result.dto';
+import type { PaginatedRiskRadarExceptionsDto } from '@/api/module/risk-radar-exceptions/dto/risk-radar-exceptions-pagination.dto';
 import {
   RiskRadarBatchRepository,
   RiskRadarExceptionsJeffRepository,
@@ -12,12 +15,8 @@ import {
 } from '@/finance-db/repositories';
 import { PartnerAndSalesAgentIdentificationRepository } from '@/iris-db/repositories';
 
-import type { RiskRadarExceptionsListDto } from '../../risk-radar-exceptions/dto/risk-radar-exception-list.dto';
-import type { RiskRadarExceptionsListResultDto } from '../../risk-radar-exceptions/dto/risk-radar-exceptions-list-result.dto';
-import { PaginatedRiskRadarExceptionsDto } from '../../risk-radar-exceptions/dto/risk-radar-exceptions-pagination.dto';
-import { object, unknown } from 'zod';
-
 @Injectable()
+// eslint-disable-next-line @darraghor/nestjs-typed/injectable-should-be-provided
 export class RiskRadarExceptionsService {
   public constructor(
     @InjectPinoLogger(RiskRadarExceptionsService.name)
@@ -210,19 +209,19 @@ export class RiskRadarExceptionsService {
     let results = await Promise.all(
       exceptions.map(async (exception) => {
         // Check for AMEX OptBlue indicator
-            profile['5.4-MapCreation'] = Date.now() - mapCreationStart;
+        profile['5.4-MapCreation'] = Date.now() - mapCreationStart;
 
-          this.logger.info(
-            `PROFILING: 5.4-MapCreation complete in ${profile['5.4-MapCreation']}ms`
-          );
-        
+        this.logger.info(
+          `PROFILING: 5.4-MapCreation complete in ${profile['5.4-MapCreation']}ms`
+        );
+
         const hasAmexOptBlue = await this.batchRepo.hasAMEXOptBlue(
           exception.mid
         );
 
-         this.logger.info(
-      `PROFILING: 5.5-MapCreation complete in ${profile['5.5-MapCreation']}ms`
-    );
+        this.logger.info(
+          `PROFILING: 5.5-MapCreation complete in ${profile['5.5-MapCreation']}ms`
+        );
 
         // Calculate total points based on exception flags
         const totalPoints =
@@ -366,11 +365,9 @@ export class RiskRadarExceptionsService {
       const partnerInfo = await this.partnerRepo.findForMerchants(mids);
 
       // Map partner info to results
-      const partnerMap = new Map(
-        partnerInfo.map((info) => [info.mid, info])
-      );
+      const partnerMap = new Map(partnerInfo.map((info) => [info.mid, info]));
 
-       profile['6.5-PartnerInfo'] = Date.now() - partnerInfoStart;
+      profile['6.5-PartnerInfo'] = Date.now() - partnerInfoStart;
       this.logger.info(
         `PROFILING: 6.5-PartnerInfo complete in ${profile['6.5-PartnerInfo']}ms`
       );
@@ -651,13 +648,13 @@ export class RiskRadarExceptionsService {
     // Set default pagination values if not provided
     const recordsPerPage = params.recordsPerPage || 25;
     const currentPage = params.currentPage || 1;
-    
+
     // Calculate pagination metadata
     const totalRecords = results.length;
     const lastPage = Math.ceil(totalRecords / recordsPerPage);
     const from = (currentPage - 1) * recordsPerPage + 1;
     const to = Math.min(currentPage * recordsPerPage, totalRecords);
-    
+
     // Apply pagination to results
     const paginatedResults = results.slice(from - 1, to);
 
@@ -681,7 +678,7 @@ export class RiskRadarExceptionsService {
         last_page: lastPage,
         from_record: from,
         to_record: to,
-      }
+      },
     };
   }
 }

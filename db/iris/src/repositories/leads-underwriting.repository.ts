@@ -10,4 +10,4 @@ export class LeadsUnderwritingRepository extends Repository<LeadsUnderwritingEnt
   public constructor(@InjectDataSource('iris') dataSource: DataSource) {
     super(LeadsUnderwritingEntity, dataSource.createEntityManager());
   }
-} 
+}

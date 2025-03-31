@@ -15,10 +15,10 @@ import type {
 } from 'react-table';
 import { useFilters, usePagination, useSortBy, useTable } from 'react-table';
 
-import type { RiskUser } from '@/shared/response/legacy-dashboard-proxy';
 import { useAssignExceptionToUser } from '@/hooks/risk-radar/use-assign-exception-to-user';
 import type { FilterState } from '@/hooks/risk-radar/use-filtered-risk-radar';
 import { useReviewExceptionByUsername } from '@/hooks/risk-radar/use-review-exception-by-username';
+import type { RiskUser } from '@/shared/response/legacy-dashboard-proxy';
 
 // Define the types for the paginated API response
 type PaginationMetaDto = {
@@ -495,7 +495,9 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
       net_dep_amt: Number(item.dNetDepAmt || 0),
       fsp_appr_auth_tot_amt: 0, // This field doesn't seem to exist in the API response
       auth_decline_amt: Number(item.dAuthDeclineAmt || 0),
-      activation_datetime: item.dtActivated ? new Date(item.dtActivated).toISOString() : '',
+      activation_datetime: item.dtActivated
+        ? new Date(item.dtActivated).toISOString()
+        : '',
       channel: item.sChannel || '',
       reseller: item.sReseller || '',
       risk_watch: item.bRiskWatch === 'Yes',
@@ -519,13 +521,17 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
       divert_balance_amt: Number(item.dSettlementBalance || 0),
       amex_opt_blue: item.sAMEXOptBlueInd === 'Yes',
       moto_avs_score: Number(item.iMototIoAVS || 0),
-      settle_30perc_more_than_auth_score: Number(item.iAuthCaptureAmtLargeVariation || 0),
+      settle_30perc_more_than_auth_score: Number(
+        item.iAuthCaptureAmtLargeVariation || 0
+      ),
       no_auth_score: Number(item.iNoAuthTrans || 0),
       auth_decline_score: Number(item.iAuthDecline || 0),
       neg_batch_score: Number(item.iNegDailyBatches || 0),
       auto_hold_score: Number(item.iAutoHold || 0),
       funding_exception_score: Number(item.iFundingExclusionAndException || 0),
-      exception_created_datetime: item.dtCreated ? new Date(item.dtCreated).toISOString() : '',
+      exception_created_datetime: item.dtCreated
+        ? new Date(item.dtCreated).toISOString()
+        : '',
       mid: item.sMID,
     }));
   }, [data]);
@@ -541,7 +547,6 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
       // Tell the table we'll handle pagination ourselves
       // @ts-expect-error - manualPagination is supported but TypeScript definitions might be outdated
       manualPagination: true,
-      // @ts-expect-error - pageCount is supported but TypeScript definitions might be outdated
       pageCount: data?.meta?.last_page || 1,
     },
     useFilters,
@@ -560,7 +565,7 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
     previousPage,
     canNextPage,
     canPreviousPage,
-    pageOptions,
+    // pageOptions,
     setPageSize,
     gotoPage,
   } = tableInstance;
@@ -688,8 +693,7 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
       <div className="flex justify-between border-t border-stroke px-8 pt-5 dark:border-strokedark">
         <p className="font-medium">
           Showing {data.meta.from_record} to {data.meta.to_record} of{' '}
-          {data.meta.current_page * data.meta.records_per_page}{' '}
-          entries
+          {data.meta.current_page * data.meta.records_per_page} entries
         </p>
         <div className="flex">
           <button
@@ -716,18 +720,20 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
             </svg>
           </button>
 
-          {Array.from({ length: data.meta.last_page }, (_, i) => i).map((page) => (
-            <button
-              key={page}
-              onClick={() => handlePageChange(page)}
-              className={`${
-                state.pageIndex === page && 'bg-primary text-white'
-              } mx-1 flex cursor-pointer items-center justify-center rounded-md p-1 px-3 hover:bg-primary hover:text-white`}
-              type="button"
-            >
-              {page + 1}
-            </button>
-          ))}
+          {Array.from({ length: data.meta.last_page }, (_, i) => i).map(
+            (page) => (
+              <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                className={`${
+                  state.pageIndex === page && 'bg-primary text-white'
+                } mx-1 flex cursor-pointer items-center justify-center rounded-md p-1 px-3 hover:bg-primary hover:text-white`}
+                type="button"
+              >
+                {page + 1}
+              </button>
+            )
+          )}
 
           <button
             className="flex cursor-pointer items-center justify-center rounded-md p-1 px-2 hover:bg-primary hover:text-white"

@@ -10,4 +10,4 @@ export class LeadsFinancialProfileRepository extends Repository<LeadsFinancialPr
   public constructor(@InjectDataSource('iris') dataSource: DataSource) {
     super(LeadsFinancialProfileEntity, dataSource.createEntityManager());
   }
-} 
+}

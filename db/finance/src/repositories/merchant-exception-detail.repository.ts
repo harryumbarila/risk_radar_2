@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import type { Repository, DataSource } from 'typeorm';
+import type { DataSource, Repository } from 'typeorm';
 import { MoreThan } from 'typeorm';
 
-import { 
-  ChargeBacksEntity, 
-  RiskRadarExceptionListLookupEntity, 
-  DdtMonthlyProcessingSummaryEntity 
+import {
+  ChargeBacksEntity,
+  RiskRadarExceptionListLookupEntity,
 } from '../entities';
 
 // Define interfaces for the return types
@@ -71,20 +70,16 @@ export type MerchantInfo = {
 @Injectable()
 export class MerchantExceptionDetailRepository {
   private chargeBacksRepository: Repository<ChargeBacksEntity>;
-  
+
   private exceptionListRepository: Repository<RiskRadarExceptionListLookupEntity>;
-  
-  private ddtMonthlyProcessingRepository: Repository<DdtMonthlyProcessingSummaryEntity>;
 
   public constructor(
     @InjectDataSource('finance') private readonly dataSource: DataSource
   ) {
-    this.chargeBacksRepository = this.dataSource.getRepository(ChargeBacksEntity);
+    this.chargeBacksRepository =
+      this.dataSource.getRepository(ChargeBacksEntity);
     this.exceptionListRepository = this.dataSource.getRepository(
       RiskRadarExceptionListLookupEntity
-    );
-    this.ddtMonthlyProcessingRepository = this.dataSource.getRepository(
-      DdtMonthlyProcessingSummaryEntity
     );
   }
 
@@ -115,7 +110,7 @@ export class MerchantExceptionDetailRepository {
 
   /**
    * Gets data about monthly processing for a merchant
-   * 
+   *
    * This is a hybrid approach as we still need SQL for temp tables and complex calculations
    */
   public async getMonthlyProcessingSummary(
@@ -203,7 +198,9 @@ export class MerchantExceptionDetailRepository {
   /**
    * Gets a list of exception types
    */
-  public async getExceptionTypes(): Promise<RiskRadarExceptionListLookupEntity[]> {
+  public async getExceptionTypes(): Promise<
+    RiskRadarExceptionListLookupEntity[]
+  > {
     return this.exceptionListRepository.find({
       where: {
         isHidden: false,
@@ -298,7 +295,9 @@ export class MerchantExceptionDetailRepository {
       WHERE l.IrisMId = @0 AND l.IsArchived = 0 AND LEN(l.IrisMId) > 11
     `;
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const results = await this.dataSource.query(query, [mid, exceptionId]);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
     return results[0] || null;
   }
-} 
+}

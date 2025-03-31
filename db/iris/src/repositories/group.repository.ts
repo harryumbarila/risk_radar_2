@@ -10,4 +10,4 @@ export class GroupRepository extends Repository<GroupEntity> {
   public constructor(@InjectDataSource('iris') dataSource: DataSource) {
     super(GroupEntity, dataSource.createEntityManager());
   }
-} 
+}

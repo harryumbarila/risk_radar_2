@@ -10,4 +10,4 @@ export class SourceEntity {
 
   @Column({ name: 'SourceName', type: 'varchar', length: 255, nullable: true })
   public sourceName: string | null;
-} 
+}

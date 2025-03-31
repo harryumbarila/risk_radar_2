@@ -1,4 +1,6 @@
+export * from './charge-backs.entity';
 export * from './chargebacks-and-retrieval-reason-code-lookup.entity';
+export * from './ddt-monthly-processing-summary.entity';
 export * from './dft-256-batch';
 export * from './dft-256-transaction';
 export * from './dft-256-transaction-from-legacy-system.entity';

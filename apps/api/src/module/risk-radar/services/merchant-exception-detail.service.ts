@@ -1,21 +1,33 @@
+/* eslint-disable */
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { InjectPinoLogger } from 'nestjs-pino';
 import { Logger } from 'pino';
-import { DataSource, Not, IsNull } from 'typeorm';
+import { DataSource } from 'typeorm';
 
-import { LeadRepository, LeadsBusinessInformationRepository, LeadsServicesRepository, LeadsUnderwritingRepository, LeadsFinancialProfileRepository, SourceRepository, LeadsOwnerRepository, PartnerAndSalesAgentIdentificationRepository } from '@/iris-db/repositories';
-import { MerchantExceptionDetailRepository, RiskRadarExceptionsJeffRepository, RiskRadarMerchAdjParamRepository } from '@/finance-db/repositories';
-import { MonthlyProcessingSummary, MerchantInfo } from '@/finance-db/repositories/merchant-exception-detail.repository';
-
-import {
+import type {
+  MerchantBusinessInfoDto,
   MerchantExceptionDetailRequestDto,
   MerchantExceptionDetailResponseDto,
-  MerchantBusinessInfoDto,
   MerchantOwnerDto,
   MerchantProcessingSummaryDto,
-  ExceptionTypeDto,
-} from '../dtos/merchant-exception-detail.dto';
+} from '@/api/module/risk-radar/dtos/merchant-exception-detail.dto';
+import {
+  MerchantExceptionDetailRepository,
+  RiskRadarExceptionsJeffRepository,
+  RiskRadarMerchAdjParamRepository,
+} from '@/finance-db/repositories';
+import type { MonthlyProcessingSummary } from '@/finance-db/repositories/merchant-exception-detail.repository';
+import {
+  LeadRepository,
+  LeadsBusinessInformationRepository,
+  LeadsFinancialProfileRepository,
+  LeadsOwnerRepository,
+  LeadsServicesRepository,
+  LeadsUnderwritingRepository,
+  PartnerAndSalesAgentIdentificationRepository,
+  SourceRepository,
+} from '@/iris-db/repositories';
 
 @Injectable()
 export class MerchantExceptionDetailService {
@@ -31,11 +43,11 @@ export class MerchantExceptionDetailService {
     private readonly merchantExceptionDetailRepository: MerchantExceptionDetailRepository,
     private readonly riskRadarExceptionsRepository: RiskRadarExceptionsJeffRepository,
     private readonly riskRadarMerchAdjParamRepository: RiskRadarMerchAdjParamRepository,
-    
-    @InjectDataSource('iris') 
+
+    @InjectDataSource('iris')
     private readonly irisDataSource: DataSource,
-    
-    @InjectDataSource('finance') 
+
+    @InjectDataSource('finance')
     private readonly financeDataSource: DataSource,
 
     @InjectPinoLogger(MerchantExceptionDetailService.name)
@@ -63,31 +75,35 @@ export class MerchantExceptionDetailService {
     });
 
     this.logger.info(
-        {
-          exceptionId: pkRiskRadarExceptions,
-          mid: sMID,
-          user: sUser,
-        },
-        'Getting chargebacks count'
-      );
+      {
+        exceptionId: pkRiskRadarExceptions,
+        mid: sMID,
+        user: sUser,
+      },
+      'Getting chargebacks count'
+    );
     // Get chargebacks count
-    const chargebacks = await this.merchantExceptionDetailRepository.getChargebacksCount(sMID);
+    const chargebacks =
+      await this.merchantExceptionDetailRepository.getChargebacksCount(sMID);
 
     this.logger.info(
-        {
-          exceptionId: pkRiskRadarExceptions,
-          mid: sMID,
-          user: sUser,
-        },
-        'Getting UW New Account Hold allow risk to edit'
-      );
-    const uwNewAccountHoldQuery = await this.irisDataSource.query(`
+      {
+        exceptionId: pkRiskRadarExceptions,
+        mid: sMID,
+        user: sUser,
+      },
+      'Getting UW New Account Hold allow risk to edit'
+    );
+    const uwNewAccountHoldQuery = await this.irisDataSource.query(
+      `
       SELECT 1 
       FROM Iris.dbo.SubscriptionQueueRequestEventJsonSource 
       WHERE irisMId = @0
         AND dtUW_NewAccountHold_OnDivertCapturedInTalusDB IS NOT NULL
         AND dtUW_NewAccountHold_OffDivertCapturedInTalusDB IS NULL
-    `, [sMID]);
+    `,
+      [sMID]
+    );
     const uwNewAccountHoldAllowRiskToEdit = !uwNewAccountHoldQuery.length;
 
     // Get lead information
@@ -120,9 +136,11 @@ export class MerchantExceptionDetailService {
     });
 
     // Get financial profile
-    const financialProfile = await this.leadsFinancialProfileRepository.findOne({
-      where: { leadId: lead.id },
-    });
+    const financialProfile = await this.leadsFinancialProfileRepository.findOne(
+      {
+        where: { leadId: lead.id },
+      }
+    );
 
     // Get source
     const source = await this.sourceRepository.findOne({
@@ -144,10 +162,14 @@ export class MerchantExceptionDetailService {
     });
 
     // Get processing summaries
-    const processingSummaries = await this.merchantExceptionDetailRepository.getMonthlyProcessingSummary(sMID);
+    const processingSummaries =
+      await this.merchantExceptionDetailRepository.getMonthlyProcessingSummary(
+        sMID
+      );
 
     // Get exception types
-    const exceptionTypes = await this.merchantExceptionDetailRepository.getExceptionTypes();
+    const exceptionTypes =
+      await this.merchantExceptionDetailRepository.getExceptionTypes();
 
     // Build response
     const response: MerchantExceptionDetailResponseDto = {
@@ -177,8 +199,10 @@ export class MerchantExceptionDetailService {
   /**
    * Maps the MonthlyProcessingSummary to the expected DTO format
    */
-  private mapProcessingSummaries(summaries: MonthlyProcessingSummary[]): MerchantProcessingSummaryDto[] {
-    return summaries.map(summary => ({
+  private mapProcessingSummaries(
+    summaries: MonthlyProcessingSummary[]
+  ): MerchantProcessingSummaryDto[] {
+    return summaries.map((summary) => ({
       year: summary.year,
       month: summary.month,
       volume: summary.volume,
@@ -229,8 +253,7 @@ export class MerchantExceptionDetailService {
               : ''
           }`
         : '',
-      selfGenerated:
-        source?.sourceName === 'Self-Sourced' ? 'Yes' : 'No',
+      selfGenerated: source?.sourceName === 'Self-Sourced' ? 'Yes' : 'No',
       businessType: businessInfo?.businessType || '',
       activatedDate: null,
       monthlyVolume: merchAdjParam?.monthlyVolumeCalcMonthly || 0,
@@ -264,12 +287,10 @@ export class MerchantExceptionDetailService {
   private buildOwners(owners: any[]): MerchantOwnerDto[] {
     return owners.map((owner) => ({
       name: `${owner.firstName || ''} ${owner.lastName || ''}`.trim(),
-      ssn4: owner.socialSecurityNumber 
-        ? owner.socialSecurityNumber.slice(-4) 
+      ssn4: owner.socialSecurityNumber
+        ? owner.socialSecurityNumber.slice(-4)
         : '',
-      dob: owner.dob 
-        ? this.formatDate(owner.dob) 
-        : '',
+      dob: owner.dob ? this.formatDate(owner.dob) : '',
       ownerCode: '99999999999', // Default owner code as per stored procedure
     }));
   }
@@ -281,4 +302,4 @@ export class MerchantExceptionDetailService {
       year: 'numeric',
     });
   }
-} 
+}

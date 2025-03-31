@@ -1,4 +1,3 @@
-import { ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   Body,
   Controller,
@@ -7,25 +6,33 @@ import {
   Query,
   ValidationPipe,
 } from '@nestjs/common';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
+import type { PaginatedRiskRadarExceptionsDto } from '@/api/module/risk-radar-exceptions/dto/risk-radar-exceptions-pagination.dto';
 import { Public } from '@/api/shared/auth/decorator/public.decorator';
+import { RiskRadarExceptionStatusRepository } from '@/finance-db/repositories/risk-radar-exception-status.repository';
+import { RiskRadarUserRepository } from '@/finance-db/repositories/risk-radar-user.repository';
+import type { ExceptionDataResponseDto } from '@/shared/response/legacy-dashboard-proxy/dto/exception-data';
 
+import {
+  MerchantExceptionDetailRequestDto,
+  MerchantExceptionDetailResponseDto,
+} from './dtos/merchant-exception-detail.dto';
 import { SendExceptionMemoEmailDto } from './dtos/send-exception-memo-email.dto';
-import { MerchantExceptionDetailRequestDto, MerchantExceptionDetailResponseDto } from './dtos/merchant-exception-detail.dto';
 import { RiskRadarService } from './risk-radar.service';
-import { MerchantExceptionDetailService } from './services/merchant-exception-detail.service';
 import { AssignExceptionReviewService } from './services/assign-exception-review/assign-exception-review.service';
 import { AssignExceptionReviewInputDto } from './services/assign-exception-review/dto/assign-exception-review-input.dto';
 import { MerchantCardNumHistoryQueryDto } from './services/merchant-card-num-history/dto/get-merchant-card-num.dto';
 import { MerchantCardNumHistoryService } from './services/merchant-card-num-history/merchant-card-num-history.service';
-import { RiskRadarExceptionsListResultDto } from '../risk-radar-exceptions/dto/risk-radar-exceptions-list-result.dto';
+import { MerchantExceptionDetailService } from './services/merchant-exception-detail.service';
 import { RiskRadarExceptionsService } from './services/risk-radar-exceptions.service';
 import { RiskRadarSaveInputDto } from './services/risk-radar-save/dto/risk-radar-save-input.dto';
 import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save.service';
-import { ExceptionDataResponseDto } from '@/shared/response/legacy-dashboard-proxy/dto/exception-data';
-import { RiskRadarExceptionStatusRepository } from '@/finance-db/repositories/risk-radar-exception-status.repository';
-import { RiskRadarUserRepository } from '@/finance-db/repositories/risk-radar-user.repository';
-import { PaginatedRiskRadarExceptionsDto } from '../risk-radar-exceptions/dto/risk-radar-exceptions-pagination.dto';
 
 @ApiTags('risk-radar')
 @Controller('v1/risk-radar')
@@ -60,15 +67,18 @@ export class RiskRadarController {
   })
   @ApiResponse({
     status: 200,
-    description: 'The merchant exception details have been successfully retrieved',
+    description:
+      'The merchant exception details have been successfully retrieved',
     type: MerchantExceptionDetailResponseDto,
   })
   public async getMerchantExceptionDetail(
     @Body() request: MerchantExceptionDetailRequestDto
   ): Promise<MerchantExceptionDetailResponseDto> {
-    return this.merchantExceptionDetailService.getMerchantExceptionDetail(request);
+    return this.merchantExceptionDetailService.getMerchantExceptionDetail(
+      request
+    );
   }
-    
+
   @Public()
   @Get('merchant-card-num-history')
   @ApiResponse({})
@@ -115,7 +125,7 @@ export class RiskRadarController {
       iSortBy,
       iProcessor,
       currentPage,
-      recordsPerPage
+      recordsPerPage,
     });
   }
 
@@ -123,16 +133,16 @@ export class RiskRadarController {
   @Public()
   @ApiOperation({
     summary: 'Get exception data',
-    description: 'Returns exception statuses and related data for UI dropdowns'
+    description: 'Returns exception statuses and related data for UI dropdowns',
   })
   @ApiResponse({
     status: 200,
-    description: 'Exception data successfully retrieved'
+    description: 'Exception data successfully retrieved',
   })
   public async getExceptionData(): Promise<ExceptionDataResponseDto> {
     const exceptionStatuses =
       await this.exceptionStatusRepo.getActiveExceptionStatuses();
-    
+
     // Get active users
     const riskUsers = await this.riskRadarUserRepository.find({
       where: { isHidden: false },
@@ -143,7 +153,7 @@ export class RiskRadarController {
       { id: 0, description: 'All' },
       { id: 1, description: 'TSYS Only' },
       { id: 2, description: 'FSP North Only' },
-      { id: 3, description: 'TalusPay Only' }
+      { id: 3, description: 'TalusPay Only' },
     ];
 
     // Define the exception types
@@ -171,14 +181,14 @@ export class RiskRadarController {
       { id: 21, description: 'Settle Amt more than 30% of Auth Amt' },
       { id: 22, description: 'Auto Hold' },
       { id: 23, description: 'HT' },
-      { id: 24, description: 'Credits' }
+      { id: 24, description: 'Credits' },
     ];
 
     return {
       source_type: sourceTypes.map((type) => ({
         pk: type.id,
         sName: type.description,
-        bHidden: false
+        bHidden: false,
       })),
       status: exceptionStatuses.map((status) => ({
         pkRiskRadarExceptionStatus: status.id,
@@ -190,9 +200,9 @@ export class RiskRadarController {
       exception_type: exceptionTypes.map((type) => ({
         pk: type.id,
         sDesc: type.description,
-        bHidden: false
+        bHidden: false,
       })),
-      risk_user: riskUsers.map(user => ({
+      risk_user: riskUsers.map((user) => ({
         pkRiskRadarUser: user.id,
         sName: user.name,
         sNTUserID: user.ntUserId,
@@ -216,5 +226,4 @@ export class RiskRadarController {
   public async saveRiskRadar(@Body() data: RiskRadarSaveInputDto) {
     return this.riskRadarSaveService.saveRiskRadar(data);
   }
-
 }

@@ -26,7 +26,12 @@ export class RiskRadarMerchAdjParamEntity {
   @Column({ name: 'bDivert', type: 'bit', nullable: false })
   public isDivert: boolean;
 
-  @Column({ name: 'sPreferredContact', type: 'varchar', length: 100, nullable: true })
+  @Column({
+    name: 'sPreferredContact',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
   public preferredContact: string | null;
 
   @Column({ name: 'dtCreated', type: 'datetime', nullable: false })
@@ -58,4 +63,4 @@ export class RiskRadarMerchAdjParamEntity {
 
   @Column({ name: 'iNewAccountBatchDays', type: 'int', nullable: true })
   public newAccountBatchDays: number | null;
-} 
+}

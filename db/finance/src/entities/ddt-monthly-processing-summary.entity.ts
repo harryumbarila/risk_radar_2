@@ -14,13 +14,25 @@ export class DdtMonthlyProcessingSummaryEntity {
   @Column({ name: 'iMonth', type: 'int', nullable: true })
   public month: number | null;
 
-  @Column({ name: 'dVol', type: 'decimal', precision: 18, scale: 2, nullable: true })
+  @Column({
+    name: 'dVol',
+    type: 'decimal',
+    precision: 18,
+    scale: 2,
+    nullable: true,
+  })
   public volume: number | null;
 
   @Column({ name: 'iTrans', type: 'int', nullable: true })
   public transactions: number | null;
 
-  @Column({ name: 'dAvgTkt', type: 'decimal', precision: 18, scale: 2, nullable: true })
+  @Column({
+    name: 'dAvgTkt',
+    type: 'decimal',
+    precision: 18,
+    scale: 2,
+    nullable: true,
+  })
   public averageTicket: number | null;
 
   @Column({ name: 'dtCreated', type: 'datetime', nullable: false })
@@ -32,6 +44,12 @@ export class DdtMonthlyProcessingSummaryEntity {
   @Column({ name: 'iSwipedPercBasedOnTransCnt', type: 'int', nullable: true })
   public swipedPercentageBasedOnTransactionCount: number | null;
 
-  @Column({ name: 'dHighestTkt', type: 'decimal', precision: 18, scale: 2, nullable: true })
+  @Column({
+    name: 'dHighestTkt',
+    type: 'decimal',
+    precision: 18,
+    scale: 2,
+    nullable: true,
+  })
   public highestTicket: number | null;
-} 
+}

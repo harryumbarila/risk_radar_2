@@ -10,4 +10,4 @@ export class GroupEntity {
 
   @Column({ name: 'GroupName', type: 'varchar', length: 255, nullable: true })
   public groupName: string | null;
-} 
+}

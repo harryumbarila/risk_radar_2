@@ -10,4 +10,4 @@ export class LeadsOwnerRepository extends Repository<LeadsOwnerEntity> {
   public constructor(@InjectDataSource('iris') dataSource: DataSource) {
     super(LeadsOwnerEntity, dataSource.createEntityManager());
   }
-} 
+}

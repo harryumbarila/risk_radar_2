@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsInt, IsNumber, IsObject, ValidateNested } from 'class-validator';
+import { IsArray, IsNumber, IsObject, ValidateNested } from 'class-validator';
+
 import { RiskRadarExceptionsListResultDto } from './risk-radar-exceptions-list-result.dto';
 
 export class PaginationMetaDto {
@@ -29,4 +30,4 @@ export class PaginatedRiskRadarExceptionsDto {
   @ValidateNested()
   @Type(() => PaginationMetaDto)
   public meta: PaginationMetaDto;
-} 
+}

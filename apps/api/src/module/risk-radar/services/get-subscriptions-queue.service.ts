@@ -10,8 +10,8 @@ export class GetSubscriptionsQueueService {
   ) {}
 
   // This service is a placeholder for future implementation
-  public async getSubscriptionsQueue(): Promise<any> {
+  public getSubscriptionsQueue(): { message: string } {
     this.logger.info('Getting subscriptions queue');
     return { message: 'Subscriptions queue feature not yet implemented' };
   }
-} 
+}

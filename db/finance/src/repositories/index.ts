@@ -1,6 +1,7 @@
 export * from './dft-256-batch.repository';
 export * from './dft-256-transaction.repository';
 export * from './dft-256-transaction-from-legacy-system.repository';
+export * from './merchant-exception-detail.repository';
 export * from './risk-radar-batch.repository';
 export * from './risk-radar-chargebacks-and-retrieval-reason-code-lookup.repository';
 export * from './risk-radar-email-template.repository';
@@ -11,6 +12,4 @@ export * from './risk-radar-issuing-bank.repository';
 export * from './risk-radar-merch-adj-param.repository';
 export * from './risk-radar-notes.repository';
 export * from './risk-radar-user.repository';
-export * from './merchant-exception-detail.repository';
-
 export * from './tsys-divert-flag-update.repository';
