@@ -14,6 +14,7 @@ import {
 } from '@nestjs/swagger';
 
 import type { PaginatedRiskRadarExceptionsDto } from '@/api/module/risk-radar-exceptions/dto/risk-radar-exceptions-pagination.dto';
+import { Public } from '@/api/shared/auth/decorator/public.decorator';
 import { RiskRadarExceptionStatusRepository } from '@/finance-db/repositories/risk-radar-exception-status.repository';
 import { RiskRadarUserRepository } from '@/finance-db/repositories/risk-radar-user.repository';
 import type { ExceptionDataResponseDto } from '@/shared/response/legacy-dashboard-proxy/dto/exception-data';
@@ -235,6 +236,7 @@ export class RiskRadarController {
     );
   }
 
+  @Public()
   @Get('exception-list')
   @ApiOkResponse()
   public async getExceptionList(
