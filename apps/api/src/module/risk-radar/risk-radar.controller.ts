@@ -234,10 +234,10 @@ export class RiskRadarController {
   @Get('merchant-exception-transaction')
   @ApiOkResponse()
   public async getMerchantExceptionTransactions(
-    @Query('riskRadarExceptionId') riskRadarExceptionId: string
+    @Query('riskRadarExceptionId') riskRadarExceptionId: number
   ) {
     return this.merchantExceptionTransactionsService.getExceptionTransactions(
-      parseInt(riskRadarExceptionId, 10)
+      riskRadarExceptionId
     );
   }
 }
