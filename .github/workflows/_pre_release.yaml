@@ -5,7 +5,7 @@ on:
     inputs:
       build-number:
         description: Build number from version
-        required: false
+        required: true
         type: string
       environment:
         description: 'The deploy environment'
