@@ -14,6 +14,8 @@ jobs:
   versioning:
     name: Generate build number
     uses: ./.github/workflows/_versioning.yaml
+    with:
+      release-type: 'pre-release'
 
   deploy-web:
     name: Deploy DENALI Web to AWS
