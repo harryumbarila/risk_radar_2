@@ -1,4 +1,5 @@
 import fastifyCompress from '@fastify/compress';
+import fastifyHelmet from '@fastify/helmet';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
@@ -24,6 +25,7 @@ async function bootstrap() {
   });
 
   await app.register(fastifyCompress);
+  await app.register(fastifyHelmet);
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -33,7 +35,7 @@ async function bootstrap() {
     })
   );
 
-  if (config.node.env === 'production') {
+  if (config.node.env !== 'production') {
     const options = new DocumentBuilder()
       .setTitle('TalusPay Dashboard API')
       .setVersion('v1')
