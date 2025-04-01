@@ -15,19 +15,7 @@ export class ExampleMultiDbController {
     private readonly merchantTINRepo: RiskRadarMerchantTaxIdRepository
   ) {}
 
-  @ApiResponse({
-    status: 200,
-    description: 'Pick some data from 2 dbs.',
-  })
-  @ApiOperation({ operationId: 'users', summary: 'Get filtered users' })
-  @Public()
-  @Get('data')
-  public data(): unknown {
-    return {};
-  }
-
   @ApiOperation({ operationId: 'merchantTIN', summary: 'Get Merchant TIN' })
-  @Public()
   @Get('get-merchant-tin')
   @ApiResponse({}) // TODO: Define type
   public async getMerchantTIN(@Query('mid') mid: string): Promise<unknown> {

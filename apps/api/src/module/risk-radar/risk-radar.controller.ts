@@ -51,7 +51,6 @@ export class RiskRadarController {
     private readonly merchantExceptionTransactionsService: MerchantExceptionTransactionsService
   ) {}
 
-  @Public()
   @Post('send-exception-memo-email')
   @ApiOkResponse({ description: 'Send exception memo emails' })
   public async sendExceptionMemoEmail(
@@ -62,7 +61,6 @@ export class RiskRadarController {
     return { message };
   }
 
-  @Public()
   @Post('merchant-exception-detail')
   @ApiOperation({
     summary: 'Get merchant exception details',
@@ -82,7 +80,6 @@ export class RiskRadarController {
     );
   }
 
-  @Public()
   @Get('merchant-card-num-history')
   @ApiResponse({})
   public async getMerchantCardNumHistory(
@@ -100,7 +97,6 @@ export class RiskRadarController {
     summary:
       'Get risk radar exceptions list with filtering and sorting options',
   })
-  @Public()
   @Get('list')
   public async getExceptionsList(
     @Query('from_date') dtStart: Date,
@@ -133,7 +129,6 @@ export class RiskRadarController {
   }
 
   @Get('exception_data')
-  @Public()
   @ApiOperation({
     summary: 'Get exception data',
     description: 'Returns exception statuses and related data for UI dropdowns',
@@ -216,21 +211,18 @@ export class RiskRadarController {
     };
   }
 
-  @Public()
   @Post('assign-exception-review')
   @ApiOkResponse()
   public assignExceptionReview(@Body() data: AssignExceptionReviewInputDto) {
     return this.assignExceptionReviewService.assignExceptionReview(data);
   }
 
-  @Public()
   @Post('save')
   @ApiOkResponse()
   public async saveRiskRadar(@Body() data: RiskRadarSaveInputDto) {
     return this.riskRadarSaveService.saveRiskRadar(data);
   }
 
-  @Public()
   @Get('merchant-exception-transaction')
   @ApiOkResponse()
   public async getMerchantExceptionTransactions(
