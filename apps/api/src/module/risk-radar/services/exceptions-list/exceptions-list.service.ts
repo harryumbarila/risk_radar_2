@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectPinoLogger, Logger } from 'nestjs-pino';
+import { InjectPinoLogger } from 'nestjs-pino';
+import { Logger } from 'pino';
 
 import { RiskRadarExceptionsJeffRepository } from '@/finance-db/repositories';
 import { LeadRepository } from '@/iris-db/repositories';
@@ -9,7 +10,8 @@ import type { ExceptionListInputDto } from './dto/exception-list-input.dto';
 @Injectable()
 export class ExceptionsListService {
   public constructor(
-    @InjectPinoLogger(ExceptionsListService.name) logger: Logger,
+    @InjectPinoLogger(ExceptionsListService.name)
+    private readonly logger: Logger,
     private readonly exceptionsJeffRepository: RiskRadarExceptionsJeffRepository,
     private readonly leadsRepository: LeadRepository
   ) {}
@@ -29,6 +31,8 @@ export class ExceptionsListService {
       processor,
       totalRecords,
     } = data;
+
+    this.logger.info('Query STARTING %o', data);
 
     // Use the query builder to get the query with all joins
     let query = this.buildFullQuery();
@@ -121,10 +125,13 @@ export class ExceptionsListService {
     let exceptions: Awaited<ReturnType<typeof query.getRawMany>>;
 
     if (shouldCalculateTotal) {
+      // TODO: Remove this once we have enable pagination in UI
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const countQuery = query.clone();
       [exceptions, totalCount] = await Promise.all([
         query.getRawMany(),
-        countQuery.getCount(),
+        0,
+        // countQuery.getCount(),
       ]);
     } else {
       exceptions = await query.getRawMany();

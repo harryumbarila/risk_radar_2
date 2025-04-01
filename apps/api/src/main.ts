@@ -20,6 +20,7 @@ async function bootstrap() {
     origin: [
       'https://dashboard.taluspay-staging.com',
       'https://dashboard.taluspay.com',
+      'http://localhost:3000',
     ],
     credentials: true,
   });

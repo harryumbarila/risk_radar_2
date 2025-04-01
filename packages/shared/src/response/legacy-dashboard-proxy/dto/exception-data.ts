@@ -1,10 +1,10 @@
-interface SourceType {
+export interface SourceType {
   pk: number;
   sName: string;
   bHidden: boolean;
 }
 
-interface ExceptionStatus {
+export interface ExceptionStatus {
   pkRiskRadarExceptionStatus: number;
   sExceptionStatusDesc: string;
   iSortOrder: number;
@@ -12,7 +12,7 @@ interface ExceptionStatus {
   dtCreated: string;
 }
 
-interface ExceptionType {
+export interface ExceptionType {
   pk: number;
   sDesc: string;
   bHidden: boolean;

@@ -3,7 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@denali/*": ["packages/*/src"]
+      "@denali/*": ["packages/*/src"],
+      "@/shared/*": ["./src/*"]
     }
   },
   "include": ["src"],
