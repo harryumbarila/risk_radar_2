@@ -12,6 +12,7 @@ import type { FC } from 'react';
 import { useEffect, useState } from 'react';
 
 import { DefaultLayout } from '@/components/layouts/default-layout';
+import { Pagination } from '@/components/risk-radar/pagination';
 import type { TransactionException } from '@/shared/response/legacy-dashboard-proxy';
 import { Tooltip } from '@/ui/common/tool-tips/risk-tooltip';
 import { Popup } from '@/web/src/components/risk-radar/popups/popups';
@@ -138,6 +139,8 @@ type EmailTemplate = {
   sTemplateEMailBody: string;
 };
 
+const ITEMS_PER_PAGE = 8;
+
 const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const { 'merchant-id': merchantId, 'exception-id': exceptionId } = params;
   const { user } = useAuth();
@@ -204,6 +207,54 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     isPinned: false,
     author: user?.name ?? null,
   });
+
+  // Add pagination states
+  const [exceptionsPage, setExceptionsPage] = useState(1);
+  const [notesPage, setNotesPage] = useState(1);
+  const [chargebacksPage, setChargebacksPage] = useState(1);
+  const [netSettlementPage, setNetSettlementPage] = useState(1);
+  const [volumePage, setVolumePage] = useState(1);
+
+  // Calculate paginated data
+  const paginatedExceptions =
+    transactionExceptionsData?.trans_exceptions?.slice(
+      (exceptionsPage - 1) * ITEMS_PER_PAGE,
+      exceptionsPage * ITEMS_PER_PAGE
+    );
+  const paginatedNotes = merchantNotesData?.slice(
+    (notesPage - 1) * ITEMS_PER_PAGE,
+    notesPage * ITEMS_PER_PAGE
+  );
+  const paginatedChargebacks = merchantChargebacksData?.slice(
+    (chargebacksPage - 1) * ITEMS_PER_PAGE,
+    chargebacksPage * ITEMS_PER_PAGE
+  );
+  const paginatedNetSettlements =
+    merchantNetSettlementData?.net_settlement?.slice(
+      (netSettlementPage - 1) * ITEMS_PER_PAGE,
+      netSettlementPage * ITEMS_PER_PAGE
+    );
+  const paginatedVolume = data?.processingSummaries?.slice(
+    (volumePage - 1) * ITEMS_PER_PAGE,
+    volumePage * ITEMS_PER_PAGE
+  );
+
+  // Calculate total pages
+  const totalExceptionsPages = Math.ceil(
+    (transactionExceptionsData?.trans_exceptions?.length || 0) / ITEMS_PER_PAGE
+  );
+  const totalNotesPages = Math.ceil(
+    (merchantNotesData?.length || 0) / ITEMS_PER_PAGE
+  );
+  const totalChargebacksPages = Math.ceil(
+    (merchantChargebacksData?.length || 0) / ITEMS_PER_PAGE
+  );
+  const totalNetSettlementPages = Math.ceil(
+    (merchantNetSettlementData?.net_settlement?.length || 0) / ITEMS_PER_PAGE
+  );
+  const totalVolumePages = Math.ceil(
+    (data?.processingSummaries?.length || 0) / ITEMS_PER_PAGE
+  );
 
   const handlePushNoteToIris = async (noteId: string): Promise<void> => {
     await pushNote(noteId);
@@ -418,10 +469,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     bAutoHoldWhite: data?.businessInfo?.isAutoHoldWhiteLabel || false,
     fkRiskExceptionStatus: data?.businessInfo?.exceptionStatusId || 0,
   };
-  const transactionExceptions = transactionExceptionsData?.trans_exceptions;
-  const merchantNotes = merchantNotesData?.notes;
-  const merchantChargebacks = merchantChargebacksData?.chargebacks;
-  const merchantNetSettlements = merchantNetSettlementData?.net_settlement;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const cardHistory: any[] =
@@ -944,7 +991,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {transactionExceptions?.map((exception) => (
+                    {paginatedExceptions?.map((exception) => (
                       <tr key={`${exception.pk}`} className="text-center">
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                           {exception.dtTransDate}
@@ -1007,6 +1054,11 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     ))}
                   </tbody>
                 </table>
+                <Pagination
+                  currentPage={exceptionsPage}
+                  totalPages={totalExceptionsPages}
+                  onPageChange={setExceptionsPage}
+                />
               </div>
             </div>
           </>
@@ -1036,7 +1088,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {merchantNotes?.map((note) => (
+                    {paginatedNotes?.map((note) => (
                       <tr key={`${note.pkNotes}`} className="text-center">
                         <td
                           className={`border-b border-[#eee] px-4 py-5 dark:border-strokedark ${
@@ -1074,6 +1126,11 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     ))}
                   </tbody>
                 </table>
+                <Pagination
+                  currentPage={notesPage}
+                  totalPages={totalNotesPages}
+                  onPageChange={setNotesPage}
+                />
                 <input
                   type="text"
                   value={noteRequest.sNotes ?? ''}
@@ -1100,12 +1157,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     }))
                   }
                 />
-                {/* <button
-                  className="inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 m-5 text-white hover:bg-opacity-90"
-                  type="button"
-                  onClick={()=>{
-                  }}
-                > Add</button> */}
               </div>
             </div>
           </>
@@ -1121,7 +1172,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   <thead>
                     <tr className="bg-gray-2 text-left dark:bg-meta-4 text-center">
                       <th className="p-4 font-medium text-black dark:text-white">
-                        case #
+                        Case #
                       </th>
                       <th className="p-4 font-medium text-black dark:text-white">
                         Trans Date
@@ -1147,19 +1198,25 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                       <th className="p-4 font-medium text-black dark:text-white">
                         Created Date
                       </th>
+                      <th className="p-4 font-medium text-black dark:text-white">
+                        P2 Chargeback
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {merchantChargebacks?.map((chargeback) => (
-                      <tr key={`${chargeback.pk}`} className="text-center">
+                    {paginatedChargebacks?.map((chargeback) => (
+                      <tr
+                        key={`${chargeback.sCaseNumber}`}
+                        className="text-center"
+                      >
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                           {chargeback.sCaseNumber}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {chargeback.dTTrans}
+                          {new Date(chargeback.dtTrans).toLocaleDateString()}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          ${chargeback.dAmt}
+                          ${chargeback.dAmt.toFixed(2)}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                           {chargeback.sCardNum}
@@ -1168,18 +1225,29 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           {chargeback.sPaymentType}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {chargeback.dtReceived}
+                          {new Date(chargeback.dtReceived).toLocaleDateString()}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                           {chargeback.sReferenceNum}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {chargeback.dtCreated}
+                          {chargeback.ReasonCodeDescription}
+                        </td>
+                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                          {new Date(chargeback.dtCreated).toLocaleDateString()}
+                        </td>
+                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                          {chargeback.bP2ChargebacksExists ? 'Yes' : 'No'}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+                <Pagination
+                  currentPage={chargebacksPage}
+                  totalPages={totalChargebacksPages}
+                  onPageChange={setChargebacksPage}
+                />
               </div>
             </div>
           </>
@@ -1224,7 +1292,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {merchantNetSettlements?.map((settlement) => (
+                    {paginatedNetSettlements?.map((settlement) => (
                       <tr
                         key={`${settlement.pkNetSettlement}`}
                         className="text-center"
@@ -1271,6 +1339,11 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     </tr>
                   </tbody>
                 </table>
+                <Pagination
+                  currentPage={netSettlementPage}
+                  totalPages={totalNetSettlementPages}
+                  onPageChange={setNetSettlementPage}
+                />
                 <div className="border border-gray-300 rounded-lg p-4 shadow-md bg-white">
                   <div className="flex items-center space-x-4">
                     {/* Amount Field */}
@@ -1392,60 +1465,47 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                 </tr>
               </thead>
               <tbody>
-                {data?.processingSummaries?.map(
-                  (vol: {
-                    year: number;
-                    month: string;
-                    volume: number;
-                    averageTicket: number;
-                    swipedPercentage: number;
-                    highestTicket: number;
-                    chargebackAmount: number;
-                    totalChargebacks: number;
-                    visaChargebackPercentage: number;
-                    mastercardChargebackPercentage: number;
-                    discoverChargebackPercentage: number;
-                    amexChargebackPercentage: number;
-                  }) => (
-                    <tr
-                      key={`${vol.year}-${vol.month}`}
-                      className="text-center"
-                    >
-                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        {vol.month} {vol.year}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        ${vol.volume.toLocaleString()}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        ${vol.averageTicket.toLocaleString()}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        {vol.swipedPercentage.toFixed(2)}%
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        ${vol.highestTicket.toLocaleString()}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        ${vol.totalChargebacks.toLocaleString()}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        {vol.visaChargebackPercentage.toFixed(2)}%
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        {vol.mastercardChargebackPercentage.toFixed(2)}%
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        {vol.discoverChargebackPercentage.toFixed(2)}%
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        {vol.amexChargebackPercentage.toFixed(2)}%
-                      </td>
-                    </tr>
-                  )
-                )}
+                {paginatedVolume?.map((vol) => (
+                  <tr key={`${vol.year}-${vol.month}`} className="text-center">
+                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                      {vol.month} {vol.year}
+                    </td>
+                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                      ${vol.volume.toLocaleString()}
+                    </td>
+                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                      ${vol.averageTicket.toLocaleString()}
+                    </td>
+                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                      {vol.swipedPercentage.toFixed(2)}%
+                    </td>
+                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                      ${vol.highestTicket.toLocaleString()}
+                    </td>
+                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                      ${vol.totalChargebacks.toLocaleString()}
+                    </td>
+                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                      {vol.visaChargebackPercentage.toFixed(2)}%
+                    </td>
+                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                      {vol.mastercardChargebackPercentage.toFixed(2)}%
+                    </td>
+                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                      {vol.discoverChargebackPercentage.toFixed(2)}%
+                    </td>
+                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                      {vol.amexChargebackPercentage.toFixed(2)}%
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
+            <Pagination
+              currentPage={volumePage}
+              totalPages={totalVolumePages}
+              onPageChange={setVolumePage}
+            />
           </div>
         </div>
       </section>

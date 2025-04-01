@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   addDays,
   format,
@@ -10,16 +10,13 @@ import {
   subDays,
 } from 'date-fns';
 import { InjectPinoLogger } from 'nestjs-pino';
-import { Logger } from 'pino';
 
 import {
   CLXReportingSearchAVSResponseLookupRepository,
   CLXReportingSearchPaymentMethodLookupRepository,
 } from '@/data-warehouse-db/repositories';
-import type {
-  RiskRadarBatch,
-  RiskRadarTransaction,
-} from '@/finance-db/entities';
+import type { RiskRadarBatch } from '@/finance-db/entities/risk-radar-batch.entity';
+import type { RiskRadarTransaction } from '@/finance-db/entities/risk-radar-transaction.entity';
 import {
   AuthResponseLookupRepository,
   DailyDetailRepository,
@@ -30,8 +27,6 @@ import {
   RiskRadarExceptionsJeffRepository,
   RiskRadarTransactionRepository,
 } from '@/finance-db/repositories';
-
-import type { MerchantExceptionTransactionsInputDto } from './dto/merchant-exception-transactions.dto';
 
 type TransactionResult = {
   transactionDate: Date;
@@ -67,14 +62,10 @@ export class MerchantExceptionTransactionsService {
   ) {}
 
   public async getExceptionTransactions(
-    data: MerchantExceptionTransactionsInputDto
-  ): Promise<TransactionResult[]> {
-    const { riskRadarExceptionId, binSearch, sortBy } = data;
-
-    if (Math.abs(sortBy) > 9) {
-      throw new Error('Invalid sortBy value. Must be between -9 and 9');
-    }
-
+    riskRadarExceptionId: number,
+    binSearch: string,
+    sortBy: number
+  ) {
     const exception = await this.riskRadarExceptionsJeff.findOne({
       where: { id: riskRadarExceptionId },
       select: ['mid', 'fundingDate', 'achFundingTime', 'createdAt'],

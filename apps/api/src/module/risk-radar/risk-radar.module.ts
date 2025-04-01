@@ -21,6 +21,7 @@ import {
 } from '@/finance-db/entities';
 import {
   AuthResponseLookupRepository,
+  ChargebacksAndRetrievalReasonCodeLookupRepository,
   DailyDetailRepository,
   DFT256BatchRepository,
   DFT256TransactionFromLegacySystemRepository,
@@ -117,6 +118,7 @@ import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save
     SourceRepository,
     LeadsOwnerRepository,
     PartnerAndSalesAgentIdentificationRepository,
+    ChargebacksAndRetrievalReasonCodeLookupRepository,
 
     RiskRadarUserRepository,
     RiskRadarEmailTemplateRepository,
