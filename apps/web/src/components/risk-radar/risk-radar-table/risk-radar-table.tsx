@@ -24,68 +24,30 @@ import type { RiskUser } from '@/shared/response/legacy-dashboard-proxy';
 import { useExceptionData } from '@/web/src/hooks/risk-radar/use-exception-data';
 import { useFilteredRiskRadar } from '@/web/src/hooks/risk-radar/use-filtered-risk-radar';
 
-type RiskRadarData = {
-  dba: string;
-  net_dep_amt: number;
-  fsp_appr_auth_tot_amt: number;
-  auth_decline_amt: number;
-  activation_datetime: string;
-  channel: string;
-  reseller: string;
-  risk_watch: boolean;
-  new_account: boolean;
-  exception_id: string;
-  assigned_user_id?: number;
-  user_reviewed?: string;
-  keyed_perc_score: number;
-  avg_ticket_score: number;
-  high_ticket_score: number;
-  credit_score: number;
-  channel_score: number;
-  monthly_vol_score: number;
-  avg_batch_score: number;
-  dup_card_score: number;
-  dup_bin_score: number;
-  late_post_score: number;
-  foreign_keyed_score: number;
-  chbk_ret_req_score: number;
-  divert: boolean;
-  divert_balance_amt: number;
-  amex_opt_blue: boolean;
-  moto_avs_score: number;
-  settle_30perc_more_than_auth_score: number;
-  no_auth_score: number;
-  auth_decline_score: number;
-  neg_batch_score: number;
-  auto_hold_score: number;
-  funding_exception_score: number;
-  exception_created_datetime: string;
-  mid: string;
-};
-
 type RiskRadarTableProps = {
   data: PaginatedAPIResponse<RiskRadarExceptionsListRow>;
   status: number;
 };
 
-type CustomColumn = Column<RiskRadarData>;
+type CustomColumn = Column<RiskRadarExceptionsListRow>;
 
 // Update the TableInstance type to include pagination properties
-type TableInstanceWithPagination<T extends object = RiskRadarData> =
-  TableInstance<T> & {
-    page: Row<T>[];
-    state: TableState<T> & {
-      pageIndex: number;
-      pageSize: number;
-    };
-    nextPage: () => void;
-    previousPage: () => void;
-    canNextPage: boolean;
-    canPreviousPage: boolean;
-    pageOptions: number[];
-    setPageSize: (pageSize: number) => void;
-    gotoPage: (pageIndex: number) => void;
+type TableInstanceWithPagination<
+  T extends object = RiskRadarExceptionsListRow,
+> = TableInstance<T> & {
+  page: Row<T>[];
+  state: TableState<T> & {
+    pageIndex: number;
+    pageSize: number;
   };
+  nextPage: () => void;
+  previousPage: () => void;
+  canNextPage: boolean;
+  canPreviousPage: boolean;
+  pageOptions: number[];
+  setPageSize: (pageSize: number) => void;
+  gotoPage: (pageIndex: number) => void;
+};
 
 export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
   data,
@@ -151,7 +113,7 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
   };
 
   const formatBoolean = (value: unknown): string => {
-    return value ? 'Yes' : 'No';
+    return value === 'Yes' ? 'Yes' : 'No';
   };
 
   const formatDate = (value: unknown): string => {
@@ -167,164 +129,165 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
     const baseColumns: CustomColumn[] = [
       {
         Header: 'DBA',
-        accessor: 'dba',
+        accessor: 'sDBA',
       },
       {
         Header: 'Net Deposit',
-        accessor: 'net_dep_amt',
-        Cell: ({ value }) => formatNumber(value),
+        accessor: 'dNetDepAmt',
+        Cell: ({ value }: { value: unknown }) => formatNumber(value),
       },
       {
         Header: 'FSP Approved Auth',
-        accessor: 'fsp_appr_auth_tot_amt',
-        Cell: ({ value }) => formatNumber(value),
+        accessor: () => 0, // This field doesn't exist in the API response
+        Cell: ({ value }: { value: unknown }) => formatNumber(value),
       },
       {
         Header: 'Auth Decline',
-        accessor: 'auth_decline_amt',
-        Cell: ({ value }) => formatNumber(value),
+        accessor: 'dAuthDeclineAmt',
+        Cell: ({ value }: { value: unknown }) => formatNumber(value),
       },
       {
         Header: 'Activation Date',
-        accessor: 'activation_datetime',
-        Cell: ({ value }) => formatDate(value),
+        accessor: 'dtActivated',
+        Cell: ({ value }: { value: unknown }) => formatDate(value),
       },
       {
         Header: 'Channel',
-        accessor: 'channel',
+        accessor: 'sChannel',
       },
       {
         Header: 'Reseller',
-        accessor: 'reseller',
+        accessor: 'sReseller',
       },
       {
         Header: 'Risk Watch',
-        accessor: 'risk_watch',
-        Cell: ({ value }) => formatBoolean(value),
+        accessor: 'bRiskWatch',
+        Cell: ({ value }: { value: unknown }) => formatBoolean(value),
       },
       {
         Header: 'New Account',
-        accessor: 'new_account',
-        Cell: ({ value }) => formatBoolean(value),
+        accessor: 'bNewAcct',
+        Cell: ({ value }: { value: unknown }) => formatBoolean(value),
       },
       {
         Header: 'Keyed %',
-        accessor: 'keyed_perc_score',
-        Cell: ({ value }) => formatNumber(value),
+        accessor: 'iNumOfKeyedTransAboveLimit',
+        Cell: ({ value }: { value: unknown }) => formatNumber(value),
       },
       {
         Header: 'Avg Ticket',
-        accessor: 'avg_ticket_score',
-        Cell: ({ value }) => formatNumber(value),
+        accessor: () => 0, // Not in the API response
+        Cell: ({ value }: { value: unknown }) => formatNumber(value),
       },
       {
         Header: 'High Ticket',
-        accessor: 'high_ticket_score',
-        Cell: ({ value }) => formatNumber(value),
+        accessor: 'iTransAmtAboveHighTicketLimit',
+        Cell: ({ value }: { value: unknown }) => formatNumber(value),
       },
       {
         Header: 'Credit',
-        accessor: 'credit_score',
-        Cell: ({ value }) => formatNumber(value),
+        accessor: 'iCreditRule',
+        Cell: ({ value }: { value: unknown }) => formatNumber(value),
       },
       {
         Header: 'Channel',
-        accessor: 'channel_score',
-        Cell: ({ value }) => formatNumber(value),
+        accessor: 'iSalesChannelRule',
+        Cell: ({ value }: { value: unknown }) => formatNumber(value),
       },
       {
         Header: 'Monthly Vol',
-        accessor: 'monthly_vol_score',
-        Cell: ({ value }) => formatNumber(value),
+        accessor: 'iBatchVolAboveLimit',
+        Cell: ({ value }: { value: unknown }) => formatNumber(value),
       },
       {
         Header: 'Avg Batch',
-        accessor: 'avg_batch_score',
-        Cell: ({ value }) => formatNumber(value),
+        accessor: 'iAvgBatch',
+        Cell: ({ value }: { value: unknown }) => formatNumber(value),
       },
       {
         Header: 'Dup Card',
-        accessor: 'dup_card_score',
-        Cell: ({ value }) => formatNumber(value),
+        accessor: 'iDupCard',
+        Cell: ({ value }: { value: unknown }) => formatNumber(value),
       },
       {
         Header: 'Dup Bin',
-        accessor: 'dup_bin_score',
-        Cell: ({ value }) => formatNumber(value),
+        accessor: 'iDupBin',
+        Cell: ({ value }: { value: unknown }) => formatNumber(value),
       },
       {
         Header: 'Late Post',
-        accessor: 'late_post_score',
-        Cell: ({ value }) => formatNumber(value),
+        accessor: 'iLatePostTrans',
+        Cell: ({ value }: { value: unknown }) => formatNumber(value),
       },
       {
         Header: 'Foreign Keyed',
-        accessor: 'foreign_keyed_score',
-        Cell: ({ value }) => formatNumber(value),
+        accessor: 'iFgnkeyedTrans',
+        Cell: ({ value }: { value: unknown }) => formatNumber(value),
       },
       {
         Header: 'Chargeback',
-        accessor: 'chbk_ret_req_score',
-        Cell: ({ value }) => formatNumber(value),
+        accessor: 'iChbkOrIRR',
+        Cell: ({ value }: { value: unknown }) => formatNumber(value),
       },
       {
         Header: 'Divert',
-        accessor: 'divert',
-        Cell: ({ value }) => formatBoolean(value),
+        accessor: 'bDivert',
+        Cell: ({ value }: { value: unknown }) => formatBoolean(value),
       },
       {
         Header: 'Divert Balance',
-        accessor: 'divert_balance_amt',
-        Cell: ({ value }) => formatNumber(value),
+        accessor: 'dSettlementBalance',
+        Cell: ({ value }: { value: unknown }) => formatNumber(value),
       },
       {
         Header: 'Amex OptBlue',
-        accessor: 'amex_opt_blue',
-        Cell: ({ value }) => formatBoolean(value),
+        accessor: 'sAMEXOptBlueInd',
+        Cell: ({ value }: { value: unknown }) => formatBoolean(value),
       },
       {
         Header: 'MOTO AVS',
-        accessor: 'moto_avs_score',
-        Cell: ({ value }) => formatScore(value),
+        accessor: 'iMototIoAVS',
+        Cell: ({ value }: { value: unknown }) => formatScore(value),
       },
       {
         Header: 'Settle 30%+',
-        accessor: 'settle_30perc_more_than_auth_score',
-        Cell: ({ value }) => formatScore(value),
+        accessor: 'iAuthCaptureAmtLargeVariation',
+        Cell: ({ value }: { value: unknown }) => formatScore(value),
       },
       {
         Header: 'No Auth',
-        accessor: 'no_auth_score',
-        Cell: ({ value }) => formatScore(value),
+        accessor: 'iNoAuthTrans',
+        Cell: ({ value }: { value: unknown }) => formatScore(value),
       },
       {
         Header: 'Auth Decline',
-        accessor: 'auth_decline_score',
-        Cell: ({ value }) => formatScore(value),
+        accessor: 'iAuthDecline',
+        Cell: ({ value }: { value: unknown }) => formatScore(value),
       },
       {
         Header: 'Negative Batch',
-        accessor: 'neg_batch_score',
-        Cell: ({ value }) => formatScore(value),
+        accessor: 'iNegDailyBatches',
+        Cell: ({ value }: { value: unknown }) => formatScore(value),
       },
       {
         Header: 'Auto Hold',
-        accessor: 'auto_hold_score',
-        Cell: ({ value }) => formatScore(value),
+        accessor: 'iAutoHold',
+        Cell: ({ value }: { value: unknown }) => formatScore(value),
       },
       {
         Header: 'Funding Exception',
-        accessor: 'funding_exception_score',
-        Cell: ({ value }) => formatScore(value),
+        accessor: 'iFundingExclusionAndException',
+        Cell: ({ value }: { value: unknown }) => formatScore(value),
       },
       {
         Header: 'Exception Created',
-        accessor: 'exception_created_datetime',
-        Cell: ({ value }) => formatDate(value),
+        accessor: 'dtCreated',
+        Cell: ({ value }: { value: unknown }) => formatDate(value),
       },
       {
         Header: 'Exception ID',
-        accessor: 'exception_id',
+        accessor: 'pkRiskRadarExceptions',
+        Cell: ({ value }: { value: unknown }) => String(value),
       },
     ];
 
@@ -341,17 +304,21 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
             </button>
           </div>
         ),
-        accessor: 'user_reviewed',
-        Cell: ({ row }: CellProps<RiskRadarData>) => (
+        accessor: 'sUserReviewed',
+        Cell: ({ row }: CellProps<RiskRadarExceptionsListRow>) => (
           <input
             type="checkbox"
             placeholder="Enter notes"
             onClick={(e) => {
               e.stopPropagation();
             }}
-            checked={reviewIds.includes(row.original.exception_id)}
+            checked={reviewIds.includes(
+              String(row.original.pkRiskRadarExceptions)
+            )}
             onChange={() =>
-              handleReviewCheckboxChange(row.original.exception_id)
+              handleReviewCheckboxChange(
+                String(row.original.pkRiskRadarExceptions)
+              )
             }
             className="border p-1 rounded"
           />
@@ -360,8 +327,8 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
     } else if (status === 2) {
       baseColumns.push({
         Header: 'Reviewed',
-        accessor: 'user_reviewed',
-        Cell: ({ value }: CellProps<RiskRadarData>) =>
+        accessor: 'sUserReviewed',
+        Cell: ({ value }: CellProps<RiskRadarExceptionsListRow>) =>
           value ? String(value) : 'N/A',
       });
     } else if (status === 3) {
@@ -389,14 +356,18 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
             </button>
           </div>
         ),
-        accessor: 'user_reviewed',
-        Cell: ({ row }: CellProps<RiskRadarData>) => (
+        accessor: 'sUserReviewed',
+        Cell: ({ row }: CellProps<RiskRadarExceptionsListRow>) => (
           <input
             type="checkbox"
             onClick={(e) => e.stopPropagation()}
-            checked={assignedExceptionIds.includes(row.original.exception_id)}
+            checked={assignedExceptionIds.includes(
+              String(row.original.pkRiskRadarExceptions)
+            )}
             onChange={() =>
-              handleAssignedCheckboxChange(row.original.exception_id)
+              handleAssignedCheckboxChange(
+                String(row.original.pkRiskRadarExceptions)
+              )
             }
             className="border p-1 rounded"
           />
@@ -405,11 +376,10 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
     } else if (status === 4) {
       baseColumns.push({
         Header: 'Assigned to',
-        accessor: 'assigned_user_id',
-        Cell: ({ row }: CellProps<RiskRadarData>) =>
+        accessor: (row) => row.sNTUserID,
+        Cell: ({ row }: CellProps<RiskRadarExceptionsListRow>) =>
           riskUsers?.find(
-            (user) =>
-              String(user.sNTUserID) === String(row.original.assigned_user_id)
+            (user) => String(user.sNTUserID) === String(row.original.sNTUserID)
           )?.sName ?? 'N/A',
       });
     }
@@ -425,66 +395,14 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
     handleAssignedCheckboxChange,
   ]);
 
-  const transformedData = useMemo(() => {
-    // Check if data exists and has the expected structure
-    if (!data || !data.data || !Array.isArray(data.data)) {
-      return [];
-    }
-
-    return data.data.map((item: RiskRadarExceptionsListRow) => ({
-      dba: item.sDBA || '',
-      net_dep_amt: Number(item.dNetDepAmt || 0),
-      fsp_appr_auth_tot_amt: 0, // This field doesn't seem to exist in the API response
-      auth_decline_amt: Number(item.dAuthDeclineAmt || 0),
-      activation_datetime: item.dtActivated
-        ? new Date(item.dtActivated).toISOString()
-        : '',
-      channel: item.sChannel || '',
-      reseller: item.sReseller || '',
-      risk_watch: item.bRiskWatch === 'Yes',
-      new_account: item.bNewAcct === 'Yes',
-      exception_id: String(item.pkRiskRadarExceptions),
-      assigned_user_id: undefined, // We'll need to map this from somewhere if needed
-      user_reviewed: item.sUserReviewed,
-      keyed_perc_score: Number(item.iNumOfKeyedTransAboveLimit || 0),
-      avg_ticket_score: 0, // Not in the API response
-      high_ticket_score: Number(item.iTransAmtAboveHighTicketLimit || 0),
-      credit_score: Number(item.iCreditRule || 0),
-      channel_score: Number(item.iSalesChannelRule || 0),
-      monthly_vol_score: Number(item.iBatchVolAboveLimit || 0),
-      avg_batch_score: Number(item.iAvgBatch || 0),
-      dup_card_score: Number(item.iDupCard || 0),
-      dup_bin_score: Number(item.iDupBin || 0),
-      late_post_score: Number(item.iLatePostTrans || 0),
-      foreign_keyed_score: Number(item.iFgnkeyedTrans || 0),
-      chbk_ret_req_score: Number(item.iChbkOrIRR || 0),
-      divert: item.bDivert === 'Yes',
-      divert_balance_amt: Number(item.dSettlementBalance || 0),
-      amex_opt_blue: item.sAMEXOptBlueInd === 'Yes',
-      moto_avs_score: Number(item.iMototIoAVS || 0),
-      settle_30perc_more_than_auth_score: Number(
-        item.iAuthCaptureAmtLargeVariation || 0
-      ),
-      no_auth_score: Number(item.iNoAuthTrans || 0),
-      auth_decline_score: Number(item.iAuthDecline || 0),
-      neg_batch_score: Number(item.iNegDailyBatches || 0),
-      auto_hold_score: Number(item.iAutoHold || 0),
-      funding_exception_score: Number(item.iFundingExclusionAndException || 0),
-      exception_created_datetime: item.dtCreated
-        ? new Date(item.dtCreated).toISOString()
-        : '',
-      mid: item.sMID,
-    }));
-  }, [data]);
-
-  const tableInstance = useTable<RiskRadarData>(
+  const tableInstance = useTable<RiskRadarExceptionsListRow>(
     {
       columns,
-      data: transformedData,
+      data: data.data || [],
       initialState: {
         pageSize: data.pageSize || DEFAULT_PAGE_SIZE,
         pageIndex: (data?.page || DEFAULT_PAGE_NUMBER) - 1,
-      } as Partial<TableState<RiskRadarData>>,
+      } as Partial<TableState<RiskRadarExceptionsListRow>>,
       // Tell the table we'll handle pagination ourselves
       // @ts-expect-error - manualPagination is supported but TypeScript definitions might be outdated
       manualPagination: true,
@@ -493,7 +411,7 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
     useFilters,
     useSortBy,
     usePagination
-  ) as TableInstanceWithPagination<RiskRadarData>;
+  ) as TableInstanceWithPagination<RiskRadarExceptionsListRow>;
 
   const {
     getTableProps,
@@ -543,7 +461,7 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
   const router = useRouter();
 
   const goToMerchantDetails = useCallback(
-    (merchantId: string, exceptionId: string): void => {
+    (merchantId: string, exceptionId: number): void => {
       router.push(
         `/risk-radar/merchants/${merchantId}/exception/${exceptionId}`
       );
@@ -585,24 +503,26 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
           className="datatable-table w-full table-auto !border-collapse break-words px-4 md:px-8 align-middle"
         >
           <thead>
-            {headerGroups.map((headerGroup: HeaderGroup<RiskRadarData>) => (
-              <tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
-                {headerGroup.headers.map(
-                  (column: ColumnInstance<RiskRadarData>) => (
-                    <th {...column.getHeaderProps()} key={column.id}>
-                      <div className="flex items-center">
-                        <span>
-                          {column.render('Header') as React.ReactNode}
-                        </span>
-                      </div>
-                    </th>
-                  )
-                )}
-              </tr>
-            ))}
+            {headerGroups.map(
+              (headerGroup: HeaderGroup<RiskRadarExceptionsListRow>) => (
+                <tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
+                  {headerGroup.headers.map(
+                    (column: ColumnInstance<RiskRadarExceptionsListRow>) => (
+                      <th {...column.getHeaderProps()} key={column.id}>
+                        <div className="flex items-center">
+                          <span>
+                            {column.render('Header') as React.ReactNode}
+                          </span>
+                        </div>
+                      </th>
+                    )
+                  )}
+                </tr>
+              )
+            )}
           </thead>
           <tbody {...getTableBodyProps()}>
-            {page.map((row: Row<RiskRadarData>) => {
+            {page.map((row: Row<RiskRadarExceptionsListRow>) => {
               prepareRow(row);
               return (
                 <tr
@@ -610,12 +530,12 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
                   key={row.id}
                   onClick={() =>
                     goToMerchantDetails(
-                      row.original.mid,
-                      row.original.exception_id
+                      row.original.sMID,
+                      row.original.pkRiskRadarExceptions
                     )
                   }
                 >
-                  {row.cells.map((cell: Cell<RiskRadarData>) => (
+                  {row.cells.map((cell: Cell<RiskRadarExceptionsListRow>) => (
                     <td {...cell.getCellProps()} key={cell.column.id}>
                       {cell.render('Cell') as React.ReactNode}
                     </td>
