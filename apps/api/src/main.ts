@@ -1,14 +1,21 @@
+import fastifyCompress from '@fastify/compress';
+import fastifyHelmet from '@fastify/helmet';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import type { NestFastifyApplication } from '@nestjs/platform-fastify';
+import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as compression from 'compression';
 import { writeFileSync } from 'fs';
 
 import { AppModule } from './app.module';
 import { config } from './config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter()
+  );
+
   app.enableCors({
     origin: [
       'https://dashboard.taluspay-staging.com',
@@ -17,8 +24,9 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  app.use(compression());
+  await app.register(fastifyCompress);
+  await app.register(fastifyHelmet);
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -27,7 +35,7 @@ async function bootstrap() {
     })
   );
 
-  if (config.node.env === 'production') {
+  if (config.node.env !== 'production') {
     const options = new DocumentBuilder()
       .setTitle('TalusPay Dashboard API')
       .setVersion('v1')

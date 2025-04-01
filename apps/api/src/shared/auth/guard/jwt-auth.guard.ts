@@ -1,7 +1,7 @@
 import type { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import type { Request } from 'express';
+import type { FastifyRequest } from 'fastify';
 
 import { AuthService } from '@/api/shared/auth/auth.service';
 import { IS_PUBLIC_KEY } from '@/api/shared/auth/decorator/public.decorator';
@@ -25,7 +25,7 @@ export class JwtAuthGuard implements CanActivate {
       return true;
     }
 
-    const request: Request = context.switchToHttp().getRequest();
+    const request: FastifyRequest = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
@@ -46,7 +46,7 @@ export class JwtAuthGuard implements CanActivate {
     throw new UnauthorizedException();
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
+  private extractTokenFromHeader(request: FastifyRequest): string | undefined {
     return request.headers.authorization;
   }
 }
