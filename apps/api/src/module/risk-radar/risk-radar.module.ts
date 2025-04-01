@@ -67,6 +67,7 @@ import { SnapPccSalesConfirmationRepository } from '@/snap-pcc-db/repositories';
 import { RiskRadarController } from './risk-radar.controller';
 import { RiskRadarService } from './risk-radar.service';
 import { AssignExceptionReviewService } from './services/assign-exception-review/assign-exception-review.service';
+import { ExceptionsListService } from './services/exceptions-list/exceptions-list.service';
 import { GetSubscriptionsQueueService } from './services/get-subscriptions-queue.service';
 import { MerchantCardNumHistoryService } from './services/merchant-card-num-history/merchant-card-num-history.service';
 import { MerchantExceptionDetailService } from './services/merchant-exception-detail.service';
@@ -162,6 +163,7 @@ import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save
     RiskRadarExceptionsService,
     RiskRadarSaveService,
     MerchantExceptionTransactionsService,
+    ExceptionsListService,
   ],
 })
 export class RiskRadarModule {}
