@@ -14,7 +14,6 @@ import {
 } from '@nestjs/swagger';
 
 import type { PaginatedRiskRadarExceptionsDto } from '@/api/module/risk-radar-exceptions/dto/risk-radar-exceptions-pagination.dto';
-import { Public } from '@/api/shared/auth/decorator/public.decorator';
 import { RiskRadarExceptionStatusRepository } from '@/finance-db/repositories/risk-radar-exception-status.repository';
 import { RiskRadarUserRepository } from '@/finance-db/repositories/risk-radar-user.repository';
 import type { ExceptionDataResponseDto } from '@/shared/response/legacy-dashboard-proxy/dto/exception-data';
@@ -24,6 +23,8 @@ import { SendExceptionMemoEmailDto } from './dtos/send-exception-memo-email.dto'
 import { RiskRadarService } from './risk-radar.service';
 import { AssignExceptionReviewService } from './services/assign-exception-review/assign-exception-review.service';
 import { AssignExceptionReviewInputDto } from './services/assign-exception-review/dto/assign-exception-review-input.dto';
+import { ExceptionListInputDto } from './services/exceptions-list/dto/exception-list-input.dto';
+import { ExceptionsListService } from './services/exceptions-list/exceptions-list.service';
 import { MerchantCardNumHistoryQueryDto } from './services/merchant-card-num-history/dto/get-merchant-card-num.dto';
 import { MerchantCardNumHistoryService } from './services/merchant-card-num-history/merchant-card-num-history.service';
 import { MerchantExceptionDetailService } from './services/merchant-exception-detail.service';
@@ -44,10 +45,10 @@ export class RiskRadarController {
     private readonly riskRadarSaveService: RiskRadarSaveService,
     private readonly exceptionStatusRepo: RiskRadarExceptionStatusRepository,
     private readonly riskRadarUserRepository: RiskRadarUserRepository,
-    private readonly merchantExceptionTransactionsService: MerchantExceptionTransactionsService
+    private readonly merchantExceptionTransactionsService: MerchantExceptionTransactionsService,
+    private readonly exceptionsListService: ExceptionsListService
   ) {}
 
-  @Public()
   @Post('send-exception-memo-email')
   @ApiOkResponse({ description: 'Send exception memo emails' })
   public async sendExceptionMemoEmail(
@@ -82,7 +83,6 @@ export class RiskRadarController {
     });
   }
 
-  @Public()
   @Get('merchant-card-num-history')
   @ApiResponse({})
   public async getMerchantCardNumHistory(
@@ -100,7 +100,6 @@ export class RiskRadarController {
     summary:
       'Get risk radar exceptions list with filtering and sorting options',
   })
-  @Public()
   @Get('list')
   public async getExceptionsList(
     @Query('from_date') dtStart: Date,
@@ -133,7 +132,6 @@ export class RiskRadarController {
   }
 
   @Get('exception_data')
-  @Public()
   @ApiOperation({
     summary: 'Get exception data',
     description: 'Returns exception statuses and related data for UI dropdowns',
@@ -216,21 +214,18 @@ export class RiskRadarController {
     };
   }
 
-  @Public()
   @Post('assign-exception-review')
   @ApiOkResponse()
   public assignExceptionReview(@Body() data: AssignExceptionReviewInputDto) {
     return this.assignExceptionReviewService.assignExceptionReview(data);
   }
 
-  @Public()
   @Post('save')
   @ApiOkResponse()
   public async saveRiskRadar(@Body() data: RiskRadarSaveInputDto) {
     return this.riskRadarSaveService.saveRiskRadar(data);
   }
 
-  @Public()
   @Get('merchant-exception-transaction')
   @ApiOkResponse()
   public async getMerchantExceptionTransactions(
@@ -239,5 +234,13 @@ export class RiskRadarController {
     return this.merchantExceptionTransactionsService.getExceptionTransactions(
       parseInt(riskRadarExceptionId, 10)
     );
+  }
+
+  @Get('exception-list')
+  @ApiOkResponse()
+  public async getExceptionList(
+    @Query(ValidationPipe) query: ExceptionListInputDto
+  ) {
+    return this.exceptionsListService.getExceptionList(query);
   }
 }

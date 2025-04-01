@@ -1,14 +1,6 @@
-name: DENALI CI
+name: Run code quality checks
 
-on:
-  push:
-    branches: [master, develop]
-  pull_request:
-    branches: [master, develop]
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+on: [workflow_call]
 
 # These are MOCKED environment variables that are required for the CI to run
 env:
@@ -25,11 +17,8 @@ env:
   NEXT_PUBLIC_MERCHANT_BASE_URL: 'http://localhost:3000'
 
 jobs:
-  container-job:
-    name: DENALI CI
+  code-checks:
     runs-on: ubuntu-latest
-    container: node:22.14.0-slim
-
     steps:
       - name: Check out code
         uses: actions/checkout@v4
