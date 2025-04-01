@@ -16,70 +16,13 @@ import type {
 import { useFilters, usePagination, useSortBy, useTable } from 'react-table';
 
 import { useAssignExceptionToUser } from '@/hooks/risk-radar/use-assign-exception-to-user';
-import type { FilterState } from '@/hooks/risk-radar/use-filtered-risk-radar';
 import { useReviewExceptionByUsername } from '@/hooks/risk-radar/use-review-exception-by-username';
+import type { PaginatedAPIResponse } from '@/shared/common';
+import { DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE } from '@/shared/request';
+import type { RiskRadarExceptionsListRow } from '@/shared/response';
 import type { RiskUser } from '@/shared/response/legacy-dashboard-proxy';
-
-// Define the types for the paginated API response
-type PaginationMetaDto = {
-  records_per_page: number;
-  current_page: number;
-  last_page: number;
-  from_record: number;
-  to_record: number;
-};
-
-type RiskRadarExceptionsListResultDto = {
-  pkRiskRadarExceptions: number;
-  dNetDepAmt?: number;
-  sDBA?: string;
-  sSolutionConsultant?: string;
-  bSelfGen?: string;
-  iTransAmtAboveLimit?: number;
-  iNumOfKeyedTransAboveLimit?: number;
-  iBatchVolAboveLimit?: number;
-  iDupCard?: number;
-  bNewAcct?: string;
-  iDupBin?: number;
-  iLatePostTrans?: number;
-  iFgnkeyedTrans?: number;
-  iNoAuthTrans?: number;
-  iChbkOrIRR?: number;
-  bNextDayFundingAcct?: string;
-  sMID: string;
-  sNTUserID?: string;
-  dtTransmission?: Date;
-  bDivert?: string;
-  sAMEXOptBlueInd?: string;
-  iAuthCaptureAmtLargeVariation?: number;
-  bRiskWatch?: string;
-  dSettlementBalance?: number;
-  iAvgBatch?: number;
-  iNegDailyBatches?: number;
-  iMototIoAVS?: number;
-  iAuthDecline?: number;
-  iTotalPoints?: number;
-  dAuthDeclineAmt: number;
-  sUserReviewed?: string;
-  dtActivated?: Date;
-  dtCreated: Date;
-  sChannel: string;
-  iAutoHold?: number;
-  dtAutoApproved?: Date;
-  iTransAmtAboveHighTicketLimit?: number;
-  iCreditRule?: number;
-  iSalesChannelRule?: number;
-  iFundingExclusionAndException?: number;
-  dAuthNonDeclinedAmt: number;
-  sReseller: string;
-  sReferralPartner: string;
-  sISV: string;
-};
-
-type PaginatedRiskRadarExceptionsDto = {
-  data: RiskRadarExceptionsListResultDto[];
-  meta: PaginationMetaDto;
-};
+import { useExceptionData } from '@/web/src/hooks/risk-radar/use-exception-data';
+import { useFilteredRiskRadar } from '@/web/src/hooks/risk-radar/use-filtered-risk-radar';
 
 type RiskRadarData = {
   dba: string;
@@ -121,11 +64,8 @@ type RiskRadarData = {
 };
 
 type RiskRadarTableProps = {
-  data: PaginatedRiskRadarExceptionsDto;
-  setFilters: React.Dispatch<React.SetStateAction<FilterState>>;
+  data: PaginatedAPIResponse<RiskRadarExceptionsListRow>;
   status: number;
-  riskUsers: { risk_users: RiskUser[] };
-  filters: FilterState;
 };
 
 type CustomColumn = Column<RiskRadarData>;
@@ -149,17 +89,18 @@ type TableInstanceWithPagination<T extends object = RiskRadarData> =
 
 export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
   data,
-  filters,
-  setFilters,
   status,
-  riskUsers,
 }): JSX.Element => {
   const [reviewIds, setReviewIds] = useState<string[]>([]);
   const [assignedExceptionIds, setAssignedExceptionIds] = useState<string[]>(
     []
   );
+
+  const { data: exceptionData } = useExceptionData();
+  const riskUsers = exceptionData?.risk_user;
+
   const [assignedUser, setAssignedUser] = useState(
-    String(riskUsers?.risk_users?.[0]?.user_id ?? '')
+    String(riskUsers?.[0]?.sNTUserID ?? '')
   );
   const { user } = useAuth();
 
@@ -433,9 +374,9 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
               onChange={(e) => setAssignedUser(e.target.value)}
               className="bg-transparent pl-2"
             >
-              {riskUsers?.risk_users?.map((user: RiskUser) => (
-                <option key={user.user_id} value={String(user.user_id)}>
-                  {user.username}
+              {riskUsers?.map((user: RiskUser) => (
+                <option key={user.sNTUserID} value={String(user.sNTUserID)}>
+                  {user.sName}
                 </option>
               ))}
             </select>
@@ -466,10 +407,10 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
         Header: 'Assigned to',
         accessor: 'assigned_user_id',
         Cell: ({ row }: CellProps<RiskRadarData>) =>
-          riskUsers?.risk_users?.find(
-            // eslint-disable-next-line eqeqeq
-            (user) => user.user_id == row.original.assigned_user_id
-          )?.username ?? 'N/A',
+          riskUsers?.find(
+            (user) =>
+              String(user.sNTUserID) === String(row.original.assigned_user_id)
+          )?.sName ?? 'N/A',
       });
     }
 
@@ -490,7 +431,7 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
       return [];
     }
 
-    return data.data.map((item: RiskRadarExceptionsListResultDto) => ({
+    return data.data.map((item: RiskRadarExceptionsListRow) => ({
       dba: item.sDBA || '',
       net_dep_amt: Number(item.dNetDepAmt || 0),
       fsp_appr_auth_tot_amt: 0, // This field doesn't seem to exist in the API response
@@ -541,13 +482,13 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
       columns,
       data: transformedData,
       initialState: {
-        pageSize: data?.meta?.records_per_page || 25,
-        pageIndex: (data?.meta?.current_page || 1) - 1,
+        pageSize: data.pageSize || DEFAULT_PAGE_SIZE,
+        pageIndex: (data?.page || DEFAULT_PAGE_NUMBER) - 1,
       } as Partial<TableState<RiskRadarData>>,
       // Tell the table we'll handle pagination ourselves
       // @ts-expect-error - manualPagination is supported but TypeScript definitions might be outdated
       manualPagination: true,
-      pageCount: data?.meta?.last_page || 1,
+      pageCount: data?.totalRecords || 1,
     },
     useFilters,
     useSortBy,
@@ -570,24 +511,20 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
     gotoPage,
   } = tableInstance;
 
-  useEffect(() => {
-    const newPage = state.pageIndex + 1;
-    if (newPage !== filters.current_page) {
-      setFilters((prev) => ({
-        ...prev,
-        current_page: newPage,
-      }));
-    }
-  }, [state.pageIndex, setFilters, filters.current_page]);
+  const { filters, setFilters } = useFilteredRiskRadar();
 
   useEffect(() => {
-    if (state.pageSize !== filters.records_per_page) {
-      setFilters((prev) => ({
-        ...prev,
-        records_per_page: state.pageSize,
-      }));
+    const newPage = state.pageIndex + 1;
+    if (newPage !== filters.page) {
+      // TODO: Update the filters
     }
-  }, [state.pageSize, setFilters, filters.records_per_page]);
+  }, [state.pageIndex, setFilters, filters.page]);
+
+  useEffect(() => {
+    if (state.pageSize !== filters.pageSize) {
+      // TODO: Update the filters
+    }
+  }, [state.pageSize, setFilters, filters.pageSize]);
 
   const handlePageChange = useCallback(
     (newPageIndex: number) => {
@@ -692,8 +629,8 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
 
       <div className="flex justify-between border-t border-stroke px-8 pt-5 dark:border-strokedark">
         <p className="font-medium">
-          Showing {data.meta.from_record} to {data.meta.to_record} of{' '}
-          {data.meta.current_page * data.meta.records_per_page} entries
+          Showing {data.pageSize} to {data.pageSize} of {data.totalRecords}{' '}
+          entries
         </p>
         <div className="flex">
           <button
@@ -720,7 +657,7 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
             </svg>
           </button>
 
-          {Array.from({ length: data.meta.last_page }, (_, i) => i).map(
+          {Array.from({ length: data.totalRecords ?? 0 }, (_, i) => i).map(
             (page) => (
               <button
                 key={page}

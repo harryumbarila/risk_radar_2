@@ -1,71 +1,64 @@
 import { useState } from 'react';
 
-import type { RiskRadarResponseDto } from '@/shared/response';
-import useBaseApi from '@/web/src/hooks/use-base-api';
-
-export type FilterState = {
-  from_date: string;
-  to_date: string;
-  status: string;
-  assigned_to: string;
-  MID: string | null;
-  dba_or_sic: string | null;
-  exception_type: string[];
-  view_all_exceptions: boolean;
-  source_type: string;
-  current_page: number;
-  records_per_page: number;
-};
+import useBaseApi from '@/hooks/use-base-api';
+import type { PaginatedAPIResponse } from '@/shared/common';
+import type {
+  RiskRadarExceptionsListRow,
+  RiskRadarFilterState,
+} from '@/shared/response';
+import { defaultRiskRadarFilters } from '@/shared/response/risk-radar/exception-list/filter-state';
 
 type UseFilteredRiskRadarReturnType = {
-  filters: FilterState;
-  setFilters: React.Dispatch<React.SetStateAction<FilterState>>;
-  data: RiskRadarResponseDto | null;
+  filters: RiskRadarFilterState;
+  setFilters: React.Dispatch<React.SetStateAction<RiskRadarFilterState>>;
+  data: PaginatedAPIResponse<RiskRadarExceptionsListRow> | null;
   isLoading: boolean;
   error: Error | null;
-  fetchData: () => void;
+  fetchData: (filtersToApply?: RiskRadarFilterState) => void;
 };
 
 export const useFilteredRiskRadar = (): UseFilteredRiskRadarReturnType => {
   const { makeRequest } = useBaseApi();
-  const [filters, setFilters] = useState<FilterState>({
-    from_date: new Date().toISOString().split('T')[0]!,
-    to_date: new Date().toISOString().split('T')[0]!,
-    status: '0',
-    assigned_to: '0',
-    MID: null,
-    dba_or_sic: null,
-    exception_type: [],
-    view_all_exceptions: false,
-    source_type: '0',
-    current_page: 1,
-    records_per_page: 10,
-  });
 
-  const [data, setData] = useState<RiskRadarResponseDto | null>(null);
+  const [filters, setFilters] = useState<RiskRadarFilterState>(
+    defaultRiskRadarFilters
+  );
+
+  const [data, setData] =
+    useState<PaginatedAPIResponse<RiskRadarExceptionsListRow> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchData = async (): Promise<void> => {
+  const createQuery = (filtersToApply: RiskRadarFilterState): string => {
+    const urlQueryParams = new URLSearchParams();
+
+    Object.entries(filtersToApply).forEach(([key, value]) => {
+      if (value) {
+        if (Array.isArray(value)) {
+          value.forEach((item) => {
+            urlQueryParams.append(key, String(item));
+          });
+        } else {
+          urlQueryParams.set(key, String(value));
+        }
+      }
+    });
+
+    return urlQueryParams.toString();
+  };
+
+  const fetchData = async (
+    filtersToApply?: RiskRadarFilterState
+  ): Promise<void> => {
     setIsLoading(true);
     try {
-      const queryParams = new URLSearchParams({
-        from_date: filters.from_date,
-        to_date: filters.to_date,
-        status: filters.status,
-        assigned_to: filters.assigned_to,
-        MID: filters.MID || 'null',
-        dba_or_sic: filters.dba_or_sic || 'null',
-        exception_type: filters.exception_type.join(', '),
-        view_all_exceptions: filters.view_all_exceptions ? '1' : '0',
-        source_type: filters.source_type,
-        current_page: filters.current_page.toString(),
-        records_per_page: filters.records_per_page.toString(),
-      });
-
-      const result = await makeRequest<RiskRadarResponseDto>(
-        `/v1/risk-radar/list?${queryParams.toString()}`
+      const queryParams = createQuery(
+        filtersToApply ?? defaultRiskRadarFilters
       );
+
+      const result = await makeRequest<
+        PaginatedAPIResponse<RiskRadarExceptionsListRow>
+      >(`/v1/risk-radar/exception-list?${queryParams}`);
 
       setData(result);
       setError(null);
