@@ -59,7 +59,6 @@ export class RiskRadarController {
     return { message };
   }
 
-  @Public()
   @Get('merchant-exception-detail')
   @ApiOperation({
     summary: 'Get merchant exception details',
@@ -73,11 +72,11 @@ export class RiskRadarController {
   })
   public async getMerchantExceptionDetail(
     @Query('merchantId') merchantId: string,
-    @Query('exceptionId') exceptionId: string,
+    @Query('exceptionId') exceptionId: number,
     @Query('user') user: string
   ): Promise<MerchantExceptionDetailResponseDto> {
     return this.merchantExceptionDetailService.getMerchantExceptionDetail({
-      pkRiskRadarExceptions: parseInt(exceptionId, 10),
+      pkRiskRadarExceptions: exceptionId,
       sMID: merchantId,
       sUser: user,
     });

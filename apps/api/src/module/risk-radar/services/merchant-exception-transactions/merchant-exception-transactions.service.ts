@@ -31,8 +31,6 @@ import {
   RiskRadarTransactionRepository,
 } from '@/finance-db/repositories';
 
-import type { MerchantExceptionTransactionsInputDto } from './dto/merchant-exception-transactions.dto';
-
 @Injectable()
 export class MerchantExceptionTransactionsService {
   public constructor(
@@ -50,11 +48,7 @@ export class MerchantExceptionTransactionsService {
     private readonly transactionRepository: RiskRadarTransactionRepository
   ) {}
 
-  public async getExceptionTransactions(
-    data: MerchantExceptionTransactionsInputDto
-  ) {
-    const { riskRadarExceptionId } = data;
-
+  public async getExceptionTransactions(riskRadarExceptionId: number) {
     const exception = await this.riskRadarExceptionsJeff.findOne({
       where: { id: riskRadarExceptionId },
       select: ['mid', 'fundingDate', 'achFundingTime', 'createdAt'],
