@@ -1,7 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { Public } from '@/api/shared/auth/decorator/public.decorator';
 import { RiskRadarMerchantTaxIdRepository } from '@/crescent-view-db/repositories';
 
 export type IrisProxyControllerConfig = {
