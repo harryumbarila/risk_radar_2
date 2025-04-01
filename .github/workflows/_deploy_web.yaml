@@ -1,0 +1,63 @@
+name: Create & Push WEB docker build
+
+on:
+  workflow_call:
+    inputs:
+      build-number:
+        description: Version build number
+        required: false
+        type: string
+      environment:
+        description: 'The deploy environment'
+        required: true
+        type: string
+    secrets:
+      role-to-assume:
+        required: true
+        description: AWS Role to assume
+      aws-region:
+        required: true
+        description: AWS Region
+      ecr-repository:
+        required: true
+        description: AWS ECR Repository
+
+jobs:
+  build-and-push:
+    name: Deploy DENALI Web
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 'Setup node with cache'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'yarn'
+
+      - name: Configure AWS credentials for Production
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.role-to-assume }}
+          aws-region: ${{ secrets.aws-region }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build docker image, and Push image to Amazon ECR WEB
+        id: build-image-web
+        env:
+          IMAGE_TAG: ${{ inputs.build-number }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ecr-repository }}
+        run: |
+          cd docker/application/web
+          make VERSION=$IMAGE_TAG build
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT

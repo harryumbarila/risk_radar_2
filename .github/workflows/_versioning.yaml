@@ -1,0 +1,36 @@
+name: Create Version Number
+
+on:
+  workflow_call:
+    outputs:
+      build-number:
+        description: 'Generated version number'
+        value: ${{ jobs.version.outputs.build-number }}
+
+jobs:
+  version:
+    name: Generate Version Number
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create version number
+        id: version
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          echo "Checking commit count..."
+          current_commit_count=$(git rev-list HEAD --count)
+          if [ -z "${RUN_NUMBER}" ]; then
+            echo "Github.run_number is empty!"
+            exit 1
+          fi
+
+          # Version format: v<run_number>.<commit_count>
+          next_version="${RUN_NUMBER}.${current_commit_count}"
+
+          echo "build-number=${next_version}" >> $GITHUB_ENV
+          echo "build-number=${next_version}" >> $GITHUB_OUTPUT
