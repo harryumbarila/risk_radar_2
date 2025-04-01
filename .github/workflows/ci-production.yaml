@@ -62,6 +62,13 @@ jobs:
       id-token: write
       contents: read
     steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          # TODO: We might need to move this to GH Actions secrets
+          role-to-assume: arn:aws:iam::257498453293:role/jobox-github-action-production-denali
+          aws-region: us-west-2
+
       - name: Restart Production API
         run: |
           aws ssm send-command --document-name "AWS-RunShellScript" --document-version "1" --targets '[{"Key":"InstanceIds","Values":["i-0de9370e9b06eab16"]}]' --parameters '{"commands":["runuser -l ec2-user -c /opt/webapps/scripts/pull_and_restart_api.sh"],"workingDirectory":[""],"executionTimeout":["3600"]}' --timeout-seconds 600 --max-concurrency "50" --max-errors "0" --cloud-watch-output-config '{"CloudWatchLogGroupName":"prd-denali-api-deployment","CloudWatchOutputEnabled":true}' --region us-west-2
