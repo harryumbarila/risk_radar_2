@@ -19,10 +19,7 @@ import { RiskRadarExceptionStatusRepository } from '@/finance-db/repositories/ri
 import { RiskRadarUserRepository } from '@/finance-db/repositories/risk-radar-user.repository';
 import type { ExceptionDataResponseDto } from '@/shared/response/legacy-dashboard-proxy/dto/exception-data';
 
-import {
-  MerchantExceptionDetailRequestDto,
-  MerchantExceptionDetailResponseDto,
-} from './dtos/merchant-exception-detail.dto';
+import { MerchantExceptionDetailResponseDto } from './dtos/merchant-exception-detail.dto';
 import { SendExceptionMemoEmailDto } from './dtos/send-exception-memo-email.dto';
 import { RiskRadarService } from './risk-radar.service';
 import { AssignExceptionReviewService } from './services/assign-exception-review/assign-exception-review.service';
@@ -30,7 +27,6 @@ import { AssignExceptionReviewInputDto } from './services/assign-exception-revie
 import { MerchantCardNumHistoryQueryDto } from './services/merchant-card-num-history/dto/get-merchant-card-num.dto';
 import { MerchantCardNumHistoryService } from './services/merchant-card-num-history/merchant-card-num-history.service';
 import { MerchantExceptionDetailService } from './services/merchant-exception-detail.service';
-import { MerchantExceptionTransactionsInputDto } from './services/merchant-exception-transactions/dto/merchant-exception-transactions.dto';
 import { MerchantExceptionTransactionsService } from './services/merchant-exception-transactions/merchant-exception-transactions.service';
 import { RiskRadarExceptionsService } from './services/risk-radar-exceptions.service';
 import { RiskRadarSaveInputDto } from './services/risk-radar-save/dto/risk-radar-save-input.dto';
@@ -63,7 +59,7 @@ export class RiskRadarController {
   }
 
   @Public()
-  @Post('merchant-exception-detail')
+  @Get('merchant-exception-detail')
   @ApiOperation({
     summary: 'Get merchant exception details',
     description: 'Retrieves detailed information about a merchant exception',
@@ -75,11 +71,15 @@ export class RiskRadarController {
     type: MerchantExceptionDetailResponseDto,
   })
   public async getMerchantExceptionDetail(
-    @Body() request: MerchantExceptionDetailRequestDto
+    @Query('merchantId') merchantId: string,
+    @Query('exceptionId') exceptionId: string,
+    @Query('user') user: string
   ): Promise<MerchantExceptionDetailResponseDto> {
-    return this.merchantExceptionDetailService.getMerchantExceptionDetail(
-      request
-    );
+    return this.merchantExceptionDetailService.getMerchantExceptionDetail({
+      pkRiskRadarExceptions: parseInt(exceptionId, 10),
+      sMID: merchantId,
+      sUser: user,
+    });
   }
 
   @Public()
@@ -234,10 +234,10 @@ export class RiskRadarController {
   @Get('merchant-exception-transaction')
   @ApiOkResponse()
   public async getMerchantExceptionTransactions(
-    @Body() data: MerchantExceptionTransactionsInputDto
+    @Query('riskRadarExceptionId') riskRadarExceptionId: string
   ) {
     return this.merchantExceptionTransactionsService.getExceptionTransactions(
-      data
+      parseInt(riskRadarExceptionId, 10)
     );
   }
 }
