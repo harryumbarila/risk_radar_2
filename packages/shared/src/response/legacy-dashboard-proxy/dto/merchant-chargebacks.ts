@@ -1,11 +1,7 @@
 export interface MerchantChargebacksResponseDto {
-  chargebacks: MerchantChargebacks[];
-}
-
-export interface MerchantChargebacks {
   pk: number;
   sMID: string;
-  dTTrans: string;
+  dtTrans: string;
   dAmt: number;
   sCardNum: string;
   dtReceived: string;
@@ -15,4 +11,5 @@ export interface MerchantChargebacks {
   sPaymentType: string;
   sCaseNumber: string;
   bP2ChargebacksExists: boolean;
+  ReasonCodeDescription: string;
 }

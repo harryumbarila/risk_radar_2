@@ -5,6 +5,16 @@ import { Repository } from 'typeorm';
 
 import { RiskRadarNotesEntity } from '../entities/risk-radar-notes.entity';
 
+type RiskRadarNote = {
+  sNotes: string;
+  dtCreated: Date;
+  sUserCreated: string;
+  bPinnedNotes: string | null;
+  pkRiskRadarNotes: number;
+  dtIrisMemoRequest: Date | null;
+  dtIrisMemoRequestFulfilled: Date | null;
+};
+
 @Injectable()
 export class RiskRadarNotesRepository extends Repository<RiskRadarNotesEntity> {
   public constructor(@InjectDataSource('finance') dataSource: DataSource) {
@@ -136,5 +146,24 @@ export class RiskRadarNotesRepository extends Repository<RiskRadarNotesEntity> {
       notes,
       notesTypeId: 5,
     });
+  }
+
+  public async getNotesByMid(mid: string): Promise<RiskRadarNote[]> {
+    return this.createQueryBuilder('notes')
+      .select([
+        'notes.notes as sNotes',
+        'notes.createdAt as dtCreated',
+        'notes.userCreated as sUserCreated',
+        "CASE WHEN notes.notesTypeId = 6 THEN '*' END as bPinnedNotes",
+        'notes.id as pkRiskRadarNotes',
+        'notes.irisMemoRequestDate as dtIrisMemoRequest',
+        'notes.irisMemoRequestFulfilledDate as dtIrisMemoRequestFulfilled',
+      ])
+      .where('notes.mid = :mid', { mid })
+      .andWhere('notes.isHidden = :isHidden', { isHidden: false })
+      .orderBy('CASE WHEN notes.notesTypeId = 6 THEN 0 ELSE 1 END')
+      .addOrderBy('notes.createdAt', 'DESC')
+      .addOrderBy('notes.id', 'DESC')
+      .getRawMany();
   }
 }

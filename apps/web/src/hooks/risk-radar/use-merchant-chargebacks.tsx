@@ -2,7 +2,7 @@ import type { MerchantChargebacksResponseDto } from '@/shared/response/legacy-da
 import { useApiSWR } from '@/web/src/hooks/use-base-api';
 
 type UseMerchantChargebacksReturnType = {
-  data: MerchantChargebacksResponseDto | undefined;
+  data: MerchantChargebacksResponseDto[] | undefined;
   error: unknown;
   isLoading: boolean;
 };
@@ -10,9 +10,9 @@ type UseMerchantChargebacksReturnType = {
 export const useMerchantChargebacks = (
   mid: string
 ): UseMerchantChargebacksReturnType => {
-  const { data, error, isLoading } = useApiSWR<MerchantChargebacksResponseDto>(
-    `/v1/legacy_dashboard_proxy/merchant_chargebacks?mid=${mid}`
-  );
+  const { data, error, isLoading } = useApiSWR<
+    MerchantChargebacksResponseDto[]
+  >(`/v1/risk-radar/chargeback-transactions?mid=${mid}`);
 
   return { data, error, isLoading };
 };

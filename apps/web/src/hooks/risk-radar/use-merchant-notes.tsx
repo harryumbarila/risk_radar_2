@@ -2,7 +2,7 @@ import type { MerchantNotesResponseDto } from '@/shared/response/legacy-dashboar
 import { useApiSWR } from '@/web/src/hooks/use-base-api';
 
 type UseMerchantNotesReturnType = {
-  data: MerchantNotesResponseDto | undefined;
+  data: MerchantNotesResponseDto[] | undefined;
   error: unknown;
   isLoading: boolean;
   refetch: () => void;
@@ -10,7 +10,7 @@ type UseMerchantNotesReturnType = {
 
 export const useMerchantNotes = (mid: string): UseMerchantNotesReturnType => {
   const { data, error, isLoading, mutate } = useApiSWR<
-    MerchantNotesResponseDto,
+    MerchantNotesResponseDto[],
     unknown
   >(`/v1/risk-radar/notes?mid=${mid}`);
 

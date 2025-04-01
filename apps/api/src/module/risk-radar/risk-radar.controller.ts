@@ -14,7 +14,10 @@ import {
 } from '@nestjs/swagger';
 
 import type { PaginatedRiskRadarExceptionsDto } from '@/api/module/risk-radar-exceptions/dto/risk-radar-exceptions-pagination.dto';
-import { RiskRadarNotesRepository } from '@/finance-db/repositories';
+import {
+  ChargebacksAndRetrievalReasonCodeLookupRepository,
+  RiskRadarNotesRepository,
+} from '@/finance-db/repositories';
 import { RiskRadarExceptionStatusRepository } from '@/finance-db/repositories/risk-radar-exception-status.repository';
 import { RiskRadarUserRepository } from '@/finance-db/repositories/risk-radar-user.repository';
 import type { ExceptionDataResponseDto } from '@/shared/response/legacy-dashboard-proxy/dto/exception-data';
@@ -48,7 +51,8 @@ export class RiskRadarController {
     private readonly riskRadarUserRepository: RiskRadarUserRepository,
     private readonly merchantExceptionTransactionsService: MerchantExceptionTransactionsService,
     private readonly exceptionsListService: ExceptionsListService,
-    private readonly riskRadarNotesRepository: RiskRadarNotesRepository
+    private readonly riskRadarNotesRepository: RiskRadarNotesRepository,
+    private readonly chargebackTransactionsService: ChargebacksAndRetrievalReasonCodeLookupRepository
   ) {}
 
   @Post('send-exception-memo-email')
@@ -249,5 +253,11 @@ export class RiskRadarController {
   @ApiOkResponse()
   public async getNotes(@Query('mid') mid: string) {
     return this.riskRadarNotesRepository.getNotesByMid(mid);
+  }
+
+  @Get('chargeback-transactions')
+  @ApiOkResponse()
+  public async getChargebackTransactions(@Query('mid') mid: string) {
+    return this.chargebackTransactionsService.getChargebackTransactions(mid);
   }
 }
