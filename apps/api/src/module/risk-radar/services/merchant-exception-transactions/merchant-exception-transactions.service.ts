@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   addDays,
   format,
@@ -10,16 +10,13 @@ import {
   subDays,
 } from 'date-fns';
 import { InjectPinoLogger } from 'nestjs-pino';
-import { Logger } from 'pino';
 
 import {
   CLXReportingSearchAVSResponseLookupRepository,
   CLXReportingSearchPaymentMethodLookupRepository,
 } from '@/data-warehouse-db/repositories';
-import type {
-  RiskRadarBatch,
-  RiskRadarTransaction,
-} from '@/finance-db/entities';
+import type { RiskRadarBatch } from '@/finance-db/entities/risk-radar-batch.entity';
+import type { RiskRadarTransaction } from '@/finance-db/entities/risk-radar-transaction.entity';
 import {
   AuthResponseLookupRepository,
   DailyDetailRepository,
@@ -69,9 +66,11 @@ export class MerchantExceptionTransactionsService {
     const cycleFilesDates = cycleFiles.map((e) => e.transmissionDate);
     const cycleFilesCycles = cycleFiles.map((e) => e.cycle);
 
+    const safeMid =
+      typeof exception.mid === 'string' ? exception.mid : String(exception.mid);
     const cycleBatches =
       await this.batchRepository.getBatchIdsForDatesAndCycles(
-        exception.mid,
+        safeMid,
         cycleFilesDates,
         cycleFilesCycles
       );
@@ -86,7 +85,10 @@ export class MerchantExceptionTransactionsService {
     // const trData = this.transformBatchesAndTransactions(batches, transactions);
   }
 
-  public determineAuthTimes(dtExceptionCreated: Date) {
+  public determineAuthTimes(dtExceptionCreated: Date): {
+    dtStartAuth: Date;
+    dtEndAuth: Date;
+  } {
     const day = getDay(dtExceptionCreated); // Sunday = 0, Monday = 1, ..., Saturday = 6
     const hour = getHours(dtExceptionCreated);
 
