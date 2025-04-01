@@ -17,6 +17,7 @@ import type { TransactionExceptionResponseDto } from '@/shared/response';
 import { Tooltip } from '@/ui/common/tool-tips/risk-tooltip';
 import { Popup } from '@/web/src/components/risk-radar/popups/popups';
 import { useEmailTemplates } from '@/web/src/hooks/risk-radar/use-email-templates';
+import type { CardHistory } from '@/web/src/hooks/risk-radar/use-get-card-history';
 import { useCardHistory } from '@/web/src/hooks/risk-radar/use-get-card-history';
 import { useMerchant } from '@/web/src/hooks/risk-radar/use-merchant';
 import { useMerchantChargebacks } from '@/web/src/hooks/risk-radar/use-merchant-chargebacks';
@@ -121,18 +122,6 @@ enum PopupType {
   CardHistory = 'cardHistory',
 }
 
-type CardHistory = {
-  iMID: string;
-  dtTransDate: string;
-  dTransAmt: number;
-  sPOSEntry: string;
-  sAVS: string;
-  iAuthCode: string;
-  sDBNetInd: string;
-  dtTransmissionDate: string;
-  dNetDepAmt: number;
-};
-
 type EmailTemplate = {
   pkRiskRadarEMailTemplate: string;
   sTemplateName: string;
@@ -144,7 +133,9 @@ const ITEMS_PER_PAGE = 8;
 const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const { 'merchant-id': merchantId, 'exception-id': exceptionId } = params;
   const { user } = useAuth();
+  const itemsPerPage = 10;
 
+  const [currentPage, setCurrentPage] = useState(1);
   const [currentTransException, setCurrentTransException] =
     useState<TransactionExceptionResponseDto | null>(null);
   const [isPopupActive, setIsPopupActive] = useState<boolean>(false);
@@ -183,6 +174,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const { data: merchantNetSettlementData, refetch: netsettlementRefresh } =
     useMerchantNetSettlement(merchantId);
   const { data: cardNumberData } = useCardHistory(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     currentTransException?.cardNumber
   );
   const { data: emailTemplatesData } = useEmailTemplates();
@@ -254,6 +246,11 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const totalVolumePages = Math.ceil(
     (data?.processingSummaries?.length || 0) / ITEMS_PER_PAGE
   );
+
+  // Calculate pagination values
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = cardNumberData?.slice(startIndex, endIndex) || [];
 
   const handlePushNoteToIris = async (noteId: string): Promise<void> => {
     await pushNote(noteId);
@@ -469,13 +466,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     fkRiskExceptionStatus: data?.businessInfo?.exceptionStatusId || 0,
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const cardHistory: any[] =
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    (cardNumberData as any)?.card_numbers?.length > 0
-      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-        ((cardNumberData as any)?.card_numbers as Array<any>)
-      : [];
+  const cardHistory = cardNumberData || [];
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
   const emailTemplates: any[] =
@@ -495,78 +486,106 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       >
         {activePopup == PopupType.CardHistory ? (
           <div className="grid grid-cols-1 gap-4">
-            <div className="max-w-full max-h-90 overflow-x-auto overflow-y-auto">
-              <table className="w-full table-auto">
-                <thead>
-                  <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                    <th className="p-4 font-medium text-black dark:text-white">
-                      MID
-                    </th>
-                    <th className="p-4 font-medium text-black dark:text-white">
-                      Trans Date
-                    </th>
-                    <th className="p-4 font-medium text-black dark:text-white">
-                      Trans Amt
-                    </th>
-                    <th className="p-4 font-medium text-black dark:text-white">
-                      POS Entry
-                    </th>
-                    <th className="p-4 font-medium text-black dark:text-white">
-                      AVS
-                    </th>
-                    <th className="p-4 font-medium text-black dark:text-white">
-                      Auth Code
-                    </th>
-                    <th className="p-4 font-medium text-black dark:text-white">
-                      Card #
-                    </th>
-                    <th className="p-4 font-medium text-black dark:text-white">
-                      DB Net Ind
-                    </th>
-                    <th className="p-4 font-medium text-black dark:text-white">
-                      Transmission Date
-                    </th>
-                    <th className="p-4 font-medium text-black dark:text-white">
-                      Net Dep. Amt
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {cardHistory.map((card: CardHistory) => {
-                    return (
-                      <tr key={`${card.iMID}`}>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {card.iMID}
+            <div className="max-w-full overflow-hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+              <div className="max-h-[600px] overflow-x-auto">
+                <table className="w-full table-auto">
+                  <thead>
+                    <tr className="bg-gray-2 text-left dark:bg-meta-4">
+                      <th className="min-w-[100px] p-4 font-medium text-black dark:text-white">
+                        MID
+                      </th>
+                      <th className="min-w-[120px] p-4 font-medium text-black dark:text-white">
+                        Trans Date
+                      </th>
+                      <th className="min-w-[100px] p-4 font-medium text-black dark:text-white">
+                        Amount
+                      </th>
+                      <th className="min-w-[80px] p-4 font-medium text-black dark:text-white">
+                        POS
+                      </th>
+                      <th className="min-w-[60px] p-4 font-medium text-black dark:text-white">
+                        AVS
+                      </th>
+                      <th className="min-w-[100px] p-4 font-medium text-black dark:text-white">
+                        Auth Code
+                      </th>
+                      <th className="min-w-[120px] p-4 font-medium text-black dark:text-white">
+                        Card #
+                      </th>
+                      <th className="min-w-[100px] p-4 font-medium text-black dark:text-white">
+                        DB Net
+                      </th>
+                      <th className="min-w-[120px] p-4 font-medium text-black dark:text-white">
+                        Trans. Date
+                      </th>
+                      <th className="min-w-[100px] p-4 font-medium text-black dark:text-white">
+                        Net Amt
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentItems.map((card: CardHistory) => (
+                      <tr key={`${card.mid}-${card.transactionDate}`}>
+                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
+                          {card.mid}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {card.dtTransDate}
+                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
+                          {new Date(card.transactionDate).toLocaleDateString()}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {card.dTransAmt}
+                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
+                          ${card.amount.toFixed(2)}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {card.sPOSEntry}
+                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
+                          {card.posEntryMode}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {card.sAVS}
+                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
+                          {card.avsResponseCode}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {card.iAuthCode}
+                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
+                          {card.authCode}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {card.sDBNetInd}
+                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
+                          {card.cardNumber}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {card.dtTransmissionDate}
+                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
+                          {card.debitNetworkIdentifier || '-'}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {card.dNetDepAmt}
+                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
+                          {new Date(card.transmissionDate).toLocaleDateString()}
+                        </td>
+                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
+                          ${card.netDepositAmount.toFixed(2)}
                         </td>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {/* Pagination */}
+              <div className="flex items-center justify-between border-t border-stroke p-4 dark:border-strokedark">
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  Showing {startIndex + 1} to {endIndex} of {cardHistory.length}{' '}
+                  entries
+                </div>
+                <div className="flex space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="rounded-md border border-stroke px-4 py-2 text-sm font-medium text-black disabled:opacity-50 dark:border-strokedark dark:text-white"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    disabled={endIndex === cardHistory.length}
+                    className="rounded-md border border-stroke px-4 py-2 text-sm font-medium text-black disabled:opacity-50 dark:border-strokedark dark:text-white"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         ) : activePopup == PopupType.Email ? (
