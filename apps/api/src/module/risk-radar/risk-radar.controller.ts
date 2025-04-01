@@ -235,7 +235,6 @@ export class RiskRadarController {
     );
   }
 
-  @Public()
   @Get('exception-list')
   @ApiOkResponse()
   public async getExceptionList(
