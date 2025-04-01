@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react';
 
 import { DefaultLayout } from '@/components/layouts/default-layout';
 import { Pagination } from '@/components/risk-radar/pagination';
-import type { TransactionException } from '@/shared/response/legacy-dashboard-proxy';
+import type { TransactionExceptionResponseDto } from '@/shared/response';
 import { Tooltip } from '@/ui/common/tool-tips/risk-tooltip';
 import { Popup } from '@/web/src/components/risk-radar/popups/popups';
 import { useEmailTemplates } from '@/web/src/hooks/risk-radar/use-email-templates';
@@ -146,7 +146,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const { user } = useAuth();
 
   const [currentTransException, setCurrentTransException] =
-    useState<TransactionException | null>(null);
+    useState<TransactionExceptionResponseDto | null>(null);
   const [isPopupActive, setIsPopupActive] = useState<boolean>(false);
   const [activePopup, setActivePopup] = useState<PopupType>(PopupType.Email);
 
@@ -176,14 +176,14 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
   // No longer need to make a separate call to useMerchantContactInfo since data is now in the same format
   const { data: transactionExceptionsData } =
-    useTransactionExceptions(merchantId);
+    useTransactionExceptions(exceptionId);
   const { data: merchantNotesData, refetch: notesRefetch } =
     useMerchantNotes(merchantId);
   const { data: merchantChargebacksData } = useMerchantChargebacks(merchantId);
   const { data: merchantNetSettlementData, refetch: netsettlementRefresh } =
     useMerchantNetSettlement(merchantId);
   const { data: cardNumberData } = useCardHistory(
-    currentTransException?.sCardNum
+    currentTransException?.cardNumber
   );
   const { data: emailTemplatesData } = useEmailTemplates();
 
@@ -216,11 +216,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const [volumePage, setVolumePage] = useState(1);
 
   // Calculate paginated data
-  const paginatedExceptions =
-    transactionExceptionsData?.trans_exceptions?.slice(
-      (exceptionsPage - 1) * ITEMS_PER_PAGE,
-      exceptionsPage * ITEMS_PER_PAGE
-    );
+  const paginatedExceptions = transactionExceptionsData?.slice(
+    (exceptionsPage - 1) * ITEMS_PER_PAGE,
+    exceptionsPage * ITEMS_PER_PAGE
+  );
   const paginatedNotes = merchantNotesData?.slice(
     (notesPage - 1) * ITEMS_PER_PAGE,
     notesPage * ITEMS_PER_PAGE
@@ -241,7 +240,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
   // Calculate total pages
   const totalExceptionsPages = Math.ceil(
-    (transactionExceptionsData?.trans_exceptions?.length || 0) / ITEMS_PER_PAGE
+    (transactionExceptionsData?.length || 0) / ITEMS_PER_PAGE
   );
   const totalNotesPages = Math.ceil(
     (merchantNotesData?.length || 0) / ITEMS_PER_PAGE
@@ -369,37 +368,37 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     let newTemplate = templateText;
     newTemplate = newTemplate.replaceAll(
       '@dtTransDate',
-      currentTransException.dtTransDate
+      currentTransException.transactionDate
     );
 
     newTemplate = newTemplate.replaceAll(
       '@dAuthAmt',
-      currentTransException.dAuthAmt.toString()
+      currentTransException.authAmount.toString()
     );
 
     newTemplate = newTemplate.replaceAll(
       '@dTransAmt',
-      currentTransException.dTransAmt.toString()
+      currentTransException.transactionAmount.toString()
     );
 
     newTemplate = newTemplate.replaceAll(
       '@sPOSEntryMode',
-      currentTransException.sPOS
+      currentTransException.posEntryMode
     );
 
     newTemplate = newTemplate.replaceAll(
       '@sAVSRespCode',
-      currentTransException.sAVS
+      currentTransException.avsResponseCode
     );
 
     newTemplate = newTemplate.replaceAll(
       '@sAuthCode',
-      currentTransException.sAuthCode
+      currentTransException.authCode
     );
 
     newTemplate = newTemplate.replaceAll(
       '@sCardLast4',
-      currentTransException.sCardNum.slice(-4)
+      currentTransException.cardNumber.slice(-4)
     );
 
     setBody(newTemplate);
@@ -992,12 +991,15 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   </thead>
                   <tbody>
                     {paginatedExceptions?.map((exception) => (
-                      <tr key={`${exception.pk}`} className="text-center">
+                      <tr
+                        key={`${exception.transactionId}`}
+                        className="text-center"
+                      >
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {exception.dtTransDate}
+                          {exception.transactionDate}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          ${exception.dAuthAmt}
+                          ${exception.authAmount}
                         </td>
                         <td
                           className="border-b border-[#eee] px-4 py-5 dark:border-strokedark"
@@ -1007,16 +1009,16 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                             setCurrentTransException(exception);
                           }}
                         >
-                          ${exception.dTransAmt}
+                          ${exception.transactionAmount}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {exception.sPOS}
+                          {exception.posEntryMode}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {exception.sAVS}
+                          {exception.avsResponseCode}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {exception.sAuthCode}
+                          {exception.authCode}
                         </td>
                         <td
                           className="border-b border-[#eee] px-4 py-5 dark:border-strokedark"
@@ -1026,29 +1028,32 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                             setActivePopup(PopupType.CardHistory);
                           }}
                         >
-                          {exception.sCardNum}
+                          {exception.cardNumber}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {exception.sPIN}
+                          {exception.debitNetworkIdentifier}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {exception.sExceptions
-                            .split(',')
-                            .map((exceptionNumber) => (
-                              <Tooltip
-                                text={
-                                  data?.exceptionTypes?.filter(
-                                    (exceptionType) =>
-                                      exceptionType.id ===
-                                      parseInt(exceptionNumber, 10)
-                                  )[0]?.description ?? ''
-                                }
-                              >
-                                <span className="cursor-pointer m-[4px] text-blue-600 underline">
-                                  {exceptionNumber}
-                                </span>
-                              </Tooltip>
-                            ))}
+                          {exception.exceptionList &&
+                            exception.exceptionList
+                              .split(' ')
+                              .filter(Boolean)
+                              .map((exceptionNumber) => (
+                                <Tooltip
+                                  key={exceptionNumber}
+                                  text={
+                                    data?.exceptionTypes?.filter(
+                                      (exceptionType) =>
+                                        exceptionType.id ===
+                                        parseInt(exceptionNumber, 10)
+                                    )[0]?.description ?? ''
+                                  }
+                                >
+                                  <span className="cursor-pointer m-[4px] text-blue-600 underline">
+                                    {exceptionNumber}
+                                  </span>
+                                </Tooltip>
+                              ))}
                         </td>
                       </tr>
                     ))}

@@ -1,21 +1,15 @@
 export interface TransactionExceptionResponseDto {
-  trans_exceptions: TransactionException[];
-}
-
-export interface TransactionException {
-  pk: number;
-  fkRiskException: number;
-  sMId: string;
-  dtTransDate: string;
-  dAuthAmt: number;
-  dTransAmt: number;
-  sPOS: string;
-  sAVS: string;
-  sAuthCode: string;
-  sCardNum: string;
-  sCardNumExt: string;
-  sPIN: number;
-  sExceptions: string;
-  sExceptionsDesc: string;
-  dtCreated: string;
+  transactionDate: string;
+  transactionAmount: number;
+  posEntryMode: string;
+  avsResponseCode: string;
+  authCode: string;
+  cardNumber: string;
+  debitNetworkIdentifier: string;
+  transactionId: string;
+  authAmount: number;
+  exceptionList: string;
+  exceptionTitle: string;
+  authResponseDescription: string;
+  binSearchMatchFlag: boolean;
 }

@@ -1,4 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import type { Logger } from 'pino';
+import { InjectPinoLogger } from 'nestjs-pino';
 import {
   addDays,
   format,
@@ -9,7 +11,6 @@ import {
   setSeconds,
   subDays,
 } from 'date-fns';
-import { InjectPinoLogger } from 'nestjs-pino';
 
 import {
   CLXReportingSearchAVSResponseLookupRepository,
@@ -66,67 +67,82 @@ export class MerchantExceptionTransactionsService {
     binSearch: string,
     sortBy: number
   ) {
-    const exception = await this.riskRadarExceptionsJeff.findOne({
-      where: { id: riskRadarExceptionId },
-      select: ['mid', 'fundingDate', 'achFundingTime', 'createdAt'],
-    });
+    try {
+      const exception = await this.riskRadarExceptionsJeff.findOne({
+        where: { id: riskRadarExceptionId },
+        select: ['mid', 'fundingDate', 'achFundingTime', 'createdAt'],
+      });
 
-    if (!exception) {
-      throw new Error(`Exception with ID ${riskRadarExceptionId} not found`);
+      if (!exception) {
+        throw new Error(`Exception with ID ${riskRadarExceptionId} not found`);
+      }
+
+      const dayOfTheFunding = format(exception.fundingDate, 'EEE');
+      const { dtStartAuth, dtEndAuth } = this.determineAuthTimes(
+        exception.createdAt
+      );
+
+      // Get cycle files to process
+      const cycleFiles = await this.getCycleFilesToProcess(
+        dayOfTheFunding,
+        exception.achFundingTime,
+        exception.fundingDate
+      );
+
+      // Get batches for the cycle files
+      const cycleBatches = await this.getBatchesForCycleFiles(
+        exception.mid,
+        cycleFiles
+      );
+
+      // Get transactions from risk radar
+      const riskRadarTransactions = await this.getRiskRadarTransactions(
+        cycleBatches,
+        binSearch
+      );
+
+      // Get declined auth transactions
+      const declinedAuthTransactions = await this.getDeclinedAuthTransactions(
+        exception.mid,
+        dtStartAuth,
+        dtEndAuth,
+        binSearch
+      );
+
+      // Get CLX transactions
+      const clxTransactions = this
+        .getCLXTransactions
+        // exception.mid,
+        // dtStartAuth,
+        // dtEndAuth,
+        // exception.fundingDate,
+        // exception.achFundingTime,
+        // binSearch
+        ();
+
+      // Combine all transactions
+      const allTransactions = [
+        ...riskRadarTransactions,
+        ...declinedAuthTransactions,
+        ...clxTransactions,
+      ];
+
+      this.logger.info(
+        { totalTransactionsCount: allTransactions.length },
+        'Combined all transactions, sorting results'
+      );
+
+      // Sort transactions
+      const sortedTransactions = this.sortTransactions(allTransactions, sortBy);
+
+      return sortedTransactions;
+    } catch (error) {
+      this.logger.error(
+        { error, riskRadarExceptionId, binSearch, sortBy },
+        'Error in getExceptionTransactions'
+      );
+      throw error;
     }
-
-    const dayOfTheFunding = format(exception.fundingDate, 'EEE');
-    const { dtStartAuth, dtEndAuth } = this.determineAuthTimes(
-      exception.createdAt
-    );
-
-    // Get cycle files to process
-    const cycleFiles = await this.getCycleFilesToProcess(
-      dayOfTheFunding,
-      exception.achFundingTime,
-      exception.fundingDate
-    );
-
-    // Get batches for the cycle files
-    const cycleBatches = await this.getBatchesForCycleFiles(
-      exception.mid,
-      cycleFiles
-    );
-
-    // Get transactions from risk radar
-    const riskRadarTransactions = await this.getRiskRadarTransactions(
-      cycleBatches,
-      binSearch
-    );
-
-    // Get declined auth transactions
-    const declinedAuthTransactions = await this.getDeclinedAuthTransactions(
-      exception.mid,
-      dtStartAuth,
-      dtEndAuth,
-      binSearch
-    );
-
-    // Get CLX transactions
-    const clxTransactions = this
-      .getCLXTransactions
-      // exception.mid,
-      // dtStartAuth,
-      // dtEndAuth,
-      // exception.fundingDate,
-      // exception.achFundingTime,
-      // binSearch
-      ();
-
-    // Combine all transactions
-    const allTransactions = [
-      ...riskRadarTransactions,
-      ...declinedAuthTransactions,
-      ...clxTransactions,
-    ];
-
-    // Sort transactions
-    return this.sortTransactions(allTransactions, sortBy);
   }
 
   private async getBatchesForCycleFiles(

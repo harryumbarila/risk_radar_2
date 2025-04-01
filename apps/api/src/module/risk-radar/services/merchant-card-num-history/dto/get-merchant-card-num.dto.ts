@@ -11,9 +11,9 @@ export class MerchantCardNumHistoryQueryDto {
   @IsEnum(MerchantCardHistorySortBy, {
     message: 'sortBy is not a valid SortOrder value',
   })
-  public sortBy: MerchantCardHistorySortBy;
+  public sortBy: MerchantCardHistorySortBy = MerchantCardHistorySortBy.TRANSACTION_DATE;
 
   @Transform(({ value }) => String(value).toUpperCase()) // Normalize input to uppercase
   @IsEnum(SortType, { message: 'sortType must be either ASC or DESC' })
-  public sortType: SortType;
+  public sortType: SortType = SortType.DESC;
 }
