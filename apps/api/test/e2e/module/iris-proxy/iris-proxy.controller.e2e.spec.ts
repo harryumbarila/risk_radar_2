@@ -3,7 +3,7 @@ import { HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   FastifyAdapter,
-  NestFastifyApplication,
+  type NestFastifyApplication,
 } from '@nestjs/platform-fastify'; // Import the Fastify adapter
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
