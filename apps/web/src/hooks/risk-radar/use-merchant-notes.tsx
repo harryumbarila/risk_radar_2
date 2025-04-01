@@ -12,7 +12,7 @@ export const useMerchantNotes = (mid: string): UseMerchantNotesReturnType => {
   const { data, error, isLoading, mutate } = useApiSWR<
     MerchantNotesResponseDto,
     unknown
-  >(`/v1/legacy_dashboard_proxy/merchant_notes?mid=${mid}`);
+  >(`/v1/risk-radar/notes?mid=${mid}`);
 
   return { data, error, isLoading, refetch: () => mutate() };
 };

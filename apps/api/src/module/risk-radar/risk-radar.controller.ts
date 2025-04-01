@@ -14,6 +14,7 @@ import {
 } from '@nestjs/swagger';
 
 import type { PaginatedRiskRadarExceptionsDto } from '@/api/module/risk-radar-exceptions/dto/risk-radar-exceptions-pagination.dto';
+import { RiskRadarNotesRepository } from '@/finance-db/repositories';
 import { RiskRadarExceptionStatusRepository } from '@/finance-db/repositories/risk-radar-exception-status.repository';
 import { RiskRadarUserRepository } from '@/finance-db/repositories/risk-radar-user.repository';
 import type { ExceptionDataResponseDto } from '@/shared/response/legacy-dashboard-proxy/dto/exception-data';
@@ -46,7 +47,8 @@ export class RiskRadarController {
     private readonly exceptionStatusRepo: RiskRadarExceptionStatusRepository,
     private readonly riskRadarUserRepository: RiskRadarUserRepository,
     private readonly merchantExceptionTransactionsService: MerchantExceptionTransactionsService,
-    private readonly exceptionsListService: ExceptionsListService
+    private readonly exceptionsListService: ExceptionsListService,
+    private readonly riskRadarNotesRepository: RiskRadarNotesRepository
   ) {}
 
   @Post('send-exception-memo-email')
@@ -241,5 +243,11 @@ export class RiskRadarController {
     @Query(ValidationPipe) query: ExceptionListInputDto
   ) {
     return this.exceptionsListService.getExceptionList(query);
+  }
+
+  @Get('notes')
+  @ApiOkResponse()
+  public async getNotes(@Query('mid') mid: string) {
+    return this.riskRadarNotesRepository.getNotesByMid(mid);
   }
 }
