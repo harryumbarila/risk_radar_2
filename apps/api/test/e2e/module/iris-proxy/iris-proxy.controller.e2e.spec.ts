@@ -1,6 +1,7 @@
 import type { INestApplication } from '@nestjs/common';
 import { HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { FastifyAdapter } from '@nestjs/platform-fastify'; // Import the Fastify adapter
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
@@ -115,7 +116,7 @@ describe('IrisProxyController (e2e)', () => {
       ],
     }).compile();
 
-    app = moduleFixture.createNestApplication();
+    app = moduleFixture.createNestApplication(new FastifyAdapter());
     await app.init();
   });
 
@@ -224,7 +225,7 @@ describe('IrisProxyController (e2e)', () => {
         ],
       }).compile();
 
-      app = moduleFixture.createNestApplication();
+      app = moduleFixture.createNestApplication(new FastifyAdapter());
       await app.init();
 
       const response = await request(app.getHttpServer())
