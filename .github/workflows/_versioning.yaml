@@ -1,0 +1,50 @@
+name: Create Version Number
+
+on:
+  workflow_call:
+    inputs:
+      release-type:
+        description: 'Type of release (stable or pre-release)'
+        required: false
+        type: string
+        default: 'stable'
+    outputs:
+      build-number:
+        description: 'Generated version number'
+        value: ${{ jobs.version.outputs.build-number }}
+
+jobs:
+  version:
+    name: Generate Version Number
+    runs-on: ubuntu-latest
+    outputs:
+      build-number: ${{ steps.version.outputs.build-number }}
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create version number
+        id: version
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
+          RELEASE_TYPE: ${{ inputs.release-type }}
+        run: |
+          echo "Checking commit count..."
+          current_commit_count=$(git rev-list HEAD --count)
+
+          if [ -z "${RUN_NUMBER}" ]; then
+            echo "Github.run_number is empty!"
+            exit 1
+          fi
+
+          if [ "$RELEASE_TYPE" == "pre-release" ]; then
+            next_version="${RUN_NUMBER}-rc-${current_commit_count}"
+          else
+            next_version="${RUN_NUMBER}.${current_commit_count}"
+          fi
+
+          echo "Generated version: $next_version"
+          echo "build-number=${next_version}" >> $GITHUB_ENV
+          echo "build-number=${next_version}" >> $GITHUB_OUTPUT

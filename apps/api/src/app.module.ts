@@ -48,6 +48,15 @@ if (process.env.NODE_ENV !== 'production') {
         logger,
         // Disable req logging (We can configure later)
         enabled: false,
+        quietReqLogger: true,
+        serializers: {
+          req: () => undefined, // Hide request logs
+          res: () => undefined, // Hide response logs
+        },
+        customAttributeKeys: {
+          reqId: null, // Hides reqId
+          responseTime: null, // Hides responseTime
+        },
       },
     }),
     GlobalModule,

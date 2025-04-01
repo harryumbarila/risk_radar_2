@@ -208,4 +208,7 @@ export class RiskRadarExceptionsJeffEntity {
 
   @Column({ name: 'iAccountType', type: 'int', nullable: true })
   public accountType: number;
+
+  @Column({ name: 'iTotalPoints', type: 'int', nullable: true })
+  public totalPoints: number;
 }

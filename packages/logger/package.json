@@ -10,7 +10,6 @@
     "@denali/eslint-config": "*",
     "@denali/jest-config": "*",
     "@denali/typescript-config": "*",
-    "@types/express-pino-logger": "^4.0.5",
     "@types/jest": "^29.5.2",
     "@typescript-eslint/eslint-plugin": "^6.2.0",
     "@typescript-eslint/parser": "^6.2.0",

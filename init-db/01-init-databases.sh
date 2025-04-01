@@ -22,7 +22,7 @@ function execute_sql() {
 }
 
 # Create each database with retries
-databases=("connector" "crescent-view" "data-warehouse" "iris" "finance", "ez-enroll", 'ez-enroll-pcc', "dsm", "snap-pcc")
+databases=("Connector" "CrescentView" "DataWarehouse" "Iris" "Finance" "EZEnroll" "EZEnroll_pcc" "DSM" "SNAP_pcc")
 
 for db in "${databases[@]}"; do
     echo "Creating database: $db"
@@ -49,7 +49,7 @@ echo "Verifying database creation..."
 execute_sql "
 SELECT name, state_desc, recovery_model_desc 
 FROM sys.databases 
-WHERE name IN ('connector', 'crescent-view', 'data-warehouse', 'iris', 'finance')
+WHERE name IN ('Connector', 'CrescentView', 'DataWarehouse', 'Iris', 'Finance')
 ORDER BY name;"
 
 echo "Database initialization completed successfully!" 
