@@ -47,7 +47,7 @@ jobs:
 
   release:
     name: Create Github release & release notes
-    needs: [deploy-web, deploy-api]
+    needs: [versioning, deploy-web, deploy-api]
     uses: ./.github/workflows/_release.yaml
     with:
       build-number: ${{ needs.versioning.outputs.build-number }}
