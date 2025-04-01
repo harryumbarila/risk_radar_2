@@ -234,10 +234,14 @@ export class RiskRadarController {
   @Get('merchant-exception-transaction')
   @ApiOkResponse()
   public async getMerchantExceptionTransactions(
-    @Query('riskRadarExceptionId') riskRadarExceptionId: number
+    @Query('riskRadarExceptionId') riskRadarExceptionId: number,
+    @Query('binSearch') binSearch: string,
+    @Query('sortBy') sortBy: number
   ) {
     return this.merchantExceptionTransactionsService.getExceptionTransactions(
-      riskRadarExceptionId
+      riskRadarExceptionId,
+      binSearch,
+      sortBy
     );
   }
 

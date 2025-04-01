@@ -121,4 +121,13 @@ export class DailyDetail {
 
   @Column({ type: 'datetime' })
   public createdAt: Date;
+
+  @Column({ name: 'iGT2AuthDeclOnDiffCardPoints', nullable: true })
+  public gt2AuthDeclOnDiffCardPoints?: number;
+
+  @Column({ name: 'iGT1AuthDeclOnSameCardPoints', nullable: true })
+  public gt1AuthDeclOnSameCardPoints?: number;
+
+  @Column({ name: 'i1AuthDeclOnSpecificReasonPoints', nullable: true })
+  public i1AuthDeclOnSpecificReasonPoints?: number;
 }
