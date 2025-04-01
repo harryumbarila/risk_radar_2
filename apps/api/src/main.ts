@@ -72,7 +72,7 @@ async function bootstrap() {
     SwaggerModule.setup('api/swagger', app, document);
   }
 
-  await app.listen(config.app.port);
+  await app.listen(config.app.port, '0.0.0.0');
 }
 
 // eslint-disable-next-line no-console
