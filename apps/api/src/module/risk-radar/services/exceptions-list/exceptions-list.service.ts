@@ -22,11 +22,12 @@ export class ExceptionsListService {
       status,
       merchantId,
       dbaNameOrSIC,
-      recordsPerPage,
-      currentPage,
+      pageSize,
+      page,
       viewAllExceptions,
       assignedToUser,
       processor,
+      totalRecords,
     } = data;
 
     // Use the query builder to get the query with all joins
@@ -107,13 +108,27 @@ export class ExceptionsListService {
       }
     }
 
-    // Apply pagination
-    const limit = recordsPerPage || 25;
-    const offset = currentPage > 1 ? currentPage * limit : 0; // First page offset is 0
+    const shouldCalculateTotal = page === 1;
+    let totalCount = totalRecords;
+
+    // Apply sorting and pagination to the main query
+    const limit = pageSize || 25;
+    const offset = (page - 1) * limit;
+    query.orderBy('exception.iTotalPoints', 'ASC');
     query.limit(limit).offset(offset);
 
-    // Retrieve data from the query
-    const exceptions = await query.getRawMany();
+    // As we are using join we use TS to infer the type of the query
+    let exceptions: Awaited<ReturnType<typeof query.getRawMany>>;
+
+    if (shouldCalculateTotal) {
+      const countQuery = query.clone();
+      [exceptions, totalCount] = await Promise.all([
+        query.getRawMany(),
+        countQuery.getCount(),
+      ]);
+    } else {
+      exceptions = await query.getRawMany();
+    }
 
     // Fallback to leads if no merchant exceptions are found (Merchant is always needed if id is provided)
     if (exceptions.length === 0 && merchantId) {
@@ -125,16 +140,18 @@ export class ExceptionsListService {
       });
 
       return {
-        page: 0,
-        recordsPerPage: 25,
+        pageSize,
+        page,
+        totalRecords: totalCount,
         data: merchantFromLeads,
       };
     }
 
-    // Return the exceptions
+    // Return the exceptions with total count (if calculated)
     return {
-      page: 0,
-      recordsPerPage: 25,
+      pageSize,
+      page,
+      totalRecords: totalCount,
       data: exceptions,
     };
   }
@@ -144,7 +161,57 @@ export class ExceptionsListService {
     return (
       this.exceptionsJeffRepository
         .createQueryBuilder('exception')
-        .select(['exception.*'])
+        // Select all columns from the exception table to ensure no conflicts with joined fields
+        .select([
+          'exception.pkRiskRadarExceptions AS pkRiskRadarExceptions',
+          'exception.fkRiskRadarExceptionStatus AS fkRiskRadarExceptionStatus',
+          'exception.fkRiskRadarUserAssigned AS fkRiskRadarUserAssigned',
+          'exception.sBankNum AS sBankNum',
+          'exception.dtFunding AS dtFunding',
+          'exception.sACHFundingTime AS sACHFundingTime',
+          'exception.dtTransmission AS dtTransmission',
+          'exception.iTransmissionNum AS iTransmissionNum',
+          'exception.dNetDepAmt AS dNetDepAmt',
+          'exception.sMID AS sMID',
+          'exception.sDBA AS sDBA',
+          'exception.dtActivated AS exception_dtActivated',
+          'exception.sISA AS sISA',
+          'exception.bSelfGen AS bSelfGen',
+          'exception.iTransAmtAboveLimit AS iTransAmtAboveLimit',
+          'exception.iNumOfKeyedTransAboveLimit AS iNumOfKeyedTransAboveLimit',
+          'exception.bBatchVolAboveLimit AS bBatchVolAboveLimit',
+          'exception.iDupCard AS iDupCard',
+          'exception.bNewAcct AS bNewAcct',
+          'exception.iDupBin AS iDupBin',
+          'exception.iLatePostTrans AS iLatePostTrans',
+          'exception.iFgnkeyedTrans AS iFgnkeyedTrans',
+          'exception.iNoAuthTrans AS iNoAuthTrans',
+          'exception.bChbkOrIRR AS bChbkOrIRR',
+          'exception.bHidden AS bHidden',
+          'exception.dtCreated AS dtCreated',
+          'exception.bAuthCaptureAmtLargeVariation AS bAuthCaptureAmtLargeVariation',
+          'exception.bNextDayFundingAcct AS bNextDayFundingAcct',
+          'exception.iMototIoAVS AS iMototIoAVS',
+          'exception.dSettlementBalance AS exception_dSettlementBalance',
+          'exception.bRiskWatch AS exception_bRiskWatch',
+          'exception.iAvgBatch AS iAvgBatch',
+          'exception.iAuthDecline AS iAuthDecline',
+          'exception.iNegDailyBatches AS iNegDailyBatches',
+          'exception.iBatchVolAboveLimit AS iBatchVolAboveLimit',
+          'exception.iChbkOrIRR AS iChbkOrIRR',
+          'exception.iAuthCaptureAmtLargeVariation AS iAuthCaptureAmtLargeVariation',
+          'exception.bDivert AS exception_bDivert',
+          'exception.dAuthDeclineAmt AS dAuthDeclineAmt',
+          'exception.sUserReviewed AS sUserReviewed',
+          'exception.iAutoHold AS iAutoHold',
+          'exception.iTransAmtAboveHighTicketLimit AS iTransAmtAboveHighTicketLimit',
+          'exception.iCreditRule AS iCreditRule',
+          'exception.iSalesChannelRule AS iSalesChannelRule',
+          'exception.iFundingExclusionAndException AS iFundingExclusionAndException',
+          'exception.dAuthNonDeclinedAmt AS dAuthNonDeclinedAmt',
+          'exception.iAccountType AS iAccountType',
+          'exception.iTotalPoints AS iTotalPoints',
+        ])
         .addSelect('leadsStatus.dtActivated', 'dtActivated')
         .addSelect('netSettlement.dSettlementBalance', 'dSettlementBalance')
         .addSelect('autoApproval.dtIrisUpdated', 'dtAutoApproved')

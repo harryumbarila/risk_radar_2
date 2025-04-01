@@ -22,11 +22,12 @@ export class ExceptionListInputDto {
 
   @IsOptional()
   @IsNumber()
+  @Type(() => Number)
   public processor?: number;
 
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => value === 'true' || value === true)
+  @Type(() => Boolean)
   public viewAllExceptions?: boolean;
 
   // Exception type
@@ -42,7 +43,8 @@ export class ExceptionListInputDto {
   // Exception status | Assigned to user | MID | DBA/SIC
   @IsNumber()
   @IsOptional()
-  public status?: number; // TODO: If not dynamic move to enum
+  @Type(() => Number)
+  public status?: number;
 
   @IsOptional()
   @IsString()
@@ -60,9 +62,16 @@ export class ExceptionListInputDto {
   // Pagination
   @IsOptional()
   @IsInt()
-  public recordsPerPage?: number = 25;
+  @Type(() => Number)
+  public pageSize?: number = 25;
 
   @IsOptional()
   @IsInt()
-  public currentPage?: number = 1;
+  @Type(() => Number)
+  public page?: number = 1;
+
+  @IsOptional()
+  @IsInt()
+  @Type(() => Number)
+  public totalRecords?: number;
 }
