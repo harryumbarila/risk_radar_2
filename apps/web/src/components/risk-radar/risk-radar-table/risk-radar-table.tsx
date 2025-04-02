@@ -25,6 +25,7 @@ import type {
 import { useExceptionData } from '@/web/src/hooks/risk-radar/use-exception-data';
 
 import { baseColumns } from './table/base-columns';
+import { DEFAULT_BLANK_VALUE } from './table/default-values';
 import { ManagerQueuedCell } from './table/manager-queued-cell';
 import { ManagerQueuedHeader } from './table/manager-queued-header';
 import { NotReviewedCell } from './table/not-reviewed-cell';
@@ -142,7 +143,7 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
         completedColumns.push({
           Header: 'Reviewed',
           accessor: 'sUserReviewed',
-          Cell: ({ value }) => value ?? 'N/A',
+          Cell: ({ value }) => value ?? DEFAULT_BLANK_VALUE,
         });
         break;
       case 3:
@@ -170,7 +171,7 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
           accessor: (row) => row.sNTUserID,
           Cell: ({ row }: CellProps<RiskRadarExceptionsListRow>) =>
             riskUsers?.find((u) => u.sNTUserID === row.original.sNTUserID)
-              ?.sName ?? 'N/A',
+              ?.sName ?? DEFAULT_BLANK_VALUE,
         });
         break;
       default:
