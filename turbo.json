@@ -5,19 +5,39 @@
     "build": {
       "dependsOn": ["^build"],
       "env": ["NODE_ENV"],
-      "outputs": [".next/**", "!.next/cache/**", "./dist/**"]
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "packages/**/dist/**",
+        "apps/**/dist/**"
+      ]
     },
     "dev": {
       "cache": false,
       "persistent": true
     },
     "lint": {
+      "inputs": [
+        "**/src/**",
+        "tsconfig.json",
+        "package.json",
+        ".eslintrc",
+        ".eslintrc.*"
+      ],
       "cache": true
     },
     "lint:fix": {
+      "inputs": [
+        "**/src/**",
+        "tsconfig.json",
+        "package.json",
+        ".eslintrc",
+        ".eslintrc.*"
+      ],
       "cache": false
     },
     "type-check": {
+      "inputs": ["**/src/**", "tsconfig.json", "package.json"],
       "cache": true
     },
     "start": {
@@ -25,9 +45,25 @@
       "cache": false
     },
     "test:unit": {
+      "inputs": [
+        "**/src/**",
+        "tsconfig.json",
+        "package.json",
+        "jest.config.*",
+        "jest.setup.*",
+        "jest-unit.*"
+      ],
       "cache": true
     },
     "test:e2e": {
+      "inputs": [
+        "**/src/**",
+        "tsconfig.json",
+        "package.json",
+        "jest.config.*",
+        "jest.setup.*",
+        "jest-e2e.*"
+      ],
       "cache": true
     }
   }
