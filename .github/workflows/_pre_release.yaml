@@ -19,7 +19,6 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
 
     permissions:
       id-token: write
