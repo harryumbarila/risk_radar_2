@@ -13,10 +13,11 @@ import { useEffect, useState } from 'react';
 
 import { DefaultLayout } from '@/components/layouts/default-layout';
 import { Pagination } from '@/components/risk-radar/pagination';
-import type { TransactionException } from '@/shared/response/legacy-dashboard-proxy';
+import type { TransactionExceptionResponseDto } from '@/shared/response';
 import { Tooltip } from '@/ui/common/tool-tips/risk-tooltip';
 import { Popup } from '@/web/src/components/risk-radar/popups/popups';
 import { useEmailTemplates } from '@/web/src/hooks/risk-radar/use-email-templates';
+import type { CardHistory } from '@/web/src/hooks/risk-radar/use-get-card-history';
 import { useCardHistory } from '@/web/src/hooks/risk-radar/use-get-card-history';
 import { useMerchant } from '@/web/src/hooks/risk-radar/use-merchant';
 import { useMerchantChargebacks } from '@/web/src/hooks/risk-radar/use-merchant-chargebacks';
@@ -121,18 +122,6 @@ enum PopupType {
   CardHistory = 'cardHistory',
 }
 
-type CardHistory = {
-  iMID: string;
-  dtTransDate: string;
-  dTransAmt: number;
-  sPOSEntry: string;
-  sAVS: string;
-  iAuthCode: string;
-  sDBNetInd: string;
-  dtTransmissionDate: string;
-  dNetDepAmt: number;
-};
-
 type EmailTemplate = {
   pkRiskRadarEMailTemplate: string;
   sTemplateName: string;
@@ -144,9 +133,11 @@ const ITEMS_PER_PAGE = 8;
 const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const { 'merchant-id': merchantId, 'exception-id': exceptionId } = params;
   const { user } = useAuth();
+  const itemsPerPage = 10;
 
+  const [currentPage, setCurrentPage] = useState(1);
   const [currentTransException, setCurrentTransException] =
-    useState<TransactionException | null>(null);
+    useState<TransactionExceptionResponseDto | null>(null);
   const [isPopupActive, setIsPopupActive] = useState<boolean>(false);
   const [activePopup, setActivePopup] = useState<PopupType>(PopupType.Email);
 
@@ -176,14 +167,15 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
   // No longer need to make a separate call to useMerchantContactInfo since data is now in the same format
   const { data: transactionExceptionsData } =
-    useTransactionExceptions(merchantId);
+    useTransactionExceptions(exceptionId);
   const { data: merchantNotesData, refetch: notesRefetch } =
     useMerchantNotes(merchantId);
   const { data: merchantChargebacksData } = useMerchantChargebacks(merchantId);
   const { data: merchantNetSettlementData, refetch: netsettlementRefresh } =
     useMerchantNetSettlement(merchantId);
   const { data: cardNumberData } = useCardHistory(
-    currentTransException?.sCardNum
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    currentTransException?.cardNumber
   );
   const { data: emailTemplatesData } = useEmailTemplates();
 
@@ -216,11 +208,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const [volumePage, setVolumePage] = useState(1);
 
   // Calculate paginated data
-  const paginatedExceptions =
-    transactionExceptionsData?.trans_exceptions?.slice(
-      (exceptionsPage - 1) * ITEMS_PER_PAGE,
-      exceptionsPage * ITEMS_PER_PAGE
-    );
+  const paginatedExceptions = transactionExceptionsData?.slice(
+    (exceptionsPage - 1) * ITEMS_PER_PAGE,
+    exceptionsPage * ITEMS_PER_PAGE
+  );
   const paginatedNotes = merchantNotesData?.slice(
     (notesPage - 1) * ITEMS_PER_PAGE,
     notesPage * ITEMS_PER_PAGE
@@ -241,7 +232,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
   // Calculate total pages
   const totalExceptionsPages = Math.ceil(
-    (transactionExceptionsData?.trans_exceptions?.length || 0) / ITEMS_PER_PAGE
+    (transactionExceptionsData?.length || 0) / ITEMS_PER_PAGE
   );
   const totalNotesPages = Math.ceil(
     (merchantNotesData?.length || 0) / ITEMS_PER_PAGE
@@ -255,6 +246,11 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const totalVolumePages = Math.ceil(
     (data?.processingSummaries?.length || 0) / ITEMS_PER_PAGE
   );
+
+  // Calculate pagination values
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = cardNumberData?.slice(startIndex, endIndex) || [];
 
   const handlePushNoteToIris = async (noteId: string): Promise<void> => {
     await pushNote(noteId);
@@ -369,37 +365,37 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     let newTemplate = templateText;
     newTemplate = newTemplate.replaceAll(
       '@dtTransDate',
-      currentTransException.dtTransDate
+      currentTransException.transactionDate
     );
 
     newTemplate = newTemplate.replaceAll(
       '@dAuthAmt',
-      currentTransException.dAuthAmt.toString()
+      currentTransException.authAmount.toString()
     );
 
     newTemplate = newTemplate.replaceAll(
       '@dTransAmt',
-      currentTransException.dTransAmt.toString()
+      currentTransException.transactionAmount.toString()
     );
 
     newTemplate = newTemplate.replaceAll(
       '@sPOSEntryMode',
-      currentTransException.sPOS
+      currentTransException.posEntryMode
     );
 
     newTemplate = newTemplate.replaceAll(
       '@sAVSRespCode',
-      currentTransException.sAVS
+      currentTransException.avsResponseCode
     );
 
     newTemplate = newTemplate.replaceAll(
       '@sAuthCode',
-      currentTransException.sAuthCode
+      currentTransException.authCode
     );
 
     newTemplate = newTemplate.replaceAll(
       '@sCardLast4',
-      currentTransException.sCardNum.slice(-4)
+      currentTransException.cardNumber.slice(-4)
     );
 
     setBody(newTemplate);
@@ -470,13 +466,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     fkRiskExceptionStatus: data?.businessInfo?.exceptionStatusId || 0,
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const cardHistory: any[] =
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    (cardNumberData as any)?.card_numbers?.length > 0
-      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-        ((cardNumberData as any)?.card_numbers as Array<any>)
-      : [];
+  const cardHistory = cardNumberData || [];
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
   const emailTemplates: any[] =
@@ -496,78 +486,106 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       >
         {activePopup == PopupType.CardHistory ? (
           <div className="grid grid-cols-1 gap-4">
-            <div className="max-w-full max-h-90 overflow-x-auto overflow-y-auto">
-              <table className="w-full table-auto">
-                <thead>
-                  <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                    <th className="p-4 font-medium text-black dark:text-white">
-                      MID
-                    </th>
-                    <th className="p-4 font-medium text-black dark:text-white">
-                      Trans Date
-                    </th>
-                    <th className="p-4 font-medium text-black dark:text-white">
-                      Trans Amt
-                    </th>
-                    <th className="p-4 font-medium text-black dark:text-white">
-                      POS Entry
-                    </th>
-                    <th className="p-4 font-medium text-black dark:text-white">
-                      AVS
-                    </th>
-                    <th className="p-4 font-medium text-black dark:text-white">
-                      Auth Code
-                    </th>
-                    <th className="p-4 font-medium text-black dark:text-white">
-                      Card #
-                    </th>
-                    <th className="p-4 font-medium text-black dark:text-white">
-                      DB Net Ind
-                    </th>
-                    <th className="p-4 font-medium text-black dark:text-white">
-                      Transmission Date
-                    </th>
-                    <th className="p-4 font-medium text-black dark:text-white">
-                      Net Dep. Amt
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {cardHistory.map((card: CardHistory) => {
-                    return (
-                      <tr key={`${card.iMID}`}>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {card.iMID}
+            <div className="max-w-full overflow-hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+              <div className="max-h-[600px] overflow-x-auto">
+                <table className="w-full table-auto">
+                  <thead>
+                    <tr className="bg-gray-2 text-left dark:bg-meta-4">
+                      <th className="min-w-[100px] p-4 font-medium text-black dark:text-white">
+                        MID
+                      </th>
+                      <th className="min-w-[120px] p-4 font-medium text-black dark:text-white">
+                        Trans Date
+                      </th>
+                      <th className="min-w-[100px] p-4 font-medium text-black dark:text-white">
+                        Amount
+                      </th>
+                      <th className="min-w-[80px] p-4 font-medium text-black dark:text-white">
+                        POS
+                      </th>
+                      <th className="min-w-[60px] p-4 font-medium text-black dark:text-white">
+                        AVS
+                      </th>
+                      <th className="min-w-[100px] p-4 font-medium text-black dark:text-white">
+                        Auth Code
+                      </th>
+                      <th className="min-w-[120px] p-4 font-medium text-black dark:text-white">
+                        Card #
+                      </th>
+                      <th className="min-w-[100px] p-4 font-medium text-black dark:text-white">
+                        DB Net
+                      </th>
+                      <th className="min-w-[120px] p-4 font-medium text-black dark:text-white">
+                        Trans. Date
+                      </th>
+                      <th className="min-w-[100px] p-4 font-medium text-black dark:text-white">
+                        Net Amt
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentItems.map((card: CardHistory) => (
+                      <tr key={`${card.mid}-${card.transactionDate}`}>
+                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
+                          {card.mid}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {card.dtTransDate}
+                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
+                          {new Date(card.transactionDate).toLocaleDateString()}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {card.dTransAmt}
+                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
+                          ${card.amount.toFixed(2)}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {card.sPOSEntry}
+                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
+                          {card.posEntryMode}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {card.sAVS}
+                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
+                          {card.avsResponseCode}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {card.iAuthCode}
+                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
+                          {card.authCode}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {card.sDBNetInd}
+                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
+                          {card.cardNumber}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {card.dtTransmissionDate}
+                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
+                          {card.debitNetworkIdentifier || '-'}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {card.dNetDepAmt}
+                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
+                          {new Date(card.transmissionDate).toLocaleDateString()}
+                        </td>
+                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
+                          ${card.netDepositAmount.toFixed(2)}
                         </td>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {/* Pagination */}
+              <div className="flex items-center justify-between border-t border-stroke p-4 dark:border-strokedark">
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  Showing {startIndex + 1} to {endIndex} of {cardHistory.length}{' '}
+                  entries
+                </div>
+                <div className="flex space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="rounded-md border border-stroke px-4 py-2 text-sm font-medium text-black disabled:opacity-50 dark:border-strokedark dark:text-white"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    disabled={endIndex === cardHistory.length}
+                    className="rounded-md border border-stroke px-4 py-2 text-sm font-medium text-black disabled:opacity-50 dark:border-strokedark dark:text-white"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         ) : activePopup == PopupType.Email ? (
@@ -992,12 +1010,15 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   </thead>
                   <tbody>
                     {paginatedExceptions?.map((exception) => (
-                      <tr key={`${exception.pk}`} className="text-center">
+                      <tr
+                        key={`${exception.transactionId}`}
+                        className="text-center"
+                      >
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {exception.dtTransDate}
+                          {exception.transactionDate}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          ${exception.dAuthAmt}
+                          ${exception.authAmount}
                         </td>
                         <td
                           className="border-b border-[#eee] px-4 py-5 dark:border-strokedark"
@@ -1007,16 +1028,16 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                             setCurrentTransException(exception);
                           }}
                         >
-                          ${exception.dTransAmt}
+                          ${exception.transactionAmount}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {exception.sPOS}
+                          {exception.posEntryMode}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {exception.sAVS}
+                          {exception.avsResponseCode}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {exception.sAuthCode}
+                          {exception.authCode}
                         </td>
                         <td
                           className="border-b border-[#eee] px-4 py-5 dark:border-strokedark"
@@ -1026,29 +1047,32 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                             setActivePopup(PopupType.CardHistory);
                           }}
                         >
-                          {exception.sCardNum}
+                          {exception.cardNumber}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {exception.sPIN}
+                          {exception.debitNetworkIdentifier}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {exception.sExceptions
-                            .split(',')
-                            .map((exceptionNumber) => (
-                              <Tooltip
-                                text={
-                                  data?.exceptionTypes?.filter(
-                                    (exceptionType) =>
-                                      exceptionType.id ===
-                                      parseInt(exceptionNumber, 10)
-                                  )[0]?.description ?? ''
-                                }
-                              >
-                                <span className="cursor-pointer m-[4px] text-blue-600 underline">
-                                  {exceptionNumber}
-                                </span>
-                              </Tooltip>
-                            ))}
+                          {exception.exceptionList &&
+                            exception.exceptionList
+                              .split(' ')
+                              .filter(Boolean)
+                              .map((exceptionNumber) => (
+                                <Tooltip
+                                  key={exceptionNumber}
+                                  text={
+                                    data?.exceptionTypes?.filter(
+                                      (exceptionType) =>
+                                        exceptionType.id ===
+                                        parseInt(exceptionNumber, 10)
+                                    )[0]?.description ?? ''
+                                  }
+                                >
+                                  <span className="cursor-pointer m-[4px] text-blue-600 underline">
+                                    {exceptionNumber}
+                                  </span>
+                                </Tooltip>
+                              ))}
                         </td>
                       </tr>
                     ))}

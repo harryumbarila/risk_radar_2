@@ -1,16 +1,29 @@
 import { useApiSWR } from '@/web/src/hooks/use-base-api';
 
-type UseRiskRadarUsersReturnType = {
-  data: unknown;
+export type CardHistory = {
+  mid: string;
+  transmissionDate: string;
+  transactionDate: string;
+  amount: number;
+  posEntryMode: string;
+  avsResponseCode: string;
+  authCode: string;
+  cardNumber: string;
+  debitNetworkIdentifier: string | null;
+  netDepositAmount: number;
+};
+
+type UseCardHistoryReturnType = {
+  data: CardHistory[] | undefined;
   error: unknown;
   isLoading: boolean;
 };
 
 export const useCardHistory = (
   cardNumber: string | undefined
-): UseRiskRadarUsersReturnType => {
-  const { data, error, isLoading } = useApiSWR<unknown>(
-    `/v1/legacy_dashboard_proxy/card_history?cardNumber=${cardNumber}`
+): UseCardHistoryReturnType => {
+  const { data, error, isLoading } = useApiSWR<CardHistory[]>(
+    `/v1/risk-radar/merchant-card-num-history?cardNumber=${cardNumber}`
   );
 
   if (!cardNumber) {

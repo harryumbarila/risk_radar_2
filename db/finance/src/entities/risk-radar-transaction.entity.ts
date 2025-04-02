@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity('tblRiskRadarTransaction', { schema: 'finance' })
+@Entity('tblRiskRadarTransaction', { schema: 'Finance.dbo' })
 export class RiskRadarTransaction {
   @PrimaryColumn({ name: 'pkDFT256Transaction' })
   public transactionId: number;

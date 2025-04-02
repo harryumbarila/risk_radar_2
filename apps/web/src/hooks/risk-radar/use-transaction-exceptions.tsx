@@ -2,16 +2,18 @@ import type { TransactionExceptionResponseDto } from '@/shared/response/legacy-d
 import { useApiSWR } from '@/web/src/hooks/use-base-api';
 
 type UseMerchantContactReturnType = {
-  data: TransactionExceptionResponseDto | undefined;
+  data: TransactionExceptionResponseDto[] | undefined;
   error: unknown;
   isLoading: boolean;
 };
 
 export const useTransactionExceptions = (
-  mid: string
+  exceptionId: string
 ): UseMerchantContactReturnType => {
-  const { data, error, isLoading } = useApiSWR<TransactionExceptionResponseDto>(
-    `/v1/legacy_dashboard_proxy/transaction_exceptions?mid=${mid}`
+  const { data, error, isLoading } = useApiSWR<
+    TransactionExceptionResponseDto[]
+  >(
+    `/v1/risk-radar/merchant-exception-transaction?riskRadarExceptionId=${exceptionId}`
   );
 
   return { data, error, isLoading };

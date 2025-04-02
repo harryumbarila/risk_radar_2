@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
   addDays,
   format,
@@ -10,23 +10,25 @@ import {
   subDays,
 } from 'date-fns';
 import { InjectPinoLogger } from 'nestjs-pino';
+import { Logger } from 'pino';
 
-import {
-  CLXReportingSearchAVSResponseLookupRepository,
-  CLXReportingSearchPaymentMethodLookupRepository,
-} from '@/data-warehouse-db/repositories';
 import type { RiskRadarBatch } from '@/finance-db/entities/risk-radar-batch.entity';
 import type { RiskRadarTransaction } from '@/finance-db/entities/risk-radar-transaction.entity';
 import {
-  AuthResponseLookupRepository,
   DailyDetailRepository,
-  FSPRiskRadarExceptionPointsRepository,
-  POSEntryModesADFRepository,
   RiskRadarBatchRepository,
   RiskRadarCycleTimeMonitorRepository,
   RiskRadarExceptionsJeffRepository,
   RiskRadarTransactionRepository,
 } from '@/finance-db/repositories';
+
+type RiskRadarExceptionJeff = {
+  id: number;
+  mid: string;
+  fundingDate: Date;
+  achFundingTime: string;
+  createdAt: Date;
+};
 
 type TransactionResult = {
   transactionDate: Date;
@@ -44,19 +46,20 @@ type TransactionResult = {
   binSearchMatchFlag: boolean;
 };
 
+type CycleFile = {
+  transmissionDate: Date;
+  cycle: string;
+  accountType: number;
+};
+
 @Injectable()
 export class MerchantExceptionTransactionsService {
   public constructor(
     @InjectPinoLogger(MerchantExceptionTransactionsService.name)
     private readonly logger: Logger,
     private readonly batchRepository: RiskRadarBatchRepository,
-    private readonly clxReportingSearchAvgRepository: CLXReportingSearchAVSResponseLookupRepository,
-    private readonly clxReportingSearchPaymentMethodRepository2: CLXReportingSearchPaymentMethodLookupRepository,
-    private readonly authResponseLookupRepository: AuthResponseLookupRepository,
     private readonly dailyDetailRepository: DailyDetailRepository,
-    private readonly posEntryModesRepository: POSEntryModesADFRepository,
     private readonly cycleTimeMonitorRepository: RiskRadarCycleTimeMonitorRepository,
-    private readonly exceptionPointsRepository: FSPRiskRadarExceptionPointsRepository,
     private readonly riskRadarExceptionsJeff: RiskRadarExceptionsJeffRepository,
     private readonly transactionRepository: RiskRadarTransactionRepository
   ) {}
@@ -66,73 +69,88 @@ export class MerchantExceptionTransactionsService {
     binSearch: string,
     sortBy: number
   ) {
-    const exception = await this.riskRadarExceptionsJeff.findOne({
-      where: { id: riskRadarExceptionId },
-      select: ['mid', 'fundingDate', 'achFundingTime', 'createdAt'],
-    });
+    try {
+      this.logger.info(
+        { riskRadarExceptionId, binSearch, sortBy },
+        'Starting getExceptionTransactions'
+      );
 
-    if (!exception) {
-      throw new Error(`Exception with ID ${riskRadarExceptionId} not found`);
+      const exception = (await this.riskRadarExceptionsJeff.findOne({
+        where: { id: riskRadarExceptionId },
+        select: ['mid', 'fundingDate', 'achFundingTime', 'createdAt'],
+      })) as RiskRadarExceptionJeff | null;
+
+      if (!exception) {
+        this.logger.error({ riskRadarExceptionId }, 'Exception not found');
+        throw new Error(`Exception with ID ${riskRadarExceptionId} not found`);
+      }
+
+      this.logger.info({ exceptionId: exception.id }, 'Exception found');
+
+      const dayOfTheFunding = format(new Date(exception.fundingDate), 'EEE');
+      const { dtStartAuth, dtEndAuth } = this.determineAuthTimes(
+        new Date(exception.createdAt)
+      );
+
+      // Get cycle files to process
+      const cycleFiles = await this.getCycleFilesToProcess(
+        dayOfTheFunding,
+        exception.achFundingTime,
+        new Date(exception.fundingDate)
+      );
+
+      // Get batches for the cycle files
+      const cycleBatches = await this.getBatchesForCycleFiles(
+        exception.mid,
+        cycleFiles
+      );
+
+      // Get transactions from risk radar
+      const riskRadarTransactions = await this.getRiskRadarTransactions(
+        cycleBatches,
+        binSearch
+      );
+
+      // Get declined auth transactions
+      const declinedAuthTransactions = await this.getDeclinedAuthTransactions(
+        exception.mid,
+        dtStartAuth,
+        dtEndAuth,
+        binSearch
+      );
+
+      // Get CLX transactions
+      const clxTransactions = this.getCLXTransactions();
+
+      // Combine all transactions
+      const allTransactions = [
+        ...riskRadarTransactions,
+        ...declinedAuthTransactions,
+        ...clxTransactions,
+      ];
+
+      this.logger.info(
+        { totalTransactionsCount: allTransactions.length },
+        'Combined all transactions, sorting results'
+      );
+
+      // Sort transactions
+      const sortedTransactions = this.sortTransactions(allTransactions, sortBy);
+
+      return sortedTransactions;
+    } catch (error: unknown) {
+      this.logger.error(
+        { error, riskRadarExceptionId },
+        'Error in getExceptionTransactions'
+      );
+      throw error;
     }
-
-    const dayOfTheFunding = format(exception.fundingDate, 'EEE');
-    const { dtStartAuth, dtEndAuth } = this.determineAuthTimes(
-      exception.createdAt
-    );
-
-    // Get cycle files to process
-    const cycleFiles = await this.getCycleFilesToProcess(
-      dayOfTheFunding,
-      exception.achFundingTime,
-      exception.fundingDate
-    );
-
-    // Get batches for the cycle files
-    const cycleBatches = await this.getBatchesForCycleFiles(
-      exception.mid,
-      cycleFiles
-    );
-
-    // Get transactions from risk radar
-    const riskRadarTransactions = await this.getRiskRadarTransactions(
-      cycleBatches,
-      binSearch
-    );
-
-    // Get declined auth transactions
-    const declinedAuthTransactions = await this.getDeclinedAuthTransactions(
-      exception.mid,
-      dtStartAuth,
-      dtEndAuth,
-      binSearch
-    );
-
-    // Get CLX transactions
-    const clxTransactions = this
-      .getCLXTransactions
-      // exception.mid,
-      // dtStartAuth,
-      // dtEndAuth,
-      // exception.fundingDate,
-      // exception.achFundingTime,
-      // binSearch
-      ();
-
-    // Combine all transactions
-    const allTransactions = [
-      ...riskRadarTransactions,
-      ...declinedAuthTransactions,
-      ...clxTransactions,
-    ];
-
-    // Sort transactions
-    return this.sortTransactions(allTransactions, sortBy);
   }
 
   private async getBatchesForCycleFiles(
     mid: string,
     cycleFiles: { transmissionDate: Date; cycle: string }[]
-  ) {
+  ): Promise<RiskRadarBatch[]> {
     const cycleFilesDates = cycleFiles.map((e) => e.transmissionDate);
     const cycleFilesCycles = cycleFiles.map((e) => e.cycle);
 
@@ -149,10 +167,10 @@ export class MerchantExceptionTransactionsService {
   ): Promise<TransactionResult[]> {
     const batchIds = batches.map((b) => b.pkDFT256Batch);
 
-    const [batchDetails, transactions] = await Promise.all([
+    const [batchDetails, transactions] = (await Promise.all([
       this.batchRepository.getBatches(batchIds),
       this.transactionRepository.getTransactionForBatchIds(batchIds),
-    ]);
+    ])) as [RiskRadarBatch[], RiskRadarTransaction[]];
 
     return transactions.map((transaction) => {
       const batch = batchDetails.find(
@@ -191,11 +209,19 @@ export class MerchantExceptionTransactionsService {
     binSearch: string
   ): Promise<TransactionResult[]> {
     const transactions =
-      await this.dailyDetailRepository.findDeclinedAuthTransactions(
+      (await this.dailyDetailRepository.findDeclinedAuthTransactions(
         mid,
         startDate,
         endDate
-      );
+      )) as Array<{
+        transactionDate: Date;
+        transactionAmount?: number;
+        posMode?: string;
+        authorizationNumber?: string;
+        truncatedCardNumber?: string;
+        transactionIdentifier?: string;
+        authorizationAmount?: number;
+      }>;
 
     return transactions.map((tr) => ({
       transactionDate: tr.transactionDate,
@@ -233,7 +259,7 @@ export class MerchantExceptionTransactionsService {
     const sortField = Math.abs(sortBy);
     const sortDirection = sortBy >= 0 ? 'asc' : 'desc';
 
-    const fieldMap = {
+    const fieldMap: Record<number, keyof TransactionResult> = {
       1: 'transactionDate',
       2: 'transactionAmount',
       3: 'posEntryMode',
@@ -245,19 +271,29 @@ export class MerchantExceptionTransactionsService {
       9: 'authAmount',
     };
 
-    const field = fieldMap[sortField] as keyof TransactionResult;
+    const field = fieldMap[sortField];
     if (!field) return transactions;
 
     return [...transactions].sort((a, b) => {
       const aVal = a[field];
       const bVal = b[field];
+
       if (sortDirection === 'asc') {
-        if (aVal < bVal) return -1;
-        if (aVal > bVal) return 1;
+        if (aVal < bVal) {
+          return -1;
+        }
+        if (aVal > bVal) {
+          return 1;
+        }
         return 0;
       }
-      if (bVal < aVal) return -1;
-      if (bVal > aVal) return 1;
+
+      if (bVal < aVal) {
+        return -1;
+      }
+      if (bVal > aVal) {
+        return 1;
+      }
       return 0;
     });
   }
@@ -325,14 +361,18 @@ export class MerchantExceptionTransactionsService {
     dayOfTheFunding: string,
     achFundingTime: string,
     fundingDate: Date
-  ) {
-    const records = await this.cycleTimeMonitorRepository.find({
+  ): Promise<CycleFile[]> {
+    const records = (await this.cycleTimeMonitorRepository.find({
       where: {
         dayOfTheFunding,
         achFundingTime,
       },
       select: ['dateDiffFundingVsTransmissionCycle', 'cycle', 'accountType'],
-    });
+    })) as Array<{
+      dateDiffFundingVsTransmissionCycle: number;
+      cycle: string;
+      accountType: number;
+    }>;
 
     return records.map((record) => ({
       transmissionDate: addDays(
