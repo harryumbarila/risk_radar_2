@@ -14,6 +14,7 @@ import {
 } from '@nestjs/swagger';
 
 import type { PaginatedRiskRadarExceptionsDto } from '@/api/module/risk-radar-exceptions/dto/risk-radar-exceptions-pagination.dto';
+import { Public } from '@/api/shared/auth/decorator/public.decorator';
 import {
   ChargebacksAndRetrievalReasonCodeLookupRepository,
   RiskRadarNotesRepository,
@@ -33,6 +34,8 @@ import { MerchantCardNumHistoryQueryDto } from './services/merchant-card-num-his
 import { MerchantCardNumHistoryService } from './services/merchant-card-num-history/merchant-card-num-history.service';
 import { MerchantExceptionDetailService } from './services/merchant-exception-detail.service';
 import { MerchantExceptionTransactionsService } from './services/merchant-exception-transactions/merchant-exception-transactions.service';
+import { EmailTemplatesResponseDto } from './services/risk-radar-email-template/dto/email-template.dto';
+import { RiskRadarEmailTemplateService } from './services/risk-radar-email-template/risk-radar-email-template.service';
 import { RiskRadarExceptionsService } from './services/risk-radar-exceptions.service';
 import { RiskRadarSaveInputDto } from './services/risk-radar-save/dto/risk-radar-save-input.dto';
 import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save.service';
@@ -52,7 +55,8 @@ export class RiskRadarController {
     private readonly merchantExceptionTransactionsService: MerchantExceptionTransactionsService,
     private readonly exceptionsListService: ExceptionsListService,
     private readonly riskRadarNotesRepository: RiskRadarNotesRepository,
-    private readonly chargebackTransactionsService: ChargebacksAndRetrievalReasonCodeLookupRepository
+    private readonly chargebackTransactionsService: ChargebacksAndRetrievalReasonCodeLookupRepository,
+    private readonly emailTemplateService: RiskRadarEmailTemplateService
   ) {}
 
   @Post('send-exception-memo-email')
@@ -263,5 +267,21 @@ export class RiskRadarController {
   @ApiOkResponse()
   public async getChargebackTransactions(@Query('mid') mid: string) {
     return this.chargebackTransactionsService.getChargebackTransactions(mid);
+  }
+
+  @Public()
+  @Get('email-templates')
+  @ApiOperation({
+    summary: 'Get active email templates',
+    description: 'Retrieves a list of all active email templates',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of active email templates successfully retrieved',
+    type: EmailTemplatesResponseDto,
+  })
+  public async getEmailTemplates(): Promise<EmailTemplatesResponseDto> {
+    const templates = await this.emailTemplateService.getActiveEmailTemplates();
+    return { templates };
   }
 }

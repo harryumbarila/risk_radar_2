@@ -13,7 +13,10 @@ import { useEffect, useState } from 'react';
 
 import { DefaultLayout } from '@/components/layouts/default-layout';
 import { Pagination } from '@/components/risk-radar/pagination';
-import type { TransactionExceptionResponseDto } from '@/shared/response';
+import type {
+  EmailTemplate,
+  TransactionExceptionResponseDto,
+} from '@/shared/response';
 import { Tooltip } from '@/ui/common/tool-tips/risk-tooltip';
 import { Popup } from '@/web/src/components/risk-radar/popups/popups';
 import { useEmailTemplates } from '@/web/src/hooks/risk-radar/use-email-templates';
@@ -121,12 +124,6 @@ enum PopupType {
   Email = 'email',
   CardHistory = 'cardHistory',
 }
-
-type EmailTemplate = {
-  pkRiskRadarEMailTemplate: string;
-  sTemplateName: string;
-  sTemplateEMailBody: string;
-};
 
 const ITEMS_PER_PAGE = 8;
 
@@ -468,12 +465,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
   const cardHistory = cardNumberData || [];
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-  const emailTemplates: any[] =
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    (emailTemplatesData as any)?.email_templates.length > 0
-      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-        (emailTemplatesData as any)?.email_templates
+  const emailTemplates =
+    emailTemplatesData!.templates?.length > 0
+      ? emailTemplatesData!.templates
       : [];
 
   return (
@@ -606,18 +600,15 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                   const template = emailTemplates?.find(
                     (template: EmailTemplate) =>
-                      template.pkRiskRadarEMailTemplate == e.target.value
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                  )?.sTemplateEMailBody;
+                      template.id == parseInt(e.target.value, 10)
+                  )?.templateEmailBody;
                   if (template) {
-                    replaceEmailTemplateParameters(template as string);
+                    replaceEmailTemplateParameters(template);
                   }
                 }}
               >
                 {emailTemplates.map((template: EmailTemplate) => (
-                  <option value={template.pkRiskRadarEMailTemplate}>
-                    {template.sTemplateName}
-                  </option>
+                  <option value={template.id}>{template.templateName}</option>
                 ))}
               </select>
             </div>

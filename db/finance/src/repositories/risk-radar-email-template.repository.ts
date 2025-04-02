@@ -18,7 +18,7 @@ export class RiskRadarEmailTemplateRepository extends Repository<RiskRadarEmailT
     Pick<RiskRadarEmailTemplateEntity, 'id' | 'templateName'>[]
   > {
     return this.find({
-      select: ['id', 'templateName'],
+      select: ['id', 'templateName', 'templateEmailBody'],
       where: {
         isHidden: false,
       },
