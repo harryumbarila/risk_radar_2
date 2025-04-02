@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react/no-unstable-nested-components */
 import { useAuth } from '@frontegg/nextjs';
 import { useRouter } from 'next/navigation';
@@ -113,7 +112,7 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
 
   const handlePageSizeChange = useCallback(
     (pageSize: number): void => {
-      fetchData({ ...filters, pageSize });
+      fetchData({ ...filters, pageSize, page: 1 });
     },
     [fetchData, filters]
   );
@@ -170,7 +169,7 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
           Header: 'Assigned to',
           accessor: (row) => row.sNTUserID,
           Cell: ({ row }: CellProps<RiskRadarExceptionsListRow>) =>
-            riskUsers?.find((user) => user.sNTUserID === row.original.sNTUserID)
+            riskUsers?.find((u) => u.sNTUserID === row.original.sNTUserID)
               ?.sName ?? 'N/A',
         });
         break;
@@ -242,82 +241,87 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
   }
 
   return (
-    <section className="data-table-common data-table-two rounded-sm border border-stroke bg-white py-4 text-xs shadow-default dark:border-strokedark dark:bg-boxdark">
-      <div className="flex justify-end border-b border-stroke px-8 pb-4 dark:border-strokedark">
-        <div className="flex items-center font-medium">
-          <select
-            value={state.pageSize}
-            className="bg-transparent pl-2"
-            onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-          >
-            {[5, 10, 20, 50].map((size) => (
-              <option key={size} value={size}>
-                {size}
-              </option>
-            ))}
-          </select>
-          <p className="pl-2 text-black dark:text-white">Entries Per Page</p>
+    <div className="flex flex-col gap-5 md:gap-7 2xl:gap-10">
+      <section className="data-table-common data-table-two rounded-sm border border-stroke bg-white py-4 text-xs shadow-default dark:border-strokedark dark:bg-boxdark">
+        <div className="flex justify-end border-b border-stroke px-8 pb-4 dark:border-strokedark">
+          <div className="flex items-center font-medium">
+            <select
+              value={state.pageSize}
+              className="bg-transparent pl-2"
+              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+            >
+              {[5, 10, 20, 50].map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
+            <p className="pl-2 text-black dark:text-white">Entries Per Page</p>
+          </div>
         </div>
-      </div>
 
-      <div className="overflow-x-auto">
-        <table
-          {...getTableProps()}
-          className="datatable-table w-full table-auto !border-collapse break-words px-4 md:px-8 align-middle"
-        >
-          <thead>
-            {headerGroups.map(
-              (headerGroup: HeaderGroup<RiskRadarExceptionsListRow>) => (
-                <tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
-                  {headerGroup.headers.map(
-                    (column: ColumnInstance<RiskRadarExceptionsListRow>) => (
-                      <th {...column.getHeaderProps()} key={column.id}>
-                        <div className="flex items-center">
-                          <span>
-                            {column.render('Header') as React.ReactNode}
-                          </span>
-                        </div>
-                      </th>
-                    )
-                  )}
-                </tr>
-              )
-            )}
-          </thead>
+        <div className="overflow-x-auto">
+          <table
+            {...getTableProps()}
+            className="datatable-table w-full table-auto !border-collapse break-words px-4 md:px-8 align-middle"
+          >
+            <thead>
+              {headerGroups.map(
+                (headerGroup: HeaderGroup<RiskRadarExceptionsListRow>) => (
+                  <tr
+                    {...headerGroup.getHeaderGroupProps()}
+                    key={headerGroup.id}
+                  >
+                    {headerGroup.headers.map(
+                      (column: ColumnInstance<RiskRadarExceptionsListRow>) => (
+                        <th {...column.getHeaderProps()} key={column.id}>
+                          <div className="flex items-center">
+                            <span>
+                              {column.render('Header') as React.ReactNode}
+                            </span>
+                          </div>
+                        </th>
+                      )
+                    )}
+                  </tr>
+                )
+              )}
+            </thead>
 
-          <tbody {...getTableBodyProps()}>
-            {page.map((row: Row<RiskRadarExceptionsListRow>) => {
-              prepareRow(row);
-              return (
-                <tr
-                  {...row.getRowProps()}
-                  key={row.id}
-                  onClick={() =>
-                    goToMerchantDetails(
-                      row.original.sMID,
-                      row.original.pkRiskRadarExceptions
-                    )
-                  }
-                >
-                  {row.cells.map((cell: Cell<RiskRadarExceptionsListRow>) => (
-                    <td {...cell.getCellProps()} key={cell.column.id}>
-                      {cell.render('Cell') as React.ReactNode}
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+            <tbody {...getTableBodyProps()}>
+              {page.map((row: Row<RiskRadarExceptionsListRow>) => {
+                prepareRow(row);
+                return (
+                  <tr
+                    {...row.getRowProps()}
+                    key={row.id}
+                    onClick={() =>
+                      goToMerchantDetails(
+                        row.original.sMID,
+                        row.original.pkRiskRadarExceptions
+                      )
+                    }
+                  >
+                    {row.cells.map((cell: Cell<RiskRadarExceptionsListRow>) => (
+                      <td {...cell.getCellProps()} key={cell.column.id}>
+                        {cell.render('Cell') as React.ReactNode}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
 
-      <TablePagination
-        page={exceptionList.page}
-        pageSize={exceptionList.pageSize}
-        totalRecords={exceptionList.totalRecords ?? 0}
-        fetchData={fetchData}
-        filters={filters}
-      />
-    </section>
+        <TablePagination
+          page={exceptionList.page}
+          pageSize={exceptionList.pageSize}
+          totalRecords={exceptionList.totalRecords ?? 0}
+          fetchData={fetchData}
+          filters={filters}
+        />
+      </section>
+    </div>
   );
 };
