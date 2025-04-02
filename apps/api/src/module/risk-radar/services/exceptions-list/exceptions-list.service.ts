@@ -29,10 +29,17 @@ export class ExceptionsListService {
       viewAllExceptions,
       assignedToUser,
       processor,
-      totalRecords,
     } = data;
 
-    this.logger.info('Query STARTING %o', data);
+    // If no categories are provided nor merchantId, return an empty array
+    if ((!categories || !categories.length) && !merchantId) {
+      return {
+        pageSize,
+        page,
+        totalRecords: 0,
+        data: [],
+      };
+    }
 
     // Use the query builder to get the query with all joins
     let query = this.buildFullQuery();
@@ -112,30 +119,16 @@ export class ExceptionsListService {
       }
     }
 
-    const shouldCalculateTotal = page === 1;
-    let totalCount = totalRecords;
-
-    // Apply sorting and pagination to the main query
     const limit = pageSize || 25;
     const offset = (page - 1) * limit;
     query.orderBy('exception.iTotalPoints', 'ASC');
     query.limit(limit).offset(offset);
 
-    // As we are using join we use TS to infer the type of the query
-    let exceptions: Awaited<ReturnType<typeof query.getRawMany>>;
-
-    if (shouldCalculateTotal) {
-      // TODO: Remove this once we have enable pagination in UI
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const countQuery = query.clone();
-      [exceptions, totalCount] = await Promise.all([
-        query.getRawMany(),
-        0,
-        // countQuery.getCount(),
-      ]);
-    } else {
-      exceptions = await query.getRawMany();
-    }
+    const countQuery = query.clone().select('COUNT(exception.sMID)');
+    const [exceptions, totalCount] = await Promise.all([
+      query.getRawMany(),
+      countQuery.getCount(),
+    ]);
 
     // Fallback to leads if no merchant exceptions are found (Merchant is always needed if id is provided)
     if (exceptions.length === 0 && merchantId) {

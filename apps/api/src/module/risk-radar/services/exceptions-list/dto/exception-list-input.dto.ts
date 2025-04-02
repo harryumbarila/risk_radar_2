@@ -69,9 +69,4 @@ export class ExceptionListInputDto {
   @IsInt()
   @Type(() => Number)
   public page?: number = 1;
-
-  @IsOptional()
-  @IsInt()
-  @Type(() => Number)
-  public totalRecords?: number;
 }

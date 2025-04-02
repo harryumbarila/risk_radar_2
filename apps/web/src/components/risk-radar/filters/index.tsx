@@ -2,26 +2,12 @@ import type { FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import type { RiskRadarFilterState } from '@/shared/response';
+import { defaultRiskRadarFilters } from '@/shared/response';
 import { useExceptionData } from '@/web/src/hooks/risk-radar/use-exception-data';
 
 import { DateAndSourceCard } from './cards/date-and-source-card';
 import { ExceptionTypeCard } from './cards/exception-type-card';
 import { StatusAndOtherCard } from './cards/status-and-other-card';
-
-const defaultValues: RiskRadarFilterState = {
-  startDate: new Date().toISOString().split('T')[0] ?? '',
-  endDate: new Date().toISOString().split('T')[0] ?? '',
-  processor: 0,
-  viewAllExceptions: false,
-  categories: [],
-  status: undefined,
-  assignedToUser: undefined,
-  merchantId: undefined,
-  dbaNameOrSIC: undefined,
-  sourceType: undefined,
-  page: 1,
-  pageSize: 10,
-};
 
 export const RiskRadarFilters: FC<{
   onSubmit?: (data: RiskRadarFilterState) => void;
@@ -49,7 +35,7 @@ export const RiskRadarFilters: FC<{
   }));
 
   const methods = useForm<RiskRadarFilterState>({
-    defaultValues,
+    defaultValues: defaultRiskRadarFilters,
     mode: 'onChange',
   });
 

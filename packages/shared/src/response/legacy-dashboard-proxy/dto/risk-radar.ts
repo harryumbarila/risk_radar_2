@@ -1,5 +1,7 @@
 import type { RiskRadarExceptionsListRow } from '@/shared/response/risk-radar';
 
+import type { RiskUser } from './exception-data';
+
 export interface RiskRadarResponseDto {
   data: RiskRadarExceptionsListRow[];
   meta: RiskRadarMeta;
@@ -56,15 +58,6 @@ export interface RiskRadarMeta {
   from_record: number;
   to_record: number;
   total_records: number;
-}
-
-export interface RiskUser {
-  pkRiskRadarUser: number;
-  sName: string;
-  sNTUserID: string;
-  bManager: boolean;
-  bHidden: boolean;
-  dtCreated: string;
 }
 
 export interface RiskRadarUsersResponseDto {
