@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import type { Logger } from 'pino';
-import { InjectPinoLogger } from 'nestjs-pino';
 import {
   addDays,
   format,
@@ -11,23 +9,26 @@ import {
   setSeconds,
   subDays,
 } from 'date-fns';
+import { InjectPinoLogger } from 'nestjs-pino';
+import { Logger } from 'pino';
 
-import {
-  CLXReportingSearchAVSResponseLookupRepository,
-  CLXReportingSearchPaymentMethodLookupRepository,
-} from '@/data-warehouse-db/repositories';
 import type { RiskRadarBatch } from '@/finance-db/entities/risk-radar-batch.entity';
 import type { RiskRadarTransaction } from '@/finance-db/entities/risk-radar-transaction.entity';
 import {
-  AuthResponseLookupRepository,
   DailyDetailRepository,
-  FSPRiskRadarExceptionPointsRepository,
-  POSEntryModesADFRepository,
   RiskRadarBatchRepository,
   RiskRadarCycleTimeMonitorRepository,
   RiskRadarExceptionsJeffRepository,
   RiskRadarTransactionRepository,
 } from '@/finance-db/repositories';
+
+type RiskRadarExceptionJeff = {
+  id: number;
+  mid: string;
+  fundingDate: Date;
+  achFundingTime: string;
+  createdAt: Date;
+};
 
 type TransactionResult = {
   transactionDate: Date;
@@ -45,19 +46,20 @@ type TransactionResult = {
   binSearchMatchFlag: boolean;
 };
 
+type CycleFile = {
+  transmissionDate: Date;
+  cycle: string;
+  accountType: number;
+};
+
 @Injectable()
 export class MerchantExceptionTransactionsService {
   public constructor(
     @InjectPinoLogger(MerchantExceptionTransactionsService.name)
     private readonly logger: Logger,
     private readonly batchRepository: RiskRadarBatchRepository,
-    private readonly clxReportingSearchAvgRepository: CLXReportingSearchAVSResponseLookupRepository,
-    private readonly clxReportingSearchPaymentMethodRepository2: CLXReportingSearchPaymentMethodLookupRepository,
-    private readonly authResponseLookupRepository: AuthResponseLookupRepository,
     private readonly dailyDetailRepository: DailyDetailRepository,
-    private readonly posEntryModesRepository: POSEntryModesADFRepository,
     private readonly cycleTimeMonitorRepository: RiskRadarCycleTimeMonitorRepository,
-    private readonly exceptionPointsRepository: FSPRiskRadarExceptionPointsRepository,
     private readonly riskRadarExceptionsJeff: RiskRadarExceptionsJeffRepository,
     private readonly transactionRepository: RiskRadarTransactionRepository
   ) {}
@@ -68,25 +70,33 @@ export class MerchantExceptionTransactionsService {
     sortBy: number
   ) {
     try {
-      const exception = await this.riskRadarExceptionsJeff.findOne({
+      this.logger.info(
+        { riskRadarExceptionId, binSearch, sortBy },
+        'Starting getExceptionTransactions'
+      );
+
+      const exception = (await this.riskRadarExceptionsJeff.findOne({
         where: { id: riskRadarExceptionId },
         select: ['mid', 'fundingDate', 'achFundingTime', 'createdAt'],
-      });
+      })) as RiskRadarExceptionJeff | null;
 
       if (!exception) {
+        this.logger.error({ riskRadarExceptionId }, 'Exception not found');
         throw new Error(`Exception with ID ${riskRadarExceptionId} not found`);
       }
 
-      const dayOfTheFunding = format(exception.fundingDate, 'EEE');
+      this.logger.info({ exceptionId: exception.id }, 'Exception found');
+
+      const dayOfTheFunding = format(new Date(exception.fundingDate), 'EEE');
       const { dtStartAuth, dtEndAuth } = this.determineAuthTimes(
-        exception.createdAt
+        new Date(exception.createdAt)
       );
 
       // Get cycle files to process
       const cycleFiles = await this.getCycleFilesToProcess(
         dayOfTheFunding,
         exception.achFundingTime,
-        exception.fundingDate
+        new Date(exception.fundingDate)
       );
 
       // Get batches for the cycle files
@@ -110,15 +120,7 @@ export class MerchantExceptionTransactionsService {
       );
 
       // Get CLX transactions
-      const clxTransactions = this
-        .getCLXTransactions
-        // exception.mid,
-        // dtStartAuth,
-        // dtEndAuth,
-        // exception.fundingDate,
-        // exception.achFundingTime,
-        // binSearch
-        ();
+      const clxTransactions = this.getCLXTransactions();
 
       // Combine all transactions
       const allTransactions = [
@@ -136,9 +138,9 @@ export class MerchantExceptionTransactionsService {
       const sortedTransactions = this.sortTransactions(allTransactions, sortBy);
 
       return sortedTransactions;
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(
-        { error, riskRadarExceptionId, binSearch, sortBy },
+        { error, riskRadarExceptionId },
         'Error in getExceptionTransactions'
       );
       throw error;
@@ -148,7 +150,7 @@ export class MerchantExceptionTransactionsService {
   private async getBatchesForCycleFiles(
     mid: string,
     cycleFiles: { transmissionDate: Date; cycle: string }[]
-  ) {
+  ): Promise<RiskRadarBatch[]> {
     const cycleFilesDates = cycleFiles.map((e) => e.transmissionDate);
     const cycleFilesCycles = cycleFiles.map((e) => e.cycle);
 
@@ -165,10 +167,10 @@ export class MerchantExceptionTransactionsService {
   ): Promise<TransactionResult[]> {
     const batchIds = batches.map((b) => b.pkDFT256Batch);
 
-    const [batchDetails, transactions] = await Promise.all([
+    const [batchDetails, transactions] = (await Promise.all([
       this.batchRepository.getBatches(batchIds),
       this.transactionRepository.getTransactionForBatchIds(batchIds),
-    ]);
+    ])) as [RiskRadarBatch[], RiskRadarTransaction[]];
 
     return transactions.map((transaction) => {
       const batch = batchDetails.find(
@@ -207,11 +209,19 @@ export class MerchantExceptionTransactionsService {
     binSearch: string
   ): Promise<TransactionResult[]> {
     const transactions =
-      await this.dailyDetailRepository.findDeclinedAuthTransactions(
+      (await this.dailyDetailRepository.findDeclinedAuthTransactions(
         mid,
         startDate,
         endDate
-      );
+      )) as Array<{
+        transactionDate: Date;
+        transactionAmount?: number;
+        posMode?: string;
+        authorizationNumber?: string;
+        truncatedCardNumber?: string;
+        transactionIdentifier?: string;
+        authorizationAmount?: number;
+      }>;
 
     return transactions.map((tr) => ({
       transactionDate: tr.transactionDate,
@@ -249,7 +259,7 @@ export class MerchantExceptionTransactionsService {
     const sortField = Math.abs(sortBy);
     const sortDirection = sortBy >= 0 ? 'asc' : 'desc';
 
-    const fieldMap = {
+    const fieldMap: Record<number, keyof TransactionResult> = {
       1: 'transactionDate',
       2: 'transactionAmount',
       3: 'posEntryMode',
@@ -261,19 +271,29 @@ export class MerchantExceptionTransactionsService {
       9: 'authAmount',
     };
 
-    const field = fieldMap[sortField] as keyof TransactionResult;
+    const field = fieldMap[sortField];
     if (!field) return transactions;
 
     return [...transactions].sort((a, b) => {
       const aVal = a[field];
       const bVal = b[field];
+
       if (sortDirection === 'asc') {
-        if (aVal < bVal) return -1;
-        if (aVal > bVal) return 1;
+        if (aVal < bVal) {
+          return -1;
+        }
+        if (aVal > bVal) {
+          return 1;
+        }
         return 0;
       }
-      if (bVal < aVal) return -1;
-      if (bVal > aVal) return 1;
+
+      if (bVal < aVal) {
+        return -1;
+      }
+      if (bVal > aVal) {
+        return 1;
+      }
       return 0;
     });
   }
@@ -341,14 +361,18 @@ export class MerchantExceptionTransactionsService {
     dayOfTheFunding: string,
     achFundingTime: string,
     fundingDate: Date
-  ) {
-    const records = await this.cycleTimeMonitorRepository.find({
+  ): Promise<CycleFile[]> {
+    const records = (await this.cycleTimeMonitorRepository.find({
       where: {
         dayOfTheFunding,
         achFundingTime,
       },
       select: ['dateDiffFundingVsTransmissionCycle', 'cycle', 'accountType'],
-    });
+    })) as Array<{
+      dateDiffFundingVsTransmissionCycle: number;
+      cycle: string;
+      accountType: number;
+    }>;
 
     return records.map((record) => ({
       transmissionDate: addDays(
