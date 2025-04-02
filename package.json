@@ -10,6 +10,7 @@
   "scripts": {
     "build": "turbo build",
     "commit": "git-cz",
+    "create-db-pkg": "node configs/toolkit/add-db-package.js",
     "dev": "turbo dev",
     "docs": "yarn workspace @denali/docs run dev-docs",
     "format": "prettier --write .",
@@ -22,8 +23,7 @@
     "test:e2e": "turbo run test:e2e",
     "test:unit": "turbo run test:unit",
     "type-check": "turbo run type-check",
-    "ui:example": "yarn workspace @denali/example run dev-example",
-    "create-db-pkg": "node configs/toolkit/add-db-package.js"
+    "ui:example": "yarn workspace @denali/example run dev-example"
   },
   "config": {
     "commitizen": {
@@ -37,7 +37,7 @@
     "@denali/eslint-config": "*",
     "@denali/shared": "*",
     "@denali/typescript-config": "*",
-    "@ls-lint/ls-lint": "^2.2.3",
+    "@ls-lint/ls-lint": "^2.3.0",
     "cross-env": "^7.0.3",
     "cz-git": "^1.11.0",
     "dotenv-cli": "^8.0.0",
