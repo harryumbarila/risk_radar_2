@@ -30,7 +30,6 @@ jobs:
   build-and-push:
     name: Deploy DENALI Web
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
     steps:
       - name: Check out the code
         uses: actions/checkout@v4
