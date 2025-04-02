@@ -7,55 +7,55 @@ on:
   workflow_dispatch:
 
 jobs:
-  code-checks:
-    name: Run code quality tools
-    uses: ./.github/workflows/_code_checks.yaml
+  # code-checks:
+  #   name: Run code quality tools
+  #   uses: ./.github/workflows/_code_checks.yaml
 
-  versioning:
-    name: Generate build number
-    uses: ./.github/workflows/_versioning.yaml
-    with:
-      release-type: 'pre-release'
+  # versioning:
+  #   name: Generate build number
+  #   uses: ./.github/workflows/_versioning.yaml
+  #   with:
+  #     release-type: 'pre-release'
 
-  deploy-web:
-    name: Deploy DENALI Web to AWS
-    needs: [versioning]
-    uses: ./.github/workflows/_deploy_web.yaml
-    with:
-      build-number: ${{ needs.versioning.outputs.build-number }}
-      environment: Staging
-    secrets:
-      # TODO: We might need to move this to GH Actions secrets
-      role-to-assume: arn:aws:iam::257498453293:role/jobox-github-action-staging-denali
-      aws-region: us-west-2
-      ecr-repository: denali/staging/web
+  # deploy-web:
+  #   name: Deploy DENALI Web to AWS
+  #   needs: [versioning]
+  #   uses: ./.github/workflows/_deploy_web.yaml
+  #   with:
+  #     build-number: ${{ needs.versioning.outputs.build-number }}
+  #     environment: Staging
+  #   secrets:
+  #     # TODO: We might need to move this to GH Actions secrets
+  #     role-to-assume: arn:aws:iam::257498453293:role/jobox-github-action-staging-denali
+  #     aws-region: us-west-2
+  #     ecr-repository: denali/staging/web
 
-  deploy-api:
-    name: Deploy DENALI API to AWS
-    needs: [versioning]
-    uses: ./.github/workflows/_deploy_api.yaml
-    with:
-      build-number: ${{ needs.versioning.outputs.build-number }}
-      environment: Staging
-    secrets:
-      # TODO: We might need to move this to GH Actions secrets
-      role-to-assume: arn:aws:iam::257498453293:role/jobox-github-action-staging-denali
-      aws-region: us-west-2
-      ecr-repository: denali/staging/api
+  # deploy-api:
+  #   name: Deploy DENALI API to AWS
+  #   needs: [versioning]
+  #   uses: ./.github/workflows/_deploy_api.yaml
+  #   with:
+  #     build-number: ${{ needs.versioning.outputs.build-number }}
+  #     environment: Staging
+  #   secrets:
+  #     # TODO: We might need to move this to GH Actions secrets
+  #     role-to-assume: arn:aws:iam::257498453293:role/jobox-github-action-staging-denali
+  #     aws-region: us-west-2
+  #     ecr-repository: denali/staging/api
 
-  pre-release:
-    name: Create Github pre-release & release notes
-    needs: [versioning, deploy-web, deploy-api]
-    uses: ./.github/workflows/_pre_release.yaml
-    with:
-      build-number: ${{ needs.versioning.outputs.build-number }}
-      environment: Staging
-    secrets:
-      github-token: ${{ secrets.GITHUB_TOKEN }}
+  # pre-release:
+  #   name: Create Github pre-release & release notes
+  #   needs: [versioning, deploy-web, deploy-api]
+  #   uses: ./.github/workflows/_pre_release.yaml
+  #   with:
+  #     build-number: ${{ needs.versioning.outputs.build-number }}
+  #     environment: Staging
+  #   secrets:
+  #     github-token: ${{ secrets.GITHUB_TOKEN }}
 
   restart-staging:
     runs-on: ubuntu-latest
-    needs: [deploy-web, deploy-api]
+    # needs: [deploy-web, deploy-api]
     permissions:
       id-token: write
       contents: read
@@ -66,6 +66,13 @@ jobs:
           # TODO: We might need to move this to GH Actions secrets
           role-to-assume: arn:aws:iam::257498453293:role/jobox-github-action-staging-denali
           aws-region: us-west-2
+
+      - name: Debug OIDC Token
+        run: |
+          echo "Fetching OIDC Token Data..."
+          cat $AWS_WEB_IDENTITY_TOKEN_FILE | jq -R 'split(".") | .[1] | @base64d | fromjson' | tee token.json
+          echo "Extracted Claims:"
+          cat token.json | jq '.'
 
       - name: Restart Staging API
         run: |
