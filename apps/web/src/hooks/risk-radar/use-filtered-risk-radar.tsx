@@ -8,13 +8,13 @@ import type {
 } from '@/shared/response';
 import { defaultRiskRadarFilters } from '@/shared/response/risk-radar/exception-list/filter-state';
 
-type UseFilteredRiskRadarReturnType = {
+export type UseFilteredRiskRadarReturnType = {
   filters: RiskRadarFilterState;
-  setFilters: React.Dispatch<React.SetStateAction<RiskRadarFilterState>>;
+  setFilters: (filters: RiskRadarFilterState) => void;
   data: PaginatedAPIResponse<RiskRadarExceptionsListRow> | null;
   isLoading: boolean;
   error: Error | null;
-  fetchData: (filtersToApply?: RiskRadarFilterState) => void;
+  fetchData: (filtersToApply: RiskRadarFilterState) => void;
 };
 
 export const useFilteredRiskRadar = (): UseFilteredRiskRadarReturnType => {
@@ -48,7 +48,7 @@ export const useFilteredRiskRadar = (): UseFilteredRiskRadarReturnType => {
   };
 
   const fetchData = async (
-    filtersToApply?: RiskRadarFilterState
+    filtersToApply: RiskRadarFilterState
   ): Promise<void> => {
     setIsLoading(true);
     try {
@@ -60,6 +60,7 @@ export const useFilteredRiskRadar = (): UseFilteredRiskRadarReturnType => {
         PaginatedAPIResponse<RiskRadarExceptionsListRow>
       >(`/v1/risk-radar/exception-list?${queryParams}`);
 
+      setFilters(filtersToApply);
       setData(result);
       setError(null);
     } catch (err) {

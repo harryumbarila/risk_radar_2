@@ -43,4 +43,6 @@ export type RiskRadarExceptionsListRow = {
   sReseller: string;
   sReferralPartner: string;
   sISV: string;
+  // Fallback when data comes from leads table
+  leadName?: string;
 };

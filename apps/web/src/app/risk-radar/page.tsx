@@ -36,12 +36,14 @@ const RiskRadar: FC = () => {
         <RiskRadarTableComponent
           data={filteredData}
           status={Number(filters.status)}
+          filters={filters}
+          fetchData={fetchData}
         />
       );
     }
 
     return <div>No data available</div>;
-  }, [filterError, filterLoading, filteredData, filters.status]);
+  }, [fetchData, filterError, filterLoading, filteredData, filters]);
 
   return (
     <DefaultLayout>

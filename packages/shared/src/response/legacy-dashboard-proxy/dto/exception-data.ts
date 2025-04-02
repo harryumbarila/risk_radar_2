@@ -18,7 +18,7 @@ export interface ExceptionType {
   bHidden: boolean;
 }
 
-interface RiskUser {
+export interface RiskUser {
   pkRiskRadarUser: number;
   sName: string;
   sNTUserID: string;
