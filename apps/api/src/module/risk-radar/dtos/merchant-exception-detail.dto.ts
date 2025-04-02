@@ -269,6 +269,12 @@ export class MerchantBusinessInfoDto {
   public swipedPercentage: number;
 
   @ApiProperty({
+    description: 'Average ticket size amount',
+    example: 150,
+  })
+  public averageTicketSizeAmount: number;
+
+  @ApiProperty({
     description: 'Chargeback count',
     example: 5,
   })
