@@ -1,25 +1,32 @@
+import {
+  DEFAULT_BLANK_VALUE,
+  DEFAULT_NO_VALUE,
+  DEFAULT_YES_VALUE,
+  DEFAULT_ZERO_VALUE,
+} from './default-values';
+
 export const formatNumber = (value: unknown): string => {
   if (value === undefined || value === null || Number(value) === 0) {
-    return 'N/A';
+    return DEFAULT_BLANK_VALUE;
   }
   return Number(value).toLocaleString();
 };
 
 export const formatScore = (value: unknown): string => {
   const numValue = Number(value);
-  if (numValue === 0) return '';
+  if (numValue === 0) return DEFAULT_ZERO_VALUE;
   return numValue.toFixed(0);
 };
 
 export const formatBoolean = (value: unknown): string => {
-  return value === 'Yes' ? 'Yes' : 'No';
+  return value === 'Yes' ? DEFAULT_YES_VALUE : DEFAULT_NO_VALUE;
 };
 
 export const formatDate = (value: unknown): string => {
-  if (!value) return 'N/A';
+  if (!value) return DEFAULT_BLANK_VALUE;
   try {
     return new Date(String(value)).toLocaleDateString();
   } catch {
-    return 'N/A';
+    return DEFAULT_BLANK_VALUE;
   }
 };

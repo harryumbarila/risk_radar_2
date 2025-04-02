@@ -2,6 +2,7 @@ import type { Column } from 'react-table';
 
 import type { RiskRadarExceptionsListRow } from '@/shared/response/risk-radar/exception-list/exception-list-row';
 
+import { DEFAULT_BLANK_VALUE } from './default-values';
 import {
   formatBoolean,
   formatDate,
@@ -14,7 +15,7 @@ type CustomColumn = Column<RiskRadarExceptionsListRow>;
 export const baseColumns: CustomColumn[] = [
   {
     Header: 'DBA',
-    accessor: (row) => row.sDBA || row.leadName,
+    accessor: (row) => row.sDBA || row.leadName || DEFAULT_BLANK_VALUE,
   },
   {
     Header: 'Net Deposit',
@@ -43,6 +44,14 @@ export const baseColumns: CustomColumn[] = [
   {
     Header: 'Reseller',
     accessor: 'sReseller',
+  },
+  {
+    Header: 'Referral Partner',
+    accessor: 'sReferralPartner',
+  },
+  {
+    Header: 'Solution Consultant',
+    accessor: 'sSolutionConsultant',
   },
   {
     Header: 'Risk Watch',
