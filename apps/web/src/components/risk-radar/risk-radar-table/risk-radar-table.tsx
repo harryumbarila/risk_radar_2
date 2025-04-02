@@ -1,10 +1,7 @@
-/* eslint-disable react/no-unstable-nested-components */
-import { useAuth } from '@frontegg/nextjs';
 import { useRouter } from 'next/navigation';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import type {
   Cell,
-  CellProps,
   Column,
   ColumnInstance,
   HeaderGroup,
@@ -14,22 +11,14 @@ import type {
 } from 'react-table';
 import { useFilters, usePagination, useSortBy, useTable } from 'react-table';
 
-import { useAssignExceptionToUser } from '@/hooks/risk-radar/use-assign-exception-to-user';
-import { useReviewExceptionByUsername } from '@/hooks/risk-radar/use-review-exception-by-username';
 import type { PaginatedAPIResponse } from '@/shared/common';
 import { DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE } from '@/shared/request';
 import type {
   RiskRadarExceptionsListRow,
   RiskRadarFilterState,
 } from '@/shared/response';
-import { useExceptionData } from '@/web/src/hooks/risk-radar/use-exception-data';
 
 import { baseColumns } from './table/base-columns';
-import { DEFAULT_BLANK_VALUE } from './table/default-values';
-import { ManagerQueuedCell } from './table/manager-queued-cell';
-import { ManagerQueuedHeader } from './table/manager-queued-header';
-import { NotReviewedCell } from './table/not-reviewed-cell';
-import { NotReviewedHeader } from './table/not-reviewed-header';
 import { TablePagination } from './table/table-pagination';
 
 type RiskRadarTableProps = {
@@ -61,55 +50,54 @@ type TableInstanceWithPagination<
 
 export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
   exceptionList,
-  status,
   filters,
   fetchData,
 }): JSX.Element => {
-  const [reviewIds, setReviewIds] = useState<string[]>([]);
-  const [assignedExceptionIds, setAssignedExceptionIds] = useState<string[]>(
-    []
-  );
+  // const [reviewIds, setReviewIds] = useState<string[]>([]);
+  // const [assignedExceptionIds, setAssignedExceptionIds] = useState<string[]>(
+  //   []
+  // );
 
-  const { data: exceptionData } = useExceptionData();
-  const riskUsers = exceptionData?.risk_user;
+  // const { data: exceptionData } = useExceptionData();
+  // const riskUsers = exceptionData?.risk_user;
 
-  const [assignedUser, setAssignedUser] = useState(
-    String(riskUsers?.[0]?.sNTUserID ?? '')
-  );
-  const { user } = useAuth();
+  // const [assignedUser, setAssignedUser] = useState(
+  //   String(riskUsers?.[0]?.sNTUserID ?? '')
+  // );
+  // const { user } = useAuth();
 
-  const { reviewException } = useReviewExceptionByUsername();
-  const { assignException } = useAssignExceptionToUser();
+  // const { reviewException } = useReviewExceptionByUsername();
+  // const { assignException } = useAssignExceptionToUser();
 
-  const handleClickOnReviewButton = useCallback(async (): Promise<void> => {
-    if (reviewIds.length > 0 && user?.name) {
-      await reviewException(
-        reviewIds.map((id) => parseInt(id, 10)),
-        user.name
-      );
-    }
-  }, [reviewException, reviewIds, user?.name]);
+  // const handleClickOnReviewButton = useCallback(async (): Promise<void> => {
+  //   if (reviewIds.length > 0 && user?.name) {
+  //     await reviewException(
+  //       reviewIds.map((id) => parseInt(id, 10)),
+  //       user.name
+  //     );
+  //   }
+  // }, [reviewException, reviewIds, user?.name]);
 
-  const handleClickOnAssignButton = useCallback(async (): Promise<void> => {
-    if (assignedExceptionIds.length > 0 && assignedUser) {
-      await assignException(
-        assignedExceptionIds.map((id) => parseInt(id, 10)),
-        assignedUser
-      );
-    }
-  }, [assignException, assignedExceptionIds, assignedUser]);
+  // const handleClickOnAssignButton = useCallback(async (): Promise<void> => {
+  //   if (assignedExceptionIds.length > 0 && assignedUser) {
+  //     await assignException(
+  //       assignedExceptionIds.map((id) => parseInt(id, 10)),
+  //       assignedUser
+  //     );
+  //   }
+  // }, [assignException, assignedExceptionIds, assignedUser]);
 
-  const handleReviewCheckboxChange = useCallback((id: string): void => {
-    setReviewIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  }, []);
+  // const handleReviewCheckboxChange = useCallback((id: string): void => {
+  //   setReviewIds((prev) =>
+  //     prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+  //   );
+  // }, []);
 
-  const handleAssignedCheckboxChange = useCallback((id: string): void => {
-    setAssignedExceptionIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  }, []);
+  // const handleAssignedCheckboxChange = useCallback((id: string): void => {
+  //   setAssignedExceptionIds((prev) =>
+  //     prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+  //   );
+  // }, []);
 
   const handlePageSizeChange = useCallback(
     (pageSize: number): void => {
@@ -119,76 +107,92 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
   );
 
   const columns = useMemo<CustomColumn[]>(() => {
-    const completedColumns = baseColumns;
+    const idColumn: CustomColumn = {
+      Header: '#',
+      Cell: ({ row }) => {
+        // Calculate the offset based on page number and page size
+        const pageOffset = (filters.page - 1) * filters.pageSize;
+        // Add 1 to zero-based index to get human-readable row number
+        const rowNumber = pageOffset + row.index + 1;
+        return String(rowNumber);
+      },
+    };
 
-    switch (status) {
-      case 1:
-        completedColumns.push({
-          accessor: 'sUserReviewed',
-          Header: (
-            <NotReviewedHeader
-              handleClickOnReviewButton={handleClickOnReviewButton}
-            />
-          ),
-          Cell: ({ row }) => (
-            <NotReviewedCell
-              reviewIds={reviewIds}
-              handleReviewCheckboxChange={handleReviewCheckboxChange}
-              row={row}
-            />
-          ),
-        });
-        break;
-      case 2:
-        completedColumns.push({
-          Header: 'Reviewed',
-          accessor: 'sUserReviewed',
-          Cell: ({ value }) => value ?? DEFAULT_BLANK_VALUE,
-        });
-        break;
-      case 3:
-        completedColumns.push({
-          Header: (
-            <ManagerQueuedHeader
-              riskUsers={riskUsers ?? []}
-              setAssignedUser={setAssignedUser}
-              handleClickOnAssignButton={handleClickOnAssignButton}
-            />
-          ),
-          accessor: 'sUserReviewed',
-          Cell: ({ row }) => (
-            <ManagerQueuedCell
-              assignedExceptionIds={assignedExceptionIds}
-              handleAssignedCheckboxChange={handleAssignedCheckboxChange}
-              row={row}
-            />
-          ),
-        });
-        break;
-      case 4:
-        completedColumns.push({
-          Header: 'Assigned to',
-          accessor: (row) => row.sNTUserID,
-          Cell: ({ row }: CellProps<RiskRadarExceptionsListRow>) =>
-            riskUsers?.find((u) => u.sNTUserID === row.original.sNTUserID)
-              ?.sName ?? DEFAULT_BLANK_VALUE,
-        });
-        break;
-      default:
-        break;
-    }
+    const completedColumns = [idColumn, ...baseColumns];
+
+    // TODO: Handle reviewed column properly to avoid re render issues
+
+    // switch (status) {
+    //   case 1:
+    //     completedColumns = [
+    //       ...completedColumns,
+    //       {
+    //         accessor: 'sUserReviewed',
+    //         Header: (
+    //           <NotReviewedHeader
+    //             handleClickOnReviewButton={handleClickOnReviewButton}
+    //           />
+    //         ),
+    //         Cell: ({ row }) => (
+    //           <NotReviewedCell
+    //             reviewIds={reviewIds}
+    //             handleReviewCheckboxChange={handleReviewCheckboxChange}
+    //             row={row}
+    //           />
+    //         ),
+    //       },
+    //     ];
+    //     break;
+    //   case 2:
+    //     completedColumns = [
+    //       ...completedColumns,
+    //       {
+    //         Header: 'Reviewed',
+    //         accessor: 'sUserReviewed',
+    //         Cell: ({ value }) => value ?? DEFAULT_BLANK_VALUE,
+    //       },
+    //     ];
+    //     break;
+    //   case 3:
+    //     completedColumns = [
+    //       ...completedColumns,
+    //       {
+    //         Header: (
+    //           <ManagerQueuedHeader
+    //             riskUsers={riskUsers ?? []}
+    //             setAssignedUser={setAssignedUser}
+    //             handleClickOnAssignButton={handleClickOnAssignButton}
+    //           />
+    //         ),
+    //         accessor: 'sUserReviewed',
+    //         Cell: ({ row }) => (
+    //           <ManagerQueuedCell
+    //             assignedExceptionIds={assignedExceptionIds}
+    //             handleAssignedCheckboxChange={handleAssignedCheckboxChange}
+    //             row={row}
+    //           />
+    //         ),
+    //       },
+    //     ];
+    //     break;
+    //   case 4:
+    //     completedColumns = [
+    //       ...completedColumns,
+    //       {
+    //         Header: 'Assigned to',
+    //         accessor: (row) => row.sNTUserID,
+    //         Cell: ({ row }: CellProps<RiskRadarExceptionsListRow>) =>
+    //           riskUsers?.find((u) => u.sNTUserID === row.original.sNTUserID)
+    //             ?.sName ?? DEFAULT_BLANK_VALUE,
+    //       },
+    //     ];
+    //     break;
+    //   default:
+    //     break;
+    // }
 
     return completedColumns;
-  }, [
-    status,
-    handleClickOnReviewButton,
-    riskUsers,
-    handleClickOnAssignButton,
-    reviewIds,
-    handleReviewCheckboxChange,
-    assignedExceptionIds,
-    handleAssignedCheckboxChange,
-  ]);
+  }, [filters.page, filters.pageSize]);
 
   const tableInstance = useTable<RiskRadarExceptionsListRow>(
     {
