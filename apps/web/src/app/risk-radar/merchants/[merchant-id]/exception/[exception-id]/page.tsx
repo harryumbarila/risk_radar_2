@@ -779,7 +779,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           </p>
           <p className="text-black dark:text-white">
             <strong>Curr. Month Swipe Cnt (%):</strong>{' '}
-            {merchantProfile?.iSwipedPercBasedOnTransCntCurrMonth || 'N/A'}
+            {merchantProfile?.iSwipedPercBasedOnTransCntCurrMonth || ''}
           </p>
           <p className="text-black dark:text-white">
             <button
@@ -816,7 +816,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             </p>
             <p className="text-black dark:text-white">
               <strong>Solution Consultant:</strong>{' '}
-              {merchantProfile?.sSolutionConsultant || 'N/A'}
+              {merchantProfile?.sSolutionConsultant || ''}
             </p>
           </div>
         </div>
@@ -826,21 +826,21 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
           <div className="grid grid-cols-4 text-black dark:text-white text-center">
             <p>
-              <strong>MV ($):</strong> {merchantProfile?.iMV$ || 'N/A'}
+              <strong>MV ($):</strong> {merchantProfile?.iMV$ || ''}
               <span className="text-gray-500 dark:text-gray-400">
                 {' '}
                 (UW Appr.- {merchantProfile?.iUWApprMV})
               </span>
             </p>
             <p>
-              <strong>AT ($):</strong> {merchantProfile?.iAT$ || 'N/A'}
+              <strong>AT ($):</strong> {merchantProfile?.iAT$ || ''}
               <span className="text-gray-500 dark:text-gray-400">
                 {' '}
                 (UW Appr.- {merchantProfile?.iUWApprAT})
               </span>
             </p>
             <p>
-              <strong>HT ($):</strong> {merchantProfile?.iHT$ || 'N/A'}
+              <strong>HT ($):</strong> {merchantProfile?.iHT$ || ''}
               <span className="text-gray-500 dark:text-gray-400">
                 {' '}
                 (UW Appr.- {merchantProfile?.iUWApprHT})
@@ -848,7 +848,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             </p>
             <p>
               <strong>Swipe Vol (%):</strong>{' '}
-              {merchantProfile?.iSwipeVolPerc || 'N/A'}
+              {merchantProfile?.iSwipeVolPerc || ''}
               <span className="text-gray-500 dark:text-gray-400">
                 {' '}
                 (UW Appr.- {merchantProfile?.iUWApprSwipeVolPerc})
@@ -918,8 +918,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               {/* Contact Name */}
               <div className="flex items-center min-h-[50px]">
                 <p className="text-black dark:text-white">
-                  <strong>Contact Name:</strong>{' '}
-                  {data?.owners?.[0]?.name || 'N/A'}
+                  <strong>Contact Name:</strong> {data?.owners?.[0]?.name || ''}
                 </p>
               </div>
 
@@ -927,7 +926,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <div className="flex items-center min-h-[50px]">
                 <p className="text-black dark:text-white">
                   <strong>Contact Email address:</strong>{' '}
-                  {merchantContactInfo?.contactEmail || 'N/A'}
+                  {merchantContactInfo?.contactEmail || ''}
                 </p>
               </div>
 
@@ -935,7 +934,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <div className="flex items-center min-h-[50px]">
                 <p className="text-black dark:text-white">
                   <strong>Contact phone number:</strong>{' '}
-                  {merchantContactInfo?.contactPhoneNumber || 'N/A'}
+                  {merchantContactInfo?.contactPhoneNumber || ''}
                 </p>
               </div>
 
@@ -969,7 +968,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <div className="max-w-full overflow-x-auto">
                 <table className="w-full table-auto">
                   <thead>
-                    <tr className="bg-gray-2 text-left dark:bg-meta-4 text-center">
+                    <tr className="bg-gray-2 dark:bg-meta-4 text-center">
                       <th className="p-4 font-medium text-black dark:text-white">
                         Trans Date
                       </th>
@@ -1087,7 +1086,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <div className="max-w-full overflow-x-auto">
                 <table className="w-full table-auto">
                   <thead>
-                    <tr className="bg-gray-2 text-left dark:bg-meta-4 text-center">
+                    <tr className="bg-gray-2 dark:bg-meta-4 text-center">
                       <th className="p-4 font-medium text-black dark:text-white">
                         Note
                       </th>
@@ -1185,7 +1184,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <div className="max-w-full overflow-x-auto">
                 <table className="w-full table-auto">
                   <thead>
-                    <tr className="bg-gray-2 text-left dark:bg-meta-4 text-center">
+                    <tr className="bg-gray-2 dark:bg-meta-4 text-center">
                       <th className="p-4 font-medium text-black dark:text-white">
                         Case #
                       </th>
@@ -1276,7 +1275,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <div className="max-w-full overflow-x-auto">
                 <table className="w-full table-auto">
                   <thead>
-                    <tr className="bg-gray-2 text-center dark:bg-meta-4 text-center">
+                    <tr className="bg-gray-2 dark:bg-meta-4 text-center">
                       <th className="p-4 font-medium text-black dark:text-white">
                         Trans Category
                       </th>
@@ -1446,7 +1445,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           <div className="max-w-full overflow-x-auto">
             <table className="w-full table-auto">
               <thead>
-                <tr className="bg-gray-2 text-left dark:bg-meta-4 text-center">
+                <tr className="bg-gray-2 dark:bg-meta-4 text-center">
                   <th className="p-4 font-medium text-black dark:text-white">
                     Month/Year
                   </th>
@@ -1537,7 +1536,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <div className="max-w-full overflow-x-auto">
                 <table className="w-full table-auto">
                   <thead>
-                    <tr className="bg-gray-2 text-left dark:bg-meta-4 text-center">
+                    <tr className="bg-gray-2 dark:bg-meta-4 text-center">
                       <th className="p-4 font-medium text-black dark:text-white">
                         ID
                       </th>

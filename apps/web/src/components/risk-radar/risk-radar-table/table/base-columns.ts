@@ -5,6 +5,7 @@ import type { RiskRadarExceptionsListRow } from '@/shared/response/risk-radar/ex
 import { DEFAULT_BLANK_VALUE } from './default-values';
 import {
   formatBoolean,
+  formatCurrency,
   formatDate,
   formatNumber,
   formatScore,
@@ -20,12 +21,12 @@ export const baseColumns: CustomColumn[] = [
   {
     Header: 'Net Deposit',
     accessor: 'dNetDepAmt',
-    Cell: ({ value }) => formatNumber(value),
+    Cell: ({ value }) => formatCurrency(value),
   },
   {
     Header: 'FSP Approved Auth',
     accessor: () => 0, // This field doesn't exist in the API response
-    Cell: ({ value }: { value: unknown }) => formatNumber(value),
+    Cell: ({ value }: { value: unknown }) => formatCurrency(value),
   },
   {
     Header: 'Auth Decline',
@@ -52,6 +53,11 @@ export const baseColumns: CustomColumn[] = [
   {
     Header: 'Solution Consultant',
     accessor: 'sSolutionConsultant',
+  },
+  {
+    Header: 'Auto Approved',
+    accessor: 'dtAutoApproved',
+    Cell: ({ value }) => formatDate(value),
   },
   {
     Header: 'Risk Watch',
@@ -124,12 +130,17 @@ export const baseColumns: CustomColumn[] = [
     Cell: ({ value }) => formatNumber(value),
   },
   {
+    Header: 'Next Day Funding',
+    accessor: 'bNextDayFundingAcct',
+    Cell: ({ value }) => formatBoolean(value),
+  },
+  {
     Header: 'Divert',
     accessor: 'bDivert',
     Cell: ({ value }) => formatBoolean(value),
   },
   {
-    Header: 'Divert Balance',
+    Header: 'NET Divert Balance',
     accessor: 'dSettlementBalance',
     Cell: ({ value }) => formatNumber(value),
   },
@@ -174,13 +185,13 @@ export const baseColumns: CustomColumn[] = [
     Cell: ({ value }) => formatScore(value),
   },
   {
+    Header: 'Total Points',
+    accessor: 'iTotalPoints',
+    Cell: ({ value }) => formatScore(value),
+  },
+  {
     Header: 'Exception Created',
     accessor: 'dtCreated',
     Cell: ({ value }) => formatDate(value),
-  },
-  {
-    Header: 'Exception ID',
-    accessor: 'pkRiskRadarExceptions',
-    Cell: ({ value }) => String(value),
   },
 ];
