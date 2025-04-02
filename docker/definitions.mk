@@ -16,19 +16,21 @@ $(BUILD_IMAGE):
 	  --build-arg BUILD_DATE=$(BUILD_DATE) \
 	  --build-arg VERSION=$(VERSION) \
 	  --build-arg GITHASH=$(GITHASH) \
-	  --cache-from=type=registry,ref=$(call image_name_cache) \
-	  --cache-to=type=registry,ref=$(call image_name_cache),mode=max \
+	  # --cache-from=type=registry,ref=$(call image_name_cache) \
+	  # --cache-to=type=registry,ref=$(call image_name_cache),mode=max \
+	  --cache-from=type=local,src=/tmp/.buildx-cache \
+	  --cache-to=type=local,dest=/tmp/.buildx-cache \
 	  --output=type=docker \
 	  -t $(call internal_image_name) .
 
 	docker tag $(call internal_image_name) $(call image_name)
 	docker tag $(call image_name) $(call image_name_latest_version)
-	docker tag $(call image_name) $(call image_name_cache)
+	# docker tag $(call image_name) $(call image_name_cache)
 
 	# Production
 	docker tag $(call internal_image_name) $(call image_name_no_vendor)
 	docker tag $(call image_name_latest_version) $(call image_name_latest_version_no_vendor)
-	docker tag $(call image_name_no_vendor) $(call image_name_cache_no_vendor)
+	# docker tag $(call image_name_no_vendor) $(call image_name_cache_no_vendor)
 
 define internal_image_name
 "en.hayes.app/$(if $(VENDOR),$(VENDOR)/)$(REPOSITORY):latest"
