@@ -50,7 +50,7 @@ jobs:
           key: yarn-cache-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: Run ls-lint
         run: yarn ls-lint

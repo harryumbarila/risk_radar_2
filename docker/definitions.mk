@@ -23,10 +23,12 @@ $(BUILD_IMAGE):
 
 	docker tag $(call internal_image_name) $(call image_name)
 	docker tag $(call image_name) $(call image_name_latest_version)
+	docker tag $(call image_name) $(call image_name_cache)
 
 	# Production
 	docker tag $(call internal_image_name) $(call image_name_no_vendor)
 	docker tag $(call image_name_latest_version) $(call image_name_latest_version_no_vendor)
+	docker tag $(call image_name_no_vendor) $(call image_name_cache_no_vendor)
 
 define internal_image_name
 "en.hayes.app/$(if $(VENDOR),$(VENDOR)/)$(REPOSITORY):latest"
@@ -50,4 +52,8 @@ endef
 
 define image_name_cache
 "$(if $(REGISTRY),$(REGISTRY)/)$(if $(VENDOR),$(VENDOR)/)$(REPOSITORY):cache"
+endef
+
+define image_name_cache_no_vendor
+"$(if $(REGISTRY),$(REGISTRY)/)$(REPOSITORY):cache"
 endef
