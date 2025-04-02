@@ -1,0 +1,81 @@
+name: Create & Push API docker build
+
+on:
+  workflow_call:
+    inputs:
+      build-number:
+        description: Version build number
+        required: true
+        type: string
+      environment:
+        description: 'The deploy environment'
+        required: true
+        type: string
+    secrets:
+      role-to-assume:
+        required: true
+        description: AWS Role to assume
+      aws-region:
+        required: true
+        description: AWS Region
+      ecr-repository:
+        required: true
+        description: AWS ECR Repository
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-and-push:
+    name: Deploy DENALI API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Restore turbo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Restore cached dependencies
+        uses: actions/cache@v4
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-modules-
+
+      - name: Configure AWS credentials for Production
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.role-to-assume }}
+          aws-region: ${{ secrets.aws-region }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build docker image, and Push image to Amazon ECR api
+        id: build-image-api
+        env:
+          IMAGE_TAG: ${{ inputs.build-number }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ecr-repository }}
+        run: |
+          cd docker/application/api
+          make VERSION=$IMAGE_TAG build
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT

@@ -1,0 +1,81 @@
+name: Run code quality checks
+
+on: [workflow_call]
+
+# These are MOCKED environment variables that are required for the CI to run
+env:
+  CI: true
+  FRONTEGG_APP_URL: 'http://localhost:3000'
+  FRONTEGG_BASE_URL: 'https://app-XXX.frontegg.com'
+  FRONTEGG_CLIENT_ID: '550e8400-e29b-41d4-a716-446655440000'
+  FRONTEGG_APP_ID: '123e4567-e89b-12d3-a456-426614174000'
+  FRONTEGG_ENCRYPTION_PASSWORD: 'a1b2c3d4e5f67890123456789abcdef01234567890abcdef1234567890abcdef'
+  FRONTEGG_COOKIE_NAME: 'fe_session'
+  FRONTEGG_HOSTED_LOGIN: true
+  FRONTEGG_LOG_LEVEL: 'debug'
+  NEXT_PUBLIC_RISK_RADAR_BASE_URL: 'http://localhost:3000'
+  NEXT_PUBLIC_MERCHANT_BASE_URL: 'http://localhost:3000'
+
+jobs:
+  code-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Restore turbo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Restore cached dependencies
+        uses: actions/cache@v4
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run ls-lint
+        run: yarn ls-lint
+
+      - name: Run type-check
+        run: yarn type-check
+
+      - name: Run lint
+        run: yarn lint
+
+      - name: Run tests unit
+        run: yarn test:unit
+
+      - name: Run tests e2e
+        run: yarn test:e2e
+
+      - name: Create WEB .env file
+        run: |
+          echo "🔧 Creating .env file for WEB app..."
+          cat <<EOF > apps/web/.env
+          FRONTEGG_APP_URL=${FRONTEGG_APP_URL}
+          FRONTEGG_BASE_URL=${FRONTEGG_BASE_URL}
+          FRONTEGG_CLIENT_ID=${FRONTEGG_CLIENT_ID}
+          FRONTEGG_APP_ID=${FRONTEGG_APP_ID}
+          FRONTEGG_ENCRYPTION_PASSWORD=${FRONTEGG_ENCRYPTION_PASSWORD}
+          FRONTEGG_COOKIE_NAME=${FRONTEGG_COOKIE_NAME}
+          FRONTEGG_HOSTED_LOGIN=${FRONTEGG_HOSTED_LOGIN}
+          FRONTEGG_LOG_LEVEL=${FRONTEGG_LOG_LEVEL}
+          EOF
+
+      - name: Run WEB build
+        run: yarn turbo run build --filter=@denali/web
+
+      - name: Run API build
+        run: yarn turbo run build --filter=@denali/api

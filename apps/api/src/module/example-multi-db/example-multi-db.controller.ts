@@ -1,0 +1,26 @@
+import { Controller, Get, Query } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+
+import { RiskRadarMerchantTaxIdRepository } from '@/crescent-view-db/repositories';
+
+export type IrisProxyControllerConfig = {
+  IRIS_ENV: string;
+};
+
+@ApiTags('Example for multi DB connection')
+@Controller('/v1/multi_dn')
+export class ExampleMultiDbController {
+  public constructor(
+    private readonly merchantTINRepo: RiskRadarMerchantTaxIdRepository
+  ) {}
+
+  @ApiOperation({ operationId: 'merchantTIN', summary: 'Get Merchant TIN' })
+  @Get('get-merchant-tin')
+  @ApiResponse({}) // TODO: Define type
+  public async getMerchantTIN(@Query('mid') mid: string): Promise<unknown> {
+    const merchantTIN =
+      await this.merchantTINRepo.getMerchantWithSameTaxID(mid);
+
+    return { merchantTIN };
+  }
+}

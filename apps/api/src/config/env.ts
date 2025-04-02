@@ -5,7 +5,7 @@ export const env = createEnv({
   server: {
     NODE_ENV: z
       .enum(['production', 'development', 'test'])
-      .default('development'),
+      .default('production'),
 
     FRONTEGG_CLIENT_ID: z.string().min(1),
     FRONTEGG_API_KEY: z.string().min(1),

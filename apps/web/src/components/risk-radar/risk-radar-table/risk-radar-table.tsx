@@ -1,208 +1,211 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
-/* eslint-disable */
-import React, { useMemo } from 'react';
-import type { Column } from 'react-table';
-import {
-  useFilters,
-  useGlobalFilter,
-  usePagination,
-  useSortBy,
-  useTable,
-} from 'react-table';
-
+/* eslint-disable react/no-unstable-nested-components */
+import { useAuth } from '@frontegg/nextjs';
+import { useRouter } from 'next/navigation';
+import React, { useCallback, useMemo, useState } from 'react';
 import type {
-  RiskRadarData,
-  RiskRadarResponseDto,
-} from '@/shared/response/legacy-dashboard-proxy';
+  Cell,
+  CellProps,
+  Column,
+  ColumnInstance,
+  HeaderGroup,
+  Row,
+  TableInstance,
+  TableState,
+} from 'react-table';
+import { useFilters, usePagination, useSortBy, useTable } from 'react-table';
+
+import { useAssignExceptionToUser } from '@/hooks/risk-radar/use-assign-exception-to-user';
+import { useReviewExceptionByUsername } from '@/hooks/risk-radar/use-review-exception-by-username';
+import type { PaginatedAPIResponse } from '@/shared/common';
+import { DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE } from '@/shared/request';
+import type {
+  RiskRadarExceptionsListRow,
+  RiskRadarFilterState,
+} from '@/shared/response';
+import { useExceptionData } from '@/web/src/hooks/risk-radar/use-exception-data';
+
+import { baseColumns } from './table/base-columns';
+import { ManagerQueuedCell } from './table/manager-queued-cell';
+import { ManagerQueuedHeader } from './table/manager-queued-header';
+import { NotReviewedCell } from './table/not-reviewed-cell';
+import { NotReviewedHeader } from './table/not-reviewed-header';
+import { TablePagination } from './table/table-pagination';
 
 type RiskRadarTableProps = {
-  data: RiskRadarResponseDto;
+  exceptionList: PaginatedAPIResponse<RiskRadarExceptionsListRow>;
+  status: number;
+  filters: RiskRadarFilterState;
+  fetchData: (filters: RiskRadarFilterState) => void;
 };
 
-const RiskRadarTable: React.FC<RiskRadarTableProps> = ({ data }) => {
-  const columns = useMemo<Column<RiskRadarData>[]>(
-    () => [
-      {
-        Header: 'DBA',
-        accessor: 'dba',
-      },
-      {
-        Header: 'Net Deposit',
-        accessor: 'net_dep_amt',
-        Cell: ({ value }) => `${value.toLocaleString()}`,
-      },
-      {
-        Header: 'FSP Approved Auth',
-        accessor: 'fsp_appr_auth_tot_amt',
-        Cell: ({ value }) => `${value.toLocaleString()}`,
-      },
-      {
-        Header: 'Auth Decline',
-        accessor: 'auth_decline_amt',
-        Cell: ({ value }) => `${value.toLocaleString()}`,
-      },
-      {
-        Header: 'Activation Date',
-        accessor: 'activation_datetime',
-        Cell: ({ value }) => new Date(value).toLocaleDateString(),
-      },
-      {
-        Header: 'Channel',
-        accessor: 'channel',
-      },
-      {
-        Header: 'Reseller',
-        accessor: 'reseller',
-      },
-      {
-        Header: 'Risk Watch',
-        accessor: 'risk_watch',
-        Cell: ({ value }) => (value ? 'Yes' : 'No'),
-      },
-      {
-        Header: 'New Account',
-        accessor: 'new_account',
-        Cell: ({ value }) => (value ? 'Yes' : 'No'),
-      },
-      {
-        Header: 'Auto Approved',
-        accessor: 'Auto_Approved_date',
-      },
-      {
-        Header: 'Keyed %',
-        accessor: 'keyed_perc_score',
-        Cell: ({ value }) => (value ? `${value}%` : 'N/A'),
-      },
-      {
-        Header: 'Average Ticket Score',
-        accessor: 'avg_ticket_score',
-        Cell: ({ value }) => Number(value).toFixed(2),
-      },
-      {
-        Header: 'High Ticket Score',
-        accessor: 'high_ticket_score',
-        Cell: ({ value }) => Number(value).toFixed(2),
-      },
-      {
-        Header: 'Credit Score',
-        accessor: 'credit_score',
-        Cell: ({ value }) => Number(value).toFixed(2),
-      },
-      {
-        Header: 'Channel Score',
-        accessor: 'channel_score',
-        Cell: ({ value }) => Number(value).toFixed(2),
-      },
-      {
-        Header: 'Monthly Volume Score',
-        accessor: 'monthly_vol_score',
-        Cell: ({ value }) => Number(value).toFixed(2),
-      },
-      {
-        Header: 'Average Batch Score',
-        accessor: 'avg_batch_score',
-        Cell: ({ value }) => Number(value).toFixed(2),
-      },
-      {
-        Header: 'Duplicate Card Score',
-        accessor: 'dup_card_score',
-        Cell: ({ value }) => Number(value).toFixed(2),
-      },
-      {
-        Header: 'Duplicate BIN Score',
-        accessor: 'dup_bin_score',
-        Cell: ({ value }) => Number(value).toFixed(2),
-      },
-      {
-        Header: 'Late Post Score',
-        accessor: 'late_post_score',
-        Cell: ({ value }) => Number(value).toFixed(2),
-      },
-      {
-        Header: 'Foreign Keyed Score',
-        accessor: 'foreign_keyed_score',
-        Cell: ({ value }) => Number(value).toFixed(2),
-      },
-      {
-        Header: 'Chargeback Return Request Score',
-        accessor: 'chbk_ret_req_score',
-        Cell: ({ value }) => Number(value).toFixed(2),
-      },
-      {
-        Header: 'Next Day Funding',
-        accessor: 'next_day_funding',
-        Cell: ({ value }) => (value === 'Y' ? 'Yes' : 'No'),
-      },
-      {
-        Header: 'Divert',
-        accessor: 'divert',
-        Cell: ({ value }) => (value === 'Y' ? 'Yes' : 'No'),
-      },
-      {
-        Header: 'Divert Balance Amount',
-        accessor: 'divert_balance_amt',
-        Cell: ({ value }) => `${Number(value).toLocaleString()}`,
-      },
-      {
-        Header: 'Amex OptBlue',
-        accessor: 'amex_opt_blue',
-        Cell: ({ value }) => (value === 'Y' ? 'Yes' : 'No'),
-      },
-      {
-        Header: 'MOTO AVS Score',
-        accessor: 'moto_avs_score',
-        Cell: ({ value }) => Number(value).toFixed(2),
-      },
-      {
-        Header: 'Settle 30% More Than Auth Score',
-        accessor: 'settle_30perc_more_than_auth_score',
-        Cell: ({ value }) => Number(value).toFixed(2),
-      },
-      {
-        Header: 'No Auth Score',
-        accessor: 'no_auth_score',
-        Cell: ({ value }) => Number(value).toFixed(2),
-      },
-      {
-        Header: 'Auth Decline Score',
-        accessor: 'auth_decline_score',
-        Cell: ({ value }) => Number(value).toFixed(2),
-      },
-      {
-        Header: 'Negative Batch Score',
-        accessor: 'neg_batch_score',
-        Cell: ({ value }) => Number(value).toFixed(2),
-      },
-      {
-        Header: 'Auto Hold Score',
-        accessor: 'auto_hold_score',
-        Cell: ({ value }) => Number(value).toFixed(2),
-      },
-      {
-        Header: 'Funding Exception Score',
-        accessor: 'funding_exception_score',
-        Cell: ({ value }) => Number(value).toFixed(2),
-      },
-      {
-        Header: 'User Reviewed',
-        accessor: 'user_reviewed',
-        Cell: ({ value }) => (value === 'Y' ? 'Yes' : 'No'),
-      },
-      {
-        Header: 'Exception Created',
-        accessor: 'exception_created_datetime',
-        Cell: ({ value }) =>
-          value ? new Date(value).toLocaleDateString() : 'N/A',
-      },
-      {
-        Header: 'Exception ID',
-        accessor: 'exception_id',
-      },
-    ],
+type CustomColumn = Column<RiskRadarExceptionsListRow>;
+
+// Update the TableInstance type to include pagination properties
+type TableInstanceWithPagination<
+  T extends object = RiskRadarExceptionsListRow,
+> = TableInstance<T> & {
+  page: Row<T>[];
+  state: TableState<T> & {
+    pageIndex: number;
+    pageSize: number;
+  };
+  nextPage: () => void;
+  previousPage: () => void;
+  canNextPage: boolean;
+  canPreviousPage: boolean;
+  pageOptions: number[];
+  setPageSize: (pageSize: number) => void;
+  gotoPage: (pageIndex: number) => void;
+};
+
+export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
+  exceptionList,
+  status,
+  filters,
+  fetchData,
+}): JSX.Element => {
+  const [reviewIds, setReviewIds] = useState<string[]>([]);
+  const [assignedExceptionIds, setAssignedExceptionIds] = useState<string[]>(
     []
   );
-  const tableData = useMemo(() => data.DATA, [data]);
+
+  const { data: exceptionData } = useExceptionData();
+  const riskUsers = exceptionData?.risk_user;
+
+  const [assignedUser, setAssignedUser] = useState(
+    String(riskUsers?.[0]?.sNTUserID ?? '')
+  );
+  const { user } = useAuth();
+
+  const { reviewException } = useReviewExceptionByUsername();
+  const { assignException } = useAssignExceptionToUser();
+
+  const handleClickOnReviewButton = useCallback(async (): Promise<void> => {
+    if (reviewIds.length > 0 && user?.name) {
+      await reviewException(
+        reviewIds.map((id) => parseInt(id, 10)),
+        user.name
+      );
+    }
+  }, [reviewException, reviewIds, user?.name]);
+
+  const handleClickOnAssignButton = useCallback(async (): Promise<void> => {
+    if (assignedExceptionIds.length > 0 && assignedUser) {
+      await assignException(
+        assignedExceptionIds.map((id) => parseInt(id, 10)),
+        assignedUser
+      );
+    }
+  }, [assignException, assignedExceptionIds, assignedUser]);
+
+  const handleReviewCheckboxChange = useCallback((id: string): void => {
+    setReviewIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  }, []);
+
+  const handleAssignedCheckboxChange = useCallback((id: string): void => {
+    setAssignedExceptionIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  }, []);
+
+  const handlePageSizeChange = useCallback(
+    (pageSize: number): void => {
+      fetchData({ ...filters, pageSize, page: 1 });
+    },
+    [fetchData, filters]
+  );
+
+  const columns = useMemo<CustomColumn[]>(() => {
+    const completedColumns = baseColumns;
+
+    switch (status) {
+      case 1:
+        completedColumns.push({
+          accessor: 'sUserReviewed',
+          Header: (
+            <NotReviewedHeader
+              handleClickOnReviewButton={handleClickOnReviewButton}
+            />
+          ),
+          Cell: ({ row }) => (
+            <NotReviewedCell
+              reviewIds={reviewIds}
+              handleReviewCheckboxChange={handleReviewCheckboxChange}
+              row={row}
+            />
+          ),
+        });
+        break;
+      case 2:
+        completedColumns.push({
+          Header: 'Reviewed',
+          accessor: 'sUserReviewed',
+          Cell: ({ value }) => value ?? 'N/A',
+        });
+        break;
+      case 3:
+        completedColumns.push({
+          Header: (
+            <ManagerQueuedHeader
+              riskUsers={riskUsers ?? []}
+              setAssignedUser={setAssignedUser}
+              handleClickOnAssignButton={handleClickOnAssignButton}
+            />
+          ),
+          accessor: 'sUserReviewed',
+          Cell: ({ row }) => (
+            <ManagerQueuedCell
+              assignedExceptionIds={assignedExceptionIds}
+              handleAssignedCheckboxChange={handleAssignedCheckboxChange}
+              row={row}
+            />
+          ),
+        });
+        break;
+      case 4:
+        completedColumns.push({
+          Header: 'Assigned to',
+          accessor: (row) => row.sNTUserID,
+          Cell: ({ row }: CellProps<RiskRadarExceptionsListRow>) =>
+            riskUsers?.find((u) => u.sNTUserID === row.original.sNTUserID)
+              ?.sName ?? 'N/A',
+        });
+        break;
+      default:
+        break;
+    }
+
+    return completedColumns;
+  }, [
+    status,
+    handleClickOnReviewButton,
+    riskUsers,
+    handleClickOnAssignButton,
+    reviewIds,
+    handleReviewCheckboxChange,
+    assignedExceptionIds,
+    handleAssignedCheckboxChange,
+  ]);
+
+  const tableInstance = useTable<RiskRadarExceptionsListRow>(
+    {
+      columns,
+      data: exceptionList.data || [],
+      initialState: {
+        pageSize: exceptionList.pageSize || DEFAULT_PAGE_SIZE,
+        pageIndex: (exceptionList?.page || DEFAULT_PAGE_NUMBER) - 1,
+      } as Partial<TableState<RiskRadarExceptionsListRow>>,
+      // Tell the table we'll handle pagination ourselves
+      // @ts-expect-error - manualPagination is supported but TypeScript definitions might be outdated
+      manualPagination: true,
+      pageCount: exceptionList?.totalRecords || 1,
+    },
+    useFilters,
+    useSortBy,
+    usePagination
+  ) as TableInstanceWithPagination<RiskRadarExceptionsListRow>;
 
   const {
     getTableProps,
@@ -211,189 +214,114 @@ const RiskRadarTable: React.FC<RiskRadarTableProps> = ({ data }) => {
     page,
     prepareRow,
     state,
-    setGlobalFilter,
-    nextPage,
-    previousPage,
-    canNextPage,
-    canPreviousPage,
-    pageOptions,
-    setPageSize,
-    gotoPage,
-  } = useTable(
-    {
-      columns,
-      data: tableData,
+  } = tableInstance;
+
+  const router = useRouter();
+
+  const goToMerchantDetails = useCallback(
+    (merchantId: string, exceptionId: number): void => {
+      router.push(
+        `/risk-radar/merchants/${merchantId}/exception/${exceptionId}`
+      );
     },
-    useFilters,
-    useGlobalFilter,
-    useSortBy,
-    usePagination
+    [router]
   );
 
-  const { globalFilter, pageIndex, pageSize } = state;
+  // Display a message if no data is available
+  if (
+    !exceptionList ||
+    !exceptionList.data ||
+    exceptionList.data.length === 0
+  ) {
+    return (
+      <div className="rounded-sm border border-stroke bg-white py-6 px-8 shadow-default dark:border-strokedark dark:bg-boxdark">
+        <p className="text-center">No data available</p>
+      </div>
+    );
+  }
 
   return (
-    <section className="data-table-common data-table-two rounded-sm border border-stroke bg-white py-4 text-xs shadow-default dark:border-strokedark dark:bg-boxdark">
-      <div className="flex justify-between border-b border-stroke px-8 pb-4 dark:border-strokedark">
-        <div className="w-100">
-          <input
-            type="text"
-            value={globalFilter || ''}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            className="w-full rounded-md border border-stroke px-5 py-2.5 outline-none focus:border-primary dark:border-strokedark dark:bg-meta-4 dark:focus:border-primary"
-            placeholder="Search..."
-          />
+    <div className="flex flex-col gap-5 md:gap-7 2xl:gap-10">
+      <section className="data-table-common data-table-two rounded-sm border border-stroke bg-white py-4 text-xs shadow-default dark:border-strokedark dark:bg-boxdark">
+        <div className="flex justify-end border-b border-stroke px-8 pb-4 dark:border-strokedark">
+          <div className="flex items-center font-medium">
+            <select
+              value={state.pageSize}
+              className="bg-transparent pl-2"
+              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+            >
+              {[5, 10, 20, 50].map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
+            <p className="pl-2 text-black dark:text-white">Entries Per Page</p>
+          </div>
         </div>
 
-        <div className="flex items-center font-medium">
-          <select
-            value={pageSize}
-            onChange={(e) => setPageSize(Number(e.target.value))}
-            className="bg-transparent pl-2"
+        <div className="overflow-x-auto">
+          <table
+            {...getTableProps()}
+            className="datatable-table w-full table-auto !border-collapse break-words px-4 md:px-8 align-middle"
           >
-            {[5, 10, 20, 50].map((size) => (
-              <option key={size} value={size}>
-                {size}
-              </option>
-            ))}
-          </select>
-          <p className="pl-2 text-black dark:text-white">Entries Per Page</p>
-        </div>
-      </div>
-
-      <div className="overflow-x-auto">
-        <table
-          {...getTableProps()}
-          className="datatable-table w-full table-auto !border-collapse break-words px-4 md:px-8"
-        >
-          <thead>
-            {headerGroups.map((headerGroup, key) => (
-              <tr {...headerGroup.getHeaderGroupProps()} key={key}>
-                {headerGroup.headers.map((column, hkey) => (
-                  <th
-                    {...column.getHeaderProps(column.getSortByToggleProps())}
-                    key={column.id}
+            <thead>
+              {headerGroups.map(
+                (headerGroup: HeaderGroup<RiskRadarExceptionsListRow>) => (
+                  <tr
+                    {...headerGroup.getHeaderGroupProps()}
+                    key={headerGroup.id}
                   >
-                    <div className="flex items-center">
-                      <span> {column.render('Header') as React.ReactNode}</span>
+                    {headerGroup.headers.map(
+                      (column: ColumnInstance<RiskRadarExceptionsListRow>) => (
+                        <th {...column.getHeaderProps()} key={column.id}>
+                          <div className="flex items-center">
+                            <span>
+                              {column.render('Header') as React.ReactNode}
+                            </span>
+                          </div>
+                        </th>
+                      )
+                    )}
+                  </tr>
+                )
+              )}
+            </thead>
 
-                      <div className="ml-2 inline-flex flex-col space-y-[2px]">
-                        <span className="inline-block">
-                          <svg
-                            className="fill-current"
-                            width="10"
-                            height="5"
-                            viewBox="0 0 10 5"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path d="M5 0L0 5H10L5 0Z" fill="" />
-                          </svg>
-                        </span>
-                        <span className="inline-block">
-                          <svg
-                            className="fill-current"
-                            width="10"
-                            height="5"
-                            viewBox="0 0 10 5"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M5 5L10 0L-4.37114e-07 8.74228e-07L5 5Z"
-                              fill=""
-                            />
-                          </svg>
-                        </span>
-                      </div>
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody {...getTableBodyProps()}>
-            {page.map((row, key) => {
-              prepareRow(row);
-              return (
-                <tr {...row.getRowProps()} key={key}>
-                  {row.cells.map((cell, key) => (
-                    <td {...cell.getCellProps()} key={key}>
-                      {cell.render('Cell') as React.ReactNode}
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="flex justify-between border-t border-stroke px-8 pt-5 dark:border-strokedark">
-        <p className="font-medium">
-          Showing {pageIndex + 1} of {pageOptions.length} pages
-        </p>
-        <div className="flex">
-          <button
-            className="flex cursor-pointer items-center justify-center rounded-md p-1 px-2 hover:bg-primary hover:text-whiter"
-            onClick={() => previousPage()}
-            disabled={!canPreviousPage}
-            type="button"
-            aria-label="Previous"
-          >
-            <svg
-              className="fill-current"
-              width="18"
-              height="18"
-              viewBox="0 0 18 18"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M12.1777 16.1156C12.009 16.1156 11.8402 16.0593 11.7277 15.9187L5.37148 9.44995C5.11836 9.19683 5.11836 8.80308 5.37148 8.54995L11.7277 2.0812C11.9809 1.82808 12.3746 1.82808 12.6277 2.0812C12.8809 2.33433 12.8809 2.72808 12.6277 2.9812L6.72148 8.99995L12.6559 15.0187C12.909 15.2718 12.909 15.6656 12.6559 15.9187C12.4871 16.0312 12.3465 16.1156 12.1777 16.1156Z"
-                fill=""
-              />
-            </svg>
-          </button>
-
-          {pageOptions.map((_page, index) => (
-            <button
-              key={_page}
-              onClick={() => gotoPage(index)}
-              className={`${
-                pageIndex === index && 'bg-primary text-white'
-              } mx-1 flex cursor-pointer items-center justify-center rounded-md p-1 px-3 hover:bg-primary hover:text-white`}
-              type="button"
-            >
-              {index + 1}
-            </button>
-          ))}
-
-          <button
-            className="flex cursor-pointer items-center justify-center rounded-md p-1 px-2 hover:bg-primary hover:text-white"
-            onClick={(): void => nextPage()}
-            disabled={!canNextPage}
-            type="button"
-            aria-label="Next"
-          >
-            <svg
-              className="fill-current"
-              width="18"
-              height="18"
-              viewBox="0 0 18 18"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M5.82148 16.1156C5.65273 16.1156 5.51211 16.0593 5.37148 15.9468C5.11836 15.6937 5.11836 15.3 5.37148 15.0468L11.2777 8.99995L5.37148 2.9812C5.11836 2.72808 5.11836 2.33433 5.37148 2.0812C5.62461 1.82808 6.01836 1.82808 6.27148 2.0812L12.6277 8.54995C12.8809 8.80308 12.8809 9.19683 12.6277 9.44995L6.27148 15.9187C6.15898 16.0312 5.99023 16.1156 5.82148 16.1156Z"
-                fill=""
-              />
-            </svg>
-          </button>
+            <tbody {...getTableBodyProps()}>
+              {page.map((row: Row<RiskRadarExceptionsListRow>) => {
+                prepareRow(row);
+                return (
+                  <tr
+                    {...row.getRowProps()}
+                    key={row.id}
+                    onClick={() =>
+                      goToMerchantDetails(
+                        row.original.sMID,
+                        row.original.pkRiskRadarExceptions
+                      )
+                    }
+                  >
+                    {row.cells.map((cell: Cell<RiskRadarExceptionsListRow>) => (
+                      <td {...cell.getCellProps()} key={cell.column.id}>
+                        {cell.render('Cell') as React.ReactNode}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
-      </div>
-    </section>
+
+        <TablePagination
+          page={exceptionList.page}
+          pageSize={exceptionList.pageSize}
+          totalRecords={exceptionList.totalRecords ?? 0}
+          fetchData={fetchData}
+          filters={filters}
+        />
+      </section>
+    </div>
   );
 };
-
-export default RiskRadarTable;

@@ -17,6 +17,7 @@ export interface MerchantProfile {
   iSwipeVolPerc: number;
   iCB: number;
   iRR: number;
+  iHT$: number;
   bDivert: boolean;
   sCashAdvEnrolled: string;
   bRiskWatch: boolean;
@@ -33,6 +34,10 @@ export interface MerchantProfile {
   iUWApprHT: number;
   dtCreated: string;
   dtLastUpdated: string;
+  sPreferredContact: string;
+  bIsTalusPayMerchant: boolean;
+  sSolutionConsultant: string;
+  iUWApprCB: number;
 }
 
 export interface Volume {
@@ -52,7 +57,35 @@ export interface Volume {
   dACBPerc: number;
 }
 
+export interface MerchantContactInfo {
+  contact_name: string;
+  contact_phone_number: string;
+  contact_email_address: string;
+  preferred_contact: string;
+  website: string;
+}
+
 export interface MerchantResponseDto {
   merchant_profile: MerchantProfile[];
   volume: Volume[];
+  exception_type_legend: ExceptionTypeLegend[];
+  risk_exception: RiskException[];
+}
+
+export interface RiskException {
+  pkRiskException: number;
+  bDivert: boolean;
+  bManagersQueue: boolean;
+  bRiskWatch: boolean;
+  bAutoHoldWhite: boolean;
+  fkRiskExceptionStatus: number;
+}
+
+export interface ExceptionTypeLegend {
+  ID: number;
+  Exception: string;
+}
+
+export interface MerchantContactResponseDto {
+  merchant_profile: MerchantContactInfo[];
 }

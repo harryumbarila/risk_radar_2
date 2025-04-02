@@ -1,0 +1,65 @@
+name: Create notes & Github Release
+
+on:
+  workflow_call:
+    inputs:
+      build-number:
+        description: Build number from version
+        required: true
+        type: string
+      environment:
+        description: 'The deploy environment'
+        required: true
+        type: string
+    secrets:
+      github-token:
+        description: 'GitHub token used to create the release'
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+
+      - name: Generate Release Notes from Git Commits
+        id: release_notes
+        run: |
+          # Fetch all production release tags (excluding pre-release tags)
+          PROD_RELEASE_TAGS=$(git tag --list "v*.*")
+
+          if [[ -z "$PROD_RELEASE_TAGS" ]]; then
+            echo "No previous production release tag found. Marking this as the first stable release."
+            echo "### First Production Release" > release_body.md
+            echo "This is the first production release. Future releases will include commit changes." >> release_body.md
+          else
+            # Get the latest stable production release tag
+            LAST_TAG=$(git tag --list "v*.*" | sort -V | tail -n 1)
+            echo "Fetching commits since last production release: $LAST_TAG"
+
+            COMMIT_LOG=$(git log "$LAST_TAG"..HEAD --pretty=format:"- %h %s" --no-merges)
+            echo "### Changes in this release:" > release_body.md
+            echo "$COMMIT_LOG" >> release_body.md
+          fi
+
+          echo "::set-output name=body::$(cat release_body.md)"
+
+      - name: Create a GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.github-token }}
+          IMAGE_TAG: ${{ inputs.build-number }}
+        run: |
+          gh release create "v${IMAGE_TAG}" \
+            --title "Release v${IMAGE_TAG}" \
+            --notes-file release_body.md \
+            --latest

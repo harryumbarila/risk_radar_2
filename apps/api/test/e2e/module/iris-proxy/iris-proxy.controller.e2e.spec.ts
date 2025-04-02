@@ -1,6 +1,8 @@
 import type { INestApplication } from '@nestjs/common';
 import { HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import type { NestFastifyApplication } from '@nestjs/platform-fastify'; // Import the Fastify adapter
+import { FastifyAdapter } from '@nestjs/platform-fastify';
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
@@ -115,8 +117,11 @@ describe('IrisProxyController (e2e)', () => {
       ],
     }).compile();
 
-    app = moduleFixture.createNestApplication();
+    app = moduleFixture.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter()
+    );
     await app.init();
+    await app.getHttpAdapter().getInstance().ready();
   });
 
   afterEach(async () => {
@@ -149,6 +154,9 @@ describe('IrisProxyController (e2e)', () => {
       expect(irisClientMock.getUsers).toHaveBeenCalled();
     });
 
+    /**
+     * TODO refactor this test should not close earlier test application. Tests can be run in parallel or separately.
+     */
     it('should return filtered users with staging environment class IDs', async () => {
       // Close the existing app
       await app.close();
@@ -224,8 +232,11 @@ describe('IrisProxyController (e2e)', () => {
         ],
       }).compile();
 
-      app = moduleFixture.createNestApplication();
+      app = moduleFixture.createNestApplication<NestFastifyApplication>(
+        new FastifyAdapter()
+      );
       await app.init();
+      await app.getHttpAdapter().getInstance().ready();
 
       const response = await request(app.getHttpServer())
         .get('/v1/iris_proxy/users')

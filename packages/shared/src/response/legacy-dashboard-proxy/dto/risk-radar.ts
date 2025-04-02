@@ -1,6 +1,10 @@
+import type { RiskRadarExceptionsListRow } from '@/shared/response/risk-radar';
+
+import type { RiskUser } from './exception-data';
+
 export interface RiskRadarResponseDto {
-  DATA: RiskRadarData[];
-  META: RiskRadarMeta;
+  data: RiskRadarExceptionsListRow[];
+  meta: RiskRadarMeta;
 }
 
 export interface RiskRadarData {
@@ -44,6 +48,7 @@ export interface RiskRadarData {
   exception_created_datetime: string;
   exception_id: string;
   mid: string;
+  reviewButton?: string;
 }
 
 export interface RiskRadarMeta {
@@ -53,4 +58,8 @@ export interface RiskRadarMeta {
   from_record: number;
   to_record: number;
   total_records: number;
+}
+
+export interface RiskRadarUsersResponseDto {
+  risk_users: RiskUser[];
 }

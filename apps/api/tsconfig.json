@@ -13,8 +13,17 @@
     "paths": {
       "@/api/*": ["./src/*"],
       "@/config/*": ["./src/config/env.ts"],
-
-      "@/shared/*": ["../../packages/shared/src/*"]
+      "@/shared/*": ["../../packages/shared/src/*"],
+      "@/logger/*": ["../../packages/logger/src/*"],
+      "@/finance-db/*": ["../../db/finance/src/*"],
+      "@/crescent-view-db/*": ["../../db/crescent-view/src/*"],
+      "@/iris-db/*": ["../../db/iris/src/*"],
+      "@/data-warehouse-db/*": ["../../db/data-warehouse/src/*"],
+      "@/connector-db/*": ["../../db/connector/src/*"],
+      "@/ez-enroll-db/*": ["../../db/ez-enroll/src/*"],
+      "@/ez-enroll-pcc-db/*": ["../../db/ez-enroll-pcc/src/*"],
+      "@/dsm-db/*": ["../../db/dsm/src/*"],
+      "@/snap-pcc-db/*": ["../../db/snap-pcc/src/*"]
     },
     "incremental": true,
     "skipLibCheck": true,
