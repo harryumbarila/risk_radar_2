@@ -10,20 +10,14 @@ import { RiskRadarTableComponent } from '@/components/risk-radar/risk-radar-tabl
 import { useFilteredRiskRadar } from '@/hooks/risk-radar/use-filtered-risk-radar';
 
 const RiskRadar: FC = () => {
-  const {
-    data: filteredData,
-    isLoading: filterLoading,
-    error: filterError,
-    fetchData,
-    filters,
-  } = useFilteredRiskRadar();
+  const { data, isLoading, error, fetchData, filters } = useFilteredRiskRadar();
 
-  const filterComponent = useMemo((): JSX.Element => {
-    if (filterLoading) {
+  const renderedComponent = useMemo((): JSX.Element => {
+    if (isLoading) {
       return <Loader size="small" fullScreen={false} />;
     }
 
-    if (filterError) {
+    if (error) {
       return (
         <div className="flex h-56 items-center justify-center">
           <p className="text-red-500">Error fetching data</p>
@@ -31,10 +25,10 @@ const RiskRadar: FC = () => {
       );
     }
 
-    if (filteredData) {
+    if (data) {
       return (
         <RiskRadarTableComponent
-          data={filteredData}
+          data={data}
           status={Number(filters.status)}
           filters={filters}
           fetchData={fetchData}
@@ -43,7 +37,7 @@ const RiskRadar: FC = () => {
     }
 
     return <div>No data available</div>;
-  }, [fetchData, filterError, filterLoading, filteredData, filters]);
+  }, [data, error, fetchData, filters, isLoading]);
 
   return (
     <DefaultLayout>
@@ -55,7 +49,7 @@ const RiskRadar: FC = () => {
         }}
       />
 
-      <div className="mt-4">{filterComponent}</div>
+      <div className="mt-4">{renderedComponent}</div>
     </DefaultLayout>
   );
 };
