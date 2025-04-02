@@ -1,3 +1,4 @@
+export * from './dto/email-templates';
 export * from './dto/exception-data';
 export * from './dto/kpi-statistics';
 export * from './dto/merchant';
