@@ -16,8 +16,6 @@ $(BUILD_IMAGE):
 	  --build-arg BUILD_DATE=$(BUILD_DATE) \
 	  --build-arg VERSION=$(VERSION) \
 	  --build-arg GITHASH=$(GITHASH) \
-	  # --cache-from=type=registry,ref=$(call image_name_cache) \
-	  # --cache-to=type=registry,ref=$(call image_name_cache),mode=max \
 	  --cache-from=type=local,src=/tmp/.buildx-cache \
 	  --cache-to=type=local,dest=/tmp/.buildx-cache \
 	  --output=type=docker \
