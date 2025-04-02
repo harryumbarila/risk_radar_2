@@ -119,16 +119,22 @@ export class ExceptionsListService {
       }
     }
 
+    // We need query without limit and offset to get the total count
+    const countQuery = query.clone().select('COUNT(exception.sMID)', 'count');
+
+    // Pagination
     const limit = pageSize || 25;
     const offset = (page - 1) * limit;
     query.orderBy('exception.iTotalPoints', 'ASC');
     query.limit(limit).offset(offset);
 
-    const countQuery = query.clone().select('COUNT(exception.sMID)');
-    const [exceptions, totalCount] = await Promise.all([
+    // Both calls are executed in parallel to speed up the process
+    const [exceptions, total] = await Promise.all([
       query.getRawMany(),
-      countQuery.getCount(),
+      countQuery.getRawOne<{ count: number }>(),
     ]);
+
+    const totalRecords = total?.count || 0;
 
     // Fallback to leads if no merchant exceptions are found (Merchant is always needed if id is provided)
     if (exceptions.length === 0 && merchantId) {
@@ -142,7 +148,7 @@ export class ExceptionsListService {
       return {
         pageSize,
         page,
-        totalRecords: totalCount,
+        totalRecords,
         data: merchantFromLeads,
       };
     }
@@ -151,7 +157,7 @@ export class ExceptionsListService {
     return {
       pageSize,
       page,
-      totalRecords: totalCount,
+      totalRecords,
       data: exceptions,
     };
   }

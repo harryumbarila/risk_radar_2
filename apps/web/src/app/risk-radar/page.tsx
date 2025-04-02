@@ -6,8 +6,8 @@ import { useMemo } from 'react';
 
 import { DefaultLayout } from '@/components/layouts/default-layout';
 import { RiskRadarFilters } from '@/components/risk-radar/filters';
-import { RiskRadarTableComponent } from '@/components/risk-radar/risk-radar-table';
 import { useFilteredRiskRadar } from '@/hooks/risk-radar/use-filtered-risk-radar';
+import { RiskRadarTable } from '@/web/src/components/risk-radar/risk-radar-table/risk-radar-table';
 
 const RiskRadar: FC = () => {
   const { data, isLoading, error, fetchData, filters } = useFilteredRiskRadar();
@@ -27,8 +27,8 @@ const RiskRadar: FC = () => {
 
     if (data) {
       return (
-        <RiskRadarTableComponent
-          data={data}
+        <RiskRadarTable
+          exceptionList={data}
           status={Number(filters.status)}
           filters={filters}
           fetchData={fetchData}
