@@ -27,15 +27,20 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'yarn'
 
-      - name: Restore Next.js build cache
+      - name: Restore turbo cache
         uses: actions/cache@v4
         with:
-          path: apps/web/.next/cache
-          key: nextjs-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
           restore-keys: |
-            nextjs-${{ runner.os }}-
+            ${{ runner.os }}-turbo-
+
+      - name: Restore cached dependencies
+        uses: actions/cache@v4
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -43,14 +48,17 @@ jobs:
       - name: Run ls-lint
         run: yarn ls-lint
 
+      - name: Run type-check
+        run: yarn type-check
+
       - name: Run lint
-        run: yarn run lint
+        run: yarn lint
 
       - name: Run tests unit
-        run: yarn run test:unit
+        run: yarn test:unit
 
       - name: Run tests e2e
-        run: yarn run test:e2e
+        run: yarn test:e2e
 
       - name: Create WEB .env file
         run: |

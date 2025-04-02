@@ -34,13 +34,21 @@ jobs:
       - name: Load repository name
         run: echo "REPO_NAME=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
 
+      - name: Restore Turbo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
           path: apps/docs/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('apps/docs/yarn.lock') }}
+          key: ${{ runner.os }}-modules-${{ hashFiles('apps/docs/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-modules-
 
       - name: Install dependencies
         run: |
