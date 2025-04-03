@@ -73,6 +73,7 @@ import { GetSubscriptionsQueueService } from './services/get-subscriptions-queue
 import { MerchantCardNumHistoryService } from './services/merchant-card-num-history/merchant-card-num-history.service';
 import { MerchantExceptionDetailService } from './services/merchant-exception-detail.service';
 import { MerchantExceptionTransactionsService } from './services/merchant-exception-transactions/merchant-exception-transactions.service';
+import { MerchantWithSameTaxIdService } from './services/merchant-with-same-tax-id/merchant-with-same-tax-id.service';
 import { RiskRadarEmailTemplateService } from './services/risk-radar-email-template/risk-radar-email-template.service';
 import { RiskRadarExceptionsService } from './services/risk-radar-exceptions.service';
 import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save.service';
@@ -106,6 +107,7 @@ import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save
       'iris'
     ),
     TypeOrmModule.forFeature([], 'connector'),
+    TypeOrmModule.forFeature([], 'crescent-view'),
   ],
   controllers: [RiskRadarController],
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -168,6 +170,7 @@ import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save
     MerchantExceptionTransactionsService,
     ExceptionsListService,
     RiskRadarEmailTemplateService,
+    MerchantWithSameTaxIdService,
   ],
 })
 export class RiskRadarModule {}
