@@ -1,4 +1,5 @@
-import type { Column } from 'react-table';
+import type { ColumnDef } from '@tanstack/react-table';
+import { createColumnHelper } from '@tanstack/react-table';
 
 import type { RiskRadarExceptionsListRow } from '@/shared/response/risk-radar/exception-list/exception-list-row';
 
@@ -11,187 +12,154 @@ import {
   formatScore,
 } from './formatters';
 
-type CustomColumn = Column<RiskRadarExceptionsListRow>;
+// any needs to be used here to avoid a typing issue from tanstack/table
+// https://github.com/TanStack/table/issues/4382#issuecomment-1420412062
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type RiskRadarTableColumn = ColumnDef<RiskRadarExceptionsListRow, any>;
 
-export const baseColumns: CustomColumn[] = [
-  {
-    Header: 'DBA',
-    accessor: (row) => row.sDBA || row.leadName || DEFAULT_BLANK_VALUE,
-  },
-  {
-    Header: 'Net Deposit',
-    accessor: 'dNetDepAmt',
-    Cell: ({ value }) => formatCurrency(value),
-  },
-  {
-    Header: 'FSP Approved Auth',
-    accessor: () => 0, // This field doesn't exist in the API response
-    Cell: ({ value }: { value: unknown }) => formatCurrency(value),
-  },
-  {
-    Header: 'Auth Decline',
-    accessor: 'dAuthDeclineAmt',
-    Cell: ({ value }) => formatNumber(value),
-  },
-  {
-    Header: 'Activation Date',
-    accessor: 'dtActivated',
-    Cell: ({ value }) => formatDate(value),
-  },
-  {
-    Header: 'Channel',
-    accessor: 'sChannel',
-  },
-  {
-    Header: 'Reseller',
-    accessor: 'sReseller',
-  },
-  {
-    Header: 'Referral Partner',
-    accessor: 'sReferralPartner',
-  },
-  {
-    Header: 'Solution Consultant',
-    accessor: 'sSolutionConsultant',
-  },
-  {
-    Header: 'Auto Approved',
-    accessor: 'dtAutoApproved',
-    Cell: ({ value }) => formatDate(value),
-  },
-  {
-    Header: 'Risk Watch',
-    accessor: 'bRiskWatch',
-    Cell: ({ value }) => formatBoolean(value),
-  },
-  {
-    Header: 'New Account',
-    accessor: 'bNewAcct',
-    Cell: ({ value }) => formatBoolean(value),
-  },
-  {
-    Header: 'Keyed %',
-    accessor: 'iNumOfKeyedTransAboveLimit',
-    Cell: ({ value }) => formatNumber(value),
-  },
-  {
-    Header: 'Avg Ticket',
-    accessor: () => 0, // Not in the API response
-    Cell: ({ value }: { value: unknown }) => formatNumber(value),
-  },
-  {
-    Header: 'High Ticket',
-    accessor: 'iTransAmtAboveHighTicketLimit',
-    Cell: ({ value }) => formatNumber(value),
-  },
-  {
-    Header: 'Credit',
-    accessor: 'iCreditRule',
-    Cell: ({ value }) => formatNumber(value),
-  },
-  {
-    Header: 'Channel',
-    accessor: 'iSalesChannelRule',
-    Cell: ({ value }) => formatNumber(value),
-  },
-  {
-    Header: 'Monthly Vol',
-    accessor: 'iBatchVolAboveLimit',
-    Cell: ({ value }) => formatNumber(value),
-  },
-  {
-    Header: 'Avg Batch',
-    accessor: 'iAvgBatch',
-    Cell: ({ value }) => formatNumber(value),
-  },
-  {
-    Header: 'Dup Card',
-    accessor: 'iDupCard',
-    Cell: ({ value }) => formatNumber(value),
-  },
-  {
-    Header: 'Dup Bin',
-    accessor: 'iDupBin',
-    Cell: ({ value }) => formatNumber(value),
-  },
-  {
-    Header: 'Late Post',
-    accessor: 'iLatePostTrans',
-    Cell: ({ value }) => formatNumber(value),
-  },
-  {
-    Header: 'Foreign Keyed',
-    accessor: 'iFgnkeyedTrans',
-    Cell: ({ value }) => formatNumber(value),
-  },
-  {
-    Header: 'Chargeback',
-    accessor: 'iChbkOrIRR',
-    Cell: ({ value }) => formatNumber(value),
-  },
-  {
-    Header: 'Next Day Funding',
-    accessor: 'bNextDayFundingAcct',
-    Cell: ({ value }) => formatBoolean(value),
-  },
-  {
-    Header: 'Divert',
-    accessor: 'bDivert',
-    Cell: ({ value }) => formatBoolean(value),
-  },
-  {
-    Header: 'NET Divert Balance',
-    accessor: 'dSettlementBalance',
-    Cell: ({ value }) => formatNumber(value),
-  },
-  {
-    Header: 'Amex OptBlue',
-    accessor: 'sAMEXOptBlueInd',
-    Cell: ({ value }) => formatBoolean(value),
-  },
-  {
-    Header: 'MOTO AVS',
-    accessor: 'iMototIoAVS',
-    Cell: ({ value }) => formatScore(value),
-  },
-  {
-    Header: 'Settle 30%+',
-    accessor: 'iAuthCaptureAmtLargeVariation',
-    Cell: ({ value }) => formatScore(value),
-  },
-  {
-    Header: 'No Auth',
-    accessor: 'iNoAuthTrans',
-    Cell: ({ value }) => formatScore(value),
-  },
-  {
-    Header: 'Auth Decline',
-    accessor: 'iAuthDecline',
-    Cell: ({ value }) => formatScore(value),
-  },
-  {
-    Header: 'Negative Batch',
-    accessor: 'iNegDailyBatches',
-    Cell: ({ value }) => formatScore(value),
-  },
-  {
-    Header: 'Auto Hold',
-    accessor: 'iAutoHold',
-    Cell: ({ value }) => formatScore(value),
-  },
-  {
-    Header: 'Funding Exception',
-    accessor: 'iFundingExclusionAndException',
-    Cell: ({ value }) => formatScore(value),
-  },
-  {
-    Header: 'Total Points',
-    accessor: 'iTotalPoints',
-    Cell: ({ value }) => formatScore(value),
-  },
-  {
-    Header: 'Exception Created',
-    accessor: 'dtCreated',
-    Cell: ({ value }) => formatDate(value),
-  },
+export const columnHelper = createColumnHelper<RiskRadarExceptionsListRow>();
+
+export const baseColumns = [
+  columnHelper.accessor(
+    (row) => row.sDBA || row.leadName || DEFAULT_BLANK_VALUE,
+    {
+      id: 'dba',
+      header: 'DBA',
+    }
+  ),
+  columnHelper.accessor('dNetDepAmt', {
+    header: 'Net Deposit',
+    cell: ({ getValue }) => formatCurrency(getValue()),
+  }),
+  columnHelper.accessor('dAuthNonDeclinedAmt', {
+    header: 'FSP Approved Auth',
+    cell: ({ getValue }) => formatCurrency(getValue()),
+  }),
+  columnHelper.accessor('dAuthDeclineAmt', {
+    header: 'Auth Decline',
+    cell: ({ getValue }) => formatCurrency(getValue()),
+  }),
+  columnHelper.accessor('dtActivated', {
+    header: 'Activation Date',
+    cell: ({ getValue }) => formatDate(getValue()),
+  }),
+  columnHelper.accessor('sChannel', { header: 'Channel' }),
+  columnHelper.accessor('sReseller', { header: 'Reseller' }),
+  columnHelper.accessor('sReferralPartner', { header: 'Referral Partner' }),
+  columnHelper.accessor('sSolutionConsultant', {
+    header: 'Solution Consultant',
+  }),
+  columnHelper.accessor('dtAutoApproved', {
+    header: 'Auto Approved',
+    cell: ({ getValue }) => formatDate(getValue()),
+  }),
+  columnHelper.accessor('bRiskWatch', {
+    header: 'Risk Watch',
+    cell: ({ getValue }) => formatBoolean(getValue()),
+  }),
+  columnHelper.accessor('bNewAcct', {
+    header: 'New Account',
+    cell: ({ getValue }) => formatBoolean(getValue()),
+  }),
+  columnHelper.accessor('iNumOfKeyedTransAboveLimit', {
+    header: 'Keyed %',
+    cell: ({ getValue }) => formatNumber(getValue()),
+  }),
+  columnHelper.display({
+    id: 'avgTicket',
+    header: 'Avg Ticket',
+    cell: () => formatNumber(0),
+  }),
+  columnHelper.accessor('iTransAmtAboveHighTicketLimit', {
+    header: 'High Ticket',
+    cell: ({ getValue }) => formatNumber(getValue()),
+  }),
+  columnHelper.accessor('iCreditRule', {
+    header: 'Credit',
+    cell: ({ getValue }) => formatNumber(getValue()),
+  }),
+  columnHelper.accessor('iSalesChannelRule', {
+    header: 'Channel',
+    cell: ({ getValue }) => formatNumber(getValue()),
+  }),
+  columnHelper.accessor('iBatchVolAboveLimit', {
+    header: 'Monthly Vol',
+    cell: ({ getValue }) => formatNumber(getValue()),
+  }),
+  columnHelper.accessor('iAvgBatch', {
+    header: 'Avg Batch',
+    cell: ({ getValue }) => formatNumber(getValue()),
+  }),
+  columnHelper.accessor('iDupCard', {
+    header: 'Dup Card',
+    cell: ({ getValue }) => formatNumber(getValue()),
+  }),
+  columnHelper.accessor('iDupBin', {
+    header: 'Dup Bin',
+    cell: ({ getValue }) => formatNumber(getValue()),
+  }),
+  columnHelper.accessor('iLatePostTrans', {
+    header: 'Late Post',
+    cell: ({ getValue }) => formatNumber(getValue()),
+  }),
+  columnHelper.accessor('iFgnkeyedTrans', {
+    header: 'Foreign Keyed',
+    cell: ({ getValue }) => formatNumber(getValue()),
+  }),
+  columnHelper.accessor('iChbkOrIRR', {
+    header: 'Chargeback',
+    cell: ({ getValue }) => formatNumber(getValue()),
+  }),
+  columnHelper.accessor('bNextDayFundingAcct', {
+    header: 'Next Day Funding',
+    cell: ({ getValue }) => formatBoolean(getValue()),
+  }),
+  columnHelper.accessor('bDivert', {
+    header: 'Divert',
+    cell: ({ getValue }) => formatBoolean(getValue()),
+  }),
+  columnHelper.accessor('dSettlementBalance', {
+    header: 'NET Divert Balance',
+    cell: ({ getValue }) => formatNumber(getValue()),
+  }),
+  columnHelper.accessor('sAMEXOptBlueInd', {
+    header: 'Amex OptBlue',
+    cell: ({ getValue }) => formatBoolean(getValue()),
+  }),
+  columnHelper.accessor('iMototIoAVS', {
+    header: 'MOTO AVS',
+    cell: ({ getValue }) => formatScore(getValue()),
+  }),
+  columnHelper.accessor('iAuthCaptureAmtLargeVariation', {
+    header: 'Settle 30%+',
+    cell: ({ getValue }) => formatScore(getValue()),
+  }),
+  columnHelper.accessor('iNoAuthTrans', {
+    header: 'No Auth',
+    cell: ({ getValue }) => formatScore(getValue()),
+  }),
+  columnHelper.accessor('iAuthDecline', {
+    header: 'Auth Decline',
+    cell: ({ getValue }) => formatScore(getValue()),
+  }),
+  columnHelper.accessor('iNegDailyBatches', {
+    header: 'Negative Batch',
+    cell: ({ getValue }) => formatScore(getValue()),
+  }),
+  columnHelper.accessor('iAutoHold', {
+    header: 'Auto Hold',
+    cell: ({ getValue }) => formatScore(getValue()),
+  }),
+  columnHelper.accessor('iFundingExclusionAndException', {
+    header: 'Funding Exception',
+    cell: ({ getValue }) => formatScore(getValue()),
+  }),
+  columnHelper.accessor('iTotalPoints', {
+    header: 'Total Points',
+    cell: ({ getValue }) => formatScore(getValue()),
+  }),
+  columnHelper.accessor('dtCreated', {
+    header: 'Exception Created',
+    cell: ({ getValue }) => formatDate(getValue()),
+  }),
 ];
