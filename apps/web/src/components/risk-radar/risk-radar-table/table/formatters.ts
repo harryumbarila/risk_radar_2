@@ -1,3 +1,5 @@
+import { format, isValid } from 'date-fns';
+
 import {
   DEFAULT_BLANK_VALUE,
   DEFAULT_NO_VALUE,
@@ -12,6 +14,18 @@ export const formatNumber = (value: unknown): string => {
   return Number(value).toLocaleString();
 };
 
+export const formatCurrency = (value: unknown): string => {
+  if (value === undefined || value === null || Number(value) === 0) {
+    return DEFAULT_BLANK_VALUE;
+  }
+
+  return Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+  }).format(Number(value));
+};
+
 export const formatScore = (value: unknown): string => {
   const numValue = Number(value);
   if (numValue === 0) return DEFAULT_ZERO_VALUE;
@@ -24,9 +38,7 @@ export const formatBoolean = (value: unknown): string => {
 
 export const formatDate = (value: unknown): string => {
   if (!value) return DEFAULT_BLANK_VALUE;
-  try {
-    return new Date(String(value)).toLocaleDateString();
-  } catch {
-    return DEFAULT_BLANK_VALUE;
-  }
+  const date = value instanceof Date ? value : new Date(String(value));
+  if (!isValid(date)) return DEFAULT_BLANK_VALUE;
+  return format(date, 'yyyy-MM-dd HH:mm:ss');
 };
