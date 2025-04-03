@@ -120,7 +120,9 @@ export class ExceptionsListService {
     }
 
     // We need query without limit and offset to get the total count
-    const countQuery = query.clone().select('COUNT(exception.sMID)', 'count');
+    const countQuery = query
+      .clone()
+      .select('COUNT(distinct pkRiskRadarExceptions)', 'count');
 
     // Pagination
     const limit = pageSize || 25;

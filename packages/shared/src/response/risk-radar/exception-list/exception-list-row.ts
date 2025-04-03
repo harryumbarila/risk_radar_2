@@ -45,4 +45,7 @@ export type RiskRadarExceptionsListRow = {
   sISV: string;
   // Fallback when data comes from leads table
   leadName?: string;
+
+  // Added for table ID
+  id?: number;
 };
