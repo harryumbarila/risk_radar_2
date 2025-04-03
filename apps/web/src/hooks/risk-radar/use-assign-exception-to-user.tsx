@@ -3,7 +3,7 @@ import { useState } from 'react';
 import useBaseApi from '@/web/src/hooks/use-base-api';
 
 type UseAssignExceptionToUserReturnType = {
-  assignException: (id: number[], riskUserId: string) => Promise<unknown>;
+  assignException: (ids: number[], user: string) => Promise<unknown>;
   isLoading: boolean;
 };
 
@@ -12,22 +12,22 @@ export const useAssignExceptionToUser =
     const { makeRequest } = useBaseApi();
     const [isLoading, setIsLoading] = useState(false);
     const assignException = async (
-      exceptionsId: number[],
-      riskUserId: string
+      ids: number[],
+      user: string
     ): Promise<unknown> => {
       setIsLoading(true);
 
       try {
         const response = await makeRequest(
-          `/v1/legacy_dashboard_proxy/assign_exception_to_user`,
+          `/v1/risk-radar/assign-exception-review`,
           {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              exceptionsId,
-              riskUserId,
+              reviewList: ids.join(','),
+              user,
             }),
           }
         );
