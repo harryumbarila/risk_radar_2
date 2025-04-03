@@ -1,197 +1,74 @@
-import React, { useCallback, useMemo } from 'react';
+import React from 'react';
 
-import type { PaginatedAPIResponse } from '@/shared/common';
+import { useExceptionData } from '@/hooks/risk-radar/use-exception-data';
+import type { CommonStatus, PaginatedAPIResponse } from '@/shared/common';
 import type {
   RiskRadarExceptionsListRow,
   RiskRadarFilterState,
 } from '@/shared/response';
+import { useAssignExceptionToUser } from '@/web/src/hooks/risk-radar/use-assign-exception-to-user';
+import { useReviewExceptionByUsername } from '@/web/src/hooks/risk-radar/use-review-exception-by-username';
 
-import type { RiskRadarTableColumn } from './table/base-columns';
-import { baseColumns, columnHelper } from './table/base-columns';
 import { TableBody } from './table/table-body';
 import { TableHeader } from './table/table-header';
 import { TablePagination } from './table/table-pagination';
+import { useRiskRadarTableColumns } from './table/use-risk-radar-columns';
 
 type RiskRadarTableProps = {
-  exceptionList: PaginatedAPIResponse<RiskRadarExceptionsListRow>;
-  // Status is used in the commented code, keeping prop for future use
-  // eslint-disable-next-line react/no-unused-prop-types
+  exceptionList: PaginatedAPIResponse<RiskRadarExceptionsListRow> | null;
   status: number;
   filters: RiskRadarFilterState;
   fetchData: (filters: RiskRadarFilterState) => void;
+  dataStatus?: CommonStatus;
 };
 
 export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
   exceptionList,
   filters,
   fetchData,
+  dataStatus,
 }): JSX.Element => {
-  // const [reviewIds, setReviewIds] = useState<string[]>([]);
-  // const [assignedExceptionIds, setAssignedExceptionIds] = useState<string[]>(
-  //   []
-  // );
+  const { data: exceptionData } = useExceptionData();
 
-  // const { data: exceptionData } = useExceptionData();
-  // const riskUsers = exceptionData?.risk_user;
+  const { reviewException, isLoading: isReviewLoading } =
+    useReviewExceptionByUsername();
+  const { assignException, isLoading: isAssignLoading } =
+    useAssignExceptionToUser();
 
-  // const [assignedUser, setAssignedUser] = useState(
-  //   String(riskUsers?.[0]?.sNTUserID ?? '')
-  // );
-  // const { user } = useAuth();
-
-  // const { reviewException } = useReviewExceptionByUsername();
-  // const { assignException } = useAssignExceptionToUser();
-
-  // const handleClickOnReviewButton = useCallback(async (): Promise<void> => {
-  //   if (reviewIds.length > 0 && user?.name) {
-  //     await reviewException(
-  //       reviewIds.map((id) => parseInt(id, 10)),
-  //       user.name
-  //     );
-  //   }
-  // }, [reviewException, reviewIds, user?.name]);
-
-  // const handleClickOnAssignButton = useCallback(async (): Promise<void> => {
-  //   if (assignedExceptionIds.length > 0 && assignedUser) {
-  //     await assignException(
-  //       assignedExceptionIds.map((id) => parseInt(id, 10)),
-  //       assignedUser
-  //     );
-  //   }
-  // }, [assignException, assignedExceptionIds, assignedUser]);
-
-  // const handleReviewCheckboxChange = useCallback((id: string): void => {
-  //   setReviewIds((prev) =>
-  //     prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-  //   );
-  // }, []);
-
-  // const handleAssignedCheckboxChange = useCallback((id: string): void => {
-  //   setAssignedExceptionIds((prev) =>
-  //     prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-  //   );
-  // }, []);
-
-  const handlePageSizeChange = useCallback(
-    (pageSize: number): void => {
-      fetchData({ ...filters, pageSize, page: 1 });
-    },
-    [fetchData, filters]
-  );
-
-  const columns = useMemo<RiskRadarTableColumn[]>(() => {
-    const idColumn = columnHelper.accessor('iNumOfKeyedTransAboveLimit', {
-      header: 'Keyed %',
-      cell: ({ row }) => {
-        // Calculate the offset based on page number and page size
-        const pageOffset = (filters.page - 1) * filters.pageSize;
-        // Add 1 to zero-based index to get human-readable row number
-        const rowNumber = pageOffset + row.index + 1;
-        return String(rowNumber);
-      },
-    });
-
-    // Reviewed column
-    let reviewedColumn = null;
-    switch (filters.status) {
-      case 1: // Not Reviewed
-        reviewedColumn = columnHelper.accessor('sUserReviewed', {
-          header: 'Reviewed',
-          cell: ({ row }) => row.original.sUserReviewed,
-        });
+  const handleSubmit = async (
+    ids: number[],
+    assignedUser: string
+  ): Promise<void> => {
+    switch (String(filters.status)) {
+      case '1': // Not Reviewed
+        await reviewException(ids, assignedUser);
+        fetchData({ ...filters, page: 1 });
         break;
-
-      default: // Reviewed
-        reviewedColumn = columnHelper.accessor('sUserReviewed', {
-          header: 'Reviewed',
-        });
+      case '3': // Manager Queued
+        await assignException(ids, assignedUser);
+        fetchData({ ...filters, page: 1 });
+        break;
+      default:
         break;
     }
+  };
 
-    const completedColumns = [idColumn, ...baseColumns, reviewedColumn];
-    return completedColumns;
-  }, [filters.page, filters.pageSize, filters.status]);
+  // Pagination
+  const handlePageSizeChange = (pageSize: number): void => {
+    fetchData({ ...filters, pageSize, page: 1 });
+  };
 
-  // TODO: Handle reviewed column properly to avoid re render issues
-  // This would use the status prop when uncommented
+  const handlePageChange = (page: number): void => {
+    fetchData({ ...filters, page });
+  };
 
-  // switch (status) {
-  //   case 1:
-  //     completedColumns = [
-  //       ...completedColumns,
-  //       {
-  //         accessorKey: 'sUserReviewed',
-  //         header: () => (
-  //           <NotReviewedHeader
-  //             handleClickOnReviewButton={handleClickOnReviewButton}
-  //           />
-  //         ),
-  //         cell: ({ row }) => (
-  //           <NotReviewedCell
-  //             reviewIds={reviewIds}
-  //             handleReviewCheckboxChange={handleReviewCheckboxChange}
-  //             row={row}
-  //           />
-  //         ),
-  //       },
-  //     ];
-  //     break;
-  //   case 2:
-  //     completedColumns = [
-  //       ...completedColumns,
-  //       {
-  //         header: 'Reviewed',
-  //         accessorKey: 'sUserReviewed',
-  //         cell: ({ getValue }) => getValue<string>() ?? DEFAULT_BLANK_VALUE,
-  //       },
-  //     ];
-  //     break;
-  //   case 3:
-  //     completedColumns = [
-  //       ...completedColumns,
-  //       {
-  //         header: () => (
-  //           <ManagerQueuedHeader
-  //             riskUsers={riskUsers ?? []}
-  //             setAssignedUser={setAssignedUser}
-  //             handleClickOnAssignButton={handleClickOnAssignButton}
-  //           />
-  //         ),
-  //         accessorKey: 'sUserReviewed',
-  //         cell: ({ row }) => (
-  //           <ManagerQueuedCell
-  //             assignedExceptionIds={assignedExceptionIds}
-  //             handleAssignedCheckboxChange={handleAssignedCheckboxChange}
-  //             row={row}
-  //           />
-  //         ),
-  //       },
-  //     ];
-  //     break;
-  //   case 4:
-  //     completedColumns = [
-  //       ...completedColumns,
-  //       {
-  //         header: 'Assigned to',
-  //         accessorFn: (row) => row.sNTUserID,
-  //         cell: ({ row }) =>
-  //           riskUsers?.find((u) => u.sNTUserID === row.original.sNTUserID)
-  //             ?.sName ?? DEFAULT_BLANK_VALUE,
-  //       },
-  //     ];
-  //     break;
-  //   default:
-  //     break;
-  // }
-
-  // Display a message if no data is available
-  if (exceptionList?.data?.length === 0) {
-    return (
-      <div className="rounded-sm border border-stroke bg-white py-6 px-8 shadow-default dark:border-strokedark dark:bg-boxdark">
-        <p className="text-center">No data available</p>
-      </div>
-    );
-  }
+  const columns = useRiskRadarTableColumns({
+    data: exceptionList?.data ?? [],
+    filters,
+    riskRadarUsers: exceptionData?.risk_user ?? [],
+    onSubmit: handleSubmit,
+    isLoading: isReviewLoading || isAssignLoading,
+  });
 
   return (
     <div className="flex flex-col gap-5 md:gap-7 2xl:gap-10">
@@ -203,18 +80,18 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
 
         <TableBody
           columns={columns}
-          exceptionList={exceptionList.data}
           pageSize={filters.pageSize}
           currentPage={filters.page}
-          totalRecords={exceptionList.totalRecords ?? 0}
+          exceptionList={exceptionList?.data ?? []}
+          totalRecords={exceptionList?.totalRecords ?? 0}
+          dataStatus={dataStatus}
         />
 
         <TablePagination
-          page={exceptionList.page}
-          pageSize={exceptionList.pageSize}
-          totalRecords={exceptionList.totalRecords ?? 0}
-          fetchData={fetchData}
-          filters={filters}
+          page={filters.page}
+          pageSize={filters.pageSize}
+          totalRecords={exceptionList?.totalRecords ?? 0}
+          onPageChange={handlePageChange}
         />
       </section>
     </div>

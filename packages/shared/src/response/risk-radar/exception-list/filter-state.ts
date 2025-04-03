@@ -6,7 +6,7 @@ export type RiskRadarFilterState = {
 
   categories?: string[];
 
-  status?: number;
+  status: number;
   assignedToUser?: number;
   merchantId?: string | null;
   dbaNameOrSIC?: string | null;
@@ -24,7 +24,7 @@ export const defaultRiskRadarFilters: RiskRadarFilterState = {
   processor: 0,
   viewAllExceptions: false,
   categories: [],
-  status: undefined,
+  status: 1,
   assignedToUser: undefined,
   merchantId: undefined,
   dbaNameOrSIC: undefined,

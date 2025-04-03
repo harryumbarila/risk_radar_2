@@ -65,10 +65,9 @@ export const baseColumns = [
     header: 'Keyed %',
     cell: ({ getValue }) => formatNumber(getValue()),
   }),
-  columnHelper.display({
-    id: 'avgTicket',
+  columnHelper.accessor('iTransAmtAboveLimit', {
     header: 'Avg Ticket',
-    cell: () => formatNumber(0),
+    cell: ({ getValue }) => formatNumber(getValue()),
   }),
   columnHelper.accessor('iTransAmtAboveHighTicketLimit', {
     header: 'High Ticket',
