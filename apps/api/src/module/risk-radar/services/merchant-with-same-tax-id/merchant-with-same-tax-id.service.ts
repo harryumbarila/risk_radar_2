@@ -1,0 +1,88 @@
+import { Injectable } from '@nestjs/common';
+import { InjectPinoLogger } from 'nestjs-pino';
+import { Logger } from 'pino';
+
+import {
+  LeadRepository,
+  LeadsBusinessInformationRepository,
+} from '@/iris-db/repositories';
+
+// Define an interface for the query result
+type MerchantIdResult = {
+  irisMId: string;
+};
+
+@Injectable()
+export class MerchantWithSameTaxIdService {
+  public constructor(
+    private readonly leadRepository: LeadRepository,
+    private readonly leadsBusinessInfoRepository: LeadsBusinessInformationRepository,
+    @InjectPinoLogger(MerchantWithSameTaxIdService.name)
+    private readonly logger: Logger
+  ) {}
+
+  /**
+   * Get all merchants that have the same Tax ID as the provided merchant ID
+   * @param merchantId The merchant ID to check
+   * @returns Array of merchant IDs with the same Tax ID
+   */
+  public async getMerchantsWithSameTaxId(
+    merchantId: string
+  ): Promise<{ merchantIds: string[] }> {
+    this.logger.info(
+      `Fetching merchants with same Tax ID for merchant: ${merchantId}`
+    );
+
+    try {
+      // Step 1: Find the lead by merchantId
+      const lead = await this.leadRepository.findOne({
+        where: { irisMId: merchantId },
+      });
+
+      if (!lead || !lead.id) {
+        this.logger.info(`No lead found for merchant ID: ${merchantId}`);
+        return { merchantIds: [] };
+      }
+
+      // Step 2: Find the business information for this lead to get the tax ID
+      const businessInfo = await this.leadsBusinessInfoRepository.findOne({
+        where: { leadId: lead.id },
+      });
+
+      if (!businessInfo || !businessInfo.federalTaxId) {
+        this.logger.info(`No tax ID found for merchant ID: ${merchantId}`);
+        return { merchantIds: [] };
+      }
+
+      const taxId = businessInfo.federalTaxId;
+
+      this.logger.info(
+        `Tax ID found for merchant ID: ${merchantId} - ${taxId}`
+      );
+
+      // Use hardcoded schema name since metadata might not provide it correctly
+      const query = `
+        SELECT DISTINCT l.IrisMId as irisMId
+        FROM Iris.dbo.Leads l
+        INNER JOIN Iris.dbo.LeadsBusinessInformation info ON info.LeadId = l.Id
+        WHERE info.FederalTaxId = '${taxId}'
+          AND l.IrisMId != '${merchantId}'
+          AND DATALENGTH(l.IrisMId) > 5
+        ORDER BY l.IrisMId
+      `;
+
+      // Cast the result to the defined interface
+      const queryResults = (await this.leadRepository.query(
+        query
+      )) as MerchantIdResult[];
+
+      // Extract merchant IDs from the result
+      const merchantIds = queryResults.map((result) => result.irisMId);
+
+      return { merchantIds };
+    } catch (error) {
+      this.logger.error(error, 'Error fetching merchants with same tax ID');
+      return { merchantIds: [] };
+    }
+  }
+}

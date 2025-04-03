@@ -26,6 +26,7 @@ import { useMerchant } from '@/web/src/hooks/risk-radar/use-merchant';
 import { useMerchantChargebacks } from '@/web/src/hooks/risk-radar/use-merchant-chargebacks';
 import { useMerchantNetSettlement } from '@/web/src/hooks/risk-radar/use-merchant-net-settlement';
 import { useMerchantNotes } from '@/web/src/hooks/risk-radar/use-merchant-notes';
+import { useMerchantsWithSameTaxId } from '@/web/src/hooks/risk-radar/use-merchants-with-same-tax-id';
 import { usePushNoteToIris } from '@/web/src/hooks/risk-radar/use-push-note-to-iris';
 import { useReviewExceptionByUsername } from '@/web/src/hooks/risk-radar/use-review-exception-by-username';
 import { useSaveMerchantData } from '@/web/src/hooks/risk-radar/use-save-merchant-data';
@@ -205,6 +206,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const [netSettlementPage, setNetSettlementPage] = useState(1);
   const [volumePage, setVolumePage] = useState(1);
 
+  // Add new state for Same Tax ID pagination
+  const [sameTaxIdPage, setSameTaxIdPage] = useState(1);
+
   // Calculate paginated data
   const paginatedExceptions = transactionExceptionsData?.slice(
     (exceptionsPage - 1) * ITEMS_PER_PAGE,
@@ -249,6 +253,21 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentItems = cardNumberData?.slice(startIndex, endIndex) || [];
+
+  const { data: merchantsWithSameTaxIdData, isLoading: sameTaxIdLoading } =
+    useMerchantsWithSameTaxId(merchantId);
+
+  // Calculate paginated data for same tax ID merchants
+  const paginatedSameTaxIdMerchants =
+    merchantsWithSameTaxIdData?.merchantIds?.slice(
+      (sameTaxIdPage - 1) * ITEMS_PER_PAGE,
+      sameTaxIdPage * ITEMS_PER_PAGE
+    );
+
+  // Calculate total pages for same tax ID
+  const totalSameTaxIdPages = Math.ceil(
+    (merchantsWithSameTaxIdData?.merchantIds?.length || 0) / ITEMS_PER_PAGE
+  );
 
   const handlePushNoteToIris = async (noteId: string): Promise<void> => {
     await pushNote(noteId);
@@ -903,6 +922,15 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         >
           NetSettlement
         </button>
+        <button
+          className="inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90"
+          type="button"
+          onClick={() => {
+            setActiveTab('sameTaxId');
+          }}
+        >
+          Match
+        </button>
       </nav>
 
       {/* Contact Tab Content */}
@@ -1492,6 +1520,57 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   </div>
                 </div>
               </div>
+            </div>
+          </>
+        )}
+        {activeTab === 'sameTaxId' && (
+          <>
+            <h2 className="mb-2 text-xl font-semibold text-black dark:text-white">
+              Merchants with Same Tax ID
+            </h2>
+            <div className="grid grid-cols-1 gap-4">
+              {sameTaxIdLoading ? (
+                <p>Loading merchants with the same tax ID...</p>
+              ) : merchantsWithSameTaxIdData?.merchantIds?.length ? (
+                <div className="max-w-full overflow-x-auto">
+                  <div className="mb-3 text-sm">
+                    The following merchants share the same Tax ID as the current
+                    merchant ({merchantId}). This information can be useful for
+                    identifying related businesses or potential fraud.
+                  </div>
+                  <table className="w-full table-auto">
+                    <thead>
+                      <tr className="bg-gray-2 dark:bg-meta-4 text-center">
+                        <th className="p-4 font-medium text-black dark:text-white">
+                          Merchant ID
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paginatedSameTaxIdMerchants?.map((merchantId) => (
+                        <tr key={merchantId} className="text-center">
+                          <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                            {merchantId}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {totalSameTaxIdPages > 1 && (
+                    <Pagination
+                      currentPage={sameTaxIdPage}
+                      totalPages={totalSameTaxIdPages}
+                      onPageChange={setSameTaxIdPage}
+                    />
+                  )}
+                </div>
+              ) : (
+                <div className="p-4 border border-gray-200 rounded-md">
+                  <p className="text-gray-600">
+                    No other merchants found with the same Tax ID.
+                  </p>
+                </div>
+              )}
             </div>
           </>
         )}
