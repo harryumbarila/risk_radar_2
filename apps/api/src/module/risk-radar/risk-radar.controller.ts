@@ -34,6 +34,7 @@ import { MerchantCardNumHistoryQueryDto } from './services/merchant-card-num-his
 import { MerchantCardNumHistoryService } from './services/merchant-card-num-history/merchant-card-num-history.service';
 import { MerchantExceptionDetailService } from './services/merchant-exception-detail.service';
 import { MerchantExceptionTransactionsService } from './services/merchant-exception-transactions/merchant-exception-transactions.service';
+import { MerchantWithSameTaxIdService } from './services/merchant-with-same-tax-id/merchant-with-same-tax-id.service';
 import { EmailTemplatesResponseDto } from './services/risk-radar-email-template/dto/email-template.dto';
 import { RiskRadarEmailTemplateService } from './services/risk-radar-email-template/risk-radar-email-template.service';
 import { RiskRadarExceptionsService } from './services/risk-radar-exceptions.service';
@@ -56,7 +57,8 @@ export class RiskRadarController {
     private readonly exceptionsListService: ExceptionsListService,
     private readonly riskRadarNotesRepository: RiskRadarNotesRepository,
     private readonly chargebackTransactionsService: ChargebacksAndRetrievalReasonCodeLookupRepository,
-    private readonly emailTemplateService: RiskRadarEmailTemplateService
+    private readonly emailTemplateService: RiskRadarEmailTemplateService,
+    private readonly merchantWithSameTaxIdService: MerchantWithSameTaxIdService
   ) {}
 
   @Post('send-exception-memo-email')
@@ -283,5 +285,37 @@ export class RiskRadarController {
   public async getEmailTemplates(): Promise<EmailTemplatesResponseDto> {
     const templates = await this.emailTemplateService.getActiveEmailTemplates();
     return { templates };
+  }
+
+  @Public()
+  @Get('merchants-with-same-tax-id')
+  @ApiOperation({
+    summary: 'Get merchants with the same tax ID',
+    description:
+      'Retrieves a list of merchant IDs that have the same tax ID as the provided merchant',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'List of merchant IDs with the same tax ID as the provided merchant',
+    schema: {
+      type: 'object',
+      properties: {
+        merchantIds: {
+          type: 'array',
+          items: {
+            type: 'string',
+          },
+          description: 'List of merchant IDs with the same tax ID',
+        },
+      },
+    },
+  })
+  public async getMerchantsWithSameTaxId(
+    @Query('merchantId') merchantId: string
+  ): Promise<{ merchantIds: string[] }> {
+    return this.merchantWithSameTaxIdService.getMerchantsWithSameTaxId(
+      merchantId
+    );
   }
 }

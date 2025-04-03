@@ -12,12 +12,23 @@ default: build
 build: $(BUILD_IMAGE)
 
 $(BUILD_IMAGE):
-	docker build --platform linux/amd64 --build-arg BUILD_DATE=$(BUILD_DATE) --build-arg VERSION=$(VERSION) --build-arg GITHASH=$(GITHASH) -t $(call internal_image_name) .
+	docker buildx build --platform linux/amd64 \
+	  --build-arg BUILD_DATE=$(BUILD_DATE) \
+	  --build-arg VERSION=$(VERSION) \
+	  --build-arg GITHASH=$(GITHASH) \
+	  --cache-from=type=local,src=/tmp/.buildx-cache \
+	  --cache-to=type=local,dest=/tmp/.buildx-cache \
+	  --output=type=docker \
+	  -t $(call internal_image_name) .
+
 	docker tag $(call internal_image_name) $(call image_name)
 	docker tag $(call image_name) $(call image_name_latest_version)
+	# docker tag $(call image_name) $(call image_name_cache)
+
 	# Production
 	docker tag $(call internal_image_name) $(call image_name_no_vendor)
 	docker tag $(call image_name_latest_version) $(call image_name_latest_version_no_vendor)
+	# docker tag $(call image_name_no_vendor) $(call image_name_cache_no_vendor)
 
 define internal_image_name
 "en.hayes.app/$(if $(VENDOR),$(VENDOR)/)$(REPOSITORY):latest"
@@ -37,4 +48,12 @@ endef
 
 define image_name_latest_version_no_vendor
 "$(if $(REGISTRY),$(REGISTRY)/)$(REPOSITORY):latest"
+endef
+
+define image_name_cache
+"$(if $(REGISTRY),$(REGISTRY)/)$(if $(VENDOR),$(VENDOR)/)$(REPOSITORY):cache"
+endef
+
+define image_name_cache_no_vendor
+"$(if $(REGISTRY),$(REGISTRY)/)$(REPOSITORY):cache"
 endef

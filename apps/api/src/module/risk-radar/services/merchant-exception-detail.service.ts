@@ -106,6 +106,50 @@ export class MerchantExceptionDetailService {
     );
     const uwNewAccountHoldAllowRiskToEdit = !uwNewAccountHoldQuery.length;
 
+    // Get current month's swiped percentage based on transaction count
+    this.logger.info(
+      {
+        exceptionId: pkRiskRadarExceptions,
+        mid: sMID,
+        user: sUser,
+      },
+      'Getting current month swiped percentage based on transaction count'
+    );
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1; // JavaScript months are 0-based
+
+    const swipedPercentTransCountQuery = await this.financeDataSource.query(
+      `
+      SELECT MAX(ISNULL(iSwipedPercBasedOnTransCnt, 0)) AS iSwipedPercBasedOnTransCntCurrMonth
+      FROM Finance..tblDDTMonthlyProcessingSummary
+      WHERE iYear = @0 AND iMonth = @1 AND sMID = @2
+      `,
+      [currentYear, currentMonth, sMID]
+    );
+
+    const swipedPercentageTransCount =
+      swipedPercentTransCountQuery[0]?.iSwipedPercBasedOnTransCntCurrMonth || 0;
+
+    // Get activated date from vwLeadsStatus
+    this.logger.info(
+      {
+        exceptionId: pkRiskRadarExceptions,
+        mid: sMID,
+        user: sUser,
+      },
+      'Getting activated date from vwLeadsStatus'
+    );
+    const activatedDateQuery = await this.irisDataSource.query(
+      `
+      SELECT ActivatedDate
+      FROM Iris.dbo.vwLeadsStatus
+      WHERE MID = @0
+      `,
+      [sMID]
+    );
+    const activatedDate = activatedDateQuery[0]?.ActivatedDate || null;
+
+    this.logger.info({}, 'Activated date: ' + activatedDate);
     // Get lead information
     const lead = await this.leadRepository.findOne({
       where: { irisMId: sMID, isArchived: false },
@@ -183,7 +227,9 @@ export class MerchantExceptionDetailService {
         merchAdjParam,
         chargebacks,
         exception,
-        uwNewAccountHoldAllowRiskToEdit
+        uwNewAccountHoldAllowRiskToEdit,
+        swipedPercentageTransCount,
+        activatedDate
       ),
       owners: this.buildOwners(owners),
       processingSummaries: this.mapProcessingSummaries(processingSummaries),
@@ -228,7 +274,9 @@ export class MerchantExceptionDetailService {
     merchAdjParam: any,
     chargebacks: { chg: number; irr: number },
     exception: any,
-    uwNewAccountHoldAllowRiskToEdit: boolean
+    uwNewAccountHoldAllowRiskToEdit: boolean,
+    swipedPercentageTransCount: number,
+    activatedDate: string | null
   ): MerchantBusinessInfoDto {
     const businessInfoDto: MerchantBusinessInfoDto = {
       dbaName: businessInfo?.dbaName || '',
@@ -255,7 +303,7 @@ export class MerchantExceptionDetailService {
         : '',
       selfGenerated: source?.sourceName === 'Self-Sourced' ? 'Yes' : 'No',
       businessType: businessInfo?.businessType || '',
-      activatedDate: null,
+      activatedDate: activatedDate ? new Date(activatedDate) : null, // Convert string to Date
       monthlyVolume: merchAdjParam?.monthlyVolumeCalcMonthly || 0,
       averageTicket: merchAdjParam?.avgTicketCalcMonthly || 0,
       swipedPercentage: merchAdjParam?.swipePercentCalcMonthly || 0,
@@ -267,10 +315,11 @@ export class MerchantExceptionDetailService {
       hasCashAdvance: services?.merchantCashAdvance === 'No' ? 'No' : 'Yes',
       isRiskWatch: merchAdjParam?.isRiskWatch || false,
       netSettlementBalance: 0, // This would come from a cross-database query
-      swipedPercentageTransCount: 0, // This would be calculated from transaction data
+      swipedPercentageTransCount, // Now using the calculated value from the query
       channel: partnerAndSalesAgent?.channel || '',
       isa: partnerAndSalesAgent?.solutionConsultant || '',
       averageMonthlySalesVolume: underwriting?.averageMonthlySalesVolume || 0,
+      averageTicketSizeAmount: underwriting?.averageTicketSizeAmount || 0,
       storeFrontSwiped: financialProfile?.storeFrontSwiped || 0,
       isAutoHoldWhiteLabel: merchAdjParam?.isAutoHoldWhiteLabel || false,
       highestTicket: underwriting?.highestTicketSizeAmount || 0,

@@ -1542,10 +1542,10 @@
   dependencies:
     call-bind "^1.0.8"
 
-"@ls-lint/ls-lint@^2.2.3":
-  version "2.2.3"
-  resolved "https://registry.yarnpkg.com/@ls-lint/ls-lint/-/ls-lint-2.2.3.tgz#a270eacea47a1dfad46f73f664f0e2a8896d88cf"
-  integrity sha512-ekM12jNm/7O2I/hsRv9HvYkRdfrHpiV1epVuI2NP+eTIcEgdIdKkKCs9KgQydu/8R5YXTov9aHdOgplmCHLupw==
+"@ls-lint/ls-lint@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@ls-lint/ls-lint/-/ls-lint-2.3.0.tgz#b20fc1c0ebbaeea5e9cb43ceca05540917f69b19"
+  integrity sha512-lsT5/7SxtImOIjpefC9wcoXt2lkikKhCjd6U+Q9Z6X5h2HBU/71ggt+XStdodZ0HkJGO333zDUeec7JROMCPFw==
 
 "@lukeed/csprng@^1.0.0":
   version "1.1.0"

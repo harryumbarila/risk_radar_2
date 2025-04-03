@@ -26,6 +26,7 @@ import { useMerchant } from '@/web/src/hooks/risk-radar/use-merchant';
 import { useMerchantChargebacks } from '@/web/src/hooks/risk-radar/use-merchant-chargebacks';
 import { useMerchantNetSettlement } from '@/web/src/hooks/risk-radar/use-merchant-net-settlement';
 import { useMerchantNotes } from '@/web/src/hooks/risk-radar/use-merchant-notes';
+import { useMerchantsWithSameTaxId } from '@/web/src/hooks/risk-radar/use-merchants-with-same-tax-id';
 import { usePushNoteToIris } from '@/web/src/hooks/risk-radar/use-push-note-to-iris';
 import { useReviewExceptionByUsername } from '@/web/src/hooks/risk-radar/use-review-exception-by-username';
 import { useSaveMerchantData } from '@/web/src/hooks/risk-radar/use-save-merchant-data';
@@ -57,6 +58,7 @@ type MerchantContactResponse = {
     selfGenerated: string;
     businessType: string;
     activatedDate: string | null;
+    averageTicketSizeAmount: number;
     monthlyVolume: number;
     averageTicket: number;
     swipedPercentage: number;
@@ -204,6 +206,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const [netSettlementPage, setNetSettlementPage] = useState(1);
   const [volumePage, setVolumePage] = useState(1);
 
+  // Add new state for Same Tax ID pagination
+  const [sameTaxIdPage, setSameTaxIdPage] = useState(1);
+
   // Calculate paginated data
   const paginatedExceptions = transactionExceptionsData?.slice(
     (exceptionsPage - 1) * ITEMS_PER_PAGE,
@@ -248,6 +253,21 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentItems = cardNumberData?.slice(startIndex, endIndex) || [];
+
+  const { data: merchantsWithSameTaxIdData, isLoading: sameTaxIdLoading } =
+    useMerchantsWithSameTaxId(merchantId);
+
+  // Calculate paginated data for same tax ID merchants
+  const paginatedSameTaxIdMerchants =
+    merchantsWithSameTaxIdData?.merchantIds?.slice(
+      (sameTaxIdPage - 1) * ITEMS_PER_PAGE,
+      sameTaxIdPage * ITEMS_PER_PAGE
+    );
+
+  // Calculate total pages for same tax ID
+  const totalSameTaxIdPages = Math.ceil(
+    (merchantsWithSameTaxIdData?.merchantIds?.length || 0) / ITEMS_PER_PAGE
+  );
 
   const handlePushNoteToIris = async (noteId: string): Promise<void> => {
     await pushNote(noteId);
@@ -433,23 +453,21 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     sDBAZip: data?.businessInfo?.dbaZip || '',
     sActivationDate: data?.businessInfo?.activatedDate || '',
     sOwnershipType: data?.businessInfo?.ownershipType || '',
-    sSIC: data?.businessInfo?.mccCode?.split(' ')[0] || '',
-    sSICDesc:
-      data?.businessInfo?.mccCode?.split(' ')[1]?.replace(/[()]/g, '') || '',
+    sSIC: data?.businessInfo?.mccCode || '',
     sReseller: data?.businessInfo?.reseller || '',
     sMerchantType: data?.businessInfo?.businessType || '',
     bIsTalusPayMerchant: data?.businessInfo?.talusPayAccountIndicator === 'Yes',
     sChannel: data?.businessInfo?.channel || '',
     sReferralPartner: data?.businessInfo?.referralPartner || '',
-    sSolutionConsultant: data?.businessInfo?.isv || '',
+    sSolutionConsultant: data?.businessInfo?.isa || '',
     iMV$: data?.businessInfo?.monthlyVolume || 0,
     iAT$: data?.businessInfo?.averageTicket || 0,
     iHT$: data?.businessInfo?.highestTicket || 0,
     iSwipeVolPerc: data?.businessInfo?.swipedPercentage || 0,
-    iUWApprMV: 0,
-    iUWApprAT: 0,
-    iUWApprHT: 0,
-    iUWApprSwipeVolPerc: 0,
+    iUWApprMV: data?.businessInfo?.averageMonthlySalesVolume || 0,
+    iUWApprAT: data?.businessInfo?.averageTicketSizeAmount || 0,
+    iUWApprHT: data?.businessInfo?.highestTicket || 0,
+    iUWApprSwipeVolPerc: data?.businessInfo?.storeFrontSwiped || 0,
     iSwipedPercBasedOnTransCntCurrMonth:
       data?.businessInfo?.swipedPercentageTransCount || 0,
     sPreferredContact: data?.businessInfo?.preferredContact || '',
@@ -733,8 +751,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             <strong>Ownership:</strong> {merchantProfile?.sOwnershipType}
           </p>
           <p className="text-black dark:text-white">
-            <strong>SIC:</strong> {merchantProfile?.sSIC} -{' '}
-            {merchantProfile?.sSICDesc}
+            <strong>SIC:</strong> {merchantProfile?.sSIC}
           </p>
         </div>
 
@@ -779,7 +796,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           </p>
           <p className="text-black dark:text-white">
             <strong>Curr. Month Swipe Cnt (%):</strong>{' '}
-            {merchantProfile?.iSwipedPercBasedOnTransCntCurrMonth || 'N/A'}
+            {merchantProfile?.iSwipedPercBasedOnTransCntCurrMonth || ''}
           </p>
           <p className="text-black dark:text-white">
             <button
@@ -816,7 +833,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             </p>
             <p className="text-black dark:text-white">
               <strong>Solution Consultant:</strong>{' '}
-              {merchantProfile?.sSolutionConsultant || 'N/A'}
+              {merchantProfile?.sSolutionConsultant || ''}
             </p>
           </div>
         </div>
@@ -826,21 +843,21 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
           <div className="grid grid-cols-4 text-black dark:text-white text-center">
             <p>
-              <strong>MV ($):</strong> {merchantProfile?.iMV$ || 'N/A'}
+              <strong>MV ($):</strong> {merchantProfile?.iMV$ || ''}
               <span className="text-gray-500 dark:text-gray-400">
                 {' '}
                 (UW Appr.- {merchantProfile?.iUWApprMV})
               </span>
             </p>
             <p>
-              <strong>AT ($):</strong> {merchantProfile?.iAT$ || 'N/A'}
+              <strong>AT ($):</strong> {merchantProfile?.iAT$ || ''}
               <span className="text-gray-500 dark:text-gray-400">
                 {' '}
                 (UW Appr.- {merchantProfile?.iUWApprAT})
               </span>
             </p>
             <p>
-              <strong>HT ($):</strong> {merchantProfile?.iHT$ || 'N/A'}
+              <strong>HT ($):</strong> {merchantProfile?.iHT$ || ''}
               <span className="text-gray-500 dark:text-gray-400">
                 {' '}
                 (UW Appr.- {merchantProfile?.iUWApprHT})
@@ -848,7 +865,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             </p>
             <p>
               <strong>Swipe Vol (%):</strong>{' '}
-              {merchantProfile?.iSwipeVolPerc || 'N/A'}
+              {merchantProfile?.iSwipeVolPerc || ''}
               <span className="text-gray-500 dark:text-gray-400">
                 {' '}
                 (UW Appr.- {merchantProfile?.iUWApprSwipeVolPerc})
@@ -905,6 +922,15 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         >
           NetSettlement
         </button>
+        <button
+          className="inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90"
+          type="button"
+          onClick={() => {
+            setActiveTab('sameTaxId');
+          }}
+        >
+          Match
+        </button>
       </nav>
 
       {/* Contact Tab Content */}
@@ -914,48 +940,110 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             <h2 className="mb-2 text-xl font-semibold text-black dark:text-white">
               Contact
             </h2>
-            <div className="grid grid-cols-2 gap-4 text-center">
-              {/* Contact Name */}
-              <div className="flex items-center min-h-[50px]">
-                <p className="text-black dark:text-white">
-                  <strong>Contact Name:</strong>{' '}
-                  {data?.owners?.[0]?.name || 'N/A'}
+            <div className="grid grid-cols-2 gap-4">
+              {/* Left Column - Contact Info */}
+              <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
+                <h3 className="mb-2 text-lg font-semibold text-black dark:text-white">
+                  Contact Info
+                </h3>
+                <p className="mb-2 text-black dark:text-white">
+                  <strong>Contact Name:</strong> {data?.owners?.[0]?.name || ''}
                 </p>
+                <p className="mb-2 text-black dark:text-white">
+                  <strong>Phone #:</strong>{' '}
+                  {merchantContactInfo?.contactPhoneNumber || ''}
+                </p>
+                <p className="mb-2 text-black dark:text-white">
+                  <strong>Fax #:</strong> {merchantContactInfo?.dbaFax || ''}
+                </p>
+                <p className="mb-2 text-black dark:text-white">
+                  <strong>Mobile #:</strong>
+                </p>
+                <p className="mb-2 text-black dark:text-white">
+                  <strong>Email:</strong>{' '}
+                  {merchantContactInfo?.contactEmail || ''}
+                </p>
+                <p className="mb-2 text-black dark:text-white">
+                  <strong>Web Site:</strong>{' '}
+                  {merchantContactInfo?.website || ''}
+                </p>
+                <div className="mb-2">
+                  <p className="text-black dark:text-white flex items-start">
+                    <strong className="inline-block mr-2">
+                      Preferred Contact:
+                    </strong>
+                    <input
+                      type="text"
+                      value={merchantUpdateRequest?.preferredContact || ''}
+                      onChange={(e) =>
+                        setMerchantUpdateRequest((prev) => ({
+                          ...prev,
+                          preferredContact: e.target.value,
+                        }))
+                      }
+                      placeholder="Enter preferred contact"
+                      className="rounded border-[1.5px] border-stroke bg-transparent px-3 py-2 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                    />
+                  </p>
+                </div>
               </div>
 
-              {/* Contact Email */}
-              <div className="flex items-center min-h-[50px]">
-                <p className="text-black dark:text-white">
-                  <strong>Contact Email address:</strong>{' '}
-                  {merchantContactInfo?.contactEmail || 'N/A'}
+              {/* Right Column - Billing Address */}
+              <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
+                <h3 className="mb-2 text-lg font-semibold text-black dark:text-white">
+                  Billing Address
+                </h3>
+                <p className="mb-1 text-black dark:text-white">
+                  <strong>Name:</strong> {data?.owners?.[0]?.name || ''}
+                </p>
+                <p className="mb-1 text-black dark:text-white">
+                  <strong>Addr:</strong>{' '}
+                  {data?.businessInfo?.legalAddress || ''}
+                </p>
+                <p className="mb-1 text-black dark:text-white">
+                  <strong>City:</strong> {data?.businessInfo?.legalCity || ''}
+                </p>
+                <p className="mb-1 text-black dark:text-white">
+                  <strong>ST:</strong> {data?.businessInfo?.legalState || ''}{' '}
+                  <strong>Zip:</strong> {data?.businessInfo?.legalZip || ''}
                 </p>
               </div>
+            </div>
 
-              {/* Contact Phone Number */}
-              <div className="flex items-center min-h-[50px]">
-                <p className="text-black dark:text-white">
-                  <strong>Contact phone number:</strong>{' '}
-                  {merchantContactInfo?.contactPhoneNumber || 'N/A'}
-                </p>
-              </div>
-
-              {/* Preferred Contact with Input */}
-              <div className="flex items-center min-h-[50px]">
-                <p className="text-black dark:text-white flex items-center">
-                  <strong>Preferred Contact:</strong>
-                  <input
-                    type="text"
-                    value={merchantUpdateRequest?.preferredContact || ''}
-                    onChange={(e) =>
-                      setMerchantUpdateRequest((prev) => ({
-                        ...prev,
-                        preferredContact: e.target.value,
-                      }))
-                    }
-                    placeholder="Alter preferred contact information"
-                    className="w-80 rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 ml-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                  />
-                </p>
+            {/* Owner Info Section */}
+            <div className="mt-6 rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
+              <h3 className="mb-2 text-lg font-semibold text-black dark:text-white">
+                Owner Info
+              </h3>
+              <div className="max-w-full overflow-x-auto">
+                <table className="w-full table-auto">
+                  <thead>
+                    <tr className="bg-blue-600 text-center text-white">
+                      <th className="p-2 font-medium">Name</th>
+                      <th className="p-2 font-medium">SSN Last 4</th>
+                      <th className="p-2 font-medium">DOB</th>
+                      <th className="p-2 font-medium">DL #</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data?.owners?.map((owner) => (
+                      <tr key={owner.ownerCode} className="text-center">
+                        <td className="border-b border-[#eee] p-2 dark:border-strokedark">
+                          {owner.name}
+                        </td>
+                        <td className="border-b border-[#eee] p-2 dark:border-strokedark">
+                          {owner.ssn4}
+                        </td>
+                        <td className="border-b border-[#eee] p-2 dark:border-strokedark">
+                          {owner.dob}
+                        </td>
+                        <td className="border-b border-[#eee] p-2 dark:border-strokedark">
+                          {/* No driver's license data available */}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           </>
@@ -969,7 +1057,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <div className="max-w-full overflow-x-auto">
                 <table className="w-full table-auto">
                   <thead>
-                    <tr className="bg-gray-2 text-left dark:bg-meta-4 text-center">
+                    <tr className="bg-gray-2 dark:bg-meta-4 text-center">
                       <th className="p-4 font-medium text-black dark:text-white">
                         Trans Date
                       </th>
@@ -1087,7 +1175,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <div className="max-w-full overflow-x-auto">
                 <table className="w-full table-auto">
                   <thead>
-                    <tr className="bg-gray-2 text-left dark:bg-meta-4 text-center">
+                    <tr className="bg-gray-2 dark:bg-meta-4 text-center">
                       <th className="p-4 font-medium text-black dark:text-white">
                         Note
                       </th>
@@ -1185,7 +1273,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <div className="max-w-full overflow-x-auto">
                 <table className="w-full table-auto">
                   <thead>
-                    <tr className="bg-gray-2 text-left dark:bg-meta-4 text-center">
+                    <tr className="bg-gray-2 dark:bg-meta-4 text-center">
                       <th className="p-4 font-medium text-black dark:text-white">
                         Case #
                       </th>
@@ -1276,7 +1364,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <div className="max-w-full overflow-x-auto">
                 <table className="w-full table-auto">
                   <thead>
-                    <tr className="bg-gray-2 text-center dark:bg-meta-4 text-center">
+                    <tr className="bg-gray-2 dark:bg-meta-4 text-center">
                       <th className="p-4 font-medium text-black dark:text-white">
                         Trans Category
                       </th>
@@ -1435,6 +1523,57 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             </div>
           </>
         )}
+        {activeTab === 'sameTaxId' && (
+          <>
+            <h2 className="mb-2 text-xl font-semibold text-black dark:text-white">
+              Merchants with Same Tax ID
+            </h2>
+            <div className="grid grid-cols-1 gap-4">
+              {sameTaxIdLoading ? (
+                <p>Loading merchants with the same tax ID...</p>
+              ) : merchantsWithSameTaxIdData?.merchantIds?.length ? (
+                <div className="max-w-full overflow-x-auto">
+                  <div className="mb-3 text-sm">
+                    The following merchants share the same Tax ID as the current
+                    merchant ({merchantId}). This information can be useful for
+                    identifying related businesses or potential fraud.
+                  </div>
+                  <table className="w-full table-auto">
+                    <thead>
+                      <tr className="bg-gray-2 dark:bg-meta-4 text-center">
+                        <th className="p-4 font-medium text-black dark:text-white">
+                          Merchant ID
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paginatedSameTaxIdMerchants?.map((merchantId) => (
+                        <tr key={merchantId} className="text-center">
+                          <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                            {merchantId}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {totalSameTaxIdPages > 1 && (
+                    <Pagination
+                      currentPage={sameTaxIdPage}
+                      totalPages={totalSameTaxIdPages}
+                      onPageChange={setSameTaxIdPage}
+                    />
+                  )}
+                </div>
+              ) : (
+                <div className="p-4 border border-gray-200 rounded-md">
+                  <p className="text-gray-600">
+                    No other merchants found with the same Tax ID.
+                  </p>
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </section>
 
       {/* Volume Table */}
@@ -1446,7 +1585,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           <div className="max-w-full overflow-x-auto">
             <table className="w-full table-auto">
               <thead>
-                <tr className="bg-gray-2 text-left dark:bg-meta-4 text-center">
+                <tr className="bg-gray-2 dark:bg-meta-4 text-center">
                   <th className="p-4 font-medium text-black dark:text-white">
                     Month/Year
                   </th>
@@ -1537,7 +1676,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <div className="max-w-full overflow-x-auto">
                 <table className="w-full table-auto">
                   <thead>
-                    <tr className="bg-gray-2 text-left dark:bg-meta-4 text-center">
+                    <tr className="bg-gray-2 dark:bg-meta-4 text-center">
                       <th className="p-4 font-medium text-black dark:text-white">
                         ID
                       </th>

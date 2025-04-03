@@ -16,7 +16,7 @@ type Props = {
 };
 
 export const StatusAndOtherCard: FC<Props> = ({ statuses, users }) => {
-  const { register, watch } = useFormContext<RiskRadarFilterState>();
+  const { control, register, watch } = useFormContext<RiskRadarFilterState>();
 
   const status = watch('status');
 
@@ -24,7 +24,7 @@ export const StatusAndOtherCard: FC<Props> = ({ statuses, users }) => {
     <RiskRadarCard title="Exception Status, MID and DBA/SIC">
       <div className="flex flex-col">
         <div className="space-y-3">
-          <StatusSelect {...register('status')} options={statuses} />
+          <StatusSelect control={control} options={statuses} />
           {/* TODO: Use a status enum */}
           {String(status) === '4' && <UserSelect options={users} />}
         </div>

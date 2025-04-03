@@ -30,6 +30,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: 'yarn'
 
       - name: Load repository name
         run: echo "REPO_NAME=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
@@ -42,13 +43,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-
 
-      - name: Cache dependencies
+      - name: Restore cached dependencies
         uses: actions/cache@v4
         with:
-          path: apps/docs/node_modules
-          key: ${{ runner.os }}-modules-${{ hashFiles('apps/docs/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-modules-
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
         run: |

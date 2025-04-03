@@ -1,41 +1,33 @@
 import type { FC } from 'react';
 
-import type { RiskRadarFilterState } from '@/shared/response/risk-radar';
-
 type TablePaginationProps = {
   page: number;
   pageSize: number;
   totalRecords: number;
-  filters: RiskRadarFilterState;
-  fetchData: (filters: RiskRadarFilterState) => void;
+  onPageChange: (page: number) => void;
 };
 
 export const TablePagination: FC<TablePaginationProps> = ({
   page,
   pageSize,
   totalRecords,
-  filters,
-  fetchData,
+  onPageChange,
 }) => {
   const fromRecord = (page - 1) * pageSize + 1;
   const toRecord = Math.min(fromRecord + pageSize - 1, totalRecords);
   const totalPages = Math.ceil(totalRecords / pageSize);
-
-  const onPageChange = (newPage: number): void => {
-    fetchData({ ...filters, page: newPage });
-  };
 
   const canGoToPreviousPage = page > 1;
   const canGoToNextPage = page < totalPages;
 
   const handlePreviousPage = (): void => {
     if (!canGoToPreviousPage) return;
-    fetchData({ ...filters, page: page - 1 });
+    onPageChange(page - 1);
   };
 
   const handleNextPage = (): void => {
     if (!canGoToNextPage) return;
-    fetchData({ ...filters, page: page + 1 });
+    onPageChange(page + 1);
   };
 
   // Generate visible page numbers with ellipses for gaps
