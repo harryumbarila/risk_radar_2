@@ -919,8 +919,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   Contact Info
                 </h3>
                 <p className="mb-2 text-black dark:text-white">
-                  <strong>Contact Name:</strong>{' '}
-                  {data?.owners?.[0]?.name || ''}
+                  <strong>Contact Name:</strong> {data?.owners?.[0]?.name || ''}
                 </p>
                 <p className="mb-2 text-black dark:text-white">
                   <strong>Phone #:</strong>{' '}
@@ -935,7 +934,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                 <p className="mb-2 text-black dark:text-white">
                   <strong>Email:</strong>{' '}
                   {merchantContactInfo?.contactEmail || ''}
-
                 </p>
                 <p className="mb-2 text-black dark:text-white">
                   <strong>Web Site:</strong>{' '}
@@ -975,8 +973,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   {data?.businessInfo?.legalAddress || ''}
                 </p>
                 <p className="mb-1 text-black dark:text-white">
-                  <strong>City:</strong>{' '}
-                  {data?.businessInfo?.legalCity || ''}
+                  <strong>City:</strong> {data?.businessInfo?.legalCity || ''}
                 </p>
                 <p className="mb-1 text-black dark:text-white">
                   <strong>ST:</strong> {data?.businessInfo?.legalState || ''}{' '}
