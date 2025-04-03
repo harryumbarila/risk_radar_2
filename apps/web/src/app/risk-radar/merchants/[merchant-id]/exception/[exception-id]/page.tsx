@@ -57,6 +57,7 @@ type MerchantContactResponse = {
     selfGenerated: string;
     businessType: string;
     activatedDate: string | null;
+    averageTicketSizeAmount: number;
     monthlyVolume: number;
     averageTicket: number;
     swipedPercentage: number;
@@ -433,23 +434,21 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     sDBAZip: data?.businessInfo?.dbaZip || '',
     sActivationDate: data?.businessInfo?.activatedDate || '',
     sOwnershipType: data?.businessInfo?.ownershipType || '',
-    sSIC: data?.businessInfo?.mccCode?.split(' ')[0] || '',
-    sSICDesc:
-      data?.businessInfo?.mccCode?.split(' ')[1]?.replace(/[()]/g, '') || '',
+    sSIC: data?.businessInfo?.mccCode || '',
     sReseller: data?.businessInfo?.reseller || '',
     sMerchantType: data?.businessInfo?.businessType || '',
     bIsTalusPayMerchant: data?.businessInfo?.talusPayAccountIndicator === 'Yes',
     sChannel: data?.businessInfo?.channel || '',
     sReferralPartner: data?.businessInfo?.referralPartner || '',
-    sSolutionConsultant: data?.businessInfo?.isv || '',
+    sSolutionConsultant: data?.businessInfo?.isa || '',
     iMV$: data?.businessInfo?.monthlyVolume || 0,
     iAT$: data?.businessInfo?.averageTicket || 0,
     iHT$: data?.businessInfo?.highestTicket || 0,
     iSwipeVolPerc: data?.businessInfo?.swipedPercentage || 0,
-    iUWApprMV: 0,
-    iUWApprAT: 0,
-    iUWApprHT: 0,
-    iUWApprSwipeVolPerc: 0,
+    iUWApprMV: data?.businessInfo?.averageMonthlySalesVolume || 0,
+    iUWApprAT: data?.businessInfo?.averageTicketSizeAmount || 0,
+    iUWApprHT: data?.businessInfo?.highestTicket || 0,
+    iUWApprSwipeVolPerc: data?.businessInfo?.storeFrontSwiped || 0,
     iSwipedPercBasedOnTransCntCurrMonth:
       data?.businessInfo?.swipedPercentageTransCount || 0,
     sPreferredContact: data?.businessInfo?.preferredContact || '',
@@ -733,8 +732,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             <strong>Ownership:</strong> {merchantProfile?.sOwnershipType}
           </p>
           <p className="text-black dark:text-white">
-            <strong>SIC:</strong> {merchantProfile?.sSIC} -{' '}
-            {merchantProfile?.sSICDesc}
+            <strong>SIC:</strong> {merchantProfile?.sSIC}
           </p>
         </div>
 
@@ -914,47 +912,110 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             <h2 className="mb-2 text-xl font-semibold text-black dark:text-white">
               Contact
             </h2>
-            <div className="grid grid-cols-2 gap-4 text-center">
-              {/* Contact Name */}
-              <div className="flex items-center min-h-[50px]">
-                <p className="text-black dark:text-white">
+            <div className="grid grid-cols-2 gap-4">
+              {/* Left Column - Contact Info */}
+              <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
+                <h3 className="mb-2 text-lg font-semibold text-black dark:text-white">
+                  Contact Info
+                </h3>
+                <p className="mb-2 text-black dark:text-white">
                   <strong>Contact Name:</strong> {data?.owners?.[0]?.name || ''}
                 </p>
-              </div>
-
-              {/* Contact Email */}
-              <div className="flex items-center min-h-[50px]">
-                <p className="text-black dark:text-white">
-                  <strong>Contact Email address:</strong>{' '}
-                  {merchantContactInfo?.contactEmail || ''}
-                </p>
-              </div>
-
-              {/* Contact Phone Number */}
-              <div className="flex items-center min-h-[50px]">
-                <p className="text-black dark:text-white">
-                  <strong>Contact phone number:</strong>{' '}
+                <p className="mb-2 text-black dark:text-white">
+                  <strong>Phone #:</strong>{' '}
                   {merchantContactInfo?.contactPhoneNumber || ''}
                 </p>
+                <p className="mb-2 text-black dark:text-white">
+                  <strong>Fax #:</strong> {merchantContactInfo?.dbaFax || ''}
+                </p>
+                <p className="mb-2 text-black dark:text-white">
+                  <strong>Mobile #:</strong>
+                </p>
+                <p className="mb-2 text-black dark:text-white">
+                  <strong>Email:</strong>{' '}
+                  {merchantContactInfo?.contactEmail || ''}
+                </p>
+                <p className="mb-2 text-black dark:text-white">
+                  <strong>Web Site:</strong>{' '}
+                  {merchantContactInfo?.website || ''}
+                </p>
+                <div className="mb-2">
+                  <p className="text-black dark:text-white flex items-start">
+                    <strong className="inline-block mr-2">
+                      Preferred Contact:
+                    </strong>
+                    <input
+                      type="text"
+                      value={merchantUpdateRequest?.preferredContact || ''}
+                      onChange={(e) =>
+                        setMerchantUpdateRequest((prev) => ({
+                          ...prev,
+                          preferredContact: e.target.value,
+                        }))
+                      }
+                      placeholder="Enter preferred contact"
+                      className="rounded border-[1.5px] border-stroke bg-transparent px-3 py-2 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                    />
+                  </p>
+                </div>
               </div>
 
-              {/* Preferred Contact with Input */}
-              <div className="flex items-center min-h-[50px]">
-                <p className="text-black dark:text-white flex items-center">
-                  <strong>Preferred Contact:</strong>
-                  <input
-                    type="text"
-                    value={merchantUpdateRequest?.preferredContact || ''}
-                    onChange={(e) =>
-                      setMerchantUpdateRequest((prev) => ({
-                        ...prev,
-                        preferredContact: e.target.value,
-                      }))
-                    }
-                    placeholder="Alter preferred contact information"
-                    className="w-80 rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 ml-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                  />
+              {/* Right Column - Billing Address */}
+              <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
+                <h3 className="mb-2 text-lg font-semibold text-black dark:text-white">
+                  Billing Address
+                </h3>
+                <p className="mb-1 text-black dark:text-white">
+                  <strong>Name:</strong> {data?.owners?.[0]?.name || ''}
                 </p>
+                <p className="mb-1 text-black dark:text-white">
+                  <strong>Addr:</strong>{' '}
+                  {data?.businessInfo?.legalAddress || ''}
+                </p>
+                <p className="mb-1 text-black dark:text-white">
+                  <strong>City:</strong> {data?.businessInfo?.legalCity || ''}
+                </p>
+                <p className="mb-1 text-black dark:text-white">
+                  <strong>ST:</strong> {data?.businessInfo?.legalState || ''}{' '}
+                  <strong>Zip:</strong> {data?.businessInfo?.legalZip || ''}
+                </p>
+              </div>
+            </div>
+
+            {/* Owner Info Section */}
+            <div className="mt-6 rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
+              <h3 className="mb-2 text-lg font-semibold text-black dark:text-white">
+                Owner Info
+              </h3>
+              <div className="max-w-full overflow-x-auto">
+                <table className="w-full table-auto">
+                  <thead>
+                    <tr className="bg-blue-600 text-center text-white">
+                      <th className="p-2 font-medium">Name</th>
+                      <th className="p-2 font-medium">SSN Last 4</th>
+                      <th className="p-2 font-medium">DOB</th>
+                      <th className="p-2 font-medium">DL #</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data?.owners?.map((owner) => (
+                      <tr key={owner.ownerCode} className="text-center">
+                        <td className="border-b border-[#eee] p-2 dark:border-strokedark">
+                          {owner.name}
+                        </td>
+                        <td className="border-b border-[#eee] p-2 dark:border-strokedark">
+                          {owner.ssn4}
+                        </td>
+                        <td className="border-b border-[#eee] p-2 dark:border-strokedark">
+                          {owner.dob}
+                        </td>
+                        <td className="border-b border-[#eee] p-2 dark:border-strokedark">
+                          {/* No driver's license data available */}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           </>
