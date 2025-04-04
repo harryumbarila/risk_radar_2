@@ -901,10 +901,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         {/* Column 3 */}
         <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
           <p className="text-black dark:text-white">
-            <strong>Reseller:</strong> {merchantProfile?.sReseller}
-          </p>
-
-          <p className="text-black dark:text-white">
             <strong>Merchant Type:</strong> {merchantProfile?.sMerchantType}
           </p>
           <p className="text-black dark:text-white">
