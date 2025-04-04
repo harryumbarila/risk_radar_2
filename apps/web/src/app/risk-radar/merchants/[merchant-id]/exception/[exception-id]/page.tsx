@@ -27,6 +27,7 @@ import { useMerchantChargebacks } from '@/web/src/hooks/risk-radar/use-merchant-
 import { useMerchantNotes } from '@/web/src/hooks/risk-radar/use-merchant-notes';
 import { useMerchantsWithSameTaxId } from '@/web/src/hooks/risk-radar/use-merchants-with-same-tax-id';
 import { usePushNoteToIris } from '@/web/src/hooks/risk-radar/use-push-note-to-iris';
+import type { SaveMerchantDataParams } from '@/web/src/hooks/risk-radar/use-save-merchant-data';
 import { useSaveMerchantData } from '@/web/src/hooks/risk-radar/use-save-merchant-data';
 import { useTransactionExceptions } from '@/web/src/hooks/risk-radar/use-transaction-exceptions';
 
@@ -133,6 +134,17 @@ type MerchantStateData = {
   isAutoHoldEnabled: boolean;
 };
 
+// Add this after the MerchantStateData type
+type ChangedFields = {
+  isDiverted?: boolean;
+  preferredContact?: boolean;
+  notes?: boolean;
+  isPinnedNote?: boolean;
+  clickedStatus?: boolean;
+  isRiskWatch?: boolean;
+  isAutoHoldEnabled?: boolean;
+};
+
 const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const { 'merchant-id': merchantId, 'exception-id': exceptionId } = params;
   const { user } = useAuth();
@@ -159,6 +171,17 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       isAutoHoldEnabled: false,
     }
   );
+
+  // Original data from API
+  const [originalData, setOriginalData] = useState<{
+    isDiverted?: boolean;
+    preferredContact?: string;
+    isRiskWatch?: boolean;
+    isAutoHoldEnabled?: boolean;
+  }>({});
+
+  // Track which fields have changed
+  const [changedFields, setChangedFields] = useState<ChangedFields>({});
 
   const { data, error, isLoading, refetch } = useMerchant(
     merchantId,
@@ -212,6 +235,14 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   // Update merchantStateData when data changes
   useEffect(() => {
     if (data) {
+      // Store original values for comparison
+      setOriginalData({
+        isDiverted: data?.businessInfo?.isDivert || false,
+        preferredContact: data?.businessInfo?.preferredContact || '',
+        isRiskWatch: data?.businessInfo?.isRiskWatch || false,
+        isAutoHoldEnabled: data?.businessInfo?.isAutoHoldWhiteLabel || false,
+      });
+
       // Update merchantStateData
       setMerchantStateData({
         isDiverted: data?.businessInfo?.isDivert || false,
@@ -221,6 +252,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         isRiskWatch: data?.businessInfo?.isRiskWatch || false,
         isAutoHoldEnabled: data?.businessInfo?.isAutoHoldWhiteLabel || false,
       });
+
+      // Reset changed fields when new data loads
+      setChangedFields({});
 
       // Keep existing behavior for backward compatibility
       setMerchantUpdateRequest((prev) => ({
@@ -238,6 +272,13 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         notes: noteRequest.sNotes || '',
         isPinnedNote: noteRequest.isPinned,
       }));
+
+      // Track that notes have changed
+      setChangedFields((prev) => ({
+        ...prev,
+        notes: true,
+        isPinnedNote: true,
+      }));
     }
   }, [noteRequest]);
 
@@ -248,6 +289,19 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       preferredContact: merchantUpdateRequest.preferredContact,
     }));
   }, [merchantUpdateRequest]);
+
+  // Update changedFields when preferredContact changes
+  useEffect(() => {
+    if (
+      originalData.preferredContact !== undefined &&
+      merchantStateData.preferredContact !== originalData.preferredContact
+    ) {
+      setChangedFields((prev) => ({
+        ...prev,
+        preferredContact: true,
+      }));
+    }
+  }, [merchantStateData.preferredContact, originalData.preferredContact]);
 
   // Calculate paginated data
   const paginatedExceptions = transactionExceptionsData?.slice(
@@ -306,31 +360,142 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     notesRefetch();
   };
 
-  const handleDivertTrigger = (): void => {
+  // Helper function to save only changed fields
+  const saveChangedFields = async (
+    singleFieldUpdate?: Record<string, unknown>
+  ): Promise<void> => {
+    try {
+      if (!user?.name) {
+        return;
+      }
+
+      setIsSaving(true);
+
+      // If we're saving a single field immediately, just use that
+      if (singleFieldUpdate) {
+        await saveMerchantdata({
+          merchantId,
+          exceptionId: parseInt(exceptionId, 10),
+          createdBy: user.name,
+          ...singleFieldUpdate,
+        });
+      } else {
+        // Construct payload with only changed fields
+        const payload: SaveMerchantDataParams = {
+          merchantId,
+          exceptionId: parseInt(exceptionId, 10),
+          createdBy: user.name,
+        };
+
+        if (changedFields.isDiverted) {
+          payload.isDiverted = merchantStateData.isDiverted;
+        }
+
+        if (changedFields.preferredContact) {
+          payload.preferredContact = merchantStateData.preferredContact;
+        }
+
+        if (changedFields.notes) {
+          payload.notes = merchantStateData.notes;
+        }
+
+        if (changedFields.isPinnedNote) {
+          payload.isPinnedNote = merchantStateData.isPinnedNote;
+        }
+
+        if (changedFields.clickedStatus) {
+          payload.clickedStatus = merchantStateData.clickedStatus;
+        }
+
+        if (changedFields.isRiskWatch) {
+          payload.isRiskWatch = merchantStateData.isRiskWatch;
+        }
+
+        if (changedFields.isAutoHoldEnabled) {
+          payload.isAutoHoldEnabled = merchantStateData.isAutoHoldEnabled;
+        }
+
+        await saveMerchantdata(payload);
+      }
+
+      // Reset changed fields after successful save
+      setChangedFields({});
+
+      refetch();
+      notesRefetch();
+    } catch (err) {
+      // console.error(err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Modified handler to save immediately if saveImmediately is true
+  const handleDivertTrigger = async (
+    saveImmediately = false
+  ): Promise<void> => {
     setMerchantStateData((prev) => ({
       ...prev,
       isDiverted: true,
     }));
+
+    setChangedFields((prev) => ({
+      ...prev,
+      isDiverted: true,
+    }));
+
+    if (saveImmediately && user?.name) {
+      await saveChangedFields({ isDiverted: true });
+    }
   };
 
-  const handleRiskWatchTrigger = (value: boolean): void => {
+  const handleRiskWatchTrigger = async (
+    value: boolean,
+    saveImmediately = false
+  ): Promise<void> => {
     setMerchantStateData((prev) => ({
       ...prev,
       isRiskWatch: value,
     }));
+
+    setChangedFields((prev) => ({
+      ...prev,
+      isRiskWatch: true,
+    }));
+
+    if (saveImmediately && user?.name) {
+      await saveChangedFields({ isRiskWatch: value });
+    }
   };
 
-  const handleAutoHoldTrigger = (value: boolean): void => {
+  const handleAutoHoldTrigger = async (
+    value: boolean,
+    saveImmediately = false
+  ): Promise<void> => {
     setMerchantStateData((prev) => ({
       ...prev,
       isAutoHoldEnabled: value,
     }));
+
+    setChangedFields((prev) => ({
+      ...prev,
+      isAutoHoldEnabled: true,
+    }));
+
+    if (saveImmediately && user?.name) {
+      await saveChangedFields({ isAutoHoldEnabled: value });
+    }
   };
 
   const handleManagersQueueTrigger = (): void => {
     setMerchantStateData((prev) => ({
       ...prev,
       clickedStatus: prev.clickedStatus === 'mgrq' ? '' : 'mgrq',
+    }));
+
+    setChangedFields((prev) => ({
+      ...prev,
+      clickedStatus: true,
     }));
   };
 
@@ -340,35 +505,17 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         ...prev,
         clickedStatus: prev.clickedStatus === 'rev' ? '' : 'rev',
       }));
+
+      setChangedFields((prev) => ({
+        ...prev,
+        clickedStatus: true,
+      }));
     }
   };
 
+  // Updated save handler that uses our helper function
   const handleSaveMerchantData = async (): Promise<void> => {
-    try {
-      if (!user?.name) {
-        return;
-      }
-
-      setIsSaving(true);
-      await saveMerchantdata({
-        merchantId,
-        exceptionId: parseInt(exceptionId, 10),
-        isDiverted: merchantStateData.isDiverted,
-        preferredContact: merchantStateData.preferredContact,
-        notes: merchantStateData.notes,
-        isPinnedNote: merchantStateData.isPinnedNote,
-        clickedStatus: merchantStateData.clickedStatus,
-        isRiskWatch: merchantStateData.isRiskWatch,
-        isAutoHoldEnabled: merchantStateData.isAutoHoldEnabled,
-        createdBy: user.name,
-      });
-      refetch();
-      notesRefetch();
-    } catch (err) {
-      // console.error(err);
-    } finally {
-      setIsSaving(false);
-    }
+    await saveChangedFields();
   };
 
   const replaceEmailTemplateParameters = (templateText: string): void => {
@@ -712,7 +859,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
               disabled={merchantStateData.isDiverted}
               checked={merchantStateData.isDiverted}
-              onChange={() => handleDivertTrigger()}
+              onChange={() => handleDivertTrigger(true)}
             />
           </p>
           <p className="text-black dark:text-white">
@@ -775,7 +922,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
               checked={merchantStateData.isRiskWatch}
               onChange={() =>
-                handleRiskWatchTrigger(!merchantStateData.isRiskWatch)
+                handleRiskWatchTrigger(!merchantStateData.isRiskWatch, true)
               }
             />
           </p>
@@ -786,7 +933,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
               checked={merchantStateData.isAutoHoldEnabled}
               onChange={() =>
-                handleAutoHoldTrigger(!merchantStateData.isAutoHoldEnabled)
+                handleAutoHoldTrigger(
+                  !merchantStateData.isAutoHoldEnabled,
+                  true
+                )
               }
             />
           </p>
@@ -975,12 +1125,18 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     <input
                       type="text"
                       value={merchantUpdateRequest?.preferredContact || ''}
-                      onChange={(e) =>
+                      onChange={(e) => {
                         setMerchantUpdateRequest((prev) => ({
                           ...prev,
                           preferredContact: e.target.value,
-                        }))
-                      }
+                        }));
+
+                        // Track that preferredContact has changed
+                        setChangedFields((prev) => ({
+                          ...prev,
+                          preferredContact: true,
+                        }));
+                      }}
                       placeholder="Enter preferred contact"
                       className="rounded border-[1.5px] border-stroke bg-transparent px-3 py-2 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                     />
@@ -1237,12 +1393,18 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                 <input
                   type="text"
                   value={noteRequest.sNotes ?? ''}
-                  onChange={(e) =>
+                  onChange={(e) => {
                     setNoteRequest((prev) => ({
                       ...prev,
                       sNotes: e.target.value,
-                    }))
-                  }
+                    }));
+
+                    // Track that notes have changed
+                    setChangedFields((prev) => ({
+                      ...prev,
+                      notes: true,
+                    }));
+                  }}
                   placeholder="New Note"
                   className="w-80 rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 my-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                 />
@@ -1253,12 +1415,18 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
                   disabled={false}
                   checked={noteRequest.isPinned}
-                  onChange={(e) =>
+                  onChange={(e) => {
                     setNoteRequest((prev) => ({
                       ...prev,
                       isPinned: e.target.checked,
-                    }))
-                  }
+                    }));
+
+                    // Track that isPinnedNote has changed
+                    setChangedFields((prev) => ({
+                      ...prev,
+                      isPinnedNote: true,
+                    }));
+                  }}
                 />
               </div>
             </div>
