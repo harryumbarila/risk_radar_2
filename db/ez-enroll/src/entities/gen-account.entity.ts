@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity({ name: 'GEN_Account', schema: 'EZEnroll' })
+@Entity({ name: 'GEN_Account', schema: 'EZEnroll.dbo' })
 export class EZEnrollGenAccount {
   @PrimaryColumn('nvarchar', { length: 15, name: 'AccountCode' })
   public accountCode!: string;
