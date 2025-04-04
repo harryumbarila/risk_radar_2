@@ -206,6 +206,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   // Add new state for Same Tax ID pagination
   const [sameTaxIdPage, setSameTaxIdPage] = useState(1);
 
+  // Add isSaving state
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+
   // Update merchantStateData when data changes
   useEffect(() => {
     if (data) {
@@ -346,6 +349,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         return;
       }
 
+      setIsSaving(true);
       await saveMerchantdata({
         merchantId,
         exceptionId: parseInt(exceptionId, 10),
@@ -358,11 +362,13 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         isAutoHoldEnabled: merchantStateData.isAutoHoldEnabled,
         createdBy: user.name,
       });
+      refetch();
+      notesRefetch();
     } catch (err) {
       // console.error(err);
+    } finally {
+      setIsSaving(false);
     }
-    refetch();
-    notesRefetch();
   };
 
   const replaceEmailTemplateParameters = (templateText: string): void => {
@@ -665,13 +671,14 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         </h1>
         <div className="inline-flex items-center justify-end">
           <button
-            className="inline-flex w-[100px] items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90"
+            className="inline-flex w-[100px] items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90 disabled:opacity-70 disabled:cursor-not-allowed"
             type="button"
+            disabled={isSaving}
             onClick={() => {
               handleSaveMerchantData().catch(() => {});
             }}
           >
-            Save
+            {isSaving ? 'Saving...' : 'Save'}
           </button>
         </div>
       </section>
