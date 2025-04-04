@@ -1,9 +1,17 @@
 import { useState } from 'react';
 
-import useBaseApi from '@/web/src/hooks/use-base-api';
+import useBaseApi from '@/hooks/use-base-api';
+
+type AssignExceptionsResponse = {
+  success: boolean;
+};
 
 type UseAssignExceptionToUserReturnType = {
-  assignException: (ids: number[], user: string) => Promise<unknown>;
+  assignException: (
+    exceptionIds: number[],
+    assignToUserId: number,
+    username: string
+  ) => Promise<boolean>;
   isLoading: boolean;
 };
 
@@ -11,36 +19,42 @@ export const useAssignExceptionToUser =
   (): UseAssignExceptionToUserReturnType => {
     const { makeRequest } = useBaseApi();
     const [isLoading, setIsLoading] = useState(false);
+
     const assignException = async (
-      ids: number[],
-      user: string
-    ): Promise<unknown> => {
+      exceptionIds: number[],
+      assignToUserId: number,
+      createdBy: string
+    ): Promise<boolean> => {
       setIsLoading(true);
 
       try {
-        const response = await makeRequest(
-          `/v1/risk-radar/assign-exception-review`,
+        // Call our new API endpoint to assign exceptions
+        const response = await makeRequest<AssignExceptionsResponse>(
+          `/v1/risk-radar/assign-exceptions`,
           {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              reviewList: ids.join(','),
-              user,
+              exceptionIds: exceptionIds.join(','),
+              assignToUserId,
+              createdBy,
             }),
           }
         );
 
         setIsLoading(false);
-
-        return response;
+        return response?.success || false;
       } catch (error) {
+        console.error('Error assigning exceptions:', error);
         setIsLoading(false);
+        return false;
       }
-
-      return null;
     };
 
-    return { assignException, isLoading };
+    return {
+      assignException,
+      isLoading,
+    };
   };

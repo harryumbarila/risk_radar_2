@@ -15,7 +15,11 @@ type UseRiskRadarTableColumnsProps = {
   filters: RiskRadarFilterState;
   data: RiskRadarExceptionsListRow[];
   riskRadarUsers: RiskUser[];
-  onSubmit: (ids: number[], assignedUser: string) => void;
+  onSubmit: (
+    ids: number[],
+    assignedUser: string,
+    exceptionStatusId?: number
+  ) => void;
   isLoading: boolean;
 };
 
@@ -56,8 +60,8 @@ export const useRiskRadarTableColumns = ({
   );
 
   const handleAssignSubmit = useCallback(
-    (assignTo: string): void => {
-      onSubmit(selectedIds, assignTo);
+    (assignTo: string, riskRadarUser: RiskUser): void => {
+      onSubmit(selectedIds, assignTo, riskRadarUser.pkRiskRadarUser);
     },
     [onSubmit, selectedIds]
   );

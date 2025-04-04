@@ -40,6 +40,7 @@ import {
   RiskRadarTransactionRepository,
   RiskRadarUserRepository,
   TSYSDivertFlagUpdateRepository,
+  RiskRadarAssignExceptionsRepository,
 } from '@/finance-db/repositories';
 import {
   LeadEntity,
@@ -67,13 +68,14 @@ import { SnapPccSalesConfirmationRepository } from '@/snap-pcc-db/repositories';
 
 import { RiskRadarController } from './risk-radar.controller';
 import { RiskRadarService } from './risk-radar.service';
-import { AssignExceptionReviewService } from './services/assign-exception-review/assign-exception-review.service';
+import { AssignExceptionsService } from './services/assign-exceptions/assign-exceptions.service';
 import { ExceptionsListService } from './services/exceptions-list/exceptions-list.service';
 import { GetSubscriptionsQueueService } from './services/get-subscriptions-queue.service';
 import { MerchantCardNumHistoryService } from './services/merchant-card-num-history/merchant-card-num-history.service';
 import { MerchantExceptionDetailService } from './services/merchant-exception-detail.service';
 import { MerchantExceptionTransactionsService } from './services/merchant-exception-transactions/merchant-exception-transactions.service';
 import { MerchantWithSameTaxIdService } from './services/merchant-with-same-tax-id/merchant-with-same-tax-id.service';
+import { ReviewExceptionService } from './services/review-exception/review-exception.service';
 import { RiskRadarEmailTemplateService } from './services/risk-radar-email-template/risk-radar-email-template.service';
 import { RiskRadarExceptionsService } from './services/risk-radar-exceptions.service';
 import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save.service';
@@ -131,6 +133,7 @@ import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save
     RiskRadarBatchRepository,
     RiskRadarNotesRepository,
     RiskRadarExceptionStatusRepository,
+    RiskRadarAssignExceptionsRepository,
 
     RiskRadarService,
     GetSubscriptionsQueueService,
@@ -164,13 +167,14 @@ import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save
     // Services
     RiskRadarService,
     MerchantCardNumHistoryService,
-    AssignExceptionReviewService,
+    AssignExceptionsService,
     RiskRadarExceptionsService,
     RiskRadarSaveService,
     MerchantExceptionTransactionsService,
     ExceptionsListService,
     RiskRadarEmailTemplateService,
     MerchantWithSameTaxIdService,
+    ReviewExceptionService,
   ],
 })
 export class RiskRadarModule {}

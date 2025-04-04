@@ -23,19 +23,16 @@ export const useReviewExceptionByUsername =
       setIsLoading(true);
 
       try {
-        const response = await makeRequest(
-          `/v1/legacy_dashboard_proxy/review_exception`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              exceptionsId: exceptionIds,
-              reviewerUsername: userName,
-            }),
-          }
-        );
+        const response = await makeRequest(`/v1/risk-radar/review-exceptions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            reviewList: exceptionIds.join(','),
+            user: userName,
+          }),
+        });
 
         setIsLoading(false);
 

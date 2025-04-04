@@ -1,4 +1,6 @@
+import { useAuth } from '@frontegg/nextjs';
 import React from 'react';
+import { toast } from 'react-toastify';
 
 import { useExceptionData } from '@/hooks/risk-radar/use-exception-data';
 import type { CommonStatus, PaginatedAPIResponse } from '@/shared/common';
@@ -29,6 +31,7 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
   dataStatus,
 }): JSX.Element => {
   const { data: exceptionData } = useExceptionData();
+  const { user } = useAuth();
 
   const { reviewException, isLoading: isReviewLoading } =
     useReviewExceptionByUsername();
@@ -37,7 +40,8 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
 
   const handleSubmit = async (
     ids: number[],
-    assignedUser: string
+    assignedUser: string,
+    assignToUserId?: number
   ): Promise<void> => {
     switch (String(filters.status)) {
       case '1': // Not Reviewed
@@ -45,7 +49,17 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
         fetchData({ ...filters, page: 1 });
         break;
       case '3': // Manager Queued
-        await assignException(ids, assignedUser);
+        if (!assignToUserId) {
+          toast.error('Assign to user is required');
+          return;
+        }
+
+        if (!user?.name) {
+          toast.error('User is required');
+          return;
+        }
+
+        await assignException(ids, assignToUserId, user.name);
         fetchData({ ...filters, page: 1 });
         break;
       default:
