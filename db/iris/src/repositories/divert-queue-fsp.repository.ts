@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { DivertQueueFSPEntity } from '../entities';
 
 export class DivertQueueFSPRepository extends Repository<DivertQueueFSPEntity> {
-  public constructor(@InjectDataSource('finance') dataSource: DataSource) {
+  public constructor(@InjectDataSource('iris') dataSource: DataSource) {
     super(DivertQueueFSPEntity, dataSource.createEntityManager());
   }
 }
