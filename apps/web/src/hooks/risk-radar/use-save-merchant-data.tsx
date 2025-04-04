@@ -3,13 +3,13 @@ import useBaseApi from '@/web/src/hooks/use-base-api';
 export type SaveMerchantDataParams = {
   merchantId: string;
   exceptionId: number;
-  isDiverted: boolean;
+  isDiverted?: boolean;
   preferredContact?: string;
   notes?: string;
-  isPinnedNote: boolean;
+  isPinnedNote?: boolean;
   clickedStatus?: string;
-  isRiskWatch: boolean;
-  isAutoHoldEnabled: boolean;
+  isRiskWatch?: boolean;
+  isAutoHoldEnabled?: boolean;
   createdBy: string;
 };
 
