@@ -24,18 +24,11 @@ import type { CardHistory } from '@/web/src/hooks/risk-radar/use-get-card-histor
 import { useCardHistory } from '@/web/src/hooks/risk-radar/use-get-card-history';
 import { useMerchant } from '@/web/src/hooks/risk-radar/use-merchant';
 import { useMerchantChargebacks } from '@/web/src/hooks/risk-radar/use-merchant-chargebacks';
-import { useMerchantNetSettlement } from '@/web/src/hooks/risk-radar/use-merchant-net-settlement';
 import { useMerchantNotes } from '@/web/src/hooks/risk-radar/use-merchant-notes';
 import { useMerchantsWithSameTaxId } from '@/web/src/hooks/risk-radar/use-merchants-with-same-tax-id';
 import { usePushNoteToIris } from '@/web/src/hooks/risk-radar/use-push-note-to-iris';
-import { useReviewExceptionByUsername } from '@/web/src/hooks/risk-radar/use-review-exception-by-username';
 import { useSaveMerchantData } from '@/web/src/hooks/risk-radar/use-save-merchant-data';
-import { useSaveNewNetSettlement } from '@/web/src/hooks/risk-radar/use-save-new-net-settlement';
-import { useSentExceptionToManagersQueue } from '@/web/src/hooks/risk-radar/use-sent-to-managers-queue';
 import { useTransactionExceptions } from '@/web/src/hooks/risk-radar/use-transaction-exceptions';
-import { useTriggerExceptionAsAutoHold } from '@/web/src/hooks/risk-radar/use-trigger-exception-as-auto-hold';
-import { useTriggerExceptionAsDivert } from '@/web/src/hooks/risk-radar/use-trigger-exception-as-divert';
-import { useTriggerExceptionAsRiskWatch } from '@/web/src/hooks/risk-radar/use-trigger-exception-asr-risk-watch';
 
 type MerchantContactResponse = {
   businessInfo: {
@@ -129,6 +122,17 @@ enum PopupType {
 
 const ITEMS_PER_PAGE = 8;
 
+// Add a type for our new state
+type MerchantStateData = {
+  isDiverted: boolean;
+  preferredContact: string;
+  notes: string;
+  isPinnedNote: boolean;
+  clickedStatus?: string;
+  isRiskWatch: boolean;
+  isAutoHoldEnabled: boolean;
+};
+
 const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const { 'merchant-id': merchantId, 'exception-id': exceptionId } = params;
   const { user } = useAuth();
@@ -144,15 +148,17 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const [template, setTemplate] = useState<string>('');
   const [body, setBody] = useState<string>('');
 
-  const [newSettlement, setNewSettlement] = useState<{
-    amount: number;
-    notes: string;
-    action: string;
-  }>({
-    amount: 0,
-    notes: '',
-    action: 'Withdraw',
-  });
+  // State for merchant save data
+  const [merchantStateData, setMerchantStateData] = useState<MerchantStateData>(
+    {
+      isDiverted: false,
+      preferredContact: '',
+      notes: '',
+      isPinnedNote: false,
+      isRiskWatch: false,
+      isAutoHoldEnabled: false,
+    }
+  );
 
   const { data, error, isLoading, refetch } = useMerchant(
     merchantId,
@@ -170,8 +176,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const { data: merchantNotesData, refetch: notesRefetch } =
     useMerchantNotes(merchantId);
   const { data: merchantChargebacksData } = useMerchantChargebacks(merchantId);
-  const { data: merchantNetSettlementData, refetch: netsettlementRefresh } =
-    useMerchantNetSettlement(merchantId);
   const { data: cardNumberData } = useCardHistory(
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     currentTransException?.cardNumber
@@ -179,13 +183,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const { data: emailTemplatesData } = useEmailTemplates();
 
   const { pushNote } = usePushNoteToIris();
-  const { triggerAsDivert } = useTriggerExceptionAsDivert();
-  const { triggerAsAutoHold } = useTriggerExceptionAsAutoHold();
-  const { triggerAsRiskWatch } = useTriggerExceptionAsRiskWatch();
   const { saveMerchantdata } = useSaveMerchantData();
-  const { managersQueue } = useSentExceptionToManagersQueue();
-  const { saveNetSettlement } = useSaveNewNetSettlement();
-  const { reviewException } = useReviewExceptionByUsername();
 
   const [activeTab, setActiveTab] = useState<string>('contact');
   const [merchantUpdateRequest, setMerchantUpdateRequest] = useState<{
@@ -203,11 +201,53 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const [exceptionsPage, setExceptionsPage] = useState(1);
   const [notesPage, setNotesPage] = useState(1);
   const [chargebacksPage, setChargebacksPage] = useState(1);
-  const [netSettlementPage, setNetSettlementPage] = useState(1);
   const [volumePage, setVolumePage] = useState(1);
 
   // Add new state for Same Tax ID pagination
   const [sameTaxIdPage, setSameTaxIdPage] = useState(1);
+
+  // Add isSaving state
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+
+  // Update merchantStateData when data changes
+  useEffect(() => {
+    if (data) {
+      // Update merchantStateData
+      setMerchantStateData({
+        isDiverted: data?.businessInfo?.isDivert || false,
+        preferredContact: data?.businessInfo?.preferredContact || '',
+        notes: '',
+        isPinnedNote: false,
+        isRiskWatch: data?.businessInfo?.isRiskWatch || false,
+        isAutoHoldEnabled: data?.businessInfo?.isAutoHoldWhiteLabel || false,
+      });
+
+      // Keep existing behavior for backward compatibility
+      setMerchantUpdateRequest((prev) => ({
+        ...prev,
+        preferredContact: data?.businessInfo?.preferredContact ?? '',
+      }));
+    }
+  }, [data]);
+
+  // Update merchantStateData when noteRequest changes
+  useEffect(() => {
+    if (noteRequest.sNotes !== null) {
+      setMerchantStateData((prev) => ({
+        ...prev,
+        notes: noteRequest.sNotes || '',
+        isPinnedNote: noteRequest.isPinned,
+      }));
+    }
+  }, [noteRequest]);
+
+  // Update merchantStateData when merchantUpdateRequest changes
+  useEffect(() => {
+    setMerchantStateData((prev) => ({
+      ...prev,
+      preferredContact: merchantUpdateRequest.preferredContact,
+    }));
+  }, [merchantUpdateRequest]);
 
   // Calculate paginated data
   const paginatedExceptions = transactionExceptionsData?.slice(
@@ -222,11 +262,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     (chargebacksPage - 1) * ITEMS_PER_PAGE,
     chargebacksPage * ITEMS_PER_PAGE
   );
-  const paginatedNetSettlements =
-    merchantNetSettlementData?.net_settlement?.slice(
-      (netSettlementPage - 1) * ITEMS_PER_PAGE,
-      netSettlementPage * ITEMS_PER_PAGE
-    );
   const paginatedVolume = data?.processingSummaries?.slice(
     (volumePage - 1) * ITEMS_PER_PAGE,
     volumePage * ITEMS_PER_PAGE
@@ -241,9 +276,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   );
   const totalChargebacksPages = Math.ceil(
     (merchantChargebacksData?.length || 0) / ITEMS_PER_PAGE
-  );
-  const totalNetSettlementPages = Math.ceil(
-    (merchantNetSettlementData?.net_settlement?.length || 0) / ITEMS_PER_PAGE
   );
   const totalVolumePages = Math.ceil(
     (data?.processingSummaries?.length || 0) / ITEMS_PER_PAGE
@@ -274,104 +306,69 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     notesRefetch();
   };
 
-  const handleDivertTrigger = async (): Promise<void> => {
-    if (exceptionId) {
-      await triggerAsDivert([parseInt(exceptionId, 10)]);
-      refetch();
-    }
+  const handleDivertTrigger = (): void => {
+    setMerchantStateData((prev) => ({
+      ...prev,
+      isDiverted: true,
+    }));
   };
 
-  const handleRiskWatchTrigger = async (value: boolean): Promise<void> => {
-    if (exceptionId) {
-      await triggerAsRiskWatch([parseInt(exceptionId, 10)], value);
-      refetch();
-    }
+  const handleRiskWatchTrigger = (value: boolean): void => {
+    setMerchantStateData((prev) => ({
+      ...prev,
+      isRiskWatch: value,
+    }));
   };
 
-  const handleAutoHoldTrigger = async (value: boolean): Promise<void> => {
-    if (exceptionId) {
-      await triggerAsAutoHold([parseInt(exceptionId, 10)], value);
-      refetch();
-    }
+  const handleAutoHoldTrigger = (value: boolean): void => {
+    setMerchantStateData((prev) => ({
+      ...prev,
+      isAutoHoldEnabled: value,
+    }));
   };
 
-  const handleManagersQueueTrigger = async (): Promise<void> => {
-    if (exceptionId) {
-      await managersQueue([parseInt(exceptionId, 10)]);
-      refetch();
-    }
+  const handleManagersQueueTrigger = (): void => {
+    setMerchantStateData((prev) => ({
+      ...prev,
+      clickedStatus: prev.clickedStatus === 'mgrq' ? '' : 'mgrq',
+    }));
   };
 
-  const handleClickOnReviewButton = async (): Promise<void> => {
+  const handleClickOnReviewButton = (): void => {
     if (user?.name) {
-      await reviewException([parseInt(exceptionId, 10)], user.name);
-      refetch();
+      setMerchantStateData((prev) => ({
+        ...prev,
+        clickedStatus: prev.clickedStatus === 'rev' ? '' : 'rev',
+      }));
     }
   };
 
-  const handleNewNetSettlement = async (): Promise<void> => {
-    const currentDate = new Date().toISOString().split('T')[0];
-
+  const handleSaveMerchantData = async (): Promise<void> => {
     try {
       if (!user?.name) {
-        // console.error('No user nickname available');
         return;
       }
 
-      let { amount } = newSettlement;
-
-      if (newSettlement.action === 'Release') {
-        amount *= -1;
-      }
-
-      await saveNetSettlement(
-        newSettlement.action,
-        currentDate ?? '',
-        0,
-        amount,
-        0,
-        0,
-        newSettlement.notes,
-        user.name,
-        merchantId
-      );
-    } catch (e) {
-      // console.error(e);
-    }
-    netsettlementRefresh();
-  };
-
-  const saveMerchantData = async (): Promise<void> => {
-    const { sNotes, isPinned, author } = noteRequest;
-    const { preferredContact } = merchantUpdateRequest;
-
-    try {
-      if (!sNotes) {
-        // console.error('no note message provided');
-        return;
-      }
-
-      if (!user?.name) {
-        return;
-      }
-
-      if (!author) {
-        return;
-      }
-
-      await saveMerchantdata(
+      setIsSaving(true);
+      await saveMerchantdata({
         merchantId,
-        sNotes,
-        isPinned,
-        user?.name || '',
-        author,
-        preferredContact
-      );
+        exceptionId: parseInt(exceptionId, 10),
+        isDiverted: merchantStateData.isDiverted,
+        preferredContact: merchantStateData.preferredContact,
+        notes: merchantStateData.notes,
+        isPinnedNote: merchantStateData.isPinnedNote,
+        clickedStatus: merchantStateData.clickedStatus,
+        isRiskWatch: merchantStateData.isRiskWatch,
+        isAutoHoldEnabled: merchantStateData.isAutoHoldEnabled,
+        createdBy: user.name,
+      });
+      refetch();
+      notesRefetch();
     } catch (err) {
       // console.error(err);
+    } finally {
+      setIsSaving(false);
     }
-    refetch();
-    notesRefetch();
   };
 
   const replaceEmailTemplateParameters = (templateText: string): void => {
@@ -422,15 +419,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     // console.log({ template, email, body });
     // Add email sending logic here
   };
-
-  useEffect(() => {
-    if (data) {
-      setMerchantUpdateRequest((prev) => ({
-        ...prev,
-        preferredContact: data?.businessInfo?.preferredContact ?? '',
-      }));
-    }
-  }, [data]);
 
   if (!merchantId) {
     notFound();
@@ -683,13 +671,14 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         </h1>
         <div className="inline-flex items-center justify-end">
           <button
-            className="inline-flex w-[100px] items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90"
+            className="inline-flex w-[100px] items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90 disabled:opacity-70 disabled:cursor-not-allowed"
             type="button"
+            disabled={isSaving}
             onClick={() => {
-              saveMerchantData().catch(() => {});
+              handleSaveMerchantData().catch(() => {});
             }}
           >
-            Save
+            {isSaving ? 'Saving...' : 'Save'}
           </button>
         </div>
       </section>
@@ -721,8 +710,8 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             <input
               type="checkbox"
               className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
-              disabled={riskException?.bDivert}
-              checked={riskException?.bDivert}
+              disabled={merchantStateData.isDiverted}
+              checked={merchantStateData.isDiverted}
               onChange={() => handleDivertTrigger()}
             />
           </p>
@@ -733,13 +722,20 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           {riskException?.fkRiskExceptionStatus === 1 ? (
             <p className="text-black dark:text-white">
               <button
-                className="inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90"
+                className={`inline-flex items-center justify-center rounded-lg border px-4 py-2 text-white transition-colors
+                ${
+                  merchantStateData.clickedStatus === 'mgrq'
+                    ? 'border-amber-600 bg-amber-600 hover:bg-amber-700'
+                    : 'border-primary bg-primary hover:bg-opacity-90'
+                }`}
                 type="button"
                 onClick={() => {
-                  handleManagersQueueTrigger().catch(() => {});
+                  handleManagersQueueTrigger();
                 }}
               >
-                Managers queue
+                {merchantStateData.clickedStatus === 'mgrq'
+                  ? "In Manager's Queue"
+                  : 'Managers queue'}
               </button>
             </p>
           ) : null}
@@ -777,9 +773,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             <input
               type="checkbox"
               className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
-              checked={riskException?.bRiskWatch}
+              checked={merchantStateData.isRiskWatch}
               onChange={() =>
-                handleRiskWatchTrigger(!riskException?.bRiskWatch)
+                handleRiskWatchTrigger(!merchantStateData.isRiskWatch)
               }
             />
           </p>
@@ -788,9 +784,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             <input
               type="checkbox"
               className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
-              checked={riskException?.bAutoHoldWhite}
+              checked={merchantStateData.isAutoHoldEnabled}
               onChange={() =>
-                handleAutoHoldTrigger(!riskException?.bAutoHoldWhite)
+                handleAutoHoldTrigger(!merchantStateData.isAutoHoldEnabled)
               }
             />
           </p>
@@ -800,19 +796,23 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           </p>
           <p className="text-black dark:text-white">
             <button
-              className={`inline-flex items-center justify-center rounded-lg border px-4 py-2 text-white
-            ${
-              riskException?.fkRiskExceptionStatus === 2
-                ? 'border-gray-600 bg-gray-600 cursor-not-allowed'
-                : 'border-primary bg-primary hover:bg-opacity-90'
-            }`}
+              className={`inline-flex items-center justify-center rounded-lg border px-4 py-2 text-white transition-colors
+              ${
+                merchantStateData.clickedStatus === 'rev'
+                  ? 'border-green-600 bg-green-600 hover:bg-green-700'
+                  : riskException?.fkRiskExceptionStatus === 2
+                    ? 'border-gray-600 bg-gray-600 cursor-not-allowed'
+                    : 'border-primary bg-primary hover:bg-opacity-90'
+              }`}
               type="button"
               disabled={riskException?.fkRiskExceptionStatus === 2}
               onClick={() => {
-                handleClickOnReviewButton().catch(() => {});
+                handleClickOnReviewButton();
               }}
             >
-              Review
+              {merchantStateData.clickedStatus === 'rev'
+                ? 'Reviewed'
+                : 'Review'}
             </button>
           </p>
         </div>
@@ -1356,172 +1356,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           </>
         )}
         {activeTab === 'netsettlement' && (
-          <>
-            <h2 className="mb-2 text-xl font-semibold text-black dark:text-white">
-              Net Settlement
-            </h2>
-            <div className="grid grid-cols-1 gap-4">
-              <div className="max-w-full overflow-x-auto">
-                <table className="w-full table-auto">
-                  <thead>
-                    <tr className="bg-gray-2 dark:bg-meta-4 text-center">
-                      <th className="p-4 font-medium text-black dark:text-white">
-                        Trans Category
-                      </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
-                        Trans Date
-                      </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
-                        Trans Amt
-                      </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
-                        Balance Amt
-                      </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
-                        Pending Amt
-                      </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
-                        WriteOff Amt
-                      </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
-                        Reason
-                      </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
-                        Created By
-                      </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
-                        Delete
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedNetSettlements?.map((settlement) => (
-                      <tr
-                        key={`${settlement.pkNetSettlement}`}
-                        className="text-center"
-                      >
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {settlement.sTransCategory}
-                        </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {settlement.dtTranDate}
-                        </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          ${settlement.dTransAmt}
-                        </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          ${settlement.dBalAmt}
-                        </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          ${settlement.dPendingAmt}
-                        </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          ${settlement.dWriteOffAmt}
-                        </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {settlement.sReason}
-                        </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {settlement.sCreatedBy}
-                        </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark" />
-                      </tr>
-                    ))}
-                    <tr key="total" className="text-center">
-                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark" />
-                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark" />
-                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark" />
-                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        {merchantNetSettlementData?.totalBalAmt}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark" />
-                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark" />
-                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark" />
-                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark" />
-                      <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark" />
-                    </tr>
-                  </tbody>
-                </table>
-                <Pagination
-                  currentPage={netSettlementPage}
-                  totalPages={totalNetSettlementPages}
-                  onPageChange={setNetSettlementPage}
-                />
-                <div className="border border-gray-300 rounded-lg p-4 shadow-md bg-white">
-                  <div className="flex items-center space-x-4">
-                    {/* Amount Field */}
-                    <label
-                      className="text-gray-700 font-semibold"
-                      htmlFor="amount"
-                    >
-                      Amount:
-                    </label>
-                    <input
-                      type="number"
-                      value={newSettlement.amount}
-                      className="border border-gray-300 rounded px-2 py-1 w-24"
-                      onChange={(e) =>
-                        setNewSettlement((prev) => ({
-                          ...prev,
-                          amount: parseFloat(e.target.value),
-                        }))
-                      }
-                    />
-
-                    {/* Notes Field */}
-                    <label
-                      className="text-gray-700 font-semibold"
-                      htmlFor="notes"
-                    >
-                      Notes:
-                    </label>
-                    <input
-                      type="text"
-                      value={newSettlement.notes}
-                      onChange={(e) =>
-                        setNewSettlement((prev) => ({
-                          ...prev,
-                          notes: e.target.value,
-                        }))
-                      }
-                      className="border border-gray-300 rounded px-2 py-1 flex-grow"
-                      defaultValue="test test test test"
-                    />
-
-                    {/* Action Dropdown */}
-                    <label
-                      className="text-gray-700 font-semibold"
-                      htmlFor="action"
-                    >
-                      Action:
-                    </label>
-                    <select
-                      value={newSettlement?.action}
-                      onChange={(e) =>
-                        setNewSettlement((prev) => ({
-                          ...prev,
-                          action: e.target.value as 'Withdraw' | 'Release',
-                        }))
-                      }
-                      className="border border-gray-300 rounded px-2 py-1 bg-white"
-                    >
-                      <option value="Withdraw">Withdraw</option>
-                      <option value="Release">Release</option>
-                    </select>
-
-                    {/* Save Button */}
-                    <button
-                      type="button"
-                      className="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600"
-                      onClick={() => handleNewNetSettlement()}
-                    >
-                      Save
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </>
+          <h2 className="mb-2 text-xl font-semibold text-black dark:text-white">
+            Coming soon
+          </h2>
         )}
         {activeTab === 'sameTaxId' && (
           <>

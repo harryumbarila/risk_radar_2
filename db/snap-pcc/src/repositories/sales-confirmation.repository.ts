@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { SnapPccSalesConfirmation } from '../entities';
 
 export class SnapPccSalesConfirmationRepository extends Repository<SnapPccSalesConfirmation> {
-  public constructor(@InjectDataSource('ez-enroll') dataSource: DataSource) {
+  public constructor(@InjectDataSource('snap-pcc') dataSource: DataSource) {
     super(SnapPccSalesConfirmation, dataSource.createEntityManager());
   }
 }

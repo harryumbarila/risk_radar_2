@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 
 import { DSMSalesConfirmationRepository } from '@/dsm-db/repositories';
 import { EZEnrollGenAccountRepository } from '@/ez-enroll-db/repositories';
@@ -18,8 +18,16 @@ import { SnapPccSalesConfirmationRepository } from '@/snap-pcc-db/repositories';
 
 import type { RiskRadarSaveInputDto } from './dto/risk-radar-save-input.dto';
 
+// Add a type for errors
+type ErrorWithMessage = {
+  message: string;
+  stack?: string;
+};
+
 @Injectable()
 export class RiskRadarSaveService {
+  private readonly logger = new Logger(RiskRadarSaveService.name);
+
   public constructor(
     private readonly merchAdjRepository: RiskRadarMerchAdjParamRepository,
     private readonly exceptionsJeffRepository: RiskRadarExceptionsJeffRepository,
@@ -34,317 +42,497 @@ export class RiskRadarSaveService {
   ) {}
 
   public async saveRiskRadar(data: RiskRadarSaveInputDto) {
-    const {
-      merchantId,
-      exceptionId,
-      bbb,
-      monthlyVolume,
-      averageTicket,
-      swipePercentage,
-      isDiverted,
-      website,
-      preferredContact,
-      notes,
-      isPinnedNote,
-      clickedStatus,
-      isRiskWatch,
-      isAutoHoldEnabled,
-      createdBy,
-    } = data;
-
-    // Get current data
-    const merchAdj = await this.merchAdjRepository.findOne({
-      select: [
-        'bbb',
-        'monthlyVolumeCalcMonthly',
-        'avgTicketCalcMonthly',
-        'swipePercentCalcMonthly',
-        'isDivert',
-        'isAutoHoldWhiteLabel',
-      ],
-      where: { mid: merchantId },
-    });
-
-    const exceptionJeff = await this.exceptionsJeffRepository.findOne({
-      select: ['exceptionStatusId'],
-      where: {
-        id: exceptionId,
-      },
-    });
-
-    if (!merchAdj) {
-      throw new BadRequestException('Merchant Adj not found.');
-    }
-
-    if (!exceptionJeff) {
-      throw new BadRequestException('Exception Jeff not found.');
-    }
-
-    // Update with input data,
-    await this.merchAdjRepository.update(
-      { mid: merchantId },
-      {
-        bbb,
-        monthlyVolumeCalcMonthly: monthlyVolume,
-        avgTicketCalcMonthly: averageTicket,
-        swipePercentCalcMonthly: swipePercentage,
-        isDivert: isDiverted,
-        preferredContact,
-        isRiskWatch,
-        isAutoHoldWhiteLabel: isAutoHoldEnabled,
-      }
+    this.logger.log(
+      `Starting saveRiskRadar for merchantId: ${data.merchantId}, exceptionId: ${data.exceptionId}`
     );
+    this.logger.debug('Input data:', JSON.stringify(data));
 
-    // Updates
-    await this.ezEnrollGenAccountRepository.update(
-      { mid16: merchantId },
-      {
-        website,
-        riskWatch: isRiskWatch,
-      }
-    );
-
-    await this.ezEnrollPccGenAccountRepository.update(
-      { mid16: merchantId },
-      {
-        website,
-        riskWatch: isRiskWatch,
-      }
-    );
-
-    await this.dsmSalesConfirmationRepository.update(
-      { mid: merchantId },
-      {
-        riskWatch: isRiskWatch,
-      }
-    );
-
-    await this.snapSalesConfirmationRepository.update(
-      { mid: merchantId },
-      {
-        riskWatch: isRiskWatch,
-      }
-    );
-
-    // Notes
-    await this.checkAndCreateChangedNotes(data, merchAdj);
-
-    // Divert
-    if (isDiverted !== merchAdj.isDivert) {
-      if (isDiverted) {
-        await this.handleIsDiverted(data);
-      } else {
-        await this.handleIsNotDiverted(data);
-      }
-    }
-
-    // Create notes depending on received status
-    if (clickedStatus === 'rev') {
-      exceptionJeff.exceptionStatusId = 2;
-      exceptionJeff.userReviewed = createdBy;
-
-      await this.notesRepository.createReviewNotes(merchantId, createdBy);
-    } else if (clickedStatus === 'mgrq') {
-      exceptionJeff.exceptionStatusId = 3;
-
-      await this.notesRepository.createManagerQueuedNotes(
+    try {
+      const {
         merchantId,
-        createdBy
-      );
-    }
-
-    //  Save notes
-    if (notes) {
-      await this.notesRepository.insert({
-        mid: merchantId,
+        exceptionId,
+        isDiverted,
+        preferredContact,
         notes,
-        notesTypeId: isPinnedNote ? 6 : 1,
-        userCreated: createdBy,
-      });
-    }
+        isPinnedNote,
+        clickedStatus,
+        isRiskWatch,
+        isAutoHoldEnabled,
+        createdBy,
+      } = data;
 
-    await this.exceptionsJeffRepository.save(exceptionJeff);
+      // Get current data
+      this.logger.log(
+        `Step 1: Fetching current merchant data for MID: ${merchantId}`
+      );
+      const merchAdj = await this.merchAdjRepository.findOne({
+        select: [
+          'monthlyVolumeCalcMonthly',
+          'avgTicketCalcMonthly',
+          'swipePercentCalcMonthly',
+          'isDivert',
+          'isAutoHoldWhiteLabel',
+        ],
+        where: { mid: merchantId },
+      });
+      this.logger.debug(
+        `Merchant data fetched:`,
+        merchAdj ? 'Success' : 'Not found'
+      );
+
+      this.logger.log(
+        `Step 2: Fetching exception data for exceptionId: ${exceptionId}`
+      );
+      const exceptionJeff = await this.exceptionsJeffRepository.findOne({
+        where: {
+          id: exceptionId,
+        },
+      });
+      this.logger.debug(`Exception data fetched:`, exceptionJeff);
+
+      if (!merchAdj) {
+        this.logger.error(`Merchant Adj not found for MID: ${merchantId}`);
+        throw new BadRequestException('Merchant Adj not found.');
+      }
+
+      if (!exceptionJeff) {
+        this.logger.error(`Exception Jeff not found for ID: ${exceptionId}`);
+        throw new BadRequestException('Exception Jeff not found.');
+      }
+
+      // Update with input data
+      this.logger.log(
+        `Step 3: Updating merchant adjustment data for MID: ${merchantId}`
+      );
+      await this.merchAdjRepository.update(
+        { mid: merchantId },
+        {
+          isDivert: isDiverted,
+          preferredContact,
+          isRiskWatch,
+          isAutoHoldWhiteLabel: isAutoHoldEnabled,
+        }
+      );
+      this.logger.log(`Merchant adjustment updated successfully`);
+
+      // Updates EZ Enroll Gen Account
+      this.logger.log(
+        `Step 4: Updating EZ Enroll Gen Account for MID: ${merchantId}`
+      );
+      try {
+        await this.ezEnrollGenAccountRepository.update(
+          { mid16: merchantId },
+          {
+            riskWatch: isRiskWatch,
+          }
+        );
+        this.logger.log(`EZ Enroll Gen Account updated successfully`);
+      } catch (error: unknown) {
+        const typedError = error as ErrorWithMessage;
+        this.logger.error(
+          `Error updating EZ Enroll Gen Account: ${typedError.message}`
+        );
+        // Continue with other updates even if this one fails
+      }
+
+      // Updates EZ Enroll PCC Gen Account
+      this.logger.log(
+        `Step 5: Updating EZ Enroll PCC Gen Account for MID: ${merchantId}`
+      );
+      try {
+        await this.ezEnrollPccGenAccountRepository.update(
+          { mid16: merchantId },
+          {
+            riskWatch: isRiskWatch,
+          }
+        );
+        this.logger.log(`EZ Enroll PCC Gen Account updated successfully`);
+      } catch (error: unknown) {
+        const typedError = error as ErrorWithMessage;
+        this.logger.error(
+          `Error updating EZ Enroll PCC Gen Account: ${typedError.message}`
+        );
+        // Continue with other updates even if this one fails
+      }
+
+      // Updates DSM Sales Confirmation
+      this.logger.log(
+        `Step 6: Updating DSM Sales Confirmation for MID: ${merchantId}`
+      );
+      try {
+        await this.dsmSalesConfirmationRepository.update(
+          { mid: merchantId },
+          {
+            riskWatch: isRiskWatch,
+          }
+        );
+        this.logger.log(`DSM Sales Confirmation updated successfully`);
+      } catch (error: unknown) {
+        const typedError = error as ErrorWithMessage;
+        this.logger.error(
+          `Error updating DSM Sales Confirmation: ${typedError.message}`
+        );
+        // Continue with other updates even if this one fails
+      }
+
+      // Updates Snap PCC Sales Confirmation
+      this.logger.log(
+        `Step 7: Updating Snap PCC Sales Confirmation for MID: ${merchantId}`
+      );
+      try {
+        await this.snapSalesConfirmationRepository.update(
+          { mid: merchantId },
+          {
+            riskWatch: isRiskWatch,
+          }
+        );
+        this.logger.log(`Snap PCC Sales Confirmation updated successfully`);
+      } catch (error: unknown) {
+        const typedError = error as ErrorWithMessage;
+        this.logger.error(
+          `Error updating Snap PCC Sales Confirmation: ${typedError.message}`
+        );
+        // Continue with other updates even if this one fails
+      }
+
+      // Notes
+      this.logger.log(`Step 8: Checking and creating changed notes`);
+      await this.checkAndCreateChangedNotes(data, merchAdj);
+      this.logger.log(`Changed notes processed successfully`);
+
+      // Divert
+      if (isDiverted !== merchAdj.isDivert) {
+        this.logger.log(
+          `Step 9: Divert status changed from ${merchAdj.isDivert} to ${isDiverted}`
+        );
+        if (isDiverted) {
+          this.logger.log(`Processing isDiverted=true actions`);
+          await this.handleIsDiverted(data);
+        } else {
+          this.logger.log(`Processing isDiverted=false actions`);
+          await this.handleIsNotDiverted(data);
+        }
+        this.logger.log(`Divert status handling completed`);
+      } else {
+        this.logger.log(`Divert status unchanged, skipping divert handling`);
+      }
+
+      // Create notes depending on received status
+      if (clickedStatus === 'rev') {
+        this.logger.log(`Step 10a: Processing review status`);
+        exceptionJeff.exceptionStatusId = 2;
+        exceptionJeff.userReviewed = createdBy;
+
+        await this.notesRepository.createReviewNotes(merchantId, createdBy);
+        this.logger.log(`Review notes created successfully`);
+      } else if (clickedStatus === 'mgrq') {
+        this.logger.log(`Step 10b: Processing manager queue status`);
+        exceptionJeff.exceptionStatusId = 3;
+
+        await this.notesRepository.createManagerQueuedNotes(
+          merchantId,
+          createdBy
+        );
+        this.logger.log(`Manager queue notes created successfully`);
+      }
+
+      //  Save notes
+      if (notes) {
+        this.logger.log(`Step 11: Saving notes for MID: ${merchantId}`);
+        await this.notesRepository.insert({
+          mid: merchantId,
+          notes,
+          notesTypeId: isPinnedNote ? 6 : 1,
+          userCreated: createdBy,
+        });
+        this.logger.log(`Notes saved successfully`);
+      } else {
+        this.logger.log(`No notes to save, skipping step 11`);
+      }
+
+      this.logger.log(`Step 12: Saving exception Jeff data`);
+      await this.exceptionsJeffRepository.save(exceptionJeff);
+      this.logger.log(`Exception data saved successfully`);
+
+      this.logger.log(
+        `RiskRadar save completed successfully for MID: ${merchantId}`
+      );
+      return { success: true, message: 'Data saved successfully' };
+    } catch (error: unknown) {
+      const typedError = error as ErrorWithMessage;
+      this.logger.error(
+        `Error in saveRiskRadar: ${typedError.message}`,
+        typedError.stack
+      );
+      throw error;
+    }
   }
 
   private async checkAndCreateChangedNotes(
     input: RiskRadarSaveInputDto,
     merchAdj: RiskRadarMerchAdjParamEntity
   ) {
-    const {
-      merchantId,
-      monthlyVolume,
-      averageTicket,
-      swipePercentage,
-      isAutoHoldEnabled,
-      isDiverted,
-      createdBy,
-    } = input;
+    const { merchantId, isAutoHoldEnabled, isDiverted, createdBy } = input;
 
-    // Monthly value changed
-    if (monthlyVolume !== merchAdj.monthlyVolumeCalcMonthly) {
-      await this.notesRepository.createMonthlyValueChangedNotes(
-        merchantId,
-        merchAdj.monthlyVolumeCalcMonthly,
-        monthlyVolume,
-        createdBy
-      );
-    }
-
-    // Average ticket value changed
-    if (averageTicket !== merchAdj.avgTicketCalcMonthly) {
-      await this.notesRepository.createAverageTicketChangedNotes(
-        merchantId,
-        merchAdj.avgTicketCalcMonthly,
-        averageTicket,
-        createdBy
-      );
-    }
-
-    // Swipe % changed
-    if (swipePercentage !== merchAdj.swipePercentCalcMonthly) {
-      await this.notesRepository.createSwipePercentChangedNotes(
-        merchantId,
-        merchAdj.swipePercentCalcMonthly,
-        swipePercentage,
-        createdBy
-      );
-    }
+    this.logger.log(
+      `Starting checkAndCreateChangedNotes for MID: ${merchantId}`
+    );
 
     // Auto hold whitelabel
     if (isAutoHoldEnabled !== merchAdj.isAutoHoldWhiteLabel) {
-      await this.notesRepository.createAutoHoldChangedNotes(
-        merchantId,
-        merchAdj.isAutoHoldWhiteLabel,
-        isAutoHoldEnabled,
-        createdBy
+      this.logger.log(
+        `Auto Hold Whitelist changed from ${merchAdj.isAutoHoldWhiteLabel} to ${isAutoHoldEnabled}`
       );
+      try {
+        await this.notesRepository.createAutoHoldChangedNotes(
+          merchantId,
+          merchAdj.isAutoHoldWhiteLabel,
+          isAutoHoldEnabled,
+          createdBy
+        );
+        this.logger.log(`Auto Hold changed notes created successfully`);
+      } catch (error: unknown) {
+        const typedError = error as ErrorWithMessage;
+        this.logger.error(
+          `Error creating Auto Hold changed notes: ${typedError.message}`
+        );
+        throw error;
+      }
     }
 
     if (isDiverted !== merchAdj.isDivert) {
-      await this.notesRepository.createDivertChangedNotes(
-        merchantId,
-        isDiverted,
-        createdBy
+      this.logger.log(
+        `Divert status changed from ${merchAdj.isDivert} to ${isDiverted}`
       );
+      try {
+        await this.notesRepository.createDivertChangedNotes(
+          merchantId,
+          isDiverted,
+          createdBy
+        );
+        this.logger.log(`Divert changed notes created successfully`);
+      } catch (error: unknown) {
+        const typedError = error as ErrorWithMessage;
+        this.logger.error(
+          `Error creating Divert changed notes: ${typedError.message}`
+        );
+        throw error;
+      }
     }
   }
 
   private async handleIsDiverted(data: RiskRadarSaveInputDto) {
     const { merchantId, createdBy } = data;
+    this.logger.log(`Starting handleIsDiverted for MID: ${merchantId}`);
 
     // Add TSYS Flag
+    this.logger.log(`Checking for existing TSYS flag`);
     const existing = await this.flagUpdateRepository.findOne({
       select: ['mid'],
       where: { mid: merchantId, isHidden: false },
     });
+    this.logger.debug(`Existing TSYS flag found: ${!!existing}`);
 
     const prefixes = ['5611', '7905'];
     const isValidPrefix = prefixes.includes(merchantId.slice(0, 4));
+    this.logger.log(
+      `MID prefix check: ${merchantId.slice(0, 4)}, isValidPrefix: ${isValidPrefix}`
+    );
 
     if (!existing && isValidPrefix) {
-      await this.flagUpdateRepository.insert({
-        mid: merchantId,
-        addDate: new Date(),
-      });
+      this.logger.log(`Adding TSYS flag for MID: ${merchantId}`);
+      try {
+        await this.flagUpdateRepository.insert({
+          mid: merchantId,
+          addDate: new Date(),
+        });
+        this.logger.log(`TSYS flag added successfully`);
+      } catch (error: unknown) {
+        const typedError = error as ErrorWithMessage;
+        this.logger.error(`Error adding TSYS flag: ${typedError.message}`);
+        throw error;
+      }
     }
 
     // Divert Queue
+    this.logger.log(`Checking divert queue`);
     const inQueue = await this.divertQueueRepository.findOne({
       where: { merchantId: Number(merchantId) },
       order: { id: 'DESC' }, // Get the latest record by descending ID
     });
+    this.logger.debug(`Divert queue check result: ${!!inQueue}`);
 
     const isDivertFlagSet = inQueue ? inQueue.isDiverted : false;
+    this.logger.log(`Current divert flag status: ${isDivertFlagSet}`);
 
     if (!isDivertFlagSet && isValidPrefix) {
-      await this.divertQueueRepository.insert({
-        merchantId: Number(merchantId),
-        isDiverted: true,
-        divertFlagNotes: 'Manual put on divert via Risk Radar',
-        createDate: new Date(),
-        createdBy,
-      });
+      this.logger.log(`Adding to divert queue for MID: ${merchantId}`);
+      try {
+        await this.divertQueueRepository.insert({
+          merchantId: Number(merchantId),
+          isDiverted: true,
+          divertFlagNotes: 'Manual put on divert via Risk Radar',
+          createDate: new Date(),
+          createdBy,
+        });
+        this.logger.log(`Added to divert queue successfully`);
+      } catch (error: unknown) {
+        const typedError = error as ErrorWithMessage;
+        this.logger.error(
+          `Error adding to divert queue: ${typedError.message}`
+        );
+        throw error;
+      }
     }
 
     // Diver Queue FSP
+    this.logger.log(`Checking FSP divert queue`);
     const inFSPQueue = await this.divertQueueFspRepository.findOne({
       where: { merchantId: Number(merchantId) },
       order: { id: 'DESC' }, // Get the latest record by descending ID
     });
+    this.logger.debug(`FSP divert queue check result: ${!!inFSPQueue}`);
 
     const fspPrefixes = ['8152'];
     const isValidFspPrefix = fspPrefixes.includes(merchantId.slice(0, 4));
+    this.logger.log(
+      `FSP MID prefix check: ${merchantId.slice(0, 4)}, isValidFspPrefix: ${isValidFspPrefix}`
+    );
+
     const isDivertFSPFlagSet = inFSPQueue ? inFSPQueue.isDiverted : false;
+    this.logger.log(`Current FSP divert flag status: ${isDivertFSPFlagSet}`);
 
     if (!isDivertFSPFlagSet && isValidFspPrefix) {
-      await this.divertQueueFspRepository.insert({
-        merchantId: Number(merchantId),
-        isDiverted: true,
-        divertFlagNotes: 'Manual put on divert via Risk Radar',
-        createDate: new Date(),
-        createdBy,
-      });
+      this.logger.log(`Adding to FSP divert queue for MID: ${merchantId}`);
+      try {
+        await this.divertQueueFspRepository.insert({
+          merchantId: Number(merchantId),
+          isDiverted: true,
+          divertFlagNotes: 'Manual put on divert via Risk Radar',
+          createDate: new Date(),
+          createdBy,
+        });
+        this.logger.log(`Added to FSP divert queue successfully`);
+      } catch (error: unknown) {
+        const typedError = error as ErrorWithMessage;
+        this.logger.error(
+          `Error adding to FSP divert queue: ${typedError.message}`
+        );
+        throw error;
+      }
     }
+
+    this.logger.log(`handleIsDiverted completed for MID: ${merchantId}`);
   }
 
   private async handleIsNotDiverted(data: RiskRadarSaveInputDto) {
     const { merchantId, createdBy } = data;
+    this.logger.log(`Starting handleIsNotDiverted for MID: ${merchantId}`);
 
     // Add TSYS Flag
+    this.logger.log(`Checking for existing TSYS flag`);
     const existing = await this.flagUpdateRepository.findOne({
       select: ['mid'],
       where: { mid: merchantId, isHidden: false },
     });
+    this.logger.debug(`Existing TSYS flag found: ${!!existing}`);
 
     const prefixes = ['5611', '7905'];
     const isValidPrefix = prefixes.includes(merchantId.slice(0, 4));
+    this.logger.log(
+      `MID prefix check: ${merchantId.slice(0, 4)}, isValidPrefix: ${isValidPrefix}`
+    );
 
     if (!existing && isValidPrefix) {
-      await this.flagUpdateRepository.update(
-        { mid: merchantId, isHidden: false },
-        {
-          isHidden: true,
-          removeDate: new Date(),
-        }
-      );
+      this.logger.log(`Updating TSYS flag for MID: ${merchantId}`);
+      try {
+        await this.flagUpdateRepository.update(
+          { mid: merchantId, isHidden: false },
+          {
+            isHidden: true,
+            removeDate: new Date(),
+          }
+        );
+        this.logger.log(`TSYS flag updated successfully`);
+      } catch (error: unknown) {
+        const typedError = error as ErrorWithMessage;
+        this.logger.error(`Error updating TSYS flag: ${typedError.message}`);
+        throw error;
+      }
     }
 
     // Divert Queue
+    this.logger.log(`Checking divert queue`);
     const inQueue = await this.divertQueueRepository.findOne({
       where: { merchantId: Number(merchantId) },
       order: { id: 'DESC' }, // Get the latest record by descending ID
     });
+    this.logger.debug(`Divert queue check result: ${!!inQueue}`);
 
     const isDivertFlagSet = inQueue ? inQueue.isDiverted : false;
+    this.logger.log(`Current divert flag status: ${isDivertFlagSet}`);
 
     if (!isDivertFlagSet && isValidPrefix) {
-      await this.divertQueueRepository.insert({
-        merchantId: Number(merchantId),
-        isDiverted: false,
-        divertFlagNotes: 'Manual remove from divert via Risk Radar',
-        createDate: new Date(),
-        createdBy,
-      });
+      this.logger.log(
+        `Adding to divert queue (turn off) for MID: ${merchantId}`
+      );
+      try {
+        await this.divertQueueRepository.insert({
+          merchantId: Number(merchantId),
+          isDiverted: false,
+          divertFlagNotes: 'Manual remove from divert via Risk Radar',
+          createDate: new Date(),
+          createdBy,
+        });
+        this.logger.log(`Added to divert queue (turn off) successfully`);
+      } catch (error: unknown) {
+        const typedError = error as ErrorWithMessage;
+        this.logger.error(
+          `Error adding to divert queue (turn off): ${typedError.message}`
+        );
+        throw error;
+      }
     }
 
     // Diver Queue FSP
+    this.logger.log(`Checking FSP divert queue`);
     const inFSPQueue = await this.divertQueueFspRepository.findOne({
       where: { merchantId: Number(merchantId) },
       order: { id: 'DESC' }, // Get the latest record by descending ID
     });
+    this.logger.debug(`FSP divert queue check result: ${!!inFSPQueue}`);
 
     const fspPrefixes = ['8152'];
     const isValidFspPrefix = fspPrefixes.includes(merchantId.slice(0, 4));
+    this.logger.log(
+      `FSP MID prefix check: ${merchantId.slice(0, 4)}, isValidFspPrefix: ${isValidFspPrefix}`
+    );
+
     const isDivertFSPFlagSet = inFSPQueue ? inFSPQueue.isDiverted : false;
+    this.logger.log(`Current FSP divert flag status: ${isDivertFSPFlagSet}`);
 
     if (!isDivertFSPFlagSet && isValidFspPrefix) {
-      await this.divertQueueFspRepository.insert({
-        merchantId: Number(merchantId),
-        isDiverted: false,
-        divertFlagNotes: 'Manual remove from divert via Risk Radar',
-        createDate: new Date(),
-        createdBy,
-      });
+      this.logger.log(
+        `Adding to FSP divert queue (turn off) for MID: ${merchantId}`
+      );
+      try {
+        await this.divertQueueFspRepository.insert({
+          merchantId: Number(merchantId),
+          isDiverted: false,
+          divertFlagNotes: 'Manual remove from divert via Risk Radar',
+          createDate: new Date(),
+          createdBy,
+        });
+        this.logger.log(`Added to FSP divert queue (turn off) successfully`);
+      } catch (error: unknown) {
+        const typedError = error as ErrorWithMessage;
+        this.logger.error(
+          `Error adding to FSP divert queue (turn off): ${typedError.message}`
+        );
+        throw error;
+      }
     }
+
+    this.logger.log(`handleIsNotDiverted completed for MID: ${merchantId}`);
   }
 }

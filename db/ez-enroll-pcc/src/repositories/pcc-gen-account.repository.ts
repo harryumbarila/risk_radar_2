@@ -5,7 +5,9 @@ import { Repository } from 'typeorm';
 import { EZEnrollPccGenAccount } from '../entities';
 
 export class EZEnrollPccGenAccountRepository extends Repository<EZEnrollPccGenAccount> {
-  public constructor(@InjectDataSource('ez-enroll') dataSource: DataSource) {
+  public constructor(
+    @InjectDataSource('ez-enroll-pcc') dataSource: DataSource
+  ) {
     super(EZEnrollPccGenAccount, dataSource.createEntityManager());
   }
 }

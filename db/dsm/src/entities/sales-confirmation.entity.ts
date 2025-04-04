@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity({ name: 'tblSalesConfirmation', schema: 'DSM' })
+@Entity({ name: 'tblSalesConfirmation', schema: 'DSM.dbo' })
 export class DSMSalesConfirmation {
   @PrimaryColumn('varchar', { length: 20, name: 'fkAppointment' })
   public appointmentId!: string;

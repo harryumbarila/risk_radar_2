@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity({ name: 'tblSalesConfirmation', schema: 'snap_pcc' })
+@Entity({ name: 'tblSalesConfirmation', schema: 'SNAP_PCC.dbo' })
 export class SnapPccSalesConfirmation {
   @PrimaryColumn('varchar', { length: 20, name: 'fkAppointment' })
   public appointmentId!: string;
