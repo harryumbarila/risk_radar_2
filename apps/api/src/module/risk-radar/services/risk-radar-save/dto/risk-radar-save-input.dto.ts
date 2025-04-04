@@ -15,27 +15,8 @@ export class RiskRadarSaveInputDto {
   @IsInt()
   public exceptionId: number;
 
-  @IsOptional()
-  @IsString()
-  @Length(1, 1)
-  public bbb?: string;
-
-  @IsInt()
-  public monthlyVolume: number;
-
-  @IsInt()
-  public averageTicket: number;
-
-  @IsInt()
-  public swipePercentage: number;
-
   @IsBoolean()
   public isDiverted: boolean;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(200)
-  public website?: string;
 
   @IsOptional()
   @IsString()
