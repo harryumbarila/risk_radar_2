@@ -3,7 +3,10 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { DSMSalesConfirmationRepository } from '@/dsm-db/repositories';
 import { EZEnrollGenAccountRepository } from '@/ez-enroll-db/repositories';
 import { EZEnrollPccGenAccountRepository } from '@/ez-enroll-pcc-db/repositories';
-import type { RiskRadarMerchAdjParamEntity } from '@/finance-db/entities';
+import type {
+  RiskRadarExceptionsJeffEntity,
+  RiskRadarMerchAdjParamEntity,
+} from '@/finance-db/entities';
 import {
   RiskRadarExceptionsJeffRepository,
   RiskRadarMerchAdjParamRepository,
@@ -61,7 +64,7 @@ export class RiskRadarSaveService {
         createdBy,
       } = data;
 
-      // Get current data
+      // Get current data - we need this to determine what changed
       this.logger.log(
         `Step 1: Fetching current merchant data for MID: ${merchantId}`
       );
@@ -72,6 +75,8 @@ export class RiskRadarSaveService {
           'swipePercentCalcMonthly',
           'isDivert',
           'isAutoHoldWhiteLabel',
+          'isRiskWatch',
+          'preferredContact',
         ],
         where: { mid: merchantId },
       });
@@ -80,128 +85,206 @@ export class RiskRadarSaveService {
         merchAdj ? 'Success' : 'Not found'
       );
 
-      this.logger.log(
-        `Step 2: Fetching exception data for exceptionId: ${exceptionId}`
-      );
-      const exceptionJeff = await this.exceptionsJeffRepository.findOne({
-        where: {
-          id: exceptionId,
-        },
-      });
-      this.logger.debug(`Exception data fetched:`, exceptionJeff);
-
       if (!merchAdj) {
         this.logger.error(`Merchant Adj not found for MID: ${merchantId}`);
         throw new BadRequestException('Merchant Adj not found.');
       }
 
-      if (!exceptionJeff) {
-        this.logger.error(`Exception Jeff not found for ID: ${exceptionId}`);
-        throw new BadRequestException('Exception Jeff not found.');
-      }
+      // Only fetch exception data if we're changing exception status
+      let exceptionJeff: RiskRadarExceptionsJeffEntity | null = null;
+      if (clickedStatus !== undefined) {
+        this.logger.log(
+          `Step 2: Fetching exception data for exceptionId: ${exceptionId}`
+        );
+        exceptionJeff = await this.exceptionsJeffRepository.findOne({
+          where: {
+            id: exceptionId,
+          },
+        });
+        this.logger.debug(`Exception data fetched:`, exceptionJeff);
 
-      // Update with input data
-      this.logger.log(
-        `Step 3: Updating merchant adjustment data for MID: ${merchantId}`
-      );
-      await this.merchAdjRepository.update(
-        { mid: merchantId },
-        {
-          isDivert: isDiverted,
-          preferredContact,
-          isRiskWatch,
-          isAutoHoldWhiteLabel: isAutoHoldEnabled,
+        if (!exceptionJeff) {
+          this.logger.error(`Exception Jeff not found for ID: ${exceptionId}`);
+          throw new BadRequestException('Exception Jeff not found.');
         }
-      );
-      this.logger.log(`Merchant adjustment updated successfully`);
-
-      // Updates EZ Enroll Gen Account
-      this.logger.log(
-        `Step 4: Updating EZ Enroll Gen Account for MID: ${merchantId}`
-      );
-      try {
-        await this.ezEnrollGenAccountRepository.update(
-          { mid16: merchantId },
-          {
-            riskWatch: isRiskWatch,
-          }
-        );
-        this.logger.log(`EZ Enroll Gen Account updated successfully`);
-      } catch (error: unknown) {
-        const typedError = error as ErrorWithMessage;
-        this.logger.error(
-          `Error updating EZ Enroll Gen Account: ${typedError.message}`
-        );
-        // Continue with other updates even if this one fails
       }
 
-      // Updates EZ Enroll PCC Gen Account
-      this.logger.log(
-        `Step 5: Updating EZ Enroll PCC Gen Account for MID: ${merchantId}`
-      );
-      try {
-        await this.ezEnrollPccGenAccountRepository.update(
-          { mid16: merchantId },
-          {
-            riskWatch: isRiskWatch,
-          }
-        );
-        this.logger.log(`EZ Enroll PCC Gen Account updated successfully`);
-      } catch (error: unknown) {
-        const typedError = error as ErrorWithMessage;
-        this.logger.error(
-          `Error updating EZ Enroll PCC Gen Account: ${typedError.message}`
-        );
-        // Continue with other updates even if this one fails
+      // Create an object with only the fields that are explicitly provided
+      const updateFields: Record<string, unknown> = {};
+
+      // Only include fields that are explicitly defined (not undefined)
+      if (isDiverted !== undefined) {
+        updateFields.isDivert = isDiverted;
       }
 
-      // Updates DSM Sales Confirmation
-      this.logger.log(
-        `Step 6: Updating DSM Sales Confirmation for MID: ${merchantId}`
-      );
-      try {
-        await this.dsmSalesConfirmationRepository.update(
-          { mid: merchantId },
-          {
-            riskWatch: isRiskWatch,
-          }
-        );
-        this.logger.log(`DSM Sales Confirmation updated successfully`);
-      } catch (error: unknown) {
-        const typedError = error as ErrorWithMessage;
-        this.logger.error(
-          `Error updating DSM Sales Confirmation: ${typedError.message}`
-        );
-        // Continue with other updates even if this one fails
+      if (preferredContact !== undefined) {
+        updateFields.preferredContact = preferredContact;
       }
 
-      // Updates Snap PCC Sales Confirmation
-      this.logger.log(
-        `Step 7: Updating Snap PCC Sales Confirmation for MID: ${merchantId}`
-      );
-      try {
-        await this.snapSalesConfirmationRepository.update(
-          { mid: merchantId },
-          {
-            riskWatch: isRiskWatch,
-          }
-        );
-        this.logger.log(`Snap PCC Sales Confirmation updated successfully`);
-      } catch (error: unknown) {
-        const typedError = error as ErrorWithMessage;
-        this.logger.error(
-          `Error updating Snap PCC Sales Confirmation: ${typedError.message}`
-        );
-        // Continue with other updates even if this one fails
+      if (isRiskWatch !== undefined) {
+        updateFields.isRiskWatch = isRiskWatch;
       }
 
-      // Notes
-      this.logger.log(`Step 8: Checking and creating changed notes`);
-      await this.checkAndCreateChangedNotes(data, merchAdj);
-      this.logger.log(`Changed notes processed successfully`);
+      if (isAutoHoldEnabled !== undefined) {
+        updateFields.isAutoHoldWhiteLabel = isAutoHoldEnabled;
+      }
 
-      // Divert
-      if (isDiverted !== merchAdj.isDivert) {
+      // Only update if we have fields to update
+      if (Object.keys(updateFields).length > 0) {
+        // Update with input data
+        this.logger.log(
+          `Step 3: Updating merchant adjustment data for MID: ${merchantId}`
+        );
+        await this.merchAdjRepository.update({ mid: merchantId }, updateFields);
+        this.logger.log(`Merchant adjustment updated successfully`);
+      } else {
+        this.logger.log('No merchant adjustment fields to update, skipping');
+      }
+
+      // Only update risk watch in other repositories if it's explicitly provided
+      if (isRiskWatch !== undefined) {
+        // Updates EZ Enroll Gen Account
+        this.logger.log(
+          `Step 4: Updating EZ Enroll Gen Account for MID: ${merchantId}`
+        );
+        try {
+          await this.ezEnrollGenAccountRepository.update(
+            { mid16: merchantId },
+            {
+              riskWatch: isRiskWatch,
+            }
+          );
+          this.logger.log(`EZ Enroll Gen Account updated successfully`);
+        } catch (error: unknown) {
+          const typedError = error as ErrorWithMessage;
+          this.logger.error(
+            `Error updating EZ Enroll Gen Account: ${typedError.message}`
+          );
+          // Continue with other updates even if this one fails
+        }
+
+        // Updates EZ Enroll PCC Gen Account
+        this.logger.log(
+          `Step 5: Updating EZ Enroll PCC Gen Account for MID: ${merchantId}`
+        );
+        try {
+          await this.ezEnrollPccGenAccountRepository.update(
+            { mid16: merchantId },
+            {
+              riskWatch: isRiskWatch,
+            }
+          );
+          this.logger.log(`EZ Enroll PCC Gen Account updated successfully`);
+        } catch (error: unknown) {
+          const typedError = error as ErrorWithMessage;
+          this.logger.error(
+            `Error updating EZ Enroll PCC Gen Account: ${typedError.message}`
+          );
+          // Continue with other updates even if this one fails
+        }
+
+        // Updates DSM Sales Confirmation
+        this.logger.log(
+          `Step 6: Updating DSM Sales Confirmation for MID: ${merchantId}`
+        );
+        try {
+          await this.dsmSalesConfirmationRepository.update(
+            { mid: merchantId },
+            {
+              riskWatch: isRiskWatch,
+            }
+          );
+          this.logger.log(`DSM Sales Confirmation updated successfully`);
+        } catch (error: unknown) {
+          const typedError = error as ErrorWithMessage;
+          this.logger.error(
+            `Error updating DSM Sales Confirmation: ${typedError.message}`
+          );
+          // Continue with other updates even if this one fails
+        }
+
+        // Updates Snap PCC Sales Confirmation
+        this.logger.log(
+          `Step 7: Updating Snap PCC Sales Confirmation for MID: ${merchantId}`
+        );
+        try {
+          await this.snapSalesConfirmationRepository.update(
+            { mid: merchantId },
+            {
+              riskWatch: isRiskWatch,
+            }
+          );
+          this.logger.log(`Snap PCC Sales Confirmation updated successfully`);
+        } catch (error: unknown) {
+          const typedError = error as ErrorWithMessage;
+          this.logger.error(
+            `Error updating Snap PCC Sales Confirmation: ${typedError.message}`
+          );
+          // Continue with other updates even if this one fails
+        }
+      } else {
+        this.logger.log('Risk Watch not provided, skipping related updates');
+      }
+
+      // Create change notes only for fields that are explicitly provided
+      if (isAutoHoldEnabled !== undefined || isDiverted !== undefined) {
+        this.logger.log(`Step 8: Checking and creating changed notes`);
+
+        // Auto hold whitelabel
+        if (
+          isAutoHoldEnabled !== undefined &&
+          isAutoHoldEnabled !== merchAdj.isAutoHoldWhiteLabel
+        ) {
+          this.logger.log(
+            `Auto Hold Whitelist changed from ${merchAdj.isAutoHoldWhiteLabel} to ${isAutoHoldEnabled}`
+          );
+          try {
+            await this.notesRepository.createAutoHoldChangedNotes(
+              merchantId,
+              merchAdj.isAutoHoldWhiteLabel,
+              isAutoHoldEnabled,
+              createdBy
+            );
+            this.logger.log(`Auto Hold changed notes created successfully`);
+          } catch (error: unknown) {
+            const typedError = error as ErrorWithMessage;
+            this.logger.error(
+              `Error creating Auto Hold changed notes: ${typedError.message}`
+            );
+            throw error;
+          }
+        }
+
+        // Divert status
+        if (isDiverted !== undefined && isDiverted !== merchAdj.isDivert) {
+          this.logger.log(
+            `Divert status changed from ${merchAdj.isDivert} to ${isDiverted}`
+          );
+          try {
+            await this.notesRepository.createDivertChangedNotes(
+              merchantId,
+              isDiverted,
+              createdBy
+            );
+            this.logger.log(`Divert changed notes created successfully`);
+          } catch (error: unknown) {
+            const typedError = error as ErrorWithMessage;
+            this.logger.error(
+              `Error creating Divert changed notes: ${typedError.message}`
+            );
+            throw error;
+          }
+        }
+
+        this.logger.log(`Changed notes processed successfully`);
+      } else {
+        this.logger.log(
+          'No note-worthy field changes, skipping notes creation'
+        );
+      }
+
+      // Handle divert status changes only if isDiverted is explicitly provided
+      if (isDiverted !== undefined && isDiverted !== merchAdj.isDivert) {
         this.logger.log(
           `Step 9: Divert status changed from ${merchAdj.isDivert} to ${isDiverted}`
         );
@@ -214,29 +297,47 @@ export class RiskRadarSaveService {
         }
         this.logger.log(`Divert status handling completed`);
       } else {
-        this.logger.log(`Divert status unchanged, skipping divert handling`);
-      }
-
-      // Create notes depending on received status
-      if (clickedStatus === 'rev') {
-        this.logger.log(`Step 10a: Processing review status`);
-        exceptionJeff.exceptionStatusId = 2;
-        exceptionJeff.userReviewed = createdBy;
-
-        await this.notesRepository.createReviewNotes(merchantId, createdBy);
-        this.logger.log(`Review notes created successfully`);
-      } else if (clickedStatus === 'mgrq') {
-        this.logger.log(`Step 10b: Processing manager queue status`);
-        exceptionJeff.exceptionStatusId = 3;
-
-        await this.notesRepository.createManagerQueuedNotes(
-          merchantId,
-          createdBy
+        this.logger.log(
+          `Divert status unchanged or not provided, skipping divert handling`
         );
-        this.logger.log(`Manager queue notes created successfully`);
       }
 
-      //  Save notes
+      // Create notes depending on received status - only if clickedStatus is provided
+      if (clickedStatus !== undefined) {
+        if (clickedStatus === 'rev') {
+          this.logger.log(`Step 10a: Processing review status`);
+          exceptionJeff.exceptionStatusId = 2;
+          exceptionJeff.userReviewed = createdBy;
+
+          await this.notesRepository.createReviewNotes(merchantId, createdBy);
+          this.logger.log(`Review notes created successfully`);
+        } else if (clickedStatus === 'mgrq') {
+          this.logger.log(`Step 10b: Processing manager queue status`);
+          exceptionJeff.exceptionStatusId = 3;
+
+          await this.notesRepository.createManagerQueuedNotes(
+            merchantId,
+            createdBy
+          );
+          this.logger.log(`Manager queue notes created successfully`);
+        } else if (clickedStatus === '') {
+          // Reset status if empty string is provided
+          this.logger.log(`Step 10c: Resetting exception status`);
+          exceptionJeff.exceptionStatusId = 1; // Reset to default status
+          exceptionJeff.userReviewed = null;
+        }
+
+        // Save exception data if clickedStatus was provided
+        this.logger.log(`Step 12: Saving exception Jeff data`);
+        await this.exceptionsJeffRepository.save(exceptionJeff);
+        this.logger.log(`Exception data saved successfully`);
+      } else {
+        this.logger.log(
+          'No status change requested, skipping exception update'
+        );
+      }
+
+      // Save notes only if they are provided
       if (notes) {
         this.logger.log(`Step 11: Saving notes for MID: ${merchantId}`);
         await this.notesRepository.insert({
@@ -249,10 +350,6 @@ export class RiskRadarSaveService {
       } else {
         this.logger.log(`No notes to save, skipping step 11`);
       }
-
-      this.logger.log(`Step 12: Saving exception Jeff data`);
-      await this.exceptionsJeffRepository.save(exceptionJeff);
-      this.logger.log(`Exception data saved successfully`);
 
       this.logger.log(
         `RiskRadar save completed successfully for MID: ${merchantId}`
@@ -279,7 +376,10 @@ export class RiskRadarSaveService {
     );
 
     // Auto hold whitelabel
-    if (isAutoHoldEnabled !== merchAdj.isAutoHoldWhiteLabel) {
+    if (
+      isAutoHoldEnabled !== undefined &&
+      isAutoHoldEnabled !== merchAdj.isAutoHoldWhiteLabel
+    ) {
       this.logger.log(
         `Auto Hold Whitelist changed from ${merchAdj.isAutoHoldWhiteLabel} to ${isAutoHoldEnabled}`
       );
@@ -300,7 +400,8 @@ export class RiskRadarSaveService {
       }
     }
 
-    if (isDiverted !== merchAdj.isDivert) {
+    // Divert status
+    if (isDiverted !== undefined && isDiverted !== merchAdj.isDivert) {
       this.logger.log(
         `Divert status changed from ${merchAdj.isDivert} to ${isDiverted}`
       );
