@@ -1003,7 +1003,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               </span>
             </p>
             <p>
-              <strong>HT ($):</strong> {merchantProfile?.iHT$ || ''}
+              <strong>HT ($):</strong>
               <span className="text-gray-500 dark:text-gray-400">
                 {' '}
                 (UW Appr.- {merchantProfile?.iUWApprHT})
