@@ -19,6 +19,7 @@ import type {
 } from '@/shared/response';
 import { Tooltip } from '@/ui/common/tool-tips/risk-tooltip';
 import { Popup } from '@/web/src/components/risk-radar/popups/popups';
+import { formatDate } from '@/web/src/components/risk-radar/risk-radar-table/table/formatters';
 import { useEmailTemplates } from '@/web/src/hooks/risk-radar/use-email-templates';
 import type { CardHistory } from '@/web/src/hooks/risk-radar/use-get-card-history';
 import { useCardHistory } from '@/web/src/hooks/risk-radar/use-get-card-history';
@@ -432,20 +433,21 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
   // Modified handler to save immediately if saveImmediately is true
   const handleDivertTrigger = async (
+    diverted: boolean,
     saveImmediately = false
   ): Promise<void> => {
     setMerchantStateData((prev) => ({
       ...prev,
-      isDiverted: true,
+      isDiverted: diverted,
     }));
 
     setChangedFields((prev) => ({
       ...prev,
-      isDiverted: true,
+      isDiverted: diverted,
     }));
 
     if (saveImmediately && user?.name) {
-      await saveChangedFields({ isDiverted: true });
+      await saveChangedFields({ isDiverted: diverted });
     }
   };
 
@@ -487,35 +489,83 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     }
   };
 
-  const handleManagersQueueTrigger = (): void => {
+  const handleManagersQueueTrigger = async (): Promise<void> => {
+    const newStatus = merchantStateData.clickedStatus === 'mgrq' ? '' : 'mgrq';
     setMerchantStateData((prev) => ({
       ...prev,
-      clickedStatus: prev.clickedStatus === 'mgrq' ? '' : 'mgrq',
+      clickedStatus: newStatus,
     }));
 
     setChangedFields((prev) => ({
       ...prev,
       clickedStatus: true,
     }));
+
+    if (user?.name) {
+      await saveChangedFields({ clickedStatus: newStatus });
+    }
   };
 
-  const handleClickOnReviewButton = (): void => {
+  const handleClickOnReviewButton = async (): Promise<void> => {
     if (user?.name) {
+      const newStatus = merchantStateData.clickedStatus === 'rev' ? '' : 'rev';
       setMerchantStateData((prev) => ({
         ...prev,
-        clickedStatus: prev.clickedStatus === 'rev' ? '' : 'rev',
+        clickedStatus: newStatus,
       }));
 
       setChangedFields((prev) => ({
         ...prev,
         clickedStatus: true,
       }));
+
+      await saveChangedFields({ clickedStatus: newStatus });
     }
   };
 
   // Updated save handler that uses our helper function
   const handleSaveMerchantData = async (): Promise<void> => {
-    await saveChangedFields();
+    try {
+      setIsSaving(true);
+      await saveMerchantdata({
+        merchantId,
+        exceptionId: parseInt(exceptionId, 10),
+        createdBy: user?.name ?? '',
+        ...merchantStateData,
+      });
+
+      // Reset form values after successful save
+      setMerchantStateData({
+        isDiverted: false,
+        preferredContact: '',
+        notes: '',
+        isPinnedNote: false,
+        clickedStatus: '',
+        isRiskWatch: false,
+        isAutoHoldEnabled: false,
+      });
+
+      setNoteRequest({
+        sNotes: null,
+        isPinned: false,
+        author: user?.name ?? null,
+      });
+
+      setMerchantUpdateRequest({
+        preferredContact: '',
+      });
+
+      // Reset changed fields
+      setChangedFields({});
+
+      // Refresh data
+      refetch();
+      notesRefetch();
+    } catch (error) {
+      // console.error('Error saving merchant data:', error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const replaceEmailTemplateParameters = (templateText: string): void => {
@@ -677,7 +727,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           {card.mid}
                         </td>
                         <td className="border-b border-[#eee] p-4 dark:border-strokedark">
-                          {new Date(card.transactionDate).toLocaleDateString()}
+                          {formatDate(card.transactionDate)}
                         </td>
                         <td className="border-b border-[#eee] p-4 dark:border-strokedark">
                           ${card.amount.toFixed(2)}
@@ -698,7 +748,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           {card.debitNetworkIdentifier || '-'}
                         </td>
                         <td className="border-b border-[#eee] p-4 dark:border-strokedark">
-                          {new Date(card.transmissionDate).toLocaleDateString()}
+                          {formatDate(card.transmissionDate)}
                         </td>
                         <td className="border-b border-[#eee] p-4 dark:border-strokedark">
                           ${card.netDepositAmount.toFixed(2)}
@@ -816,18 +866,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         <h1 className=" text-2xl font-semibold text-black dark:text-white">
           MID: {merchantProfile?.sMId}
         </h1>
-        <div className="inline-flex items-center justify-end">
-          <button
-            className="inline-flex w-[100px] items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90 disabled:opacity-70 disabled:cursor-not-allowed"
-            type="button"
-            disabled={isSaving}
-            onClick={() => {
-              handleSaveMerchantData().catch(() => {});
-            }}
-          >
-            {isSaving ? 'Saving...' : 'Save'}
-          </button>
-        </div>
       </section>
 
       <section className="mb-4 grid grid-cols-4 gap-4">
@@ -857,13 +895,16 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             <input
               type="checkbox"
               className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
-              disabled={merchantStateData.isDiverted}
+              disabled={!data?.businessInfo?.uwNewAccountHoldAllowRiskToEdit}
               checked={merchantStateData.isDiverted}
-              onChange={() => handleDivertTrigger(true)}
+              onChange={() =>
+                handleDivertTrigger(!merchantStateData.isDiverted, true)
+              }
             />
           </p>
           <p className="text-black dark:text-white">
-            <strong>Activated:</strong> {merchantProfile?.sActivationDate}
+            <strong>Activated:</strong>{' '}
+            {formatDate(merchantProfile?.sActivationDate)}
           </p>
 
           {riskException?.fkRiskExceptionStatus === 1 ? (
@@ -877,7 +918,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                 }`}
                 type="button"
                 onClick={() => {
-                  handleManagersQueueTrigger();
+                  handleManagersQueueTrigger().catch(() => {});
                 }}
               >
                 {merchantStateData.clickedStatus === 'mgrq'
@@ -900,10 +941,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
         {/* Column 3 */}
         <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
-          <p className="text-black dark:text-white">
-            <strong>Reseller:</strong> {merchantProfile?.sReseller}
-          </p>
-
           <p className="text-black dark:text-white">
             <strong>Merchant Type:</strong> {merchantProfile?.sMerchantType}
           </p>
@@ -957,7 +994,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               type="button"
               disabled={riskException?.fkRiskExceptionStatus === 2}
               onClick={() => {
-                handleClickOnReviewButton();
+                handleClickOnReviewButton().catch(() => {});
               }}
             >
               {merchantStateData.clickedStatus === 'rev'
@@ -1007,7 +1044,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               </span>
             </p>
             <p>
-              <strong>HT ($):</strong> {merchantProfile?.iHT$ || ''}
+              <strong>HT ($):</strong>
               <span className="text-gray-500 dark:text-gray-400">
                 {' '}
                 (UW Appr.- {merchantProfile?.iUWApprHT})
@@ -1142,6 +1179,18 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     />
                   </p>
                 </div>
+                <div className="mt-4 flex justify-center">
+                  <button
+                    className="inline-flex w-[100px] items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90 disabled:opacity-70 disabled:cursor-not-allowed"
+                    type="button"
+                    disabled={isSaving}
+                    onClick={() => {
+                      handleSaveMerchantData().catch(() => {});
+                    }}
+                  >
+                    {isSaving ? 'Saving...' : 'Save'}
+                  </button>
+                </div>
               </div>
 
               {/* Right Column - Billing Address */}
@@ -1250,7 +1299,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                         className="text-center"
                       >
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {exception.transactionDate}
+                          {formatDate(exception.transactionDate)}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                           ${exception.authAmount}
@@ -1359,7 +1408,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           {note.sNotes}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {note.dtCreated}
+                          {formatDate(note.dtCreated)}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                           {note.sUserCreated}
@@ -1390,44 +1439,58 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   totalPages={totalNotesPages}
                   onPageChange={setNotesPage}
                 />
-                <input
-                  type="text"
-                  value={noteRequest.sNotes ?? ''}
-                  onChange={(e) => {
-                    setNoteRequest((prev) => ({
-                      ...prev,
-                      sNotes: e.target.value,
-                    }));
+                <div className="flex items-center gap-4 justify-center mt-[5px]">
+                  <input
+                    type="text"
+                    value={noteRequest.sNotes ?? ''}
+                    onChange={(e) => {
+                      setNoteRequest((prev) => ({
+                        ...prev,
+                        sNotes: e.target.value,
+                      }));
 
-                    // Track that notes have changed
-                    setChangedFields((prev) => ({
-                      ...prev,
-                      notes: true,
-                    }));
-                  }}
-                  placeholder="New Note"
-                  className="w-80 rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 my-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                />
-                <span className="m-3">pinned</span>
-                <input
-                  type="checkbox"
-                  id="pin"
-                  className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
-                  disabled={false}
-                  checked={noteRequest.isPinned}
-                  onChange={(e) => {
-                    setNoteRequest((prev) => ({
-                      ...prev,
-                      isPinned: e.target.checked,
-                    }));
+                      // Track that notes have changed
+                      setChangedFields((prev) => ({
+                        ...prev,
+                        notes: true,
+                      }));
+                    }}
+                    placeholder="New Note"
+                    className="max-w-[400px] rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  />
+                  <div className="flex items-center gap-2">
+                    <span>pinned</span>
+                    <input
+                      type="checkbox"
+                      id="pin"
+                      className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
+                      disabled={false}
+                      checked={noteRequest.isPinned}
+                      onChange={(e) => {
+                        setNoteRequest((prev) => ({
+                          ...prev,
+                          isPinned: e.target.checked,
+                        }));
 
-                    // Track that isPinnedNote has changed
-                    setChangedFields((prev) => ({
-                      ...prev,
-                      isPinnedNote: true,
-                    }));
-                  }}
-                />
+                        // Track that isPinnedNote has changed
+                        setChangedFields((prev) => ({
+                          ...prev,
+                          isPinnedNote: true,
+                        }));
+                      }}
+                    />
+                  </div>
+                  <button
+                    className="inline-flex w-[100px] items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90 disabled:opacity-70 disabled:cursor-not-allowed"
+                    type="button"
+                    disabled={isSaving}
+                    onClick={() => {
+                      handleSaveMerchantData().catch(() => {});
+                    }}
+                  >
+                    {isSaving ? 'Saving...' : 'Save'}
+                  </button>
+                </div>
               </div>
             </div>
           </>
@@ -1484,7 +1547,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           {chargeback.sCaseNumber}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {new Date(chargeback.dtTrans).toLocaleDateString()}
+                          {formatDate(chargeback.dtTrans)}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                           ${chargeback.dAmt.toFixed(2)}
@@ -1496,7 +1559,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           {chargeback.sPaymentType}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {new Date(chargeback.dtReceived).toLocaleDateString()}
+                          {formatDate(chargeback.dtReceived)}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                           {chargeback.sReferenceNum}
@@ -1505,7 +1568,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           {chargeback.ReasonCodeDescription}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {new Date(chargeback.dtCreated).toLocaleDateString()}
+                          {formatDate(chargeback.dtCreated)}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                           {chargeback.bP2ChargebacksExists ? 'Yes' : 'No'}

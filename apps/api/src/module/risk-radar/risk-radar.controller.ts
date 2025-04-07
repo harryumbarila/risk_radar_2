@@ -26,8 +26,11 @@ import type { ExceptionDataResponseDto } from '@/shared/response/legacy-dashboar
 import { MerchantExceptionDetailResponseDto } from './dtos/merchant-exception-detail.dto';
 import { SendExceptionMemoEmailDto } from './dtos/send-exception-memo-email.dto';
 import { RiskRadarService } from './risk-radar.service';
-import { AssignExceptionReviewService } from './services/assign-exception-review/assign-exception-review.service';
-import { AssignExceptionReviewInputDto } from './services/assign-exception-review/dto/assign-exception-review-input.dto';
+import { AssignExceptionsService } from './services/assign-exceptions/assign-exceptions.service';
+import {
+  AssignExceptionsDto,
+  AssignExceptionsResponseDto,
+} from './services/assign-exceptions/dto/assign-exceptions.dto';
 import { ExceptionListInputDto } from './services/exceptions-list/dto/exception-list-input.dto';
 import { ExceptionsListService } from './services/exceptions-list/exceptions-list.service';
 import { MerchantCardNumHistoryQueryDto } from './services/merchant-card-num-history/dto/get-merchant-card-num.dto';
@@ -35,6 +38,8 @@ import { MerchantCardNumHistoryService } from './services/merchant-card-num-hist
 import { MerchantExceptionDetailService } from './services/merchant-exception-detail.service';
 import { MerchantExceptionTransactionsService } from './services/merchant-exception-transactions/merchant-exception-transactions.service';
 import { MerchantWithSameTaxIdService } from './services/merchant-with-same-tax-id/merchant-with-same-tax-id.service';
+import { ReviewExceptionInputDto } from './services/review-exception/dto/review-exception-input.dto';
+import { ReviewExceptionService } from './services/review-exception/review-exception.service';
 import { EmailTemplatesResponseDto } from './services/risk-radar-email-template/dto/email-template.dto';
 import { RiskRadarEmailTemplateService } from './services/risk-radar-email-template/risk-radar-email-template.service';
 import { RiskRadarExceptionsService } from './services/risk-radar-exceptions.service';
@@ -48,7 +53,7 @@ export class RiskRadarController {
     private readonly riskRadarService: RiskRadarService,
     private readonly merchantExceptionDetailService: MerchantExceptionDetailService,
     private readonly merchantCardNumHistoryService: MerchantCardNumHistoryService,
-    private readonly assignExceptionReviewService: AssignExceptionReviewService,
+    private readonly reviewExceptionService: ReviewExceptionService,
     private readonly riskRadarExceptionsService: RiskRadarExceptionsService,
     private readonly riskRadarSaveService: RiskRadarSaveService,
     private readonly exceptionStatusRepo: RiskRadarExceptionStatusRepository,
@@ -58,7 +63,8 @@ export class RiskRadarController {
     private readonly riskRadarNotesRepository: RiskRadarNotesRepository,
     private readonly chargebackTransactionsService: ChargebacksAndRetrievalReasonCodeLookupRepository,
     private readonly emailTemplateService: RiskRadarEmailTemplateService,
-    private readonly merchantWithSameTaxIdService: MerchantWithSameTaxIdService
+    private readonly merchantWithSameTaxIdService: MerchantWithSameTaxIdService,
+    private readonly assignExceptionsService: AssignExceptionsService
   ) {}
 
   @Post('send-exception-memo-email')
@@ -225,10 +231,18 @@ export class RiskRadarController {
     };
   }
 
-  @Post('assign-exception-review')
-  @ApiOkResponse()
-  public assignExceptionReview(@Body() data: AssignExceptionReviewInputDto) {
-    return this.assignExceptionReviewService.assignExceptionReview(data);
+  @Post('review-exceptions')
+  @ApiOperation({
+    summary: 'Review exceptions',
+    description:
+      'Marks risk radar exceptions as reviewed by the specified user',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The exceptions were successfully reviewed',
+  })
+  public async reviewExceptions(@Body() data: ReviewExceptionInputDto) {
+    return this.reviewExceptionService.reviewExceptions(data);
   }
 
   @Post('save')
@@ -316,6 +330,26 @@ export class RiskRadarController {
   ): Promise<{ merchantIds: string[] }> {
     return this.merchantWithSameTaxIdService.getMerchantsWithSameTaxId(
       merchantId
+    );
+  }
+
+  @Post('assign-exceptions')
+  @ApiOperation({
+    summary: 'Assign exceptions to a user',
+    description: 'Assigns selected risk radar exceptions to a specific user',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The exceptions were successfully assigned',
+    type: AssignExceptionsResponseDto,
+  })
+  public async assignExceptions(
+    @Body() data: AssignExceptionsDto
+  ): Promise<AssignExceptionsResponseDto> {
+    return this.assignExceptionsService.assignExceptions(
+      data.exceptionIds,
+      data.assignToUserId,
+      data.createdBy
     );
   }
 }

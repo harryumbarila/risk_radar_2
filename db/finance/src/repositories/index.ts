@@ -5,6 +5,7 @@ export * from './dft-256-transaction.repository';
 export * from './dft-256-transaction-from-legacy-system.repository';
 export * from './merchant-exception-detail.repository';
 export * from './pos-entry-modes-adf.repository';
+export * from './risk-radar-assign-exceptions.repository';
 export * from './risk-radar-batch.repository';
 export * from './risk-radar-chargebacks-and-retrieval-reason-code-lookup.repository';
 export * from './risk-radar-cycle-time-monitor.repository';
