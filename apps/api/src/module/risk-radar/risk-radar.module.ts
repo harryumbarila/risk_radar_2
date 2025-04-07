@@ -29,6 +29,7 @@ import {
   FSPRiskRadarExceptionPointsRepository,
   MerchantExceptionDetailRepository,
   POSEntryModesADFRepository,
+  RiskRadarAssignExceptionsRepository,
   RiskRadarBatchRepository,
   RiskRadarCycleTimeMonitorRepository,
   RiskRadarEmailTemplateRepository,
@@ -40,7 +41,6 @@ import {
   RiskRadarTransactionRepository,
   RiskRadarUserRepository,
   TSYSDivertFlagUpdateRepository,
-  RiskRadarAssignExceptionsRepository,
 } from '@/finance-db/repositories';
 import {
   LeadEntity,

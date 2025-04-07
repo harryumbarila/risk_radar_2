@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import useBaseApi from '@/hooks/use-base-api';
+import useBaseApi from '@/web/src/hooks/use-base-api';
 
 type AssignExceptionsResponse = {
   success: boolean;
@@ -13,12 +13,14 @@ type UseAssignExceptionToUserReturnType = {
     username: string
   ) => Promise<boolean>;
   isLoading: boolean;
+  error: Error | null;
 };
 
 export const useAssignExceptionToUser =
   (): UseAssignExceptionToUserReturnType => {
     const { makeRequest } = useBaseApi();
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
 
     const assignException = async (
       exceptionIds: number[],
@@ -26,6 +28,7 @@ export const useAssignExceptionToUser =
       createdBy: string
     ): Promise<boolean> => {
       setIsLoading(true);
+      setError(null);
 
       try {
         // Call our new API endpoint to assign exceptions
@@ -46,8 +49,10 @@ export const useAssignExceptionToUser =
 
         setIsLoading(false);
         return response?.success || false;
-      } catch (error) {
-        console.error('Error assigning exceptions:', error);
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Unknown error occurred';
+        setError(err instanceof Error ? err : new Error(errorMessage));
         setIsLoading(false);
         return false;
       }
@@ -56,5 +61,6 @@ export const useAssignExceptionToUser =
     return {
       assignException,
       isLoading,
+      error,
     };
   };

@@ -1,8 +1,8 @@
 import type { FC } from 'react';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 import type { RiskUser } from '@/shared/response/legacy-dashboard-proxy/dto/exception-data';
-import { toast } from 'react-toastify';
 
 type ManagerQueuedHeaderProps = {
   riskUsers: RiskUser[];

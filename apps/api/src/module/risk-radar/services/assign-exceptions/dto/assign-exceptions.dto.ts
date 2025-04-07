@@ -38,4 +38,4 @@ export class AssignExceptionsResponseDto {
     example: true,
   })
   public success: boolean;
-} 
+}

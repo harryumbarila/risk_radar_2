@@ -2,9 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectPinoLogger } from 'nestjs-pino';
 import { Logger } from 'pino';
 
+import type { RiskRadarExceptionsJeffEntity } from '@/finance-db/entities/risk-radar-exceptions-jeff.entity';
 import { RiskRadarNotesRepository } from '@/finance-db/repositories';
 import { RiskRadarExceptionsJeffRepository } from '@/finance-db/repositories/risk-radar-exceptions-jeff.repository';
 import { RiskRadarUserRepository } from '@/finance-db/repositories/risk-radar-user.repository';
+
+type ExceptionWithMid = Pick<RiskRadarExceptionsJeffEntity, 'id' | 'mid'>;
 
 /**
  * Service to handle assigning risk radar exceptions to specific users
@@ -20,12 +23,23 @@ export class AssignExceptionsService {
     private readonly userRepository: RiskRadarUserRepository
   ) {}
 
+  private isExceptionWithMid(obj: unknown): obj is ExceptionWithMid {
+    return (
+      typeof obj === 'object' &&
+      obj !== null &&
+      'id' in obj &&
+      typeof (obj as ExceptionWithMid).id === 'number' &&
+      'mid' in obj &&
+      typeof (obj as ExceptionWithMid).mid === 'string'
+    );
+  }
+
   /**
    * Assign risk radar exceptions to a specific user
    */
   public async assignExceptions(
-    exceptionIds: string, 
-    assignToUserId: number, 
+    exceptionIds: string,
+    assignToUserId: number,
     createdBy: string
   ): Promise<{ success: boolean }> {
     this.logger.info(
@@ -36,10 +50,10 @@ export class AssignExceptionsService {
       // Parse exception IDs from comma-separated string to array of numbers
       const exceptionIdArray = exceptionIds
         .split(',')
-        .map(id => id.trim())
-        .filter(id => id !== '')
-        .map(id => parseInt(id, 10))
-        .filter(id => !Number.isNaN(id));
+        .map((id) => id.trim())
+        .filter((id) => id !== '')
+        .map((id) => parseInt(id, 10))
+        .filter((id) => !Number.isNaN(id));
 
       this.logger.debug(`Parsed exception IDs: ${exceptionIdArray.join(', ')}`);
 
@@ -63,26 +77,27 @@ export class AssignExceptionsService {
       );
 
       // Get MIDs for all updated exceptions
-      const exceptions = await this.exceptionsJeffRepository.getExceptionsByMIDs(
-        exceptionIdArray
-      );
-      
+      const exceptions =
+        await this.exceptionsJeffRepository.getExceptionsByMIDs(
+          exceptionIdArray
+        );
+
       // Create notes for each exception
-      const createNotesPromises = exceptions.map((exception: { mid: string }) => 
+      const createNotesPromises = exceptions.map((exception) =>
         this.notesRepository.createAssignmentNotes(
           exception.mid,
           assignedUserName,
           createdBy
         )
       );
-      
+
       await Promise.all(createNotesPromises);
 
       this.logger.info(
         `Successfully assigned ${exceptions.length} exceptions to user ID ${assignToUserId}`
       );
       return { success: true };
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(
         { err: error },
         `Error assigning exceptions: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -90,4 +105,4 @@ export class AssignExceptionsService {
       throw error;
     }
   }
-} 
+}

@@ -48,7 +48,9 @@ export class ReviewExceptionService {
       mids.map(({ mid }) => this.notesRepository.createReviewNotes(mid, user))
     );
 
-    this.logger.info(`Successfully reviewed ${mids.length} exceptions by user ${user}`);
+    this.logger.info(
+      `Successfully reviewed ${mids.length} exceptions by user ${user}`
+    );
     return { success: true, message: `Updated ${mids.length} exceptions` };
   }
-} 
+}

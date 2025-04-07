@@ -26,6 +26,11 @@ import type { ExceptionDataResponseDto } from '@/shared/response/legacy-dashboar
 import { MerchantExceptionDetailResponseDto } from './dtos/merchant-exception-detail.dto';
 import { SendExceptionMemoEmailDto } from './dtos/send-exception-memo-email.dto';
 import { RiskRadarService } from './risk-radar.service';
+import { AssignExceptionsService } from './services/assign-exceptions/assign-exceptions.service';
+import {
+  AssignExceptionsDto,
+  AssignExceptionsResponseDto,
+} from './services/assign-exceptions/dto/assign-exceptions.dto';
 import { ExceptionListInputDto } from './services/exceptions-list/dto/exception-list-input.dto';
 import { ExceptionsListService } from './services/exceptions-list/exceptions-list.service';
 import { MerchantCardNumHistoryQueryDto } from './services/merchant-card-num-history/dto/get-merchant-card-num.dto';
@@ -33,15 +38,13 @@ import { MerchantCardNumHistoryService } from './services/merchant-card-num-hist
 import { MerchantExceptionDetailService } from './services/merchant-exception-detail.service';
 import { MerchantExceptionTransactionsService } from './services/merchant-exception-transactions/merchant-exception-transactions.service';
 import { MerchantWithSameTaxIdService } from './services/merchant-with-same-tax-id/merchant-with-same-tax-id.service';
+import { ReviewExceptionInputDto } from './services/review-exception/dto/review-exception-input.dto';
+import { ReviewExceptionService } from './services/review-exception/review-exception.service';
 import { EmailTemplatesResponseDto } from './services/risk-radar-email-template/dto/email-template.dto';
 import { RiskRadarEmailTemplateService } from './services/risk-radar-email-template/risk-radar-email-template.service';
 import { RiskRadarExceptionsService } from './services/risk-radar-exceptions.service';
 import { RiskRadarSaveInputDto } from './services/risk-radar-save/dto/risk-radar-save-input.dto';
 import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save.service';
-import { AssignExceptionsService } from './services/assign-exceptions/assign-exceptions.service';
-import { AssignExceptionsDto, AssignExceptionsResponseDto } from './services/assign-exceptions/dto/assign-exceptions.dto';
-import { ReviewExceptionService } from './services/review-exception/review-exception.service';
-import { ReviewExceptionInputDto } from './services/review-exception/dto/review-exception-input.dto';
 
 @ApiTags('risk-radar')
 @Controller('v1/risk-radar')
@@ -231,15 +234,14 @@ export class RiskRadarController {
   @Post('review-exceptions')
   @ApiOperation({
     summary: 'Review exceptions',
-    description: 'Marks risk radar exceptions as reviewed by the specified user',
+    description:
+      'Marks risk radar exceptions as reviewed by the specified user',
   })
   @ApiResponse({
     status: 200,
     description: 'The exceptions were successfully reviewed',
   })
-  public async reviewExceptions(
-    @Body() data: ReviewExceptionInputDto
-  ) {
+  public async reviewExceptions(@Body() data: ReviewExceptionInputDto) {
     return this.reviewExceptionService.reviewExceptions(data);
   }
 

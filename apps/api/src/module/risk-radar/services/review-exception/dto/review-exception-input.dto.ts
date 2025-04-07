@@ -20,4 +20,4 @@ export class ReviewExceptionInputDto {
   @IsString()
   @IsNotEmpty()
   public user: string;
-} 
+}

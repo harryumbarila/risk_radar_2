@@ -4,8 +4,8 @@ import type { DataSource } from 'typeorm';
 import { Repository } from 'typeorm';
 
 import { RiskRadarExceptionsJeffEntity } from '../entities/risk-radar-exceptions-jeff.entity';
-import { RiskRadarNotesRepository } from './risk-radar-notes.repository';
-import { RiskRadarUserRepository } from './risk-radar-user.repository';
+import type { RiskRadarNotesRepository } from './risk-radar-notes.repository';
+import type { RiskRadarUserRepository } from './risk-radar-user.repository';
 
 /**
  * Repository to handle Risk Radar exception assignments
