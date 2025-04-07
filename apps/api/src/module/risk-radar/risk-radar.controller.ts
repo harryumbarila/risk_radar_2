@@ -36,7 +36,7 @@ import { ExceptionsListService } from './services/exceptions-list/exceptions-lis
 import { MerchantCardNumHistoryQueryDto } from './services/merchant-card-num-history/dto/get-merchant-card-num.dto';
 import { MerchantCardNumHistoryService } from './services/merchant-card-num-history/merchant-card-num-history.service';
 import { MerchantExceptionDetailService } from './services/merchant-exception-detail.service';
-import { MerchantExceptionTransactionsService } from './services/merchant-exception-transactions/merchant-exception-transactions.service';
+import { MerchantExceptionTransactionsService } from './services/merchant-exception-transactions/merchant-exception-transactions2.service';
 import { MerchantWithSameTaxIdService } from './services/merchant-with-same-tax-id/merchant-with-same-tax-id.service';
 import { ReviewExceptionInputDto } from './services/review-exception/dto/review-exception-input.dto';
 import { ReviewExceptionService } from './services/review-exception/review-exception.service';
@@ -258,11 +258,11 @@ export class RiskRadarController {
     @Query('binSearch') binSearch: string,
     @Query('sortBy') sortBy: number
   ) {
-    return this.merchantExceptionTransactionsService.getExceptionTransactions(
+    return this.merchantExceptionTransactionsService.getExceptionsTrans({
       riskRadarExceptionId,
       binSearch,
-      sortBy
-    );
+      sortBy,
+    });
   }
 
   @Get('exception-list')
