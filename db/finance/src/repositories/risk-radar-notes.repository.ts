@@ -121,7 +121,7 @@ export class RiskRadarNotesRepository extends Repository<RiskRadarNotesEntity> {
     const oldValueString = oldValue ? 'Check' : 'UnCheck';
     const newValueString = newValue ? 'Check' : 'Uncheck';
 
-    const notes = `MV Changed from ${oldValueString} to ${newValueString}`;
+    const notes = `Auto hold Changed from ${oldValueString} to ${newValueString}`;
 
     await this.insert({
       mid,
