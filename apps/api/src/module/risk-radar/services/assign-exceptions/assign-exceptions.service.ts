@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectPinoLogger } from 'nestjs-pino';
 import { Logger } from 'pino';
 
+import { RiskRadarNotesService } from '@/api/module/risk-radar/services/risk-radar-notes/risk-radar-notes.service';
+import { RiskRadarUserService } from '@/api/module/risk-radar/services/risk-radar-user/risk-radar-user.service';
 import type { RiskRadarExceptionsJeffEntity } from '@/finance-db/entities/risk-radar-exceptions-jeff.entity';
-import { RiskRadarNotesRepository } from '@/finance-db/repositories';
-import { RiskRadarExceptionsJeffRepository } from '@/finance-db/repositories/risk-radar-exceptions-jeff.repository';
-import { RiskRadarUserRepository } from '@/finance-db/repositories/risk-radar-user.repository';
+import { RiskRadarAssignExceptionsRepository } from '@/finance-db/repositories/risk-radar-assign-exceptions.repository';
 
 type ExceptionWithMid = Pick<RiskRadarExceptionsJeffEntity, 'id' | 'mid'>;
 
@@ -17,10 +17,9 @@ export class AssignExceptionsService {
   public constructor(
     @InjectPinoLogger(AssignExceptionsService.name)
     private readonly logger: Logger,
-
-    private readonly exceptionsJeffRepository: RiskRadarExceptionsJeffRepository,
-    private readonly notesRepository: RiskRadarNotesRepository,
-    private readonly userRepository: RiskRadarUserRepository
+    private readonly assignExceptionsRepository: RiskRadarAssignExceptionsRepository,
+    private readonly notesService: RiskRadarNotesService,
+    private readonly userService: RiskRadarUserService
   ) {}
 
   private isExceptionWithMid(obj: unknown): obj is ExceptionWithMid {
@@ -63,38 +62,34 @@ export class AssignExceptionsService {
       }
 
       // Get the NT user ID of the assigned user
-      const assignedUser = await this.userRepository.findOne({
-        where: { id: assignToUserId },
-        select: ['ntUserId'],
-      });
-
+      const assignedUser = await this.userService.getUserById(assignToUserId);
       const assignedUserName = assignedUser?.ntUserId || '';
 
-      // Use the repository's assignExceptions method to update the exceptions
-      await this.exceptionsJeffRepository.assignExceptions(
+      // Use the repository to handle the database operations
+      await this.assignExceptionsRepository.assignExceptions(
         exceptionIdArray,
         assignToUserId
       );
 
-      // Get MIDs for all updated exceptions
+      // Get MIDs for the assigned exceptions
       const exceptions =
-        await this.exceptionsJeffRepository.getExceptionsByMIDs(
+        await this.assignExceptionsRepository.getExceptionsByMIDs(
           exceptionIdArray
         );
 
       // Create notes for each exception
-      const createNotesPromises = exceptions.map((exception) =>
-        this.notesRepository.createAssignmentNotes(
-          exception.mid,
-          assignedUserName,
-          createdBy
+      await Promise.all(
+        exceptions.map((exception) =>
+          this.notesService.createAssignmentNotes(
+            exception.mid,
+            assignedUserName,
+            createdBy
+          )
         )
       );
 
-      await Promise.all(createNotesPromises);
-
       this.logger.info(
-        `Successfully assigned ${exceptions.length} exceptions to user ID ${assignToUserId}`
+        `Successfully assigned exceptions to user ID ${assignToUserId}`
       );
       return { success: true };
     } catch (error: unknown) {

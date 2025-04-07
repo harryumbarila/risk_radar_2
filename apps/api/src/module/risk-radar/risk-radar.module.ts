@@ -78,7 +78,9 @@ import { MerchantWithSameTaxIdService } from './services/merchant-with-same-tax-
 import { ReviewExceptionService } from './services/review-exception/review-exception.service';
 import { RiskRadarEmailTemplateService } from './services/risk-radar-email-template/risk-radar-email-template.service';
 import { RiskRadarExceptionsService } from './services/risk-radar-exceptions.service';
+import { RiskRadarNotesService } from './services/risk-radar-notes/risk-radar-notes.service';
 import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save.service';
+import { RiskRadarUserService } from './services/risk-radar-user/risk-radar-user.service';
 
 @Module({
   imports: [
@@ -175,6 +177,9 @@ import { RiskRadarSaveService } from './services/risk-radar-save/risk-radar-save
     RiskRadarEmailTemplateService,
     MerchantWithSameTaxIdService,
     ReviewExceptionService,
+    RiskRadarNotesService,
+    RiskRadarUserService,
   ],
+  exports: [RiskRadarNotesService, RiskRadarUserService],
 })
 export class RiskRadarModule {}
