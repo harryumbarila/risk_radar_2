@@ -9,7 +9,7 @@ FLUENT_REPOSITORY := $(or $(FLUENT_IMAGE_REPOSITORY), $(notdir $(CURDIR)))
 
 
 $(BUILD_IMAGE):
-	docker build --build-arg BUILD_DATE=$(BUILD_DATE) --build-arg VERSION=$(VERSION) --build-arg GITHASH=$(GITHASH) -t $(call internal_image_name) .
+	docker build --platform linux/amd64 --build-arg BUILD_DATE=$(BUILD_DATE) --build-arg VERSION=$(VERSION) --build-arg GITHASH=$(GITHASH) -t $(call internal_image_name) .
 	docker tag $(call internal_image_name) $(call image_name)
 	docker tag $(call image_name) $(REGISTRY)/$(FLUENT_REPOSITORY):$(VERSION)
 	docker tag $(call image_name) $(REGISTRY)/$(FLUENT_REPOSITORY):latest
