@@ -727,7 +727,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           {card.mid}
                         </td>
                         <td className="border-b border-[#eee] p-4 dark:border-strokedark">
-                          {new Date(card.transactionDate).toLocaleDateString()}
+                          {formatDate(card.transactionDate)}
                         </td>
                         <td className="border-b border-[#eee] p-4 dark:border-strokedark">
                           ${card.amount.toFixed(2)}
@@ -748,7 +748,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           {card.debitNetworkIdentifier || '-'}
                         </td>
                         <td className="border-b border-[#eee] p-4 dark:border-strokedark">
-                          {new Date(card.transmissionDate).toLocaleDateString()}
+                          {formatDate(card.transmissionDate)}
                         </td>
                         <td className="border-b border-[#eee] p-4 dark:border-strokedark">
                           ${card.netDepositAmount.toFixed(2)}
