@@ -17,19 +17,6 @@ jobs:
     with:
       release-type: 'pre-release'
 
-  deploy-web:
-    name: Deploy DENALI Web to AWS
-    needs: [versioning]
-    uses: ./.github/workflows/_deploy_web.yaml
-    with:
-      build-number: ${{ needs.versioning.outputs.build-number }}
-      environment: Staging
-    secrets:
-      # TODO: We might need to move this to GH Actions secrets
-      role-to-assume: arn:aws:iam::257498453293:role/jobox-github-action-staging-denali
-      aws-region: us-west-2
-      ecr-repository: denali/staging/web
-
   deploy-api:
     name: Deploy DENALI API to AWS
     needs: [versioning]
