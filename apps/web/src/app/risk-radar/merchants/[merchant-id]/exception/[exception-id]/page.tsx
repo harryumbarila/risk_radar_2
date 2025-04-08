@@ -490,7 +490,8 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   };
 
   const handleManagersQueueTrigger = async (): Promise<void> => {
-    const newStatus = merchantStateData.clickedStatus === 'mgrq' ? '' : 'mgrq';
+    const newStatus =
+      merchantStateData.clickedStatus === 'mgrq' ? 'none' : 'mgrq';
     setMerchantStateData((prev) => ({
       ...prev,
       clickedStatus: newStatus,
@@ -508,7 +509,8 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
   const handleClickOnReviewButton = async (): Promise<void> => {
     if (user?.name) {
-      const newStatus = merchantStateData.clickedStatus === 'rev' ? '' : 'rev';
+      const newStatus =
+        merchantStateData.clickedStatus === 'rev' ? 'none' : 'rev';
       setMerchantStateData((prev) => ({
         ...prev,
         clickedStatus: newStatus,
@@ -540,7 +542,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         preferredContact: '',
         notes: '',
         isPinnedNote: false,
-        clickedStatus: '',
+        clickedStatus: 'none',
         isRiskWatch: false,
         isAutoHoldEnabled: false,
       });
