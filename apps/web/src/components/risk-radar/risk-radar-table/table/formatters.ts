@@ -1,4 +1,4 @@
-import { format, isValid } from 'date-fns';
+import { format } from 'date-fns';
 
 import {
   DEFAULT_BLANK_VALUE,
@@ -38,7 +38,5 @@ export const formatBoolean = (value: unknown): string => {
 
 export const formatDate = (value: unknown): string => {
   if (!value) return DEFAULT_BLANK_VALUE;
-  const date = value instanceof Date ? value : new Date(String(value));
-  if (!isValid(date)) return DEFAULT_BLANK_VALUE;
-  return format(date, 'yyyy-MM-dd HH:mm:ss');
+  return format(value as string, 'dd/MM/yyyy hh:mm:ss a');
 };
