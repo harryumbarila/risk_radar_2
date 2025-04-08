@@ -1338,7 +1338,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           }}
                         >
                           {exception.cardNumber}{' '}
-                          {exception.transactionId.slice(-4)}
+                          {exception.transactionId?.slice(-4)}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                           {exception.debitNetworkIdentifier}
