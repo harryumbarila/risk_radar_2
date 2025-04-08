@@ -52,8 +52,12 @@ export class ExceptionsListService {
         endDate,
       });
 
-    if (!viewAllExceptions) {
-      query.andWhere('exception.iTotalPoints > 20'); // Only after 20 is considered relevant
+    // Skip point filter if view all exceptions is checked or 14 is selected
+    const shouldSkipPointFilter =
+      viewAllExceptions || categories.includes('14');
+
+    if (!shouldSkipPointFilter) {
+      query.andWhere('exception.iTotalPoints > 20');
     }
 
     if (processor) {
@@ -127,7 +131,7 @@ export class ExceptionsListService {
     // Pagination
     const limit = pageSize || 25;
     const offset = (page - 1) * limit;
-    query.orderBy('exception.iTotalPoints', 'ASC');
+    query.orderBy('exception.iTotalPoints', 'DESC');
     query.limit(limit).offset(offset);
 
     // Both calls are executed in parallel to speed up the process
