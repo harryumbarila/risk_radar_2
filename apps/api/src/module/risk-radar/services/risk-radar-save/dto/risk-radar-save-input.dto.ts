@@ -15,6 +15,7 @@ export class RiskRadarSaveInputDto {
   @IsInt()
   public exceptionId: number;
 
+  @IsOptional()
   @IsBoolean()
   public isDiverted: boolean;
 
@@ -28,6 +29,7 @@ export class RiskRadarSaveInputDto {
   @MaxLength(500)
   public notes?: string;
 
+  @IsOptional()
   @IsBoolean()
   public isPinnedNote: boolean;
 
@@ -36,12 +38,15 @@ export class RiskRadarSaveInputDto {
   @Length(1, 5)
   public clickedStatus?: string;
 
+  @IsOptional()
   @IsBoolean()
   public isRiskWatch: boolean;
 
+  @IsOptional()
   @IsBoolean()
   public isAutoHoldEnabled: boolean;
 
+  @IsOptional()
   @IsString()
   @MaxLength(25)
   public createdBy: string;

@@ -5,19 +5,19 @@ import { Logger } from 'pino';
 import { RiskRadarNotesRepository } from '@/finance-db/repositories';
 import { RiskRadarExceptionsJeffRepository } from '@/finance-db/repositories/risk-radar-exceptions-jeff.repository';
 
-import type { AssignExceptionReviewInputDto } from './dto/assign-exception-review-input.dto';
+import type { AssignExceptionReviewInputDto } from './dto/review-exception-input.dto';
 
 @Injectable()
-export class AssignExceptionReviewService {
+export class ReviewExceptionService {
   public constructor(
-    @InjectPinoLogger(AssignExceptionReviewService.name)
+    @InjectPinoLogger(ReviewExceptionService.name)
     private readonly logger: Logger,
 
     private readonly exceptionsJeffRepository: RiskRadarExceptionsJeffRepository,
     private readonly notesRepository: RiskRadarNotesRepository
   ) {}
 
-  public async assignExceptionReview(data: AssignExceptionReviewInputDto) {
+  public async reviewExceptions(data: AssignExceptionReviewInputDto) {
     const { reviewList, user } = data;
 
     const exceptionIds = reviewList

@@ -1,11 +1,12 @@
 import type { FC } from 'react';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 import type { RiskUser } from '@/shared/response/legacy-dashboard-proxy/dto/exception-data';
 
 type ManagerQueuedHeaderProps = {
   riskUsers: RiskUser[];
-  onAssign: (user: string) => void;
+  onAssign: (user: string, riskRadarUser: RiskUser) => void;
   checked: boolean;
   onChange: (checked: boolean) => void;
   isLoading?: boolean;
@@ -26,7 +27,14 @@ export const ManagerQueuedHeader: FC<ManagerQueuedHeaderProps> = ({
 
   const handleAssign = (): void => {
     if (selectedUser) {
-      onAssign(selectedUser);
+      const selectedUserObject = riskUsers.find(
+        (user) => user.sNTUserID === selectedUser
+      );
+      if (!selectedUserObject?.pkRiskRadarUser) {
+        toast.error('User not found');
+        return;
+      }
+      onAssign(selectedUser, selectedUserObject);
     }
   };
 

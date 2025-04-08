@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { DivertQueueEntity } from '../entities';
 
 export class DivertQueueRepository extends Repository<DivertQueueEntity> {
-  public constructor(@InjectDataSource('finance') dataSource: DataSource) {
+  public constructor(@InjectDataSource('iris') dataSource: DataSource) {
     super(DivertQueueEntity, dataSource.createEntityManager());
   }
 }
