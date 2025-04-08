@@ -1295,9 +1295,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {paginatedExceptions?.map((exception) => (
+                    {paginatedExceptions?.map((exception, index) => (
                       <tr
-                        key={`${exception.transactionId}`}
+                        // eslint-disable-next-line react/no-array-index-key
+                        key={`${exception.transactionId}-${index}`}
                         className="text-center"
                       >
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">

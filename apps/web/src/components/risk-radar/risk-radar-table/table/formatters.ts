@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 
 import {
   DEFAULT_BLANK_VALUE,
@@ -38,5 +38,10 @@ export const formatBoolean = (value: unknown): string => {
 
 export const formatDate = (value: unknown): string => {
   if (!value) return DEFAULT_BLANK_VALUE;
-  return format(value as string, 'MM/dd/yyyy hh:mm:ss a');
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return formatInTimeZone(value as string, 'UTC', 'MM/dd/yyyy hh:mm:ss a');
+  } catch {
+    return DEFAULT_BLANK_VALUE;
+  }
 };
