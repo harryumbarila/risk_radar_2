@@ -422,7 +422,7 @@ export class MerchantExceptionTransactionsService {
       authCode: String(t.authCode) ?? '',
       cardNumber: `${t.sCardNumF6}******${t.sCardNumL4}`,
       debitNetworkIdentifier: t.sDebitNetworkIdentifier ?? '',
-      transactionId: t.sTransID.slice(-4) ?? '',
+      transactionId: t.sTransID ?? '',
       authAmount: Number(t.dAuthAmt ?? 0),
       exceptionList: this.getExceptionList(t),
       exceptionTitle: this.getExceptionTitle(t),
