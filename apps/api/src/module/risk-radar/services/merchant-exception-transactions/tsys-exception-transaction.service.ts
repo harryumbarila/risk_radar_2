@@ -29,7 +29,8 @@ export class TsysExceptionTransactionService {
   ) {}
 
   public async getTSYSTransactionsForException(
-    e: RiskRadarExceptionsJeffEntity
+    e: RiskRadarExceptionsJeffEntity,
+    binSearch?: string
   ) {
     const { dtStartAuth, dtEndAuth } = this.determineAuthTimes(e.createdAt);
 
@@ -43,8 +44,13 @@ export class TsysExceptionTransactionService {
 
     // We run in parallel to speed up the process
     const res = await Promise.all([
-      this.getTSYSTransactionFromBatches(batchIds),
-      this.getTSYSTransactionsForAuthDates(e.mid, dtStartAuth, dtEndAuth),
+      this.getTSYSTransactionFromBatches(batchIds, binSearch),
+      this.getTSYSTransactionsForAuthDates(
+        e.mid,
+        dtStartAuth,
+        dtEndAuth,
+        binSearch
+      ),
     ]);
 
     const transactions = res.flat();
@@ -155,7 +161,8 @@ export class TsysExceptionTransactionService {
   }
 
   private async getTSYSTransactionFromBatches(
-    batchIds: number[]
+    batchIds: number[],
+    binSearch?: string
   ): Promise<TransactionResult[]> {
     const transactions = await this.batchRepository
       .createQueryBuilder('b')
@@ -209,7 +216,9 @@ export class TsysExceptionTransactionService {
       exceptionList: this.getExceptionList(t),
       exceptionTitle: this.getExceptionTitle(t),
       authResponseDescription: '',
-      binSearchMatchFlag: false,
+      binSearchMatchFlag: binSearch
+        ? t.sCardNumL4.startsWith(binSearch)
+        : false,
     }));
 
     return transformed;
@@ -218,7 +227,8 @@ export class TsysExceptionTransactionService {
   private async getTSYSTransactionsForAuthDates(
     mid: string,
     dtStartAuth: Date,
-    dtEndAuth: Date
+    dtEndAuth: Date,
+    binSearch?: string
   ): Promise<TransactionResult[]> {
     const transactions = await this.dailyDetailRepository
       .createQueryBuilder('dd')
@@ -260,7 +270,7 @@ export class TsysExceptionTransactionService {
       .getRawMany<TSYSTransactionFromDailyDetail>();
 
     const transformed = transactions.map<TransactionResult>((t) => ({
-      transactionDate: t.transdate,
+      transactionDate: t.transactionDate,
       transactionAmount: Number(t.transamount ?? 0),
       posEntryMode: `${t.posmode.slice(0, 2)} ${t.sPOSEntryMode}`.trim() ?? '',
       avsResponseCode: '',
@@ -272,7 +282,9 @@ export class TsysExceptionTransactionService {
       exceptionList: '3',
       exceptionTitle: 'Auth Decl',
       authResponseDescription: t.Definition ?? '',
-      binSearchMatchFlag: false,
+      binSearchMatchFlag: binSearch
+        ? t.cardnum_truncated.startsWith(binSearch)
+        : false,
     }));
 
     return transformed;

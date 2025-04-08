@@ -17,12 +17,14 @@ export class FspExceptionTransactionService {
   ) {}
 
   public async getFSPTransactionsForException(
-    e: RiskRadarExceptionsJeffEntity
+    e: RiskRadarExceptionsJeffEntity,
+    binSearch?: string
   ): Promise<TransactionResult[]> {
     const transactions = await this.getFSPTransactions(
       e.mid,
       e.fundingDate,
-      e.achFundingTime
+      e.achFundingTime,
+      binSearch
     );
 
     return transactions;
@@ -31,7 +33,8 @@ export class FspExceptionTransactionService {
   private async getFSPTransactions(
     mid: string,
     dtFunding: Date,
-    sACHFundingTime: string
+    sACHFundingTime: string,
+    binSearch?: string
   ): Promise<TransactionResult[]> {
     // Dates
     const dtFundingString = dtFunding.toISOString().split('T')[0]; // Only need date part (YYYY-MM-DD)
@@ -88,34 +91,41 @@ export class FspExceptionTransactionService {
 
     // Group transactions by transaction ID using map to join exception types to create list & title
     const grouped = Object.values(
-      rawTransactions.reduce<Record<string, TransactionResult>>((acc, t) => {
-        const key = t.txnID;
+      rawTransactions.reduce<Record<string, TransactionResult>>(
+        (acc, t, index) => {
+          // Handle NULL transaction IDs by creating a unique key using the index
+          const key = t.txnID || `null-${index}`;
 
-        if (!acc[key]) {
-          acc[key] = {
-            id: t.txnID,
-            transactionDate: t.TransactionDate,
-            transactionAmount: t.Amount,
-            posEntryMode: t.sPaymentMethodDesc,
-            avsResponseCode: t.sAVSRespDesc,
-            authCode: t.AuthCode,
-            cardNumber: `${t.First6}******${t.Last4}`,
-            debitNetworkIdentifier: t.Network,
-            transactionId: t.txnID,
-            authAmount: t.Amount,
-            exceptionList: this.getExceptionTypeNumber(t.sExceptionType) ?? '',
-            exceptionTitle: t.sExceptionType ?? '',
-            authResponseDescription: '',
-            binSearchMatchFlag: false,
-          };
-        } else if (t.sExceptionType) {
-          acc[key].exceptionTitle += ` - ${t.sExceptionType}`;
-          acc[key].exceptionList +=
-            ` - ${this.getExceptionTypeNumber(t.sExceptionType)}`;
-        }
+          if (!acc[key]) {
+            acc[key] = {
+              id: t.txnID || `null-${index}`,
+              transactionDate: t.TransactionDate,
+              transactionAmount: t.Amount,
+              posEntryMode: t.sPaymentMethodDesc,
+              avsResponseCode: t.sAVSRespDesc,
+              authCode: t.AuthCode,
+              cardNumber: `${t.First6}******${t.Last4}`,
+              debitNetworkIdentifier: t.Network,
+              transactionId: t.txnID || `null-${index}`,
+              authAmount: t.Amount,
+              exceptionList:
+                this.getExceptionTypeNumber(t.sExceptionType) ?? '',
+              exceptionTitle: t.sExceptionType ?? '',
+              authResponseDescription: '',
+              binSearchMatchFlag: binSearch
+                ? t.First6.startsWith(binSearch)
+                : false,
+            };
+          } else if (t.sExceptionType) {
+            acc[key].exceptionTitle += ` - ${t.sExceptionType}`;
+            acc[key].exceptionList +=
+              ` - ${this.getExceptionTypeNumber(t.sExceptionType)}`;
+          }
 
-        return acc;
-      }, {})
+          return acc;
+        },
+        {}
+      )
     );
 
     return grouped;

@@ -24,7 +24,7 @@ export type FSPTransaction = {
   First6: string;
   Last4: string;
   Network: string;
-  txnID: string;
+  txnID: string | null;
   sExceptionType: string;
 };
 
@@ -53,7 +53,7 @@ export type TSYSTransactionFromBatch = {
 };
 
 export type TSYSTransactionFromDailyDetail = {
-  transdate?: Date;
+  transactionDate?: Date;
   transamount?: number;
   posmode?: string;
   sPOSEntryMode?: string;
