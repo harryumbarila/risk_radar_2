@@ -1,22 +1,27 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({ name: 'clx.CLXReportingSearch_PaymentMethodLookup' })
+@Entity({ name: 'CLXReportingSearch_PaymentMethodLookup', schema: 'clx' })
 export class CLXReportingSearchPaymentMethodLookup {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'pkCLXAuthPaymentMethod' })
   public id: number;
 
-  @Column({ nullable: true })
-  public methodKey: number;
+  @Column({ name: 'iPaymentMethodKey', type: 'int', nullable: true })
+  public methodKey: number | null;
 
-  @Column({ length: 50, nullable: true })
-  public description: string;
+  @Column({
+    name: 'sPaymentMethodDesc',
+    type: 'varchar',
+    length: 50,
+    nullable: true,
+  })
+  public description: string | null;
 
-  @Column()
+  @Column({ name: 'bCardPresentTalusDefined', type: 'bit' })
   public isCardPresentTalusDefined: boolean;
 
-  @Column()
+  @Column({ name: 'bHidden', type: 'bit' })
   public isHidden: boolean;
 
-  @Column()
+  @Column({ name: 'dtCreated', type: 'datetime' })
   public createdAt: Date;
 }
