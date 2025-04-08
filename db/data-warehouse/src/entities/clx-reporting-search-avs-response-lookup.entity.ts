@@ -1,25 +1,35 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({ name: 'clx.CLXReportingSearch_AVSResponseLookup' })
+@Entity({ name: 'CLXReportingSearch_AVSResponseLookup', schema: 'clx' })
 export class CLXReportingSearchAVSResponseLookup {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'pkCLXAuthAVSResp' })
   public id: number;
 
-  @Column({ nullable: true })
-  public responseCode: number;
+  @Column({ name: 'iAVSResp', type: 'int', nullable: true })
+  public responseCode: number | null;
 
-  @Column({ length: 500, nullable: true })
-  public shortName: string;
+  @Column({
+    name: 'sAVSRespShortName',
+    type: 'varchar',
+    length: 500,
+    nullable: true,
+  })
+  public shortName: string | null;
 
-  @Column({ length: 100, nullable: true })
-  public description: string;
+  @Column({
+    name: 'sAVSRespDesc',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
+  public description: string | null;
 
-  @Column({ length: 5, nullable: true })
-  public responseCodeText: string;
+  @Column({ name: 'sAVSRespCode', type: 'varchar', length: 5, nullable: true })
+  public responseCodeText: string | null;
 
-  @Column()
+  @Column({ name: 'bHidden', type: 'bit' })
   public isHidden: boolean;
 
-  @Column()
+  @Column({ name: 'dtCreated', type: 'datetime' })
   public createdAt: Date;
 }

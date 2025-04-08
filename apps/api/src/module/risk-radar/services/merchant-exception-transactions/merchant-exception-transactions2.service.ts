@@ -7,6 +7,7 @@ import {
   format,
   getDay,
   getHours,
+  parse,
   setHours,
   setMinutes,
   setSeconds,
@@ -15,6 +16,11 @@ import {
 import { InjectPinoLogger } from 'nestjs-pino';
 import { Logger } from 'pino';
 
+import {
+  CLXReportingSearchAVSResponseLookup,
+  CLXReportingSearchPaymentMethodLookup,
+} from '@/data-warehouse-db/entities';
+import { ClxReportingRepository } from '@/data-warehouse-db/repositories';
 import {
   DailyDetailRepository,
   RiskRadarBatchRepository,
@@ -37,6 +43,7 @@ type TransactionResult = {
   exceptionTitle: string; // Exception title
   authResponseDescription: string; // Authorization response description
   binSearchMatchFlag: boolean; // BIN search match flag
+  id?: string;
 };
 
 type TransactionFromBatch = {
@@ -77,6 +84,19 @@ type TransactionFromDailyDetail = {
   debitNetworkIdentifier?: string;
 };
 
+type FSPTransaction = {
+  TransactionDate: Date;
+  Amount: number;
+  sPaymentMethodDesc: string;
+  sAVSRespDesc: string;
+  AuthCode: string | null;
+  First6: string;
+  Last4: string;
+  Network: string;
+  txnID: string;
+  sExceptionType: string;
+};
+
 type AuthDates = {
   dtStartAuth: Date;
   dtEndAuth: Date;
@@ -89,17 +109,13 @@ export class MerchantExceptionTransactionsService {
     private readonly logger: Logger,
     private readonly batchRepository: RiskRadarBatchRepository,
     private readonly dailyDetailRepository: DailyDetailRepository,
-    private readonly riskRadarExceptionsJeff: RiskRadarExceptionsJeffRepository
+    private readonly riskRadarExceptionsJeff: RiskRadarExceptionsJeffRepository,
+    private readonly clxReportingRepository: ClxReportingRepository
   ) {}
-
-  // TODO: Remove once FSP is implemented
-  // uspRiskRadarMerchantExceptionTransactions-rr
-  // FSP - 8152 - tblRiskRadarExceptions_jeff (sBankNum)
-  // DataWarehouse.clx.CLXReportingSearch
 
   public async getExceptionsTrans(
     input: MerchantExceptionTransactionsInputDto
-  ): Promise<TransactionResult[]> {
+  ): Promise<TransactionResult[] | unknown[]> {
     const { riskRadarExceptionId } = input;
 
     const exception = await this.riskRadarExceptionsJeff.findOne({
@@ -118,19 +134,19 @@ export class MerchantExceptionTransactionsService {
     const isTSYS = ['5611', '7905'].includes(first4Mid);
     const isFSP = ['8152'].includes(first4Mid);
 
-    const { dtStartAuth, dtEndAuth } = this.determineAuthTimes(
-      exception.createdAt
-    );
-
-    const batches = await this.getCycleFileBatches(
-      exception.mid,
-      format(exception.fundingDate, 'EEE'), // Short day of the week (Mon, Tue, etc)
-      exception.achFundingTime,
-      exception.fundingDate
-    );
-    const batchIds = batches.map((b) => b.batchId);
-
     if (isTSYS) {
+      const { dtStartAuth, dtEndAuth } = this.determineAuthTimes(
+        exception.createdAt
+      );
+
+      const batches = await this.getCycleFileBatches(
+        exception.mid,
+        format(exception.fundingDate, 'EEE'), // Short day of the week (Mon, Tue, etc)
+        exception.achFundingTime,
+        exception.fundingDate
+      );
+      const batchIds = batches.map((b) => b.batchId);
+
       // We run in parallel to speed up the process
       const res = await Promise.all([
         this.getTSYSTransactionFromBatches(batchIds),
@@ -143,12 +159,18 @@ export class MerchantExceptionTransactionsService {
 
       const transactions = res.flat();
 
-      // TODO: Add sort by from input once FSP is implemented
+      // TODO: Add sort by from input
       return this.sortTransactionsBy(transactions, 'authAmount', 'desc');
     }
 
     if (isFSP) {
-      // TODO: Implement FSP logic
+      const transactions = await this.getFSPTransactions(
+        exception.mid,
+        exception.fundingDate,
+        exception.achFundingTime
+      );
+
+      return this.sortTransactionsBy(transactions, 'transactionAmount', 'desc');
     }
 
     throw new BadRequestException(
@@ -472,6 +494,132 @@ export class MerchantExceptionTransactionsService {
     }));
 
     return transformed;
+  }
+
+  public async getFSPTransactions(
+    mid: string,
+    dtFunding: Date,
+    sACHFundingTime: string
+  ): Promise<TransactionResult[]> {
+    // Dates
+    const dtFundingString = dtFunding.toISOString().split('T')[0]; // Only need date part (YYYY-MM-DD)
+
+    const dtAuthEnd = parse(
+      `${dtFundingString} ${sACHFundingTime}`,
+      'yyyy-MM-dd h:mm a',
+      new Date()
+    );
+
+    const dtAuthStart = subDays(dtAuthEnd, 1);
+
+    const rawTransactions = await this.clxReportingRepository
+      .createQueryBuilder('s')
+      .select([
+        's.TransactionDate AS TransactionDate',
+        's.Amount AS Amount ',
+        'pm.sPaymentMethodDesc AS sPaymentMethodDesc',
+        'avs.sAVSRespDesc AS sAVSRespDesc',
+        's.AuthCode AS AuthCode',
+        's.First6 AS First6',
+        's.Last4 AS Last4',
+        's.Network AS Network',
+        's.txnID AS txnID',
+        'ep.sExceptionType AS sExceptionType',
+      ])
+      .leftJoin(
+        CLXReportingSearchPaymentMethodLookup,
+        'pm',
+        'pm.iPaymentMethodKey = s.PaymentMethodKey'
+      )
+      .leftJoin(
+        CLXReportingSearchAVSResponseLookup,
+        'avs',
+        'avs.iAVSResp = s.AVSResponseKey'
+      )
+      .leftJoin(
+        'finance..tblFSPRiskRadarExceptionPoints',
+        'ep',
+        'ep.Id = s.id AND ep.sMID = s.SiteID AND ep.dtExceptionRunDate = :dtFunding AND ep.sExceptionRunTime = :sACHFundingTime'
+      )
+      .where('s.siteId = :mid', { mid })
+      .andWhere(
+        '(s.TransactionDateTime BETWEEN :start AND :end OR ep.Id IS NOT NULL)'
+      )
+      .setParameters({
+        mid,
+        dtFunding,
+        sACHFundingTime,
+        start: dtAuthStart,
+        end: dtAuthEnd,
+      })
+      .getRawMany<FSPTransaction>();
+
+    // Group transactions by transaction ID using map to join exception types to create list & title
+    const grouped = Object.values(
+      rawTransactions.reduce<Record<string, TransactionResult>>((acc, t) => {
+        const key = t.txnID;
+
+        if (!acc[key]) {
+          acc[key] = {
+            id: t.txnID,
+            transactionDate: t.TransactionDate,
+            transactionAmount: t.Amount,
+            posEntryMode: t.sPaymentMethodDesc,
+            avsResponseCode: t.sAVSRespDesc,
+            authCode: t.AuthCode,
+            cardNumber: `${t.First6}******${t.Last4}`,
+            debitNetworkIdentifier: t.Network,
+            transactionId: t.txnID,
+            authAmount: t.Amount,
+            exceptionList: this.getExceptionTypeNumber(t.sExceptionType) ?? '',
+            exceptionTitle: t.sExceptionType ?? '',
+            authResponseDescription: '',
+            binSearchMatchFlag: false,
+          };
+        } else if (t.sExceptionType) {
+          acc[key].exceptionTitle += ` - ${t.sExceptionType}`;
+          acc[key].exceptionList +=
+            ` - ${this.getExceptionTypeNumber(t.sExceptionType)}`;
+        }
+
+        return acc;
+      }, {})
+    );
+
+    return grouped;
+  }
+
+  private getExceptionTypeNumber(exceptionType: string): string {
+    switch (exceptionType) {
+      case 'AVGTKT':
+        return '2';
+      case 'AUTHDECL':
+        return '3';
+      case 'AUTHDECLSAMECARD':
+        return '25';
+      case 'AUTHDECLSPECIFICREASON':
+        return '26';
+      case 'AUTHDECLGT5IN30MIN':
+        return '27';
+      case 'DUPBIN':
+        return '7';
+      case 'DUPCARD':
+        return '8';
+      case 'DUPCARDIN30DAYS':
+        return '28';
+      case 'DUPCARDSWIPETHENKEYEDIN30DAYS':
+        return '29';
+      case 'FOREIGNKEYED':
+        return '9';
+      case 'KEYEDTRANSAMTABVLIMIT':
+        return '10';
+      case 'MOTOIOAAVS':
+        return '12';
+      case 'AVGBAT':
+        return '4';
+      default:
+        return '';
+    }
   }
 
   private sortTransactionsBy(
