@@ -1,5 +1,6 @@
 import type { CellContext, HeaderContext } from '@tanstack/react-table';
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import classNames from 'classnames';
 import type { FC, ReactNode } from 'react';
 import { useMemo } from 'react';
 
@@ -33,10 +34,12 @@ export const TableBody: FC<Props> = ({
     merchantId: string,
     exceptionId: number
   ): void => {
-    window.open(
-      `/risk-radar/merchants/${merchantId}/exception/${exceptionId}`,
-      '_blank'
-    );
+    if (merchantId && exceptionId) {
+      window.open(
+        `/risk-radar/merchants/${merchantId}/exception/${exceptionId}`,
+        '_blank'
+      );
+    }
   };
 
   const table = useReactTable({
@@ -128,7 +131,11 @@ export const TableBody: FC<Props> = ({
                 const isLast = row.getVisibleCells().length === index + 1;
                 return (
                   <td
-                    className="cursor-pointer"
+                    className={classNames('cursor-pointer', {
+                      '!cursor-not-allowed':
+                        !cell.row.original.sMID ||
+                        !cell.row.original.pkRiskRadarExceptions,
+                    })}
                     key={cell.id}
                     onClick={() => {
                       // Last column is interactive
