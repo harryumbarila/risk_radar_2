@@ -7,6 +7,7 @@ import { InjectPinoLogger } from 'nestjs-pino';
 import { Logger } from 'pino';
 
 import { RiskRadarExceptionsJeffRepository } from '@/finance-db/repositories';
+import { SortType } from '@/shared/request';
 import type { TransactionResult } from '@/shared/response';
 import { FSPIds, TSYSIds } from '@/shared/response';
 
@@ -27,7 +28,10 @@ export class MerchantExceptionTransactionsService {
   public async getExceptionsTransactions(
     input: MerchantExceptionTransactionsInputDto
   ): Promise<TransactionResult[] | unknown[]> {
-    const { riskRadarExceptionId } = input;
+    const { riskRadarExceptionId, sortBy, sortType, binSearch } = input;
+
+    const sortByColumn = sortBy ?? 'authAmount';
+    const sortTypeColumn = sortType ?? SortType.DESC;
 
     const exception = await this.riskRadarExceptionsJeff.findOne({
       where: {
@@ -48,20 +52,25 @@ export class MerchantExceptionTransactionsService {
     if (isTSYS) {
       const transactions =
         await this.tsysExceptionTransactionService.getTSYSTransactionsForException(
-          exception
+          exception,
+          binSearch
         );
 
-      // TODO: Add sort by from input
-      return this.sortTransactionsBy(transactions, 'authAmount', 'desc');
+      return this.sortTransactionsBy(transactions, sortByColumn, sortType);
     }
 
     if (isFSP) {
       const transactions =
         await this.fspExceptionTransactionService.getFSPTransactionsForException(
-          exception
+          exception,
+          binSearch
         );
 
-      return this.sortTransactionsBy(transactions, 'transactionAmount', 'desc');
+      return this.sortTransactionsBy(
+        transactions,
+        sortByColumn,
+        sortTypeColumn
+      );
     }
 
     throw new BadRequestException(
@@ -71,8 +80,8 @@ export class MerchantExceptionTransactionsService {
 
   private sortTransactionsBy(
     transactions: TransactionResult[],
-    sortBy: keyof TransactionResult = 'transactionDate',
-    order: 'asc' | 'desc' = 'asc'
+    sortBy: keyof TransactionResult = 'transactionAmount',
+    order: SortType = SortType.DESC
   ): TransactionResult[] {
     return [...transactions].sort((a, b) => {
       const valueA = a[sortBy];
@@ -93,7 +102,7 @@ export class MerchantExceptionTransactionsService {
         }
       }
 
-      return order === 'asc' ? comparison : -comparison;
+      return order === SortType.ASC ? comparison : -comparison;
     });
   }
 }
