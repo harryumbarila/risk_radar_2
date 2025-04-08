@@ -541,13 +541,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
       // Reset form values after successful save
       setMerchantStateData({
-        isDiverted: false,
-        preferredContact: '',
+        ...merchantStateData,
         notes: '',
         isPinnedNote: false,
         clickedStatus: 'none',
-        isRiskWatch: false,
-        isAutoHoldEnabled: false,
       });
 
       setNoteRequest({
@@ -555,11 +552,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         isPinned: false,
         author: user?.name ?? null,
       });
-
-      setMerchantUpdateRequest({
-        preferredContact: '',
-      });
-
       // Reset changed fields
       setChangedFields({});
 
