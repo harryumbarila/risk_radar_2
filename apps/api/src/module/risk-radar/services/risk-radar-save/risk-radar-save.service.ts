@@ -487,7 +487,9 @@ export class RiskRadarSaveService {
 
     if (isValidPrefix) {
       if (inQueue) {
-        this.logger.log(`Updating existing divert queue for MID: ${merchantId}`);
+        this.logger.log(
+          `Updating existing divert queue for MID: ${merchantId}`
+        );
         try {
           await this.divertQueueRepository.update(
             { id: inQueue.id },
@@ -501,11 +503,15 @@ export class RiskRadarSaveService {
           this.logger.log(`Updated divert queue successfully`);
         } catch (error: unknown) {
           const typedError = error as ErrorWithMessage;
-          this.logger.error(`Error updating divert queue: ${typedError.message}`);
+          this.logger.error(
+            `Error updating divert queue: ${typedError.message}`
+          );
           throw error;
         }
       } else {
-        this.logger.log(`Adding new entry to divert queue for MID: ${merchantId}`);
+        this.logger.log(
+          `Adding new entry to divert queue for MID: ${merchantId}`
+        );
         try {
           await this.divertQueueRepository.insert({
             merchantId: Number(merchantId),
@@ -517,7 +523,9 @@ export class RiskRadarSaveService {
           this.logger.log(`Added to divert queue successfully`);
         } catch (error: unknown) {
           const typedError = error as ErrorWithMessage;
-          this.logger.error(`Error adding to divert queue: ${typedError.message}`);
+          this.logger.error(
+            `Error adding to divert queue: ${typedError.message}`
+          );
           throw error;
         }
       }
@@ -542,7 +550,9 @@ export class RiskRadarSaveService {
 
     if (isValidFspPrefix) {
       if (inFSPQueue) {
-        this.logger.log(`Updating existing FSP divert queue for MID: ${merchantId}`);
+        this.logger.log(
+          `Updating existing FSP divert queue for MID: ${merchantId}`
+        );
         try {
           await this.divertQueueFspRepository.update(
             { id: inFSPQueue.id },
@@ -556,11 +566,15 @@ export class RiskRadarSaveService {
           this.logger.log(`Updated FSP divert queue successfully`);
         } catch (error: unknown) {
           const typedError = error as ErrorWithMessage;
-          this.logger.error(`Error updating FSP divert queue: ${typedError.message}`);
+          this.logger.error(
+            `Error updating FSP divert queue: ${typedError.message}`
+          );
           throw error;
         }
       } else {
-        this.logger.log(`Adding new entry to FSP divert queue for MID: ${merchantId}`);
+        this.logger.log(
+          `Adding new entry to FSP divert queue for MID: ${merchantId}`
+        );
         try {
           await this.divertQueueFspRepository.insert({
             merchantId: Number(merchantId),
@@ -572,7 +586,9 @@ export class RiskRadarSaveService {
           this.logger.log(`Added to FSP divert queue successfully`);
         } catch (error: unknown) {
           const typedError = error as ErrorWithMessage;
-          this.logger.error(`Error adding to FSP divert queue: ${typedError.message}`);
+          this.logger.error(
+            `Error adding to FSP divert queue: ${typedError.message}`
+          );
           throw error;
         }
       }
@@ -646,7 +662,9 @@ export class RiskRadarSaveService {
 
     if (isValidPrefix) {
       if (inQueue) {
-        this.logger.log(`Updating existing divert queue for MID: ${merchantId}`);
+        this.logger.log(
+          `Updating existing divert queue for MID: ${merchantId}`
+        );
         try {
           await this.divertQueueRepository.update(
             { id: inQueue.id },
@@ -660,11 +678,15 @@ export class RiskRadarSaveService {
           this.logger.log(`Updated divert queue successfully`);
         } catch (error: unknown) {
           const typedError = error as ErrorWithMessage;
-          this.logger.error(`Error updating divert queue: ${typedError.message}`);
+          this.logger.error(
+            `Error updating divert queue: ${typedError.message}`
+          );
           throw error;
         }
       } else {
-        this.logger.log(`Adding new entry to divert queue for MID: ${merchantId}`);
+        this.logger.log(
+          `Adding new entry to divert queue for MID: ${merchantId}`
+        );
         try {
           await this.divertQueueRepository.insert({
             merchantId: Number(merchantId),
@@ -676,7 +698,9 @@ export class RiskRadarSaveService {
           this.logger.log(`Added to divert queue successfully`);
         } catch (error: unknown) {
           const typedError = error as ErrorWithMessage;
-          this.logger.error(`Error adding to divert queue: ${typedError.message}`);
+          this.logger.error(
+            `Error adding to divert queue: ${typedError.message}`
+          );
           throw error;
         }
       }
@@ -701,7 +725,9 @@ export class RiskRadarSaveService {
 
     if (isValidFspPrefix) {
       if (inFSPQueue) {
-        this.logger.log(`Updating existing FSP divert queue for MID: ${merchantId}`);
+        this.logger.log(
+          `Updating existing FSP divert queue for MID: ${merchantId}`
+        );
         try {
           await this.divertQueueFspRepository.update(
             { id: inFSPQueue.id },
@@ -715,11 +741,15 @@ export class RiskRadarSaveService {
           this.logger.log(`Updated FSP divert queue successfully`);
         } catch (error: unknown) {
           const typedError = error as ErrorWithMessage;
-          this.logger.error(`Error updating FSP divert queue: ${typedError.message}`);
+          this.logger.error(
+            `Error updating FSP divert queue: ${typedError.message}`
+          );
           throw error;
         }
       } else {
-        this.logger.log(`Adding new entry to FSP divert queue for MID: ${merchantId}`);
+        this.logger.log(
+          `Adding new entry to FSP divert queue for MID: ${merchantId}`
+        );
         try {
           await this.divertQueueFspRepository.insert({
             merchantId: Number(merchantId),
@@ -731,7 +761,9 @@ export class RiskRadarSaveService {
           this.logger.log(`Added to FSP divert queue successfully`);
         } catch (error: unknown) {
           const typedError = error as ErrorWithMessage;
-          this.logger.error(`Error adding to FSP divert queue: ${typedError.message}`);
+          this.logger.error(
+            `Error adding to FSP divert queue: ${typedError.message}`
+          );
           throw error;
         }
       }
