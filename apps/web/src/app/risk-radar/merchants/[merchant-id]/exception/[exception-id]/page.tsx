@@ -19,7 +19,10 @@ import type {
 } from '@/shared/response';
 import { Tooltip } from '@/ui/common/tool-tips/risk-tooltip';
 import { Popup } from '@/web/src/components/risk-radar/popups/popups';
-import { formatDate } from '@/web/src/components/risk-radar/risk-radar-table/table/formatters';
+import {
+  formatDate,
+  formatDateWithoutTime,
+} from '@/web/src/components/risk-radar/risk-radar-table/table/formatters';
 import { useEmailTemplates } from '@/web/src/hooks/risk-radar/use-email-templates';
 import type { CardHistory } from '@/web/src/hooks/risk-radar/use-get-card-history';
 import { useCardHistory } from '@/web/src/hooks/risk-radar/use-get-card-history';
@@ -1535,9 +1538,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                       <th className="p-4 font-medium text-black dark:text-white">
                         Created Date
                       </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
-                        P2 Chargeback
-                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1550,7 +1550,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           {chargeback.sCaseNumber}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {formatDate(chargeback.dtTrans)}
+                          {formatDateWithoutTime(chargeback.dtTrans)}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                           ${chargeback.dAmt.toFixed(2)}
@@ -1562,7 +1562,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           {chargeback.sPaymentType}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {formatDate(chargeback.dtReceived)}
+                          {formatDateWithoutTime(chargeback.dtReceived)}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                           {chargeback.sReferenceNum}
@@ -1572,9 +1572,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                         </td>
                         <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                           {formatDate(chargeback.dtCreated)}
-                        </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                          {chargeback.bP2ChargebacksExists ? 'Yes' : 'No'}
                         </td>
                       </tr>
                     ))}

@@ -39,9 +39,15 @@ export const formatBoolean = (value: unknown): string => {
 export const formatDate = (value: unknown): string => {
   if (!value) return DEFAULT_BLANK_VALUE;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
     return formatInTimeZone(value as string, 'UTC', 'MM/dd/yyyy hh:mm:ss a');
   } catch {
     return DEFAULT_BLANK_VALUE;
   }
+};
+
+export const formatDateWithoutTime = (value: unknown): string => {
+  if (!value) return DEFAULT_BLANK_VALUE;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+  return formatInTimeZone(value as string, 'UTC', 'MM/dd/yyyy');
 };
