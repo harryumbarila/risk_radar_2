@@ -1,3 +1,4 @@
+import { isValid, parse } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 
 import {
@@ -36,12 +37,26 @@ export const formatBoolean = (value: unknown): string => {
   return value === 'Yes' ? DEFAULT_YES_VALUE : DEFAULT_NO_VALUE;
 };
 
-export const formatDate = (value: unknown): string => {
-  if (!value) return DEFAULT_BLANK_VALUE;
+export const parseDate = (value: unknown): Date | null => {
+  let parsedDate: Date;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return formatInTimeZone(value as string, 'UTC', 'MM/dd/yyyy hh:mm:ss a');
+    parsedDate = new Date(String(value));
+    if (!isValid(parsedDate)) return null;
   } catch {
-    return DEFAULT_BLANK_VALUE;
+    // If that fails, try the custom format
+    parsedDate = parse(String(value), 'MM/dd/yyyy hh:mm:ss a', new Date());
   }
+  return parsedDate;
+};
+
+export const formatDate = (value: unknown): string => {
+  const parsedDate = parseDate(value);
+  if (!parsedDate || !isValid(parsedDate)) return DEFAULT_BLANK_VALUE;
+  return formatInTimeZone(parsedDate, 'UTC', 'MM/dd/yyyy hh:mm:ss a');
+};
+
+export const formatDateWithoutTime = (value: unknown): string => {
+  const parsedDate = parseDate(value);
+  if (!parsedDate || !isValid(parsedDate)) return DEFAULT_BLANK_VALUE;
+  return formatInTimeZone(parsedDate, 'UTC', 'MM/dd/yyyy');
 };

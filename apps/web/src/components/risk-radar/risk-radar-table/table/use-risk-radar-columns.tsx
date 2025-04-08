@@ -36,7 +36,11 @@ export const useRiskRadarTableColumns = ({
   const onSelectAllIds = useCallback(
     (selected: boolean): void => {
       if (selected) {
-        setSelectedIds(data.map((item) => item.pkRiskRadarExceptions));
+        setSelectedIds(
+          data
+            .filter((item) => !item.sUserReviewed)
+            .map((item) => item.pkRiskRadarExceptions)
+        );
       } else {
         setSelectedIds([]);
       }
@@ -49,15 +53,6 @@ export const useRiskRadarTableColumns = ({
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
   }, []);
-
-  const isReviewed = useCallback(
-    (row: RiskRadarExceptionsListRow): boolean => {
-      return (
-        !!row.sUserReviewed || selectedIds.includes(row.pkRiskRadarExceptions)
-      );
-    },
-    [selectedIds]
-  );
 
   const handleAssignSubmit = useCallback(
     (assignTo: string, riskRadarUser: RiskUser): void => {
@@ -91,7 +86,8 @@ export const useRiskRadarTableColumns = ({
     // Reviewed column
     let reviewedColumn = null;
 
-    const isAllSelected = data.length === selectedIds.length;
+    const canBeReviewed = data.filter((item) => !item.sUserReviewed);
+    const isAllSelected = canBeReviewed.length === selectedIds.length;
 
     switch (String(filters.status)) {
       case '1': // Not Reviewed
@@ -102,15 +98,16 @@ export const useRiskRadarTableColumns = ({
               onChange={onSelectAllIds}
               onReview={handleReviewSubmit}
               isLoading={isLoading}
+              disabled={!canBeReviewed.length}
             />
           ),
           cell: ({ row }) => {
-            const reviewed = isReviewed(row.original);
             const exceptionId = row.original.pkRiskRadarExceptions;
+            if (row.original.sUserReviewed) return row.original.sUserReviewed;
 
             return (
               <ExceptionReviewCheckbox
-                reviewed={reviewed}
+                reviewed={selectedIds.includes(exceptionId)}
                 exceptionId={exceptionId}
                 onChange={() => {
                   onSelectedIdChange(exceptionId);
@@ -133,12 +130,12 @@ export const useRiskRadarTableColumns = ({
             />
           ),
           cell: ({ row }) => {
-            const reviewed = isReviewed(row.original);
             const exceptionId = row.original.pkRiskRadarExceptions;
+            if (row.original.sUserReviewed) return row.original.sUserReviewed;
 
             return (
               <ExceptionReviewCheckbox
-                reviewed={reviewed}
+                reviewed={selectedIds.includes(exceptionId)}
                 exceptionId={exceptionId}
                 onChange={() => {
                   onSelectedIdChange(exceptionId);
@@ -166,15 +163,14 @@ export const useRiskRadarTableColumns = ({
     const completedColumns = [idColumn, ...baseColumns, reviewedColumn];
     return completedColumns;
   }, [
-    data.length,
-    selectedIds.length,
+    data,
+    selectedIds,
     filters.status,
     filters.page,
     filters.pageSize,
     onSelectAllIds,
     handleReviewSubmit,
     isLoading,
-    isReviewed,
     onSelectedIdChange,
     riskRadarUsers,
     handleAssignSubmit,

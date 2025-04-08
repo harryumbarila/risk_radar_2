@@ -50,7 +50,8 @@ export class FspExceptionTransactionService {
     const rawTransactions = await this.clxReportingRepository
       .createQueryBuilder('s')
       .select([
-        's.TransactionDate AS TransactionDate',
+        's.id as exceptionId',
+        's.TransactionDateTime AS TransactionDate',
         's.Amount AS Amount ',
         'pm.sPaymentMethodDesc AS sPaymentMethodDesc',
         'avs.sAVSRespDesc AS sAVSRespDesc',
@@ -91,42 +92,48 @@ export class FspExceptionTransactionService {
 
     // Group transactions by transaction ID using map to join exception types to create list & title
     const grouped = Object.values(
-      rawTransactions.reduce<Record<string, TransactionResult>>(
-        (acc, t, index) => {
-          // Handle NULL transaction IDs by creating a unique key using the index
-          const key = t.txnID || `null-${index}`;
+      rawTransactions.reduce<
+        Record<string, TransactionResult & { exceptionListArray: string[] }>
+      >((acc, t) => {
+        const key = t.exceptionId;
 
-          if (!acc[key]) {
-            acc[key] = {
-              id: t.txnID || `null-${index}`,
-              transactionDate: t.TransactionDate,
-              transactionAmount: t.Amount,
-              posEntryMode: t.sPaymentMethodDesc,
-              avsResponseCode: t.sAVSRespDesc,
-              authCode: t.AuthCode,
-              cardNumber: `${t.First6}******${t.Last4}`,
-              debitNetworkIdentifier: t.Network,
-              transactionId: t.txnID || `null-${index}`,
-              authAmount: t.Amount,
-              exceptionList:
-                this.getExceptionTypeNumber(t.sExceptionType) ?? '',
-              exceptionTitle: t.sExceptionType ?? '',
-              authResponseDescription: '',
-              binSearchMatchFlag: binSearch
-                ? t.First6.startsWith(binSearch)
-                : false,
-            };
-          } else if (t.sExceptionType) {
-            acc[key].exceptionTitle += ` - ${t.sExceptionType}`;
-            acc[key].exceptionList +=
-              ` - ${this.getExceptionTypeNumber(t.sExceptionType)}`;
-          }
+        if (!acc[key]) {
+          acc[key] = {
+            id: t.exceptionId,
+            transactionDate: t.TransactionDate,
+            transactionAmount: t.Amount,
+            posEntryMode: t.sPaymentMethodDesc,
+            avsResponseCode: t.sAVSRespDesc,
+            authCode: t.AuthCode,
+            cardNumber: `${t.First6}******${t.Last4}`,
+            debitNetworkIdentifier: t.Network,
+            transactionId: t.txnID,
+            authAmount: t.Amount,
+            exceptionList: '',
+            exceptionTitle: '',
+            exceptionListArray: [t.sExceptionType],
+            authResponseDescription: '',
+            binSearchMatchFlag: binSearch
+              ? t.First6.startsWith(binSearch)
+              : false,
+          };
+        } else if (t.sExceptionType) {
+          acc[key].exceptionListArray.push(t.sExceptionType);
+        }
 
-          return acc;
-        },
-        {}
-      )
-    );
+        return acc;
+      }, {})
+    ).map<TransactionResult>((t) => ({
+      ...t,
+
+      exceptionList: Array.from(new Set(t.exceptionListArray.filter(Boolean)))
+        .map((e) => this.getExceptionTypeNumber(e))
+        .join(' - '),
+
+      exceptionTitle: Array.from(
+        new Set(t.exceptionListArray.filter(Boolean))
+      ).join(' - '),
+    }));
 
     return grouped;
   }
