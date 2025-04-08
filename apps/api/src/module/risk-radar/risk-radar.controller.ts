@@ -252,7 +252,6 @@ export class RiskRadarController {
     return this.riskRadarSaveService.saveRiskRadar(data);
   }
 
-  @Public()
   @Get('merchant-exception-transaction')
   @ApiOkResponse()
   public async getMerchantExceptionTransactions(
