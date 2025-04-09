@@ -5,7 +5,7 @@
 
 'use client';
 
-import { Breadcrumb } from '@denali/ui';
+import { Breadcrumb, Loader } from '@denali/ui';
 import { useAuth } from '@frontegg/nextjs';
 import { notFound } from 'next/navigation';
 import type { FC } from 'react';
@@ -619,11 +619,21 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   }
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <DefaultLayout>
+        <Loader />
+      </DefaultLayout>
+    );
   }
 
   if (error) {
-    return <div>Error loading merchant data</div>;
+    return (
+      <DefaultLayout>
+        <div className="flex flex-col items-center justify-center h-full">
+          <p className="text-red-500 text-lg">Error loading merchant data</p>
+        </div>
+      </DefaultLayout>
+    );
   }
 
   const merchantProfile = {
