@@ -99,6 +99,14 @@ export class ExceptionsListService {
       query.andWhere('exception.sMID = :merchantId', {
         merchantId,
       });
+    } else if (dbaNameOrSIC) {
+      query.andWhere(
+        '(exception.sDBA LIKE :dbaFilter OR leadsInfo.DBAName LIKE :dbaFilter OR leadsInfo.MccCode LIKE :sicFilter)',
+        {
+          dbaFilter: `%${dbaNameOrSIC}%`,
+          sicFilter: `%${dbaNameOrSIC}%`,
+        }
+      );
     } else {
       if (status) {
         query.andWhere('exception.fkRiskRadarExceptionStatus = :status', {
@@ -110,16 +118,6 @@ export class ExceptionsListService {
         query.andWhere('exception.fkRiskRadarUserAssigned = :assignedToUser', {
           assignedToUser,
         });
-      }
-
-      if (dbaNameOrSIC) {
-        query.andWhere(
-          '(exception.sDBA LIKE :dbaFilter OR leadsInfo.DBAName LIKE :dbaFilter OR leadsInfo.MccCode LIKE :sicFilter)',
-          {
-            dbaFilter: `%${dbaNameOrSIC}%`,
-            sicFilter: `%${dbaNameOrSIC}%`,
-          }
-        );
       }
     }
 
