@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { Public } from '@/api/shared/auth/decorator/public.decorator';
+import { IrisClient } from '@/api/shared/module/iris/iris.client';
 import type {
   IrisChannelsResponseDto,
   IrisFilteredUsersResponseDto,
@@ -16,7 +17,6 @@ import {
 import type { LeadUserAssignedOutputDto } from './dto';
 import { LeadUserAssignedInputDto } from './dto';
 import { IrisProxyService } from './iris-proxy.service';
-import { IrisClient } from './webservice/iris.client';
 
 export type IrisProxyControllerConfig = {
   IRIS_ENV: string;

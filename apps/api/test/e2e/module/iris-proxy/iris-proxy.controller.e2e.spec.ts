@@ -10,7 +10,7 @@ import * as request from 'supertest';
 import type { LeadUserAssignedInputDto } from '@/api/module/iris-proxy/dto';
 import { IrisProxyController } from '@/api/module/iris-proxy/iris-proxy.controller';
 import { IrisProxyService } from '@/api/module/iris-proxy/iris-proxy.service';
-import { IrisClient } from '@/api/module/iris-proxy/webservice/iris.client';
+import { IrisClient } from '@/api/shared/module/iris/iris.client';
 
 describe('IrisProxyController (e2e)', () => {
   let app: INestApplication;

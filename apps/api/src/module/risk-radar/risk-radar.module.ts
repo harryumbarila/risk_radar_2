@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { IrisClient } from '@/api/module/iris-proxy/webservice/iris.client';
+import { IrisModule } from '@/api/shared/module/iris/iris.module';
 import {
   ClxReportingRepository,
   CLXReportingSearchAVSResponseLookupRepository,
@@ -116,6 +116,7 @@ import { RiskRadarUserService } from './services/risk-radar-user/risk-radar-user
     ),
     TypeOrmModule.forFeature([], 'connector'),
     TypeOrmModule.forFeature([], 'crescent-view'),
+    IrisModule,
   ],
   controllers: [RiskRadarController],
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -187,9 +188,6 @@ import { RiskRadarUserService } from './services/risk-radar-user/risk-radar-user
     FspExceptionTransactionService,
     TsysExceptionTransactionService,
     PushNoteToIrisService,
-
-    // Clients
-    IrisClient,
   ],
   exports: [RiskRadarNotesService, RiskRadarUserService],
 })
