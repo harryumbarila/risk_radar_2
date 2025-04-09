@@ -52,12 +52,10 @@ export class ExceptionsListService {
         endDate,
       });
 
-    // Skip point filter if view all exceptions is checked or 14 is selected
-    const shouldSkipPointFilter =
-      viewAllExceptions || categories.includes('14');
-
-    if (!shouldSkipPointFilter) {
-      query.andWhere('exception.iTotalPoints > 20');
+    if (!viewAllExceptions) {
+      query.andWhere(
+        '(exception.iTotalPoints > 20 OR (exception.iNegDailyBatches IS NOT NULL AND exception.iNegDailyBatches > 0))'
+      );
     }
 
     if (processor) {
