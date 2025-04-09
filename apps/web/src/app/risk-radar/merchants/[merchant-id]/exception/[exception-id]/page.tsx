@@ -359,8 +359,8 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     (merchantsWithSameTaxIdData?.merchantIds?.length || 0) / ITEMS_PER_PAGE
   );
 
-  const handlePushNoteToIris = async (noteId: string): Promise<void> => {
-    await pushNote(noteId);
+  const handlePushNoteToIris = async (note: string): Promise<void> => {
+    await pushNote(note, merchantId);
     notesRefetch();
   };
 

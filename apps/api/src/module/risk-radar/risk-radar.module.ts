@@ -77,6 +77,7 @@ import { FspExceptionTransactionService } from './services/merchant-exception-tr
 import { MerchantExceptionTransactionsService } from './services/merchant-exception-transactions/merchant-exception-transactions.service';
 import { TsysExceptionTransactionService } from './services/merchant-exception-transactions/tsys-exception-transaction.service';
 import { MerchantWithSameTaxIdService } from './services/merchant-with-same-tax-id/merchant-with-same-tax-id.service';
+import { PushNoteToIrisService } from './services/push-note-to-iris/push-note-to-iris.service';
 import { ReviewExceptionService } from './services/review-exception/review-exception.service';
 import { RiskRadarEmailTemplateService } from './services/risk-radar-email-template/risk-radar-email-template.service';
 import { RiskRadarExceptionsService } from './services/risk-radar-exceptions.service';
@@ -183,6 +184,7 @@ import { RiskRadarUserService } from './services/risk-radar-user/risk-radar-user
     RiskRadarUserService,
     FspExceptionTransactionService,
     TsysExceptionTransactionService,
+    PushNoteToIrisService,
   ],
   exports: [RiskRadarNotesService, RiskRadarUserService],
 })
