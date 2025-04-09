@@ -33,8 +33,8 @@ import { useMerchantsWithSameTaxId } from '@/web/src/hooks/risk-radar/use-mercha
 import { usePushNoteToIris } from '@/web/src/hooks/risk-radar/use-push-note-to-iris';
 import type { SaveMerchantDataParams } from '@/web/src/hooks/risk-radar/use-save-merchant-data';
 import { useSaveMerchantData } from '@/web/src/hooks/risk-radar/use-save-merchant-data';
-import { useTransactionExceptions } from '@/web/src/hooks/risk-radar/use-transaction-exceptions';
 import { useSendExceptionMemoEmail } from '@/web/src/hooks/risk-radar/use-send-exception-memo-email';
+import { useTransactionExceptions } from '@/web/src/hooks/risk-radar/use-transaction-exceptions';
 
 type MerchantContactResponse = {
   businessInfo: {
@@ -650,7 +650,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       });
       setIsPopupActive(false);
     } catch (error) {
-      console.error('Error sending email:', error);
+      // console.error('Error sending email:', error);
     } finally {
       setIsSendingEmail(false);
     }
