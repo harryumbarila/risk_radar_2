@@ -1,8 +1,8 @@
-import { IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class PushNoteToIrisInputDto {
-  @IsString()
-  public note: string;
+  @IsNumber()
+  public noteId: number;
 
   @IsString()
   public merchantId: string;

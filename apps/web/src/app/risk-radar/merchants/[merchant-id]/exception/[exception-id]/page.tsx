@@ -10,6 +10,7 @@ import { useAuth } from '@frontegg/nextjs';
 import { notFound } from 'next/navigation';
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import { DefaultLayout } from '@/components/layouts/default-layout';
 import { Pagination } from '@/components/risk-radar/pagination';
@@ -359,8 +360,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     (merchantsWithSameTaxIdData?.merchantIds?.length || 0) / ITEMS_PER_PAGE
   );
 
-  const handlePushNoteToIris = async (note: string): Promise<void> => {
-    await pushNote(note, merchantId);
+  const handlePushNoteToIris = async (noteId: number): Promise<void> => {
+    await pushNote(noteId, merchantId);
+    refetch();
     notesRefetch();
   };
 
@@ -559,7 +561,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       refetch();
       notesRefetch();
     } catch (error) {
-      // console.error('Error saving merchant data:', error);
+      toast.error(`Error saving merchant data`);
     } finally {
       setIsSaving(false);
     }
@@ -1429,12 +1431,18 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                               id={`pushToIris-${note.pkNotes}`}
                               aria-label={`Push note ${note.pkNotes} to Iris`}
                               className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
-                              disabled={note.bPushedToIris}
-                              checked={note.bPushedToIris}
+                              disabled={!!note.dtIrisMemoRequest}
+                              checked={!!note.dtIrisMemoRequest}
                               onChange={() => {
-                                handlePushNoteToIris(
-                                  note.pkNotes.toString()
-                                ).catch(() => {});
+                                handlePushNoteToIris(note.pkRiskRadarNotes)
+                                  .then(() => {
+                                    toast.success(`Note pushed to Iris`);
+                                  })
+                                  .catch((e: Error) => {
+                                    toast.error(
+                                      `Failed to push note to Iris: ${e?.message ?? 'Unknown error'}`
+                                    );
+                                  });
                               }}
                             />
                           </div>

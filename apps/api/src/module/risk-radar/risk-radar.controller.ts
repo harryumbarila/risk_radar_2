@@ -353,6 +353,7 @@ export class RiskRadarController {
     );
   }
 
+  @Public()
   @Post('push-note-to-iris')
   @ApiOperation({
     summary: 'Push a note to Iris',

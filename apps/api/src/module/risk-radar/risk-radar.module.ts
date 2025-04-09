@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { IrisClient } from '@/api/module/iris-proxy/webservice/iris.client';
 import {
   ClxReportingRepository,
   CLXReportingSearchAVSResponseLookupRepository,
@@ -169,6 +170,7 @@ import { RiskRadarUserService } from './services/risk-radar-user/risk-radar-user
     RiskRadarCycleTimeMonitorRepository,
     FSPRiskRadarExceptionPointsRepository,
     RiskRadarTransactionRepository,
+    RiskRadarNotesRepository,
     // Services
     RiskRadarService,
     MerchantCardNumHistoryService,
@@ -185,6 +187,9 @@ import { RiskRadarUserService } from './services/risk-radar-user/risk-radar-user
     FspExceptionTransactionService,
     TsysExceptionTransactionService,
     PushNoteToIrisService,
+
+    // Clients
+    IrisClient,
   ],
   exports: [RiskRadarNotesService, RiskRadarUserService],
 })
