@@ -1,14 +1,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectDataSource } from '@nestjs/typeorm';
 import { InjectPinoLogger } from 'nestjs-pino';
 import { Logger } from 'pino';
-import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
-import { RiskRadarEmailTemplateRepository } from '@/finance-db/repositories/risk-radar-email-template.repository';
-import { RiskRadarUserRepository } from '@/finance-db/repositories/risk-radar-user.repository';
-import { RiskRadarNotesRepository } from '@/finance-db/repositories/risk-radar-notes.repository';
 import { LeadRepository } from '@/iris-db/repositories';
 import { LeadsBusinessInformationRepository } from '@/iris-db/repositories/leads-business-information.repository';
+import { RiskRadarEmailTemplateRepository } from '@/finance-db/repositories/risk-radar-email-template.repository';
+import { RiskRadarNotesRepository } from '@/finance-db/repositories/risk-radar-notes.repository';
+import { RiskRadarUserRepository } from '@/finance-db/repositories/risk-radar-user.repository';
 
 import type { SendExceptionMemoEmailDto } from './dtos/send-exception-memo-email.dto';
 
@@ -24,7 +24,7 @@ export class RiskRadarService {
     @InjectPinoLogger(RiskRadarService.name) private readonly logger: Logger
   ) {}
 
-  public async sendExceptionMemoEmail(params: SendExceptionMemoEmailDto) {
+  public async sendExceptionMemoEmail(params: SendExceptionMemoEmailDto): Promise<string> {
     const { mid, emailBody, emailTemplateId, emailRecipient, user } = params;
 
     // Find data
