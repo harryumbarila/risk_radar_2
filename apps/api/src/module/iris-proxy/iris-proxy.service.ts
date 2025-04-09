@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 
+import { IrisClient } from '@/api/shared/module/iris/iris.client';
 import type { LeadDetailResponse } from '@/shared/response';
 
 import type {
@@ -11,7 +12,6 @@ import type {
 } from './dto';
 import type { IrisProxyControllerConfig } from './iris-proxy.controller';
 import type { AssignedByMapper } from './mappers';
-import { IrisClient } from './webservice/iris.client';
 
 @Injectable()
 export class IrisProxyService {

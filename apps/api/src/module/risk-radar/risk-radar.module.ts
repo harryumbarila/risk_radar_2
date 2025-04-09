@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { IrisModule } from '@/api/shared/module/iris/iris.module';
 import {
   ClxReportingRepository,
   CLXReportingSearchAVSResponseLookupRepository,
@@ -77,6 +78,7 @@ import { FspExceptionTransactionService } from './services/merchant-exception-tr
 import { MerchantExceptionTransactionsService } from './services/merchant-exception-transactions/merchant-exception-transactions.service';
 import { TsysExceptionTransactionService } from './services/merchant-exception-transactions/tsys-exception-transaction.service';
 import { MerchantWithSameTaxIdService } from './services/merchant-with-same-tax-id/merchant-with-same-tax-id.service';
+import { PushNoteToIrisService } from './services/push-note-to-iris/push-note-to-iris.service';
 import { ReviewExceptionService } from './services/review-exception/review-exception.service';
 import { RiskRadarEmailTemplateService } from './services/risk-radar-email-template/risk-radar-email-template.service';
 import { RiskRadarExceptionsService } from './services/risk-radar-exceptions.service';
@@ -114,6 +116,7 @@ import { RiskRadarUserService } from './services/risk-radar-user/risk-radar-user
     ),
     TypeOrmModule.forFeature([], 'connector'),
     TypeOrmModule.forFeature([], 'crescent-view'),
+    IrisModule,
   ],
   controllers: [RiskRadarController],
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -168,6 +171,7 @@ import { RiskRadarUserService } from './services/risk-radar-user/risk-radar-user
     RiskRadarCycleTimeMonitorRepository,
     FSPRiskRadarExceptionPointsRepository,
     RiskRadarTransactionRepository,
+    RiskRadarNotesRepository,
     // Services
     RiskRadarService,
     MerchantCardNumHistoryService,
@@ -183,6 +187,7 @@ import { RiskRadarUserService } from './services/risk-radar-user/risk-radar-user
     RiskRadarUserService,
     FspExceptionTransactionService,
     TsysExceptionTransactionService,
+    PushNoteToIrisService,
   ],
   exports: [RiskRadarNotesService, RiskRadarUserService],
 })
