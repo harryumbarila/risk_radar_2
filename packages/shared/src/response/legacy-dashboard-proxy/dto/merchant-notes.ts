@@ -9,4 +9,5 @@ export interface MerchantNotesResponseDto {
   isPinned: boolean;
   dtIrisMemoRequestFulfilled: string;
   bPushedToIris: boolean;
+  pkRiskRadarNotes: number;
 }

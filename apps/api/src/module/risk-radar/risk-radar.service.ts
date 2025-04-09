@@ -1,8 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectDataSource } from '@nestjs/typeorm';
 import { InjectPinoLogger } from 'nestjs-pino';
 import { Logger } from 'pino';
+import { DataSource } from 'typeorm';
 
 import { RiskRadarEmailTemplateRepository } from '@/finance-db/repositories/risk-radar-email-template.repository';
+import { RiskRadarNotesRepository } from '@/finance-db/repositories/risk-radar-notes.repository';
 import { RiskRadarUserRepository } from '@/finance-db/repositories/risk-radar-user.repository';
 import { LeadRepository } from '@/iris-db/repositories';
 import { LeadsBusinessInformationRepository } from '@/iris-db/repositories/leads-business-information.repository';
@@ -16,18 +19,19 @@ export class RiskRadarService {
     private readonly riskRadarEmailTemplateRepository: RiskRadarEmailTemplateRepository,
     private readonly leadsBusinessInfoRepository: LeadsBusinessInformationRepository,
     private readonly leadsRepository: LeadRepository,
-
-    // private readonly riskRadarNotesRepository: RiskRadarNotesRepository,
-
+    private readonly riskRadarNotesRepository: RiskRadarNotesRepository,
+    @InjectDataSource('finance') private readonly financeDataSource: DataSource,
     @InjectPinoLogger(RiskRadarService.name) private readonly logger: Logger
   ) {}
 
-  public async sendExceptionMemoEmail(params: SendExceptionMemoEmailDto) {
+  public async sendExceptionMemoEmail(
+    params: SendExceptionMemoEmailDto
+  ): Promise<string> {
     const { mid, emailBody, emailTemplateId, emailRecipient, user } = params;
 
     // Find data
     const lead = await this.leadsRepository.findOneBy({
-      id: mid,
+      irisMId: String(mid),
       isArchived: false,
     });
 
@@ -44,7 +48,7 @@ export class RiskRadarService {
     }
 
     const riskRadarUser = await this.riskRadarUserRepository.findOneBy({
-      ntUserId: user,
+      name: user,
       isHidden: false,
     });
 
@@ -70,19 +74,33 @@ export class RiskRadarService {
       throw new BadRequestException('Some fields are missing');
     }
 
-    // Send email
-    const sentMessage = `Sent email to '${emailRecipient}' titled ${subject}`;
+    try {
+      // Send email using sp_send_dbmail
+      await this.financeDataSource.query(
+        `EXEC msdb.dbo.sp_send_dbmail
+          @profile_name = 'RISK',
+          @recipients = @0,
+          @copy_recipients = @1,
+          @reply_to = @1,
+          @subject = @2,
+          @body = @3`,
+        [emailRecipient, replyTo, subject, emailBody]
+      );
 
-    // TODO: Use email service to send email and uncomment
-    // await this.riskRadarNotesRepository.insert({
-    //   notesTypeId: 1,
-    //   mid,
-    //   notes: sentMessage,
-    //   userCreated: user,
-    // });
+      // Record the action in notes
+      await this.riskRadarNotesRepository.insert({
+        notesTypeId: 1,
+        mid: mid.toString(),
+        notes: `Sent an email to ${emailRecipient} titled ${subject}`,
+        userCreated: user,
+      });
 
-    this.logger.info(sentMessage);
-
-    return sentMessage;
+      const sentMessage = `Sent email to '${emailRecipient}' titled ${subject}`;
+      this.logger.info({ message: sentMessage } as const);
+      return sentMessage;
+    } catch (error: unknown) {
+      this.logger.error({ error } as const, 'Failed to send email');
+      throw new BadRequestException('Failed to send email');
+    }
   }
 }

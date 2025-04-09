@@ -10,6 +10,7 @@ import { useAuth } from '@frontegg/nextjs';
 import { notFound } from 'next/navigation';
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import { DefaultLayout } from '@/components/layouts/default-layout';
 import { Pagination } from '@/components/risk-radar/pagination';
@@ -33,6 +34,7 @@ import { useMerchantsWithSameTaxId } from '@/web/src/hooks/risk-radar/use-mercha
 import { usePushNoteToIris } from '@/web/src/hooks/risk-radar/use-push-note-to-iris';
 import type { SaveMerchantDataParams } from '@/web/src/hooks/risk-radar/use-save-merchant-data';
 import { useSaveMerchantData } from '@/web/src/hooks/risk-radar/use-save-merchant-data';
+import { useSendExceptionMemoEmail } from '@/web/src/hooks/risk-radar/use-send-exception-memo-email';
 import { useTransactionExceptions } from '@/web/src/hooks/risk-radar/use-transaction-exceptions';
 
 type MerchantContactResponse = {
@@ -161,8 +163,13 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const [activePopup, setActivePopup] = useState<PopupType>(PopupType.Email);
 
   const [email, setEmail] = useState<string>('');
-  const [template, setTemplate] = useState<string>('');
-  const [body, setBody] = useState<string>('');
+  const [templateData, setTemplateData] = useState<{
+    templateId: number | null;
+    body: string;
+  }>({
+    templateId: null,
+    body: '',
+  });
 
   // State for merchant save data
   const [merchantStateData, setMerchantStateData] = useState<MerchantStateData>(
@@ -211,6 +218,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
   const { pushNote } = usePushNoteToIris();
   const { saveMerchantdata } = useSaveMerchantData();
+  const { sendExceptionMemoEmail } = useSendExceptionMemoEmail();
 
   const [activeTab, setActiveTab] = useState<string>('contact');
   const [merchantUpdateRequest, setMerchantUpdateRequest] = useState<{
@@ -235,6 +243,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
   // Add isSaving state
   const [isSaving, setIsSaving] = useState<boolean>(false);
+
+  // Add isSendingEmail state
+  const [isSendingEmail, setIsSendingEmail] = useState<boolean>(false);
 
   // Update merchantStateData when data changes
   useEffect(() => {
@@ -359,8 +370,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     (merchantsWithSameTaxIdData?.merchantIds?.length || 0) / ITEMS_PER_PAGE
   );
 
-  const handlePushNoteToIris = async (noteId: string): Promise<void> => {
-    await pushNote(noteId);
+  const handlePushNoteToIris = async (noteId: number): Promise<void> => {
+    await pushNote(noteId, merchantId);
+    refetch();
     notesRefetch();
   };
 
@@ -559,7 +571,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       refetch();
       notesRefetch();
     } catch (error) {
-      // console.error('Error saving merchant data:', error);
+      toast.error(`Error saving merchant data`);
     } finally {
       setIsSaving(false);
     }
@@ -606,12 +618,44 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       currentTransException.cardNumber.slice(-4)
     );
 
-    setBody(newTemplate);
+    setTemplateData((prev) => ({
+      ...prev,
+      body: newTemplate,
+    }));
   };
 
-  const handleSendEmail = (): void => {
-    // console.log({ template, email, body });
-    // Add email sending logic here
+  const handleSendEmail = async (): Promise<void> => {
+    if (
+      !currentTransException ||
+      !email ||
+      !templateData.body ||
+      templateData.templateId === null
+    ) {
+      return;
+    }
+
+    try {
+      setIsSendingEmail(true);
+      await sendExceptionMemoEmail({
+        mid: parseInt(merchantId, 10),
+        emailTemplateId: templateData.templateId,
+        emailRecipient: email,
+        emailBody: templateData.body,
+        user: user?.name ?? '',
+      });
+
+      // Clear form after successful send
+      setEmail('');
+      setTemplateData({
+        templateId: null,
+        body: '',
+      });
+      setIsPopupActive(false);
+    } catch (error) {
+      // console.error('Error sending email:', error);
+    } finally {
+      setIsSendingEmail(false);
+    }
   };
 
   if (!merchantId) {
@@ -804,21 +848,28 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               </label>
               <select
                 className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                value={template}
+                value={templateData.templateId?.toString() || ''}
                 onChange={(e) => {
-                  setTemplate(e.target.value);
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                  const template = emailTemplates?.find(
-                    (template: EmailTemplate) =>
-                      template.id == parseInt(e.target.value, 10)
+                  const templateId = e.target.value
+                    ? parseInt(e.target.value, 10)
+                    : null;
+                  setTemplateData((prev) => ({
+                    ...prev,
+                    templateId,
+                  }));
+                  const selectedTemplate = emailTemplates?.find(
+                    (template: EmailTemplate) => template.id === templateId
                   )?.templateEmailBody;
-                  if (template) {
-                    replaceEmailTemplateParameters(template);
+                  if (selectedTemplate) {
+                    replaceEmailTemplateParameters(selectedTemplate);
                   }
                 }}
               >
+                <option value="">Select a template</option>
                 {emailTemplates.map((template: EmailTemplate) => (
-                  <option value={template.id}>{template.templateName}</option>
+                  <option key={template.id} value={template.id}>
+                    {template.templateName}
+                  </option>
                 ))}
               </select>
             </div>
@@ -851,8 +902,13 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <textarea
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
                 rows={4}
-                value={body}
-                onChange={(e) => setBody(e.target.value)}
+                value={templateData.body}
+                onChange={(e) =>
+                  setTemplateData((prev) => ({
+                    ...prev,
+                    body: e.target.value,
+                  }))
+                }
                 placeholder="Enter email content..."
               />
             </div>
@@ -861,9 +917,15 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             <button
               type="button"
               onClick={handleSendEmail}
-              className="w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition"
+              disabled={
+                isSendingEmail ||
+                !email ||
+                !templateData.body ||
+                templateData.templateId === null
+              }
+              className="w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Send Email
+              {isSendingEmail ? 'Sending...' : 'Send Email'}
             </button>
           </div>
         ) : null}
@@ -1429,12 +1491,18 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                               id={`pushToIris-${note.pkNotes}`}
                               aria-label={`Push note ${note.pkNotes} to Iris`}
                               className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
-                              disabled={note.bPushedToIris}
-                              checked={note.bPushedToIris}
+                              disabled={!!note.dtIrisMemoRequest}
+                              checked={!!note.dtIrisMemoRequest}
                               onChange={() => {
-                                handlePushNoteToIris(
-                                  note.pkNotes.toString()
-                                ).catch(() => {});
+                                handlePushNoteToIris(note.pkRiskRadarNotes)
+                                  .then(() => {
+                                    toast.success(`Note pushed to Iris`);
+                                  })
+                                  .catch((e: Error) => {
+                                    toast.error(
+                                      `Failed to push note to Iris: ${e?.message ?? 'Unknown error'}`
+                                    );
+                                  });
                               }}
                             />
                           </div>

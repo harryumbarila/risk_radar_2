@@ -6,7 +6,7 @@ import type { AxiosResponse } from 'axios';
 
 import type { LeadUserAssignedInputDto } from '@/api/module/iris-proxy/dto';
 import { IrisProxyService } from '@/api/module/iris-proxy/iris-proxy.service';
-import { IrisClient } from '@/api/module/iris-proxy/webservice/iris.client';
+import { IrisClient } from '@/api/shared/module/iris/iris.client';
 
 describe('IrisProxyService', () => {
   let service: IrisProxyService;

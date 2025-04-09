@@ -39,6 +39,8 @@ import { MerchantExceptionDetailService } from './services/merchant-exception-de
 import { MerchantExceptionTransactionsInputDto } from './services/merchant-exception-transactions/dto/merchant-exception-transactions.dto';
 import { MerchantExceptionTransactionsService } from './services/merchant-exception-transactions/merchant-exception-transactions.service';
 import { MerchantWithSameTaxIdService } from './services/merchant-with-same-tax-id/merchant-with-same-tax-id.service';
+import { PushNoteToIrisInputDto } from './services/push-note-to-iris/dto/push-note-to-iris-input.dto';
+import { PushNoteToIrisService } from './services/push-note-to-iris/push-note-to-iris.service';
 import { ReviewExceptionInputDto } from './services/review-exception/dto/review-exception-input.dto';
 import { ReviewExceptionService } from './services/review-exception/review-exception.service';
 import { EmailTemplatesResponseDto } from './services/risk-radar-email-template/dto/email-template.dto';
@@ -65,7 +67,8 @@ export class RiskRadarController {
     private readonly chargebackTransactionsService: ChargebacksAndRetrievalReasonCodeLookupRepository,
     private readonly emailTemplateService: RiskRadarEmailTemplateService,
     private readonly merchantWithSameTaxIdService: MerchantWithSameTaxIdService,
-    private readonly assignExceptionsService: AssignExceptionsService
+    private readonly assignExceptionsService: AssignExceptionsService,
+    private readonly pushNoteToIrisService: PushNoteToIrisService
   ) {}
 
   @Post('send-exception-memo-email')
@@ -348,5 +351,19 @@ export class RiskRadarController {
       data.assignToUserId,
       data.createdBy
     );
+  }
+
+  @Public()
+  @Post('push-note-to-iris')
+  @ApiOperation({
+    summary: 'Push a note to Iris',
+    description: 'Pushes a note to Iris for a given merchant ID',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The note was successfully pushed to Iris',
+  })
+  public async pushNoteToIris(@Body() data: PushNoteToIrisInputDto) {
+    return this.pushNoteToIrisService.pushNoteToIris(data);
   }
 }
