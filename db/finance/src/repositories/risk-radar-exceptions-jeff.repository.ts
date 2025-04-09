@@ -303,9 +303,7 @@ export class RiskRadarExceptionsJeffRepository extends Repository<RiskRadarExcep
             );
             break;
           case '14':
-            orConditions.push(
-              `exception.iNegDailyBatches IS NOT NULL AND exception.iNegDailyBatches > 0`
-            );
+            orConditions.push(`exception.iNegDailyBatches IS NOT NULL`);
             break;
           case '15':
             orConditions.push(

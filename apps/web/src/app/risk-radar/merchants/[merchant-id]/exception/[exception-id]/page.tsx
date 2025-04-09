@@ -5,7 +5,7 @@
 
 'use client';
 
-import { Breadcrumb } from '@denali/ui';
+import { Breadcrumb, Loader } from '@denali/ui';
 import { useAuth } from '@frontegg/nextjs';
 import { notFound } from 'next/navigation';
 import type { FC } from 'react';
@@ -541,13 +541,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
       // Reset form values after successful save
       setMerchantStateData({
-        isDiverted: false,
-        preferredContact: '',
+        ...merchantStateData,
         notes: '',
         isPinnedNote: false,
         clickedStatus: 'none',
-        isRiskWatch: false,
-        isAutoHoldEnabled: false,
       });
 
       setNoteRequest({
@@ -555,11 +552,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         isPinned: false,
         author: user?.name ?? null,
       });
-
-      setMerchantUpdateRequest({
-        preferredContact: '',
-      });
-
       // Reset changed fields
       setChangedFields({});
 
@@ -627,11 +619,21 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   }
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <DefaultLayout>
+        <Loader />
+      </DefaultLayout>
+    );
   }
 
   if (error) {
-    return <div>Error loading merchant data</div>;
+    return (
+      <DefaultLayout>
+        <div className="flex flex-col items-center justify-center h-full">
+          <p className="text-red-500 text-lg">Error loading merchant data</p>
+        </div>
+      </DefaultLayout>
+    );
   }
 
   const merchantProfile = {

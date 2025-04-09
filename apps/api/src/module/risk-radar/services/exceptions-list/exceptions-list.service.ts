@@ -52,12 +52,10 @@ export class ExceptionsListService {
         endDate,
       });
 
-    // Skip point filter if view all exceptions is checked or 14 is selected
-    const shouldSkipPointFilter =
-      viewAllExceptions || categories.includes('14');
-
-    if (!shouldSkipPointFilter) {
-      query.andWhere('exception.iTotalPoints > 20');
+    if (!viewAllExceptions) {
+      query.andWhere(
+        '(exception.iTotalPoints > 20 OR (exception.iNegDailyBatches IS NOT NULL AND exception.iNegDailyBatches > 0))'
+      );
     }
 
     if (processor) {
@@ -99,6 +97,14 @@ export class ExceptionsListService {
       query.andWhere('exception.sMID = :merchantId', {
         merchantId,
       });
+    } else if (dbaNameOrSIC) {
+      query.andWhere(
+        '(exception.sDBA LIKE :dbaFilter OR leadsInfo.DBAName LIKE :dbaFilter OR leadsInfo.MccCode LIKE :sicFilter)',
+        {
+          dbaFilter: `%${dbaNameOrSIC}%`,
+          sicFilter: `%${dbaNameOrSIC}%`,
+        }
+      );
     } else {
       if (status) {
         query.andWhere('exception.fkRiskRadarExceptionStatus = :status', {
@@ -110,16 +116,6 @@ export class ExceptionsListService {
         query.andWhere('exception.fkRiskRadarUserAssigned = :assignedToUser', {
           assignedToUser,
         });
-      }
-
-      if (dbaNameOrSIC) {
-        query.andWhere(
-          '(exception.sDBA LIKE :dbaFilter OR leadsInfo.DBAName LIKE :dbaFilter OR leadsInfo.MccCode LIKE :sicFilter)',
-          {
-            dbaFilter: `%${dbaNameOrSIC}%`,
-            sicFilter: `%${dbaNameOrSIC}%`,
-          }
-        );
       }
     }
 
