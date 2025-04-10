@@ -9,11 +9,10 @@ type VersionData = {
   created_at: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export default function handler(
   _req: NextApiRequest,
   res: NextApiResponse<VersionData>
-) {
+): void {
   try {
     // Path to version.json file
     const versionFilePath = path.join(process.cwd(), 'version.json');
