@@ -48,3 +48,15 @@ jobs:
           echo "Generated version: $next_version"
           echo "build-number=${next_version}" >> $GITHUB_ENV
           echo "build-number=${next_version}" >> $GITHUB_OUTPUT
+
+          # Get current branch and commit
+          BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          COMMIT=$(git rev-parse --short HEAD)
+          TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+
+          # Create version.json file for apps/web
+          mkdir -p apps/web
+          echo "{ \"version\": \"${next_version}\", \"branch\": \"${BRANCH}\", \"commit\": \"${COMMIT}\", \"created_at\": \"${TIMESTAMP}\" }" > apps/web/version.json
+
+          echo "Created version.json with content:"
+          cat apps/web/version.json

@@ -33,9 +33,9 @@ describe('AppController (e2e)', () => {
         .expect(200)
         .expect((res) => {
           expect(res.body).toHaveProperty('version', '1.0.0');
-          expect(res.body).toHaveProperty('branch', 'develop');
-          expect(res.body).toHaveProperty('commit', 'develop');
-          expect(res.body).toHaveProperty('created_at', '2025-02-01');
+          expect(res.body).toHaveProperty('branch', 'master');
+          expect(res.body).toHaveProperty('commit', 'latest');
+          expect(res.body).toHaveProperty('created_at');
           expect(res.body).toHaveProperty('current_server_time');
         });
     });

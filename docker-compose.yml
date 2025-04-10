@@ -19,7 +19,6 @@ services:
       timeout: 3s
       retries: 10
       start_period: 10s
-
 networks:
   denali-network:
     driver: bridge
