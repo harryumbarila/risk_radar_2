@@ -709,6 +709,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     iSwipedPercBasedOnTransCntCurrMonth:
       data?.businessInfo?.swipedPercentageTransCount || 0,
     sPreferredContact: data?.businessInfo?.preferredContact || '',
+    netBalance: data?.businessInfo?.netSettlementBalance || 0,
   };
 
   const merchantContactInfo = data?.businessInfo || null;
@@ -972,6 +973,17 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <strong>Activated:</strong>
             </p>
             <p>{formatDate(merchantProfile?.sActivationDate)}</p>
+
+            <p className="text-black dark:text-white">
+              <strong>Net Balance:</strong>
+            </p>
+            <p>
+              {formatCurrency(
+                merchantContactInfo?.netSettlementBalance || 0,
+                2,
+                true
+              )}
+            </p>
           </div>
         </div>
         {/* Column 2 */}
