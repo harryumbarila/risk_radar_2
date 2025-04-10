@@ -11,7 +11,7 @@ type VersionData = {
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export default function handler(
-  req: NextApiRequest,
+  _req: NextApiRequest,
   res: NextApiResponse<VersionData>
 ) {
   try {
