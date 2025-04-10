@@ -15,7 +15,10 @@ export const formatNumber = (value: unknown): string => {
   return Number(value).toLocaleString();
 };
 
-export const formatCurrency = (value: unknown): string => {
+export const formatCurrency = (
+  value: unknown,
+  minimumFractionDigits = 2
+): string => {
   if (value === undefined || value === null || Number(value) === 0) {
     return DEFAULT_BLANK_VALUE;
   }
@@ -23,7 +26,7 @@ export const formatCurrency = (value: unknown): string => {
   return Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-    minimumFractionDigits: 2,
+    minimumFractionDigits,
   }).format(Number(value));
 };
 
