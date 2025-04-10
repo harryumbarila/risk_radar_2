@@ -7,6 +7,11 @@ export const middleware = async (
   const { pathname, searchParams } = request.nextUrl;
   const { headers } = request;
 
+  // Skip authentication for the version endpoint
+  if (pathname === '/api/version') {
+    return undefined; // Skip middleware for this path
+  }
+
   // shouldByPassMiddleware from getSessionOnEdge was moved under the hood of handleSessionOnEdge
 
   // Additional logic if needed
@@ -21,6 +26,7 @@ export const config = {
     // - _next (Next.js internals)
     // - static files (images, favicon)
     // - auth-related routes
-    '/(.*)',
+    // And exclude specific API routes that should be public
+    '/((?!api/version|_next|favicon.ico).*)',
   ],
 };

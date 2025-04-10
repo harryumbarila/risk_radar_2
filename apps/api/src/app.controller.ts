@@ -7,10 +7,9 @@ import {
 } from '@nestjs/swagger';
 
 import { Public } from '@/api/shared/auth/decorator/public.decorator';
-import {
-  VersionData,
-  VersionResolver,
-} from './shared/version/version-resolver';
+
+import type { VersionData } from './shared/version/version-resolver';
+import { VersionResolver } from './shared/version/version-resolver';
 
 class AppVersionResponseDto {
   @ApiProperty({ description: 'Current app version' })
@@ -28,13 +27,12 @@ class AppVersionResponseDto {
   @ApiProperty({ description: 'Server time' })
   public current_server_time: string;
 
-  constructor(version: VersionData) {
+  public constructor(version: VersionData) {
     this.version = version.version;
     this.branch = version.branch;
     this.commit = version.commit;
     this.created_at = version.created_at;
-    this.current_server_time =
-      new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString();
+    this.current_server_time = `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
   }
 }
 

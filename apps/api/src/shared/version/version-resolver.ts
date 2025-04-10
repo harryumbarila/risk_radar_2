@@ -1,6 +1,5 @@
-import { join, dirname } from 'path';
-
-const fs = require('fs');
+import * as fs from 'fs';
+import { dirname, join } from 'path';
 
 function findVersionFile(): string {
   // Get the directory path of the current module
@@ -22,13 +21,13 @@ export type VersionData = {
 };
 
 export class VersionResolver {
-  static resolveVersion(): VersionData {
+  public static resolveVersion(): VersionData {
     const path = findVersionFile();
 
     if (fs.existsSync(path)) {
       return JSON.parse(
-        fs.readFileSync(path, 'utf8').replace(new RegExp('\n', 'g'), ' ')
-      );
+        fs.readFileSync(path, 'utf8').replace(/\n/g, ' ')
+      ) as VersionData;
     }
 
     return {
