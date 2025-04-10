@@ -17,9 +17,13 @@ export const formatNumber = (value: unknown): string => {
 
 export const formatCurrency = (
   value: unknown,
-  minimumFractionDigits = 2
+  minimumFractionDigits = 2,
+  returnZero = false
 ): string => {
-  if (value === undefined || value === null || Number(value) === 0) {
+  if (
+    !returnZero &&
+    (value === undefined || value === null || Number(value) === 0)
+  ) {
     return DEFAULT_BLANK_VALUE;
   }
 
