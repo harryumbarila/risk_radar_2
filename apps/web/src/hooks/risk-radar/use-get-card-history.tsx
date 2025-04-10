@@ -20,16 +20,18 @@ type UseCardHistoryReturnType = {
 };
 
 export const useCardHistory = (
-  cardNumber: string | undefined
+  cardNumber: string | null | undefined
 ): UseCardHistoryReturnType => {
   const { data, error, isLoading } = useApiSWR<CardHistory[]>(
-    `/v1/risk-radar/merchant-card-num-history?cardNumber=${cardNumber}`
+    cardNumber
+      ? `/v1/risk-radar/merchant-card-num-history?cardNumber=${cardNumber}`
+      : null
   );
 
   if (!cardNumber) {
     return {
       data: undefined,
-      error: new Error('Card number is required'),
+      error: undefined,
       isLoading: false,
     };
   }

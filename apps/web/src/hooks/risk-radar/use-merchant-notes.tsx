@@ -8,11 +8,13 @@ type UseMerchantNotesReturnType = {
   refetch: () => void;
 };
 
-export const useMerchantNotes = (mid: string): UseMerchantNotesReturnType => {
+export const useMerchantNotes = (
+  mid: string | null | undefined
+): UseMerchantNotesReturnType => {
   const { data, error, isLoading, mutate } = useApiSWR<
     MerchantNotesResponseDto[],
     unknown
-  >(`/v1/risk-radar/notes?mid=${mid}`);
+  >(mid ? `/v1/risk-radar/notes?mid=${mid}` : null);
 
   return { data, error, isLoading, refetch: () => mutate() };
 };

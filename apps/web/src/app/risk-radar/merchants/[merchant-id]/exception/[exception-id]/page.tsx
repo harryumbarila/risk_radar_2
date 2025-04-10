@@ -196,6 +196,18 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   // Track which fields have changed
   const [changedFields, setChangedFields] = useState<ChangedFields>({});
 
+  // Move activeTab state declaration to before it's used
+  const [activeTab, setActiveTab] = useState<string>('contact');
+
+  // Add tab-specific loading states
+  const [isExceptionsLoading, setIsExceptionsLoading] =
+    useState<boolean>(false);
+  const [isNotesLoading, setIsNotesLoading] = useState<boolean>(false);
+  const [isChargebacksLoading, setIsChargebacksLoading] =
+    useState<boolean>(false);
+  const [isSameTaxIdLoading, setIsSameTaxIdLoading] = useState<boolean>(false);
+
+  // Main merchant data - always load this
   const { data, error, isLoading, refetch } = useMerchant(
     merchantId,
     exceptionId
@@ -206,23 +218,58 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     refetch: () => void;
   };
 
-  // No longer need to make a separate call to useMerchantContactInfo since data is now in the same format
-  const { data: transactionExceptionsData } =
-    useTransactionExceptions(exceptionId);
-  const { data: merchantNotesData, refetch: notesRefetch } =
-    useMerchantNotes(merchantId);
-  const { data: merchantChargebacksData } = useMerchantChargebacks(merchantId);
-  const { data: cardNumberData } = useCardHistory(
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    currentTransException?.cardNumber
+  // Always call hooks but with conditional parameters
+  const { data: transactionExceptionsData } = useTransactionExceptions(
+    activeTab === 'exceptions' ? exceptionId : null
   );
+
+  const { data: merchantNotesData, refetch: notesRefetch } = useMerchantNotes(
+    activeTab === 'notes' ? merchantId : null
+  );
+
+  const { data: merchantChargebacksData } = useMerchantChargebacks(
+    activeTab === 'chargebacks' ? merchantId : null
+  );
+
+  // Card history data is only needed when the card history popup is active
+  const { data: cardNumberData } = useCardHistory(
+    // Only load card history data when popup is active with card history
+    isPopupActive &&
+      activePopup === PopupType.CardHistory &&
+      currentTransException
+      ? currentTransException.cardNumber
+      : null
+  );
+
   const { data: emailTemplatesData } = useEmailTemplates();
+
+  const { data: merchantsWithSameTaxIdData } = useMerchantsWithSameTaxId(
+    activeTab === 'sameTaxId' ? merchantId : null
+  );
+
+  // Monitor data loading states
+  useEffect(() => {
+    if (activeTab === 'exceptions') {
+      setIsExceptionsLoading(!transactionExceptionsData);
+    } else if (activeTab === 'notes') {
+      setIsNotesLoading(!merchantNotesData);
+    } else if (activeTab === 'chargebacks') {
+      setIsChargebacksLoading(!merchantChargebacksData);
+    } else if (activeTab === 'sameTaxId') {
+      setIsSameTaxIdLoading(!merchantsWithSameTaxIdData);
+    }
+  }, [
+    activeTab,
+    transactionExceptionsData,
+    merchantNotesData,
+    merchantChargebacksData,
+    merchantsWithSameTaxIdData,
+  ]);
 
   const { pushNote } = usePushNoteToIris();
   const { saveMerchantdata } = useSaveMerchantData();
   const { sendExceptionMemoEmail } = useSendExceptionMemoEmail();
 
-  const [activeTab, setActiveTab] = useState<string>('contact');
   const [merchantUpdateRequest, setMerchantUpdateRequest] = useState<{
     preferredContact: string;
   }>({
@@ -356,9 +403,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentItems = cardNumberData?.slice(startIndex, endIndex) || [];
-
-  const { data: merchantsWithSameTaxIdData, isLoading: sameTaxIdLoading } =
-    useMerchantsWithSameTaxId(merchantId);
 
   // Calculate paginated data for same tax ID merchants
   const paginatedSameTaxIdMerchants =
@@ -1396,322 +1440,340 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         )}
         {activeTab === 'exceptions' && (
           <div className="grid grid-cols-1 gap-4">
-            <div className="max-w-full overflow-x-auto">
-              <table className="w-full table-auto">
-                <thead>
-                  <tr className="bg-gray-2 dark:bg-meta-4 text-center">
-                    <th className="p-4 py-1 font-medium text-black dark:text-white">
-                      Trans Date
-                    </th>
-                    <th className="p-4 py-1 font-medium text-black dark:text-white">
-                      Auth Amt
-                    </th>
-                    <th className="p-4 py-1 font-medium text-black dark:text-white">
-                      Trans Amt
-                    </th>
-                    <th className="p-4 py-1 font-medium text-black dark:text-white">
-                      POS
-                    </th>
-                    <th className="p-4 py-1 font-medium text-black dark:text-white">
-                      AVS
-                    </th>
-                    <th className="p-4 py-1 font-medium text-black dark:text-white">
-                      Auth Code
-                    </th>
-                    <th className="p-4 py-1 font-medium text-black dark:text-white">
-                      Card #
-                    </th>
-                    <th className="p-4 py-1 font-medium text-black dark:text-white">
-                      PIN
-                    </th>
-                    <th className="p-4 py-1 font-medium text-black dark:text-white">
-                      Eligible Exceptions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedExceptions?.map((exception, index) => (
-                    <tr
-                      // eslint-disable-next-line react/no-array-index-key
-                      key={`${exception.transactionId}-${index}`}
-                      className="text-center"
-                    >
-                      <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                        {formatDate(exception.transactionDate)}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                        ${exception.authAmount}
-                      </td>
-                      <td
-                        className="border-b border-[#eee] px-4 py-2 dark:border-strokedark"
-                        onClick={() => {
-                          setIsPopupActive(true);
-                          setActivePopup(PopupType.Email);
-                          setCurrentTransException(exception);
-                        }}
-                      >
-                        ${exception.transactionAmount}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                        {exception.posEntryMode}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                        {exception.avsResponseCode}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                        {exception.authCode}
-                      </td>
-                      <td
-                        className="border-b border-[#eee] px-4 py-2 dark:border-strokedark"
-                        onClick={() => {
-                          setIsPopupActive(true);
-                          setCurrentTransException(exception);
-                          setActivePopup(PopupType.CardHistory);
-                        }}
-                      >
-                        {exception.cardNumber}{' '}
-                        {exception.transactionId?.slice(-4)}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                        {exception.debitNetworkIdentifier}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                        {exception.exceptionList &&
-                          exception.exceptionList
-                            .split(' ')
-                            .filter((r) => !!r && r !== '-')
-                            .map((exceptionNumber) => (
-                              <Tooltip
-                                key={exceptionNumber}
-                                text={
-                                  data?.exceptionTypes?.filter(
-                                    (exceptionType) =>
-                                      exceptionType.id ===
-                                      parseInt(exceptionNumber, 10)
-                                  )[0]?.description ?? ''
-                                }
-                              >
-                                <span className="cursor-pointer m-[4px] text-blue-600 underline">
-                                  {exceptionNumber}
-                                </span>
-                              </Tooltip>
-                            ))}
-                      </td>
+            {isExceptionsLoading ? (
+              <div className="flex justify-center items-center p-8">
+                <Loader />
+              </div>
+            ) : (
+              <div className="max-w-full overflow-x-auto">
+                <table className="w-full table-auto">
+                  <thead>
+                    <tr className="bg-gray-2 dark:bg-meta-4 text-center">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                        Trans Date
+                      </th>
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                        Auth Amt
+                      </th>
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                        Trans Amt
+                      </th>
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                        POS
+                      </th>
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                        AVS
+                      </th>
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                        Auth Code
+                      </th>
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                        Card #
+                      </th>
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                        PIN
+                      </th>
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                        Eligible Exceptions
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-              <Pagination
-                currentPage={exceptionsPage}
-                totalPages={totalExceptionsPages}
-                onPageChange={setExceptionsPage}
-              />
-            </div>
+                  </thead>
+                  <tbody>
+                    {paginatedExceptions?.map((exception, index) => (
+                      <tr
+                        // eslint-disable-next-line react/no-array-index-key
+                        key={`${exception.transactionId}-${index}`}
+                        className="text-center"
+                      >
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                          {formatDate(exception.transactionDate)}
+                        </td>
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                          ${exception.authAmount}
+                        </td>
+                        <td
+                          className="border-b border-[#eee] px-4 py-2 dark:border-strokedark"
+                          onClick={() => {
+                            setIsPopupActive(true);
+                            setActivePopup(PopupType.Email);
+                            setCurrentTransException(exception);
+                          }}
+                        >
+                          ${exception.transactionAmount}
+                        </td>
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                          {exception.posEntryMode}
+                        </td>
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                          {exception.avsResponseCode}
+                        </td>
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                          {exception.authCode}
+                        </td>
+                        <td
+                          className="border-b border-[#eee] px-4 py-2 dark:border-strokedark"
+                          onClick={() => {
+                            setIsPopupActive(true);
+                            setCurrentTransException(exception);
+                            setActivePopup(PopupType.CardHistory);
+                          }}
+                        >
+                          {exception.cardNumber}{' '}
+                          {exception.transactionId?.slice(-4)}
+                        </td>
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                          {exception.debitNetworkIdentifier}
+                        </td>
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                          {exception.exceptionList &&
+                            exception.exceptionList
+                              .split(' ')
+                              .filter((r) => !!r && r !== '-')
+                              .map((exceptionNumber) => (
+                                <Tooltip
+                                  key={exceptionNumber}
+                                  text={
+                                    data?.exceptionTypes?.filter(
+                                      (exceptionType) =>
+                                        exceptionType.id ===
+                                        parseInt(exceptionNumber, 10)
+                                    )[0]?.description ?? ''
+                                  }
+                                >
+                                  <span className="cursor-pointer m-[4px] text-blue-600 underline">
+                                    {exceptionNumber}
+                                  </span>
+                                </Tooltip>
+                              ))}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <Pagination
+                  currentPage={exceptionsPage}
+                  totalPages={totalExceptionsPages}
+                  onPageChange={setExceptionsPage}
+                />
+              </div>
+            )}
           </div>
         )}
         {activeTab === 'notes' && (
           <div className="grid grid-cols-1 gap-4">
-            <div className="max-w-full overflow-x-auto">
-              <table className="w-full table-auto">
-                <thead>
-                  <tr className="bg-gray-2 dark:bg-meta-4 text-center">
-                    <th className="p-4 py-1 font-medium text-black dark:text-white">
-                      Note
-                    </th>
-                    <th className="p-4 py-1 font-medium text-black dark:text-white">
-                      Date Created
-                    </th>
-                    <th className="p-4 py-1 font-medium text-black dark:text-white">
-                      Created By
-                    </th>
-                    <th className="p-4 py-1 font-medium text-black dark:text-white">
-                      Push to Iris
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedNotes?.map((note) => (
-                    <tr key={`${note.pkNotes}`} className="text-center">
-                      <td
-                        className={`border-b border-[#eee] px-4 py-2 dark:border-strokedark ${
-                          note.isPinned
-                            ? 'text-red-500'
-                            : 'text-black dark:text-white'
-                        }`}
-                      >
-                        {note.sNotes}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                        {formatDate(note.dtCreated)}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                        {note.sUserCreated}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                        <div className="">
-                          <input
-                            type="checkbox"
-                            id={`pushToIris-${note.pkNotes}`}
-                            aria-label={`Push note ${note.pkNotes} to Iris`}
-                            className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
-                            disabled={!!note.dtIrisMemoRequest}
-                            checked={!!note.dtIrisMemoRequest}
-                            onChange={() => {
-                              handlePushNoteToIris(note.pkRiskRadarNotes)
-                                .then(() => {
-                                  toast.success(`Note pushed to Iris`);
-                                })
-                                .catch((e: Error) => {
-                                  toast.error(
-                                    `Failed to push note to Iris: ${e?.message ?? 'Unknown error'}`
-                                  );
-                                });
-                            }}
-                          />
-                        </div>
-                      </td>
+            {isNotesLoading ? (
+              <div className="flex justify-center items-center p-8">
+                <Loader />
+              </div>
+            ) : (
+              <div className="max-w-full overflow-x-auto">
+                <table className="w-full table-auto">
+                  <thead>
+                    <tr className="bg-gray-2 dark:bg-meta-4 text-center">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                        Note
+                      </th>
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                        Date Created
+                      </th>
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                        Created By
+                      </th>
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                        Push to Iris
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-              <Pagination
-                currentPage={notesPage}
-                totalPages={totalNotesPages}
-                onPageChange={setNotesPage}
-              />
-              <div className="flex items-center gap-4 justify-center mt-[5px]">
-                <input
-                  type="text"
-                  value={noteRequest.sNotes ?? ''}
-                  onChange={(e) => {
-                    setNoteRequest((prev) => ({
-                      ...prev,
-                      sNotes: e.target.value,
-                    }));
-
-                    // Track that notes have changed
-                    setChangedFields((prev) => ({
-                      ...prev,
-                      notes: true,
-                    }));
-                  }}
-                  placeholder="New Note"
-                  className="max-w-[400px] rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  </thead>
+                  <tbody>
+                    {paginatedNotes?.map((note) => (
+                      <tr key={`${note.pkNotes}`} className="text-center">
+                        <td
+                          className={`border-b border-[#eee] px-4 py-2 dark:border-strokedark ${
+                            note.isPinned
+                              ? 'text-red-500'
+                              : 'text-black dark:text-white'
+                          }`}
+                        >
+                          {note.sNotes}
+                        </td>
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                          {formatDate(note.dtCreated)}
+                        </td>
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                          {note.sUserCreated}
+                        </td>
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                          <div className="">
+                            <input
+                              type="checkbox"
+                              id={`pushToIris-${note.pkNotes}`}
+                              aria-label={`Push note ${note.pkNotes} to Iris`}
+                              className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
+                              disabled={!!note.dtIrisMemoRequest}
+                              checked={!!note.dtIrisMemoRequest}
+                              onChange={() => {
+                                handlePushNoteToIris(note.pkRiskRadarNotes)
+                                  .then(() => {
+                                    toast.success(`Note pushed to Iris`);
+                                  })
+                                  .catch((e: Error) => {
+                                    toast.error(
+                                      `Failed to push note to Iris: ${e?.message ?? 'Unknown error'}`
+                                    );
+                                  });
+                              }}
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <Pagination
+                  currentPage={notesPage}
+                  totalPages={totalNotesPages}
+                  onPageChange={setNotesPage}
                 />
-                <div className="flex items-center gap-2">
-                  <span>pinned</span>
+                <div className="flex items-center gap-4 justify-center mt-[5px]">
                   <input
-                    type="checkbox"
-                    id="pin"
-                    className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
-                    disabled={false}
-                    checked={noteRequest.isPinned}
+                    type="text"
+                    value={noteRequest.sNotes ?? ''}
                     onChange={(e) => {
                       setNoteRequest((prev) => ({
                         ...prev,
-                        isPinned: e.target.checked,
+                        sNotes: e.target.value,
                       }));
 
-                      // Track that isPinnedNote has changed
+                      // Track that notes have changed
                       setChangedFields((prev) => ({
                         ...prev,
-                        isPinnedNote: true,
+                        notes: true,
                       }));
                     }}
+                    placeholder="New Note"
+                    className="max-w-[400px] rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                   />
+                  <div className="flex items-center gap-2">
+                    <span>pinned</span>
+                    <input
+                      type="checkbox"
+                      id="pin"
+                      className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
+                      disabled={false}
+                      checked={noteRequest.isPinned}
+                      onChange={(e) => {
+                        setNoteRequest((prev) => ({
+                          ...prev,
+                          isPinned: e.target.checked,
+                        }));
+
+                        // Track that isPinnedNote has changed
+                        setChangedFields((prev) => ({
+                          ...prev,
+                          isPinnedNote: true,
+                        }));
+                      }}
+                    />
+                  </div>
+                  <button
+                    className="inline-flex w-[100px] items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90 disabled:opacity-70 disabled:cursor-not-allowed"
+                    type="button"
+                    disabled={isSaving}
+                    onClick={() => {
+                      handleSaveMerchantData().catch(() => {});
+                    }}
+                  >
+                    {isSaving ? 'Saving...' : 'Save'}
+                  </button>
                 </div>
-                <button
-                  className="inline-flex w-[100px] items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90 disabled:opacity-70 disabled:cursor-not-allowed"
-                  type="button"
-                  disabled={isSaving}
-                  onClick={() => {
-                    handleSaveMerchantData().catch(() => {});
-                  }}
-                >
-                  {isSaving ? 'Saving...' : 'Save'}
-                </button>
               </div>
-            </div>
+            )}
           </div>
         )}
         {activeTab === 'chargebacks' && (
           <div className="grid grid-cols-1 gap-4">
-            <div className="max-w-full overflow-x-auto">
-              <table className="w-full table-auto">
-                <thead>
-                  <tr className="bg-gray-2 dark:bg-meta-4 text-center">
-                    <th className="p-4 py-1 font-medium text-black dark:text-white">
-                      Case #
-                    </th>
-                    <th className="p-4 py-1 font-medium text-black dark:text-white">
-                      Trans Date
-                    </th>
-                    <th className="p-4 py-1 font-medium text-black dark:text-white">
-                      Amount
-                    </th>
-                    <th className="p-4 py-1 font-medium text-black dark:text-white">
-                      Card #
-                    </th>
-                    <th className="p-4 py-1 font-medium text-black dark:text-white">
-                      Payment Type
-                    </th>
-                    <th className="p-4 py-1 font-medium text-black dark:text-white">
-                      Received Date
-                    </th>
-                    <th className="p-4 py-1 font-medium text-black dark:text-white">
-                      Reference #
-                    </th>
-                    <th className="p-4 py-1 font-medium text-black dark:text-white">
-                      Reason Code
-                    </th>
-                    <th className="p-4 py-1 font-medium text-black dark:text-white">
-                      Created Date
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedChargebacks?.map((chargeback) => (
-                    <tr
-                      key={`${chargeback.sCaseNumber}`}
-                      className="text-center"
-                    >
-                      <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                        {chargeback.sCaseNumber}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                        {formatDateWithoutTime(chargeback.dtTrans)}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                        ${chargeback.dAmt.toFixed(2)}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                        {chargeback.sCardNum}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                        {chargeback.sPaymentType}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                        {formatDateWithoutTime(chargeback.dtReceived)}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                        {chargeback.sReferenceNum}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                        {chargeback.ReasonCodeDescription}
-                      </td>
-                      <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                        {formatDate(chargeback.dtCreated)}
-                      </td>
+            {isChargebacksLoading ? (
+              <div className="flex justify-center items-center p-8">
+                <Loader />
+              </div>
+            ) : (
+              <div className="max-w-full overflow-x-auto">
+                <table className="w-full table-auto">
+                  <thead>
+                    <tr className="bg-gray-2 dark:bg-meta-4 text-center">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                        Case #
+                      </th>
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                        Trans Date
+                      </th>
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                        Amount
+                      </th>
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                        Card #
+                      </th>
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                        Payment Type
+                      </th>
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                        Received Date
+                      </th>
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                        Reference #
+                      </th>
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                        Reason Code
+                      </th>
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                        Created Date
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-              <Pagination
-                currentPage={chargebacksPage}
-                totalPages={totalChargebacksPages}
-                onPageChange={setChargebacksPage}
-              />
-            </div>
+                  </thead>
+                  <tbody>
+                    {paginatedChargebacks?.map((chargeback) => (
+                      <tr
+                        key={`${chargeback.sCaseNumber}`}
+                        className="text-center"
+                      >
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                          {chargeback.sCaseNumber}
+                        </td>
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                          {formatDateWithoutTime(chargeback.dtTrans)}
+                        </td>
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                          ${chargeback.dAmt.toFixed(2)}
+                        </td>
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                          {chargeback.sCardNum}
+                        </td>
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                          {chargeback.sPaymentType}
+                        </td>
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                          {formatDateWithoutTime(chargeback.dtReceived)}
+                        </td>
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                          {chargeback.sReferenceNum}
+                        </td>
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                          {chargeback.ReasonCodeDescription}
+                        </td>
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                          {formatDate(chargeback.dtCreated)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <Pagination
+                  currentPage={chargebacksPage}
+                  totalPages={totalChargebacksPages}
+                  onPageChange={setChargebacksPage}
+                />
+              </div>
+            )}
           </div>
         )}
         {activeTab === 'netsettlement' && (
@@ -1725,8 +1787,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               Merchants with Same Tax ID
             </h2>
             <div className="grid grid-cols-1 gap-4">
-              {sameTaxIdLoading ? (
-                <p>Loading merchants with the same tax ID...</p>
+              {isSameTaxIdLoading ? (
+                <div className="flex justify-center items-center p-8">
+                  <Loader />
+                </div>
               ) : merchantsWithSameTaxIdData?.merchantIds?.length ? (
                 <div className="max-w-full overflow-x-auto">
                   <div className="mb-3 text-sm">

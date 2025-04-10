@@ -8,12 +8,14 @@ type UseMerchantContactReturnType = {
 };
 
 export const useTransactionExceptions = (
-  exceptionId: string
+  exceptionId: string | null | undefined
 ): UseMerchantContactReturnType => {
   const { data, error, isLoading } = useApiSWR<
     TransactionExceptionResponseDto[]
   >(
-    `/v1/risk-radar/merchant-exception-transaction?riskRadarExceptionId=${exceptionId}`
+    exceptionId
+      ? `/v1/risk-radar/merchant-exception-transaction?riskRadarExceptionId=${exceptionId}`
+      : null
   );
 
   return { data, error, isLoading };
