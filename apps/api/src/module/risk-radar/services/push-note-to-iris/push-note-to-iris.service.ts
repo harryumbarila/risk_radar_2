@@ -47,9 +47,13 @@ export class PushNoteToIrisService {
 
     try {
       // Push to Iris
-      await this.irisClient.post(`api/v1/merchants/${merchantId}/memos`, {
-        text: formattedNote,
-        is_visible: true,
+      await this.irisClient.post(`/api/v1/merchants/${merchantId}/memos`, {
+        memos: [
+          {
+            text: formattedNote,
+            is_visible: true,
+          },
+        ],
       });
 
       // Save to DB
