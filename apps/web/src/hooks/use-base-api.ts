@@ -73,7 +73,8 @@ export function useApiSWR<Data = never, Error = never>(
       refreshInterval: 0,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-      dedupingInterval: 10000, // Deduplicate requests within 10 seconds
+      dedupingInterval: 10000, // Deduplicate requests within 10 seconds      
+      revalidateIfStale: false,
       ...swrOptions,
     }
   );
