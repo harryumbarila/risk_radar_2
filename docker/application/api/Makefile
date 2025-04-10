@@ -14,6 +14,6 @@ clean-dist.tgz:
 
 .PHONY: version
 version:
-	@echo '{ "version": "$(VERSION)", "branch": "$(BRANCH)", "commit": "$(COMMIT)", "created_at": "'`date '+%Y-%m-%d %H:%M:%S'`'" }' > $(ROOT_DIR)/version.json
+	@echo '{ "version": "$(VERSION)", "branch": "$(BRANCH)", "commit": "$(COMMIT)", "created_at": "'`date '+%Y-%m-%d %H:%M:%S'`'" }' > $(ROOT_DIR)/apps/api/version.json
 
 $(BUILD_IMAGE): clean-dist.tgz version dist.tgz

@@ -23,6 +23,12 @@ export class CLXReportingSearch {
   @Column({ name: 'AccountNumber', length: 25 })
   public accountNumber: string;
 
+  @Column({ name: 'AccountNumberF6', length: 6 })
+  public accountNumberF6: string;
+
+  @Column({ name: 'AccountNumberL4', length: 4 })
+  public accountNumberL4: string;
+
   @Column({ name: 'DrdNetwork', length: 5 })
   public drdNetwork: string;
 }

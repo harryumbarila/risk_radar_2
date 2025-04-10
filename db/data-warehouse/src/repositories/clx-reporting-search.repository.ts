@@ -18,11 +18,11 @@ export class ClxReportingRepository extends Repository<CLXReportingSearch> {
     last4Digits: string
   ): Promise<CLXReportingSearch[]> {
     return this.createQueryBuilder('clx')
-      .where('clx.accountNumber LIKE :sCardNumF6', {
-        sCardNumF6: `${first6Digits}%`,
+      .where('clx.accountNumberF6 = :first6Digits', {
+        first6Digits,
       })
-      .andWhere('clx.accountNumber LIKE :sCardNumL4', {
-        sCardNumL4: `%${last4Digits}`,
+      .andWhere('clx.accountNumberL4 = :last4Digits', {
+        last4Digits,
       })
       .getMany();
   }

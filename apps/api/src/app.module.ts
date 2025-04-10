@@ -7,6 +7,7 @@ import { LoggerModule } from 'nestjs-pino';
 
 import { GlobalModule } from '@/api/module/global/global.module';
 import { JwtAuthGuard } from '@/api/shared/auth/guard/jwt-auth.guard';
+import { loggerConfig } from '@/api/shared/config/logger.config';
 import { DbTypeORMModule as ConnectorDbTypeOrmModule } from '@/connector-db/connection/nestjs-module';
 import { DbTypeORMModule as CrescentViewDbTypeOrmModule } from '@/crescent-view-db/connection/nestjs-module';
 import { DbTypeORMModule as DataWarehouseDbTypeOrmModule } from '@/data-warehouse-db/connection/nestjs-module';
@@ -15,7 +16,6 @@ import { DbTypeORMModule as EzEnrollDbTypeOrmModule } from '@/ez-enroll-db/conne
 import { DbTypeORMModule as EzEnrollPccTypeOrmModule } from '@/ez-enroll-pcc-db/connection/nestjs-module';
 import { DbTypeORMModule as FinanceDbTypeOrmModule } from '@/finance-db/connection/nestjs-module';
 import { DbTypeORMModule as IrisDbTypeOrmModule } from '@/iris-db/connection/nestjs-module';
-import { logger } from '@/logger/index';
 import { DbTypeORMModule as SnapPccTypeOrmModule } from '@/snap-pcc-db/connection/nestjs-module';
 
 import { AppController } from './app.controller';
@@ -43,22 +43,7 @@ if (process.env.NODE_ENV !== 'production') {
     EzEnrollDbTypeOrmModule,
     EzEnrollPccTypeOrmModule,
     SnapPccTypeOrmModule,
-    LoggerModule.forRoot({
-      pinoHttp: {
-        logger,
-        // Disable req logging (We can configure later)
-        enabled: false,
-        quietReqLogger: true,
-        serializers: {
-          req: () => undefined, // Hide request logs
-          res: () => undefined, // Hide response logs
-        },
-        customAttributeKeys: {
-          reqId: null, // Hides reqId
-          responseTime: null, // Hides responseTime
-        },
-      },
-    }),
+    LoggerModule.forRoot(loggerConfig),
     GlobalModule,
     LegacyDashboardProxyModule,
     IrisProxyModule,

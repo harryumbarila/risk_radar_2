@@ -19,19 +19,6 @@ jobs:
     name: Deploy DENALI Docs to Github Pages
     uses: ./.github/workflows/_deploy_docs.yaml
 
-  deploy-web:
-    name: Deploy DENALI Web to AWS
-    needs: [versioning]
-    uses: ./.github/workflows/_deploy_web.yaml
-    with:
-      build-number: ${{ needs.versioning.outputs.build-number }}
-      environment: Production
-    secrets:
-      # TODO: We might need to move this to GH Actions secrets
-      role-to-assume: arn:aws:iam::257498453293:role/jobox-github-action-production-denali
-      aws-region: us-west-2
-      ecr-repository: denali/web
-
   deploy-api:
     name: Deploy DENALI API to AWS
     needs: [versioning]
@@ -47,7 +34,7 @@ jobs:
 
   release:
     name: Create Github release & release notes
-    needs: [versioning, deploy-web, deploy-api]
+    needs: [versioning, deploy-api]
     uses: ./.github/workflows/_release.yaml
     with:
       build-number: ${{ needs.versioning.outputs.build-number }}
@@ -57,7 +44,7 @@ jobs:
 
   restart-production:
     runs-on: ubuntu-latest
-    needs: [deploy-web, deploy-api]
+    needs: [deploy-api]
     permissions:
       id-token: write
       contents: read
