@@ -190,11 +190,29 @@ export class IrisClient {
     return this.client.get<T>(url, config);
   }
 
-  public async post<T>(url: string, data = {}, config = {}) {
+  public async post<T>(
+    url: string,
+    data = {},
+    config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-KEY': this.apiKey,
+      },
+    }
+  ) {
     return this.client.post<T>(url, data, config);
   }
 
-  public async put<T>(url: string, data = {}, config = {}) {
+  public async put<T>(
+    url: string,
+    data = {},
+    config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-KEY': this.apiKey,
+      },
+    }
+  ) {
     return this.client.put<T>(url, data, config);
   }
 
@@ -211,7 +229,15 @@ export class IrisClient {
     return this.client.patch<T>(url, data, config);
   }
 
-  public async delete<T>(url: string, config = {}) {
+  public async delete<T>(
+    url: string,
+    config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-KEY': this.apiKey,
+      },
+    }
+  ) {
     return this.client.delete<T>(url, config);
   }
 }
