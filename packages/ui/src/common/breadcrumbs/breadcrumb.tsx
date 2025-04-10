@@ -3,13 +3,15 @@ import type { FC } from 'react';
 
 type BreadcrumbProps = {
   pageName: string;
+  extra?: string;
 };
 
-export const Breadcrumb: FC<BreadcrumbProps> = ({ pageName }) => {
+export const Breadcrumb: FC<BreadcrumbProps> = ({ pageName, extra }) => {
   return (
     <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <h2 className="text-title-md2 font-semibold text-black dark:text-white">
         {pageName}
+        {extra && ` - ${extra}`}
       </h2>
 
       <nav>
