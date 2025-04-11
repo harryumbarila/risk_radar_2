@@ -57,3 +57,7 @@ version.json
 # Swagger
 swagger.json
 swagger-docs.json
+
+#cursor
+.cursorrules
+
