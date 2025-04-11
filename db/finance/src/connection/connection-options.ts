@@ -10,5 +10,7 @@ export const connectionOptions: DataSourceOptions = {
   options: {
     encrypt: config.db.ssl,
     trustServerCertificate: true,
+    disableAsciiToUnicodeParamConversion: true,
   },
+  logging: ['query', 'error'],
 };
