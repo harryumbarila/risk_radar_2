@@ -1,3 +1,5 @@
+import { getCurrentLocalDate } from '@/shared/utils/date-utils';
+
 export type RiskRadarFilterState = {
   startDate: string;
   endDate: string;
@@ -19,8 +21,8 @@ export type RiskRadarFilterState = {
 };
 
 export const defaultRiskRadarFilters: RiskRadarFilterState = {
-  startDate: new Date().toISOString().split('T')[0] ?? '',
-  endDate: new Date().toISOString().split('T')[0] ?? '',
+  startDate: getCurrentLocalDate(),
+  endDate: getCurrentLocalDate(),
   processor: 0,
   viewAllExceptions: false,
   categories: [],
