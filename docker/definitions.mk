@@ -19,7 +19,8 @@ $(BUILD_IMAGE):
 	  --cache-from=type=local,src=/tmp/.buildx-cache \
 	  --cache-to=type=local,dest=/tmp/.buildx-cache \
 	  --output=type=docker \
-	  -t $(call internal_image_name) .
+	  -t $(call internal_image_name) $(ROOT_DIR) \
+		-f $(DOCKERFILE)
 
 	docker tag $(call internal_image_name) $(call image_name)
 	docker tag $(call image_name) $(call image_name_latest_version)
