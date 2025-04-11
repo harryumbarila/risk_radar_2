@@ -1,0 +1,17 @@
+**/node_modules
+**/npm-debug.log
+**/yarn-debug.log
+**/.git
+**/.github
+**/.husky
+**/.turbo
+**/.next
+**/dist
+**/.swc
+**/Dockerfile
+**/.env
+**/.env.local
+**/docker
+**/init-db
+**/templates
+**/scripts
