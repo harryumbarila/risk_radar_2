@@ -7,6 +7,7 @@
 
 import { Breadcrumb, Loader } from '@denali/ui';
 import { useAuth } from '@frontegg/nextjs';
+import classNames from 'classnames';
 import { notFound } from 'next/navigation';
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
@@ -21,6 +22,7 @@ import type {
 import { Tooltip } from '@/ui/common/tool-tips/risk-tooltip';
 import { Popup } from '@/web/src/components/risk-radar/popups/popups';
 import {
+  formatCurrency,
   formatDate,
   formatDateWithoutTime,
 } from '@/web/src/components/risk-radar/risk-radar-table/table/formatters';
@@ -194,6 +196,18 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   // Track which fields have changed
   const [changedFields, setChangedFields] = useState<ChangedFields>({});
 
+  // Move activeTab state declaration to before it's used
+  const [activeTab, setActiveTab] = useState<string>('contact');
+
+  // Add tab-specific loading states
+  const [isExceptionsLoading, setIsExceptionsLoading] =
+    useState<boolean>(false);
+  const [isNotesLoading, setIsNotesLoading] = useState<boolean>(false);
+  const [isChargebacksLoading, setIsChargebacksLoading] =
+    useState<boolean>(false);
+  const [isSameTaxIdLoading, setIsSameTaxIdLoading] = useState<boolean>(false);
+
+  // Main merchant data - always load this
   const { data, error, isLoading, refetch } = useMerchant(
     merchantId,
     exceptionId
@@ -204,23 +218,58 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     refetch: () => void;
   };
 
-  // No longer need to make a separate call to useMerchantContactInfo since data is now in the same format
-  const { data: transactionExceptionsData } =
-    useTransactionExceptions(exceptionId);
-  const { data: merchantNotesData, refetch: notesRefetch } =
-    useMerchantNotes(merchantId);
-  const { data: merchantChargebacksData } = useMerchantChargebacks(merchantId);
-  const { data: cardNumberData } = useCardHistory(
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    currentTransException?.cardNumber
+  // Always call hooks but with conditional parameters
+  const { data: transactionExceptionsData } = useTransactionExceptions(
+    activeTab === 'exceptions' ? exceptionId : null
   );
+
+  const { data: merchantNotesData, refetch: notesRefetch } = useMerchantNotes(
+    activeTab === 'notes' ? merchantId : null
+  );
+
+  const { data: merchantChargebacksData } = useMerchantChargebacks(
+    activeTab === 'chargebacks' ? merchantId : null
+  );
+
+  // Card history data is only needed when the card history popup is active
+  const { data: cardNumberData } = useCardHistory(
+    // Only load card history data when popup is active with card history
+    isPopupActive &&
+      activePopup === PopupType.CardHistory &&
+      currentTransException
+      ? currentTransException.cardNumber
+      : null
+  );
+
   const { data: emailTemplatesData } = useEmailTemplates();
+
+  const { data: merchantsWithSameTaxIdData } = useMerchantsWithSameTaxId(
+    activeTab === 'sameTaxId' ? merchantId : null
+  );
+
+  // Monitor data loading states
+  useEffect(() => {
+    if (activeTab === 'exceptions') {
+      setIsExceptionsLoading(!transactionExceptionsData);
+    } else if (activeTab === 'notes') {
+      setIsNotesLoading(!merchantNotesData);
+    } else if (activeTab === 'chargebacks') {
+      setIsChargebacksLoading(!merchantChargebacksData);
+    } else if (activeTab === 'sameTaxId') {
+      setIsSameTaxIdLoading(!merchantsWithSameTaxIdData);
+    }
+  }, [
+    activeTab,
+    transactionExceptionsData,
+    merchantNotesData,
+    merchantChargebacksData,
+    merchantsWithSameTaxIdData,
+  ]);
 
   const { pushNote } = usePushNoteToIris();
   const { saveMerchantdata } = useSaveMerchantData();
   const { sendExceptionMemoEmail } = useSendExceptionMemoEmail();
 
-  const [activeTab, setActiveTab] = useState<string>('contact');
   const [merchantUpdateRequest, setMerchantUpdateRequest] = useState<{
     preferredContact: string;
   }>({
@@ -354,9 +403,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentItems = cardNumberData?.slice(startIndex, endIndex) || [];
-
-  const { data: merchantsWithSameTaxIdData, isLoading: sameTaxIdLoading } =
-    useMerchantsWithSameTaxId(merchantId);
 
   // Calculate paginated data for same tax ID merchants
   const paginatedSameTaxIdMerchants =
@@ -707,6 +753,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     iSwipedPercBasedOnTransCntCurrMonth:
       data?.businessInfo?.swipedPercentageTransCount || 0,
     sPreferredContact: data?.businessInfo?.preferredContact || '',
+    netBalance: data?.businessInfo?.netSettlementBalance || 0,
   };
 
   const merchantContactInfo = data?.businessInfo || null;
@@ -726,7 +773,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
   return (
     <DefaultLayout>
-      <Breadcrumb pageName="Merchant profile" />
+      <Breadcrumb pageName="Merchant profile" extra={`MID: ${merchantId}`} />
       <Popup
         isOpen={isPopupActive}
         onClose={() => setIsPopupActive(false)}
@@ -930,129 +977,143 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           </div>
         ) : null}
       </Popup>
-      {/* Header */}
-      <section className="mb-2 grid grid-cols-2 gap-4">
-        <h1 className=" text-2xl font-semibold text-black dark:text-white">
-          MID: {merchantProfile?.sMId}
-        </h1>
-      </section>
 
-      <section className="mb-4 grid grid-cols-4 gap-4">
+      <section className="mb-4 grid grid-cols-6 gap-4">
         {/* Column 1 */}
-        <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
-          <p className="text-black dark:text-white">
-            <strong>DBA Name:</strong> {merchantContactInfo?.dbaName}
-          </p>
-          <p className="text-black dark:text-white">
-            <strong>Address:</strong>{' '}
-            {merchantProfile?.sDBAAddress || merchantContactInfo?.dbaAddress}
-          </p>
-          <p className="text-black dark:text-white">
-            <strong>City:</strong>{' '}
-            {merchantProfile?.sDBACity || merchantContactInfo?.dbaCity}
-          </p>
-          <p className="text-black dark:text-white">
-            <strong>State:</strong>{' '}
-            {merchantProfile?.sDBAState || merchantContactInfo?.dbaState}
-          </p>
-          <p className="text-black dark:text-white">
-            <strong>ZIP:</strong>{' '}
-            {merchantProfile?.sDBAZip || merchantContactInfo?.dbaZip}
-          </p>
-          <p className="text-black dark:text-white">
-            <strong>Divert:</strong>
-            <input
-              type="checkbox"
-              className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
-              disabled={!data?.businessInfo?.uwNewAccountHoldAllowRiskToEdit}
-              checked={merchantStateData.isDiverted}
-              onChange={() =>
-                handleDivertTrigger(!merchantStateData.isDiverted, true)
-              }
-            />
-          </p>
-          <p className="text-black dark:text-white">
-            <strong>Activated:</strong>{' '}
-            {formatDate(merchantProfile?.sActivationDate)}
-          </p>
-
-          {riskException?.fkRiskExceptionStatus === 1 ? (
+        <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark col-span-2">
+          <div className="grid grid-cols-[max-content_1fr] gap-x-4 font-mono">
+            {/* DBA Name */}
             <p className="text-black dark:text-white">
-              <button
-                className={`inline-flex items-center justify-center rounded-lg border px-4 py-2 text-white transition-colors
-                ${
-                  merchantStateData.clickedStatus === 'mgrq'
-                    ? 'border-amber-600 bg-amber-600 hover:bg-amber-700'
-                    : 'border-primary bg-primary hover:bg-opacity-90'
-                }`}
-                type="button"
-                onClick={() => {
-                  handleManagersQueueTrigger().catch(() => {});
-                }}
-              >
-                {merchantStateData.clickedStatus === 'mgrq'
-                  ? "In Manager's Queue"
-                  : 'Managers queue'}
-              </button>
+              <strong>DBA Name:</strong>
             </p>
-          ) : null}
-        </div>
+            <p>{merchantContactInfo?.dbaName}</p>
 
+            {/* Address */}
+            <p className="text-black dark:text-white">
+              <strong>Address:</strong>
+            </p>
+            <p>
+              {merchantProfile?.sDBAAddress || merchantContactInfo?.dbaAddress}
+            </p>
+
+            <p className="text-black dark:text-white">
+              <strong>City:</strong>{' '}
+            </p>
+            <div className="flex justify-between gap-2">
+              <p>{merchantProfile?.sDBACity || merchantContactInfo?.dbaCity}</p>
+
+              <p>
+                <strong>ST:</strong>{' '}
+                {merchantProfile?.sDBAState || merchantContactInfo?.dbaState}
+              </p>
+
+              <p>
+                <strong>ZIP:</strong>{' '}
+                {merchantProfile?.sDBAZip || merchantContactInfo?.dbaZip}
+              </p>
+            </div>
+
+            <p className="text-black dark:text-white">
+              <strong>Activated:</strong>
+            </p>
+            <p>{formatDate(merchantProfile?.sActivationDate)}</p>
+
+            <p className="text-black dark:text-white">
+              <strong>Net Balance:</strong>
+            </p>
+            <p>
+              {formatCurrency(
+                merchantContactInfo?.netSettlementBalance || 0,
+                2,
+                true
+              )}
+            </p>
+          </div>
+        </div>
         {/* Column 2 */}
-        <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
-          <p className="text-black dark:text-white">
-            <strong>Ownership:</strong> {merchantProfile?.sOwnershipType}
-          </p>
-          <p className="text-black dark:text-white">
-            <strong>SIC:</strong> {merchantProfile?.sSIC}
-          </p>
-        </div>
+        <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark col-span-2">
+          <div className="grid grid-cols-[max-content_1fr] gap-x-4 font-mono">
+            <p className="text-black dark:text-white">
+              <strong>Ownership:</strong>
+            </p>
+            <p>{merchantProfile?.sOwnershipType}</p>
 
+            <p className="text-black dark:text-white">
+              <strong>SIC:</strong>
+            </p>
+            <p>{merchantProfile?.sSIC}</p>
+
+            <p className="text-black dark:text-white">
+              <strong>Merchant Type:</strong>
+            </p>
+            <p>{merchantProfile?.sMerchantType}</p>
+
+            <p className="text-black dark:text-white">
+              <strong>Talus Pay:</strong>
+            </p>
+            <p>{merchantProfile?.bIsTalusPayMerchant ? 'Yes' : 'No'}</p>
+          </div>
+        </div>
         {/* Column 3 */}
-        <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
-          <p className="text-black dark:text-white">
-            <strong>Merchant Type:</strong> {merchantProfile?.sMerchantType}
-          </p>
-          <p className="text-black dark:text-white">
-            <strong>Talus Pay:</strong>{' '}
-            {merchantProfile?.bIsTalusPayMerchant ? 'Yes' : 'No'}
-          </p>
-        </div>
+        <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark col-span-2">
+          <div className="flex flex-row gap-x-1">
+            <div className="grid grid-cols-[max-content_1fr] gap-x-4 font-mono">
+              <p className="text-black dark:text-white">
+                <strong>Risk Watch:</strong>
+              </p>
+              <input
+                type="checkbox"
+                className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
+                checked={merchantStateData.isRiskWatch}
+                onChange={() =>
+                  handleRiskWatchTrigger(!merchantStateData.isRiskWatch, true)
+                }
+              />
 
-        {/* Column 4 */}
-        <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
-          <p className="text-black dark:text-white">
-            <strong>Risk Watch:</strong>
-            <input
-              type="checkbox"
-              className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
-              checked={merchantStateData.isRiskWatch}
-              onChange={() =>
-                handleRiskWatchTrigger(!merchantStateData.isRiskWatch, true)
-              }
-            />
-          </p>
-          <p className="text-black dark:text-white">
-            <strong>Auto Hold White List:</strong>
-            <input
-              type="checkbox"
-              className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
-              checked={merchantStateData.isAutoHoldEnabled}
-              onChange={() =>
-                handleAutoHoldTrigger(
-                  !merchantStateData.isAutoHoldEnabled,
-                  true
-                )
-              }
-            />
-          </p>
-          <p className="text-black dark:text-white">
-            <strong>Curr. Month Swipe Cnt (%):</strong>{' '}
-            {merchantProfile?.iSwipedPercBasedOnTransCntCurrMonth || ''}
-          </p>
-          <p className="text-black dark:text-white">
-            <button
-              className={`inline-flex items-center justify-center rounded-lg border px-4 py-2 text-white transition-colors
+              <p className="text-black dark:text-white">
+                <strong>Auto Hold White List:</strong>
+              </p>
+              <input
+                type="checkbox"
+                className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
+                checked={merchantStateData.isAutoHoldEnabled}
+                onChange={() =>
+                  handleAutoHoldTrigger(
+                    !merchantStateData.isAutoHoldEnabled,
+                    true
+                  )
+                }
+              />
+
+              {/* Divert */}
+              <p className="text-black dark:text-white">
+                <strong>Divert:</strong>
+              </p>
+              <input
+                type="checkbox"
+                className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
+                disabled={!data?.businessInfo?.uwNewAccountHoldAllowRiskToEdit}
+                checked={merchantStateData.isDiverted}
+                onChange={() =>
+                  handleDivertTrigger(!merchantStateData.isDiverted, true)
+                }
+              />
+
+              <p className="text-black dark:text-white">
+                <strong>Curr. Month Swipe Cnt (%):</strong>{' '}
+              </p>
+              <p>
+                {merchantProfile?.iSwipedPercBasedOnTransCntCurrMonth || ''}
+              </p>
+            </div>
+
+            {/* Separator */}
+            <div className="w-px bg-gray-300 mx-4 self-stretch" />
+
+            {/* Buttons */}
+            <div className="flex flex-col justify-center gap-2 h-full">
+              <button
+                className={`inline-flex items-center justify-center rounded-lg border px-4 py-1 text-white transition-colors
               ${
                 merchantStateData.clickedStatus === 'rev'
                   ? 'border-green-600 bg-green-600 hover:bg-green-700'
@@ -1060,17 +1121,37 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     ? 'border-gray-600 bg-gray-600 cursor-not-allowed'
                     : 'border-primary bg-primary hover:bg-opacity-90'
               }`}
-              type="button"
-              disabled={riskException?.fkRiskExceptionStatus === 2}
-              onClick={() => {
-                handleClickOnReviewButton().catch(() => {});
-              }}
-            >
-              {merchantStateData.clickedStatus === 'rev'
-                ? 'Reviewed'
-                : 'Review'}
-            </button>
-          </p>
+                type="button"
+                disabled={riskException?.fkRiskExceptionStatus === 2}
+                onClick={() => {
+                  handleClickOnReviewButton().catch(() => {});
+                }}
+              >
+                {merchantStateData.clickedStatus === 'rev'
+                  ? 'Reviewed'
+                  : 'Review'}
+              </button>
+
+              {riskException?.fkRiskExceptionStatus === 2 && (
+                <button
+                  className={`inline-flex items-center justify-center rounded-lg border px-4 py-1 text-white transition-colors
+                ${
+                  merchantStateData.clickedStatus === 'mgrq'
+                    ? 'border-amber-600 bg-amber-600 hover:bg-amber-700'
+                    : 'border-primary bg-primary hover:bg-opacity-90'
+                }`}
+                  type="button"
+                  onClick={() => {
+                    handleManagersQueueTrigger().catch(() => {});
+                  }}
+                >
+                  {merchantStateData.clickedStatus === 'mgrq'
+                    ? "In Manager's Queue"
+                    : 'Managers queue'}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </section>
 
@@ -1092,39 +1173,35 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               {merchantProfile?.sSolutionConsultant || ''}
             </p>
           </div>
-        </div>
-      </section>
-
-      <section className="mb-4">
-        <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
+          <hr className="my-2 border-t border-gray-300" />
           <div className="grid grid-cols-4 text-black dark:text-white text-center">
             <p>
-              <strong>MV ($):</strong> {merchantProfile?.iMV$ || ''}
+              <strong>MV:</strong> {formatCurrency(merchantProfile?.iMV$, 0)}
               <span className="text-gray-500 dark:text-gray-400">
                 {' '}
-                (UW Appr.- {merchantProfile?.iUWApprMV})
+                (UW Appr.- {formatCurrency(merchantProfile?.iUWApprMV, 0)})
               </span>
             </p>
             <p>
-              <strong>AT ($):</strong> {merchantProfile?.iAT$ || ''}
+              <strong>AT:</strong> {formatCurrency(merchantProfile?.iAT$, 0)}
               <span className="text-gray-500 dark:text-gray-400">
                 {' '}
-                (UW Appr.- {merchantProfile?.iUWApprAT})
+                (UW Appr.- {formatCurrency(merchantProfile?.iUWApprAT, 0)})
               </span>
             </p>
             <p>
-              <strong>HT ($):</strong>
+              <strong>HT:</strong> {formatCurrency(merchantProfile?.iHT$, 0)}
               <span className="text-gray-500 dark:text-gray-400">
                 {' '}
-                (UW Appr.- {merchantProfile?.iUWApprHT})
+                (UW Appr.- {formatCurrency(merchantProfile?.iUWApprHT, 0)})
               </span>
             </p>
             <p>
-              <strong>Swipe Vol (%):</strong>{' '}
-              {merchantProfile?.iSwipeVolPerc || ''}
+              <strong>Swipe Vol:</strong>{' '}
+              {`${merchantProfile?.iSwipeVolPerc}%` || ''}
               <span className="text-gray-500 dark:text-gray-400">
                 {' '}
-                (UW Appr.- {merchantProfile?.iUWApprSwipeVolPerc})
+                (UW Appr.- {`${merchantProfile?.iUWApprSwipeVolPerc}%` || ''})
               </span>
             </p>
           </div>
@@ -1132,9 +1209,14 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       </section>
 
       {/* Tabs */}
-      <nav className="mb-4 flex gap-2 border-b border-stroke pb-2 dark:border-strokedark">
+      <nav className="flex gap-1 px-1">
         <button
-          className="inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90"
+          className={classNames(
+            'inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
+            {
+              '!opacity-100': activeTab === 'contact',
+            }
+          )}
           type="button"
           onClick={() => {
             setActiveTab('contact');
@@ -1143,7 +1225,12 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           Contact
         </button>
         <button
-          className="inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90"
+          className={classNames(
+            'inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
+            {
+              '!opacity-100': activeTab === 'exceptions',
+            }
+          )}
           type="button"
           onClick={() => {
             setActiveTab('exceptions');
@@ -1152,7 +1239,12 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           Exceptions
         </button>
         <button
-          className="inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90"
+          className={classNames(
+            'inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
+            {
+              '!opacity-100': activeTab === 'notes',
+            }
+          )}
           type="button"
           onClick={() => {
             setActiveTab('notes');
@@ -1161,7 +1253,12 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           Notes
         </button>
         <button
-          className="inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90"
+          className={classNames(
+            'inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
+            {
+              '!opacity-100': activeTab === 'chargebacks',
+            }
+          )}
           type="button"
           onClick={() => {
             setActiveTab('chargebacks');
@@ -1170,7 +1267,12 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           Chargebacks
         </button>
         <button
-          className="inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90"
+          className={classNames(
+            'inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
+            {
+              '!opacity-100': activeTab === 'netsettlement',
+            }
+          )}
           type="button"
           onClick={() => {
             setActiveTab('netsettlement');
@@ -1179,7 +1281,12 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           NetSettlement
         </button>
         <button
-          className="inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90"
+          className={classNames(
+            'inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
+            {
+              '!opacity-100': activeTab === 'sameTaxId',
+            }
+          )}
           type="button"
           onClick={() => {
             setActiveTab('sameTaxId');
@@ -1193,72 +1300,82 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       <section className="mb-4 rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
         {activeTab === 'contact' && (
           <>
-            <h2 className="mb-2 text-xl font-semibold text-black dark:text-white">
-              Contact
-            </h2>
             <div className="grid grid-cols-2 gap-4">
               {/* Left Column - Contact Info */}
-              <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
-                <h3 className="mb-2 text-lg font-semibold text-black dark:text-white">
-                  Contact Info
-                </h3>
-                <p className="mb-2 text-black dark:text-white">
-                  <strong>Contact Name:</strong> {data?.owners?.[0]?.name || ''}
-                </p>
-                <p className="mb-2 text-black dark:text-white">
-                  <strong>Phone #:</strong>{' '}
-                  {merchantContactInfo?.contactPhoneNumber || ''}
-                </p>
-                <p className="mb-2 text-black dark:text-white">
-                  <strong>Fax #:</strong> {merchantContactInfo?.dbaFax || ''}
-                </p>
-                <p className="mb-2 text-black dark:text-white">
-                  <strong>Mobile #:</strong>
-                </p>
-                <p className="mb-2 text-black dark:text-white">
-                  <strong>Email:</strong>{' '}
-                  {merchantContactInfo?.contactEmail || ''}
-                </p>
-                <p className="mb-2 text-black dark:text-white">
-                  <strong>Web Site:</strong>{' '}
-                  {merchantContactInfo?.website || ''}
-                </p>
-                <div className="mb-2">
-                  <p className="text-black dark:text-white flex items-start">
-                    <strong className="inline-block mr-2">
-                      Preferred Contact:
-                    </strong>
-                    <input
-                      type="text"
-                      value={merchantUpdateRequest?.preferredContact || ''}
-                      onChange={(e) => {
-                        setMerchantUpdateRequest((prev) => ({
-                          ...prev,
-                          preferredContact: e.target.value,
-                        }));
+              <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark flex flex-row gap-y-2">
+                <div className="flex flex-col justify-between w-full gap-y-2">
+                  {/* Contact Info */}
+                  <div className="grid grid-cols-[max-content_1fr] gap-x-4 font-mono">
+                    <p className="text-black dark:text-white">
+                      <strong>Contact Name:</strong>
+                    </p>
+                    <p>{data?.owners?.[0]?.name || ''}</p>
 
-                        // Track that preferredContact has changed
-                        setChangedFields((prev) => ({
-                          ...prev,
-                          preferredContact: true,
-                        }));
-                      }}
-                      placeholder="Enter preferred contact"
-                      className="rounded border-[1.5px] border-stroke bg-transparent px-3 py-2 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    />
-                  </p>
-                </div>
-                <div className="mt-4 flex justify-center">
-                  <button
-                    className="inline-flex w-[100px] items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90 disabled:opacity-70 disabled:cursor-not-allowed"
-                    type="button"
-                    disabled={isSaving}
-                    onClick={() => {
-                      handleSaveMerchantData().catch(() => {});
-                    }}
-                  >
-                    {isSaving ? 'Saving...' : 'Save'}
-                  </button>
+                    <p className="text-black dark:text-white">
+                      <strong>Phone #:</strong>
+                    </p>
+                    <p>{merchantContactInfo?.contactPhoneNumber || ''}</p>
+
+                    <p className="text-black dark:text-white">
+                      <strong>Fax #:</strong>
+                    </p>
+                    <p>{merchantContactInfo?.dbaFax || ''}</p>
+
+                    <p className="text-black dark:text-white">
+                      <strong>Mobile #:</strong>
+                    </p>
+                    <p>{merchantContactInfo?.contactPhoneNumber || ''}</p>
+
+                    <p className="text-black dark:text-white">
+                      <strong>Email:</strong>{' '}
+                    </p>
+                    <p>{merchantContactInfo?.contactEmail || ''}</p>
+
+                    <p className="text-black dark:text-white">
+                      <strong>Web Site:</strong>{' '}
+                    </p>
+                    <p>{merchantContactInfo?.website || ''}</p>
+                  </div>
+
+                  <div className="flex flex-row items-center">
+                    <p className="text-black dark:text-white">
+                      <strong className="inline-block mr-2">
+                        Preferred Contact:
+                      </strong>
+                    </p>
+
+                    <div className="flex flex-row items-center gap-x-2">
+                      <input
+                        type="text"
+                        value={merchantUpdateRequest?.preferredContact || ''}
+                        onChange={(e) => {
+                          setMerchantUpdateRequest((prev) => ({
+                            ...prev,
+                            preferredContact: e.target.value,
+                          }));
+
+                          // Track that preferredContact has changed
+                          setChangedFields((prev) => ({
+                            ...prev,
+                            preferredContact: true,
+                          }));
+                        }}
+                        placeholder="Enter preferred contact"
+                        className="rounded border-[1.5px] border-stroke bg-transparent px-3 py-1 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      />
+
+                      <button
+                        className="inline-flex w-[100px] items-center justify-center rounded-lg border border-primary bg-primary px-4 py-1 text-white hover:bg-opacity-90 disabled:opacity-70 disabled:cursor-not-allowed"
+                        type="button"
+                        disabled={isSaving}
+                        onClick={() => {
+                          handleSaveMerchantData().catch(() => {});
+                        }}
+                      >
+                        {isSaving ? 'Saving...' : 'Save'}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -1267,20 +1384,31 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                 <h3 className="mb-2 text-lg font-semibold text-black dark:text-white">
                   Billing Address
                 </h3>
-                <p className="mb-1 text-black dark:text-white">
-                  <strong>Name:</strong> {data?.owners?.[0]?.name || ''}
-                </p>
-                <p className="mb-1 text-black dark:text-white">
-                  <strong>Addr:</strong>{' '}
-                  {data?.businessInfo?.legalAddress || ''}
-                </p>
-                <p className="mb-1 text-black dark:text-white">
-                  <strong>City:</strong> {data?.businessInfo?.legalCity || ''}
-                </p>
-                <p className="mb-1 text-black dark:text-white">
-                  <strong>ST:</strong> {data?.businessInfo?.legalState || ''}{' '}
-                  <strong>Zip:</strong> {data?.businessInfo?.legalZip || ''}
-                </p>
+                <div className="grid grid-cols-[max-content_1fr] gap-x-4 font-mono">
+                  <p className="mb-1 text-black dark:text-white">
+                    <strong>Name:</strong>
+                  </p>
+                  <p>{data?.owners?.[0]?.name || ''}</p>
+
+                  <p className="mb-1 text-black dark:text-white">
+                    <strong>Addr:</strong>
+                  </p>
+                  <p>{data?.businessInfo?.legalAddress || ''}</p>
+                  <p className="mb-1 text-black dark:text-white">
+                    <strong>City:</strong>
+                  </p>
+                  <p>{data?.businessInfo?.legalCity || ''}</p>
+
+                  <p className="mb-1 text-black dark:text-white">
+                    <strong>ST:</strong>
+                  </p>
+                  <p>{data?.businessInfo?.legalState || ''}</p>
+
+                  <p className="mb-1 text-black dark:text-white">
+                    <strong>Zip:</strong>
+                  </p>
+                  <p>{data?.businessInfo?.legalZip || ''}</p>
+                </div>
               </div>
             </div>
 
@@ -1323,40 +1451,41 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           </>
         )}
         {activeTab === 'exceptions' && (
-          <>
-            <h2 className="mb-2 text-xl font-semibold text-black dark:text-white">
-              Exceptions
-            </h2>
-            <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 gap-4">
+            {isExceptionsLoading ? (
+              <div className="flex justify-center items-center p-8">
+                <Loader />
+              </div>
+            ) : (
               <div className="max-w-full overflow-x-auto">
                 <table className="w-full table-auto">
                   <thead>
                     <tr className="bg-gray-2 dark:bg-meta-4 text-center">
-                      <th className="p-4 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
                         Trans Date
                       </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
                         Auth Amt
                       </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
                         Trans Amt
                       </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
                         POS
                       </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
                         AVS
                       </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
                         Auth Code
                       </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
                         Card #
                       </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
                         PIN
                       </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
                         Eligible Exceptions
                       </th>
                     </tr>
@@ -1368,14 +1497,14 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                         key={`${exception.transactionId}-${index}`}
                         className="text-center"
                       >
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {formatDate(exception.transactionDate)}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           ${exception.authAmount}
                         </td>
                         <td
-                          className="border-b border-[#eee] px-4 py-5 dark:border-strokedark"
+                          className="border-b border-[#eee] px-4 py-2 dark:border-strokedark"
                           onClick={() => {
                             setIsPopupActive(true);
                             setActivePopup(PopupType.Email);
@@ -1384,17 +1513,17 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                         >
                           ${exception.transactionAmount}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {exception.posEntryMode}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {exception.avsResponseCode}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {exception.authCode}
                         </td>
                         <td
-                          className="border-b border-[#eee] px-4 py-5 dark:border-strokedark"
+                          className="border-b border-[#eee] px-4 py-2 dark:border-strokedark"
                           onClick={() => {
                             setIsPopupActive(true);
                             setCurrentTransException(exception);
@@ -1404,14 +1533,14 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           {exception.cardNumber}{' '}
                           {exception.transactionId?.slice(-4)}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {exception.debitNetworkIdentifier}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {exception.exceptionList &&
                             exception.exceptionList
-                              .split(' - ')
-                              .filter(Boolean)
+                              .split(' ')
+                              .filter((r) => !!r && r !== '-')
                               .map((exceptionNumber) => (
                                 <Tooltip
                                   key={exceptionNumber}
@@ -1439,29 +1568,30 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   onPageChange={setExceptionsPage}
                 />
               </div>
-            </div>
-          </>
+            )}
+          </div>
         )}
         {activeTab === 'notes' && (
-          <>
-            <h2 className="mb-2 text-xl font-semibold text-black dark:text-white">
-              Notes
-            </h2>
-            <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 gap-4">
+            {isNotesLoading ? (
+              <div className="flex justify-center items-center p-8">
+                <Loader />
+              </div>
+            ) : (
               <div className="max-w-full overflow-x-auto">
                 <table className="w-full table-auto">
                   <thead>
                     <tr className="bg-gray-2 dark:bg-meta-4 text-center">
-                      <th className="p-4 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
                         Note
                       </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
                         Date Created
                       </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
                         Created By
                       </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
                         Push to Iris
                       </th>
                     </tr>
@@ -1470,7 +1600,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     {paginatedNotes?.map((note) => (
                       <tr key={`${note.pkNotes}`} className="text-center">
                         <td
-                          className={`border-b border-[#eee] px-4 py-5 dark:border-strokedark ${
+                          className={`border-b border-[#eee] px-4 py-2 dark:border-strokedark ${
                             note.isPinned
                               ? 'text-red-500'
                               : 'text-black dark:text-white'
@@ -1478,13 +1608,13 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                         >
                           {note.sNotes}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {formatDate(note.dtCreated)}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {note.sUserCreated}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           <div className="">
                             <input
                               type="checkbox"
@@ -1569,44 +1699,45 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   </button>
                 </div>
               </div>
-            </div>
-          </>
+            )}
+          </div>
         )}
         {activeTab === 'chargebacks' && (
-          <>
-            <h2 className="mb-2 text-xl font-semibold text-black dark:text-white">
-              Chargebacks
-            </h2>
-            <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 gap-4">
+            {isChargebacksLoading ? (
+              <div className="flex justify-center items-center p-8">
+                <Loader />
+              </div>
+            ) : (
               <div className="max-w-full overflow-x-auto">
                 <table className="w-full table-auto">
                   <thead>
                     <tr className="bg-gray-2 dark:bg-meta-4 text-center">
-                      <th className="p-4 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
                         Case #
                       </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
                         Trans Date
                       </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
                         Amount
                       </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
                         Card #
                       </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
                         Payment Type
                       </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
                         Received Date
                       </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
                         Reference #
                       </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
                         Reason Code
                       </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white">
                         Created Date
                       </th>
                     </tr>
@@ -1617,31 +1748,31 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                         key={`${chargeback.sCaseNumber}`}
                         className="text-center"
                       >
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {chargeback.sCaseNumber}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {formatDateWithoutTime(chargeback.dtTrans)}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           ${chargeback.dAmt.toFixed(2)}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {chargeback.sCardNum}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {chargeback.sPaymentType}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {formatDateWithoutTime(chargeback.dtReceived)}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {chargeback.sReferenceNum}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {chargeback.ReasonCodeDescription}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {formatDate(chargeback.dtCreated)}
                         </td>
                       </tr>
@@ -1654,8 +1785,8 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   onPageChange={setChargebacksPage}
                 />
               </div>
-            </div>
-          </>
+            )}
+          </div>
         )}
         {activeTab === 'netsettlement' && (
           <h2 className="mb-2 text-xl font-semibold text-black dark:text-white">
@@ -1668,8 +1799,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               Merchants with Same Tax ID
             </h2>
             <div className="grid grid-cols-1 gap-4">
-              {sameTaxIdLoading ? (
-                <p>Loading merchants with the same tax ID...</p>
+              {isSameTaxIdLoading ? (
+                <div className="flex justify-center items-center p-8">
+                  <Loader />
+                </div>
               ) : merchantsWithSameTaxIdData?.merchantIds?.length ? (
                 <div className="max-w-full overflow-x-auto">
                   <div className="mb-3 text-sm">
@@ -1725,34 +1858,34 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             <table className="w-full table-auto">
               <thead>
                 <tr className="bg-gray-2 dark:bg-meta-4 text-center">
-                  <th className="p-4 font-medium text-black dark:text-white">
+                  <th className="p-4 py-1 font-medium text-black dark:text-white">
                     Month/Year
                   </th>
-                  <th className="p-4 font-medium text-black dark:text-white">
+                  <th className="p-4 py-1 font-medium text-black dark:text-white">
                     Volume
                   </th>
-                  <th className="p-4 font-medium text-black dark:text-white">
+                  <th className="p-4 py-1 font-medium text-black dark:text-white">
                     Avg Ticket
                   </th>
-                  <th className="p-4 font-medium text-black dark:text-white">
+                  <th className="p-4 py-1 font-medium text-black dark:text-white">
                     Swiped %
                   </th>
-                  <th className="p-4 font-medium text-black dark:text-white">
+                  <th className="p-4 py-1 font-medium text-black dark:text-white">
                     Highest Ticket
                   </th>
-                  <th className="p-4 font-medium text-black dark:text-white">
+                  <th className="p-4 py-1 font-medium text-black dark:text-white">
                     Total CB
                   </th>
-                  <th className="p-4 font-medium text-black dark:text-white">
+                  <th className="p-4 py-1 font-medium text-black dark:text-white">
                     V CB %
                   </th>
-                  <th className="p-4 font-medium text-black dark:text-white">
+                  <th className="p-4 py-1 font-medium text-black dark:text-white">
                     MC CB %
                   </th>
-                  <th className="p-4 font-medium text-black dark:text-white">
+                  <th className="p-4 py-1 font-medium text-black dark:text-white">
                     Disc CB %
                   </th>
-                  <th className="p-4 font-medium text-black dark:text-white">
+                  <th className="p-4 py-1 font-medium text-black dark:text-white">
                     Amex CB %
                   </th>
                 </tr>
@@ -1760,34 +1893,34 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <tbody>
                 {paginatedVolume?.map((vol) => (
                   <tr key={`${vol.year}-${vol.month}`} className="text-center">
-                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       {vol.month} {vol.year}
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       ${vol.volume.toLocaleString()}
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       ${vol.averageTicket.toLocaleString()}
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       {vol.swipedPercentage.toFixed(2)}%
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       ${vol.highestTicket.toLocaleString()}
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       ${vol.totalChargebacks.toLocaleString()}
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       {vol.visaChargebackPercentage.toFixed(2)}%
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       {vol.mastercardChargebackPercentage.toFixed(2)}%
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       {vol.discoverChargebackPercentage.toFixed(2)}%
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       {vol.amexChargebackPercentage.toFixed(2)}%
                     </td>
                   </tr>

@@ -12,7 +12,7 @@ type UseMerchantsWithSameTaxIdReturnType = {
 };
 
 export function useMerchantsWithSameTaxId(
-  merchantId: string
+  merchantId: string | null | undefined
 ): UseMerchantsWithSameTaxIdReturnType {
   const { data, error, isLoading, mutate } =
     useApiSWR<MerchantsWithSameTaxIdResponse>(

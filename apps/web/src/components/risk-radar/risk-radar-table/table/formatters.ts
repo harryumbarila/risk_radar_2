@@ -15,15 +15,22 @@ export const formatNumber = (value: unknown): string => {
   return Number(value).toLocaleString();
 };
 
-export const formatCurrency = (value: unknown): string => {
-  if (value === undefined || value === null || Number(value) === 0) {
+export const formatCurrency = (
+  value: unknown,
+  minimumFractionDigits = 2,
+  returnZero = false
+): string => {
+  if (
+    !returnZero &&
+    (value === undefined || value === null || Number(value) === 0)
+  ) {
     return DEFAULT_BLANK_VALUE;
   }
 
   return Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-    minimumFractionDigits: 2,
+    minimumFractionDigits,
   }).format(Number(value));
 };
 

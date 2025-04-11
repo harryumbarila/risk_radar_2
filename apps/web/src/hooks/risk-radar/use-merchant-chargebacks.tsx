@@ -8,11 +8,11 @@ type UseMerchantChargebacksReturnType = {
 };
 
 export const useMerchantChargebacks = (
-  mid: string
+  mid: string | null | undefined
 ): UseMerchantChargebacksReturnType => {
   const { data, error, isLoading } = useApiSWR<
     MerchantChargebacksResponseDto[]
-  >(`/v1/risk-radar/chargeback-transactions?mid=${mid}`);
+  >(mid ? `/v1/risk-radar/chargeback-transactions?mid=${mid}` : null);
 
   return { data, error, isLoading };
 };
