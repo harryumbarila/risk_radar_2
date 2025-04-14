@@ -16,6 +16,10 @@ import { RiskRadarNotesRepository } from '@/finance-db/repositories/risk-radar-n
 
 import type { PushNoteToIrisInputDto } from './dto/push-note-to-iris-input.dto';
 
+export enum IrisMemoVisibility {
+  Yes = 'Yes',
+  No = 'No',
+}
 @Injectable()
 export class PushNoteToIrisService {
   public constructor(
@@ -51,7 +55,7 @@ export class PushNoteToIrisService {
         memos: [
           {
             text: formattedNote,
-            is_visible: true,
+            is_visible: IrisMemoVisibility.No,
           },
         ],
       });
