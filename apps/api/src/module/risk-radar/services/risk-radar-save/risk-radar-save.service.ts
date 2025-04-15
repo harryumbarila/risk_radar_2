@@ -476,68 +476,36 @@ export class RiskRadarSaveService {
 
     // Divert Queue
     this.logger.log(`Checking divert queue`);
-    const inQueue = await this.divertQueueRepository.findOne({
-      where: { merchantId: Number(merchantId) },
-      order: { id: 'DESC' }, // Get the latest record by descending ID
-    });
-    this.logger.debug(`Divert queue check result: ${!!inQueue}`);
-
-    const isDivertFlagSet = inQueue ? inQueue.isDiverted : false;
-    this.logger.log(`Current divert flag status: ${isDivertFlagSet}`);
+    /*
+     * TODO: FIXME: Create a new entry or update the existing one?
+     * Check default values for create also should be set when updated
+     * IsProcess should be set to 0 when updated
+     */
 
     if (isValidPrefix) {
-      if (inQueue) {
-        this.logger.log(
-          `Updating existing divert queue for MID: ${merchantId}`
+      this.logger.log(
+        `Adding new entry to divert queue for MID: ${merchantId}`
+      );
+      try {
+        await this.divertQueueRepository.insert({
+          merchantId: Number(merchantId),
+          isDiverted: true,
+          divertFlagNotes: 'Manual put on divert via Risk Radar',
+          createDate: new Date(),
+          createdBy,
+        });
+        this.logger.log(`Added to divert queue successfully`);
+      } catch (error: unknown) {
+        const typedError = error as ErrorWithMessage;
+        this.logger.error(
+          `Error adding to divert queue: ${typedError.message}`
         );
-        try {
-          await this.divertQueueRepository.update(
-            { id: inQueue.id },
-            {
-              isDiverted: true,
-              divertFlagNotes: 'Manual put on divert via Risk Radar',
-              createDate: new Date(),
-              createdBy,
-            }
-          );
-          this.logger.log(`Updated divert queue successfully`);
-        } catch (error: unknown) {
-          const typedError = error as ErrorWithMessage;
-          this.logger.error(
-            `Error updating divert queue: ${typedError.message}`
-          );
-          throw error;
-        }
-      } else {
-        this.logger.log(
-          `Adding new entry to divert queue for MID: ${merchantId}`
-        );
-        try {
-          await this.divertQueueRepository.insert({
-            merchantId: Number(merchantId),
-            isDiverted: true,
-            divertFlagNotes: 'Manual put on divert via Risk Radar',
-            createDate: new Date(),
-            createdBy,
-          });
-          this.logger.log(`Added to divert queue successfully`);
-        } catch (error: unknown) {
-          const typedError = error as ErrorWithMessage;
-          this.logger.error(
-            `Error adding to divert queue: ${typedError.message}`
-          );
-          throw error;
-        }
+        throw error;
       }
     }
 
     // Divert Queue FSP
     this.logger.log(`Checking FSP divert queue`);
-    const inFSPQueue = await this.divertQueueFspRepository.findOne({
-      where: { merchantId: Number(merchantId) },
-      order: { id: 'DESC' }, // Get the latest record by descending ID
-    });
-    this.logger.debug(`FSP divert queue check result: ${!!inFSPQueue}`);
 
     const fspPrefixes = ['8152'];
     const isValidFspPrefix = fspPrefixes.includes(merchantId.slice(0, 4));
@@ -545,52 +513,25 @@ export class RiskRadarSaveService {
       `FSP MID prefix check: ${merchantId.slice(0, 4)}, isValidFspPrefix: ${isValidFspPrefix}`
     );
 
-    const isDivertFSPFlagSet = inFSPQueue ? inFSPQueue.isDiverted : false;
-    this.logger.log(`Current FSP divert flag status: ${isDivertFSPFlagSet}`);
-
     if (isValidFspPrefix) {
-      if (inFSPQueue) {
-        this.logger.log(
-          `Updating existing FSP divert queue for MID: ${merchantId}`
+      this.logger.log(
+        `Adding new entry to FSP divert queue for MID: ${merchantId}`
+      );
+      try {
+        await this.divertQueueFspRepository.insert({
+          merchantId: Number(merchantId),
+          isDiverted: true,
+          divertFlagNotes: 'Manual put on divert via Risk Radar',
+          createDate: new Date(),
+          createdBy,
+        });
+        this.logger.log(`Added to FSP divert queue successfully`);
+      } catch (error: unknown) {
+        const typedError = error as ErrorWithMessage;
+        this.logger.error(
+          `Error adding to FSP divert queue: ${typedError.message}`
         );
-        try {
-          await this.divertQueueFspRepository.update(
-            { id: inFSPQueue.id },
-            {
-              isDiverted: true,
-              divertFlagNotes: 'Manual put on divert via Risk Radar',
-              createDate: new Date(),
-              createdBy,
-            }
-          );
-          this.logger.log(`Updated FSP divert queue successfully`);
-        } catch (error: unknown) {
-          const typedError = error as ErrorWithMessage;
-          this.logger.error(
-            `Error updating FSP divert queue: ${typedError.message}`
-          );
-          throw error;
-        }
-      } else {
-        this.logger.log(
-          `Adding new entry to FSP divert queue for MID: ${merchantId}`
-        );
-        try {
-          await this.divertQueueFspRepository.insert({
-            merchantId: Number(merchantId),
-            isDiverted: true,
-            divertFlagNotes: 'Manual put on divert via Risk Radar',
-            createDate: new Date(),
-            createdBy,
-          });
-          this.logger.log(`Added to FSP divert queue successfully`);
-        } catch (error: unknown) {
-          const typedError = error as ErrorWithMessage;
-          this.logger.error(
-            `Error adding to FSP divert queue: ${typedError.message}`
-          );
-          throw error;
-        }
+        throw error;
       }
     }
 
@@ -648,71 +589,38 @@ export class RiskRadarSaveService {
         }
       }
     }
-
+    /*
+     * TODO: FIXME: Create a new entry or update the existing one?
+     * Check default values for create also should be set when updated
+     * IsProcess should be set to 0 when updated
+     */
     // Divert Queue
     this.logger.log(`Checking divert queue`);
-    const inQueue = await this.divertQueueRepository.findOne({
-      where: { merchantId: Number(merchantId) },
-      order: { id: 'DESC' }, // Get the latest record by descending ID
-    });
-    this.logger.debug(`Divert queue check result: ${!!inQueue}`);
-
-    const isDivertFlagSet = inQueue ? inQueue.isDiverted : false;
-    this.logger.log(`Current divert flag status: ${isDivertFlagSet}`);
 
     if (isValidPrefix) {
-      if (inQueue) {
-        this.logger.log(
-          `Updating existing divert queue for MID: ${merchantId}`
+      this.logger.log(
+        `Adding new entry to divert queue for MID: ${merchantId}`
+      );
+      try {
+        await this.divertQueueRepository.insert({
+          merchantId: Number(merchantId),
+          isDiverted: false,
+          divertFlagNotes: 'Manual remove from divert via Risk Radar',
+          createDate: new Date(),
+          createdBy,
+        });
+        this.logger.log(`Added to divert queue successfully`);
+      } catch (error: unknown) {
+        const typedError = error as ErrorWithMessage;
+        this.logger.error(
+          `Error adding to divert queue: ${typedError.message}`
         );
-        try {
-          await this.divertQueueRepository.update(
-            { id: inQueue.id },
-            {
-              isDiverted: false,
-              divertFlagNotes: 'Manual remove from divert via Risk Radar',
-              createDate: new Date(),
-              createdBy,
-            }
-          );
-          this.logger.log(`Updated divert queue successfully`);
-        } catch (error: unknown) {
-          const typedError = error as ErrorWithMessage;
-          this.logger.error(
-            `Error updating divert queue: ${typedError.message}`
-          );
-          throw error;
-        }
-      } else {
-        this.logger.log(
-          `Adding new entry to divert queue for MID: ${merchantId}`
-        );
-        try {
-          await this.divertQueueRepository.insert({
-            merchantId: Number(merchantId),
-            isDiverted: false,
-            divertFlagNotes: 'Manual remove from divert via Risk Radar',
-            createDate: new Date(),
-            createdBy,
-          });
-          this.logger.log(`Added to divert queue successfully`);
-        } catch (error: unknown) {
-          const typedError = error as ErrorWithMessage;
-          this.logger.error(
-            `Error adding to divert queue: ${typedError.message}`
-          );
-          throw error;
-        }
+        throw error;
       }
     }
 
     // Divert Queue FSP
     this.logger.log(`Checking FSP divert queue`);
-    const inFSPQueue = await this.divertQueueFspRepository.findOne({
-      where: { merchantId: Number(merchantId) },
-      order: { id: 'DESC' }, // Get the latest record by descending ID
-    });
-    this.logger.debug(`FSP divert queue check result: ${!!inFSPQueue}`);
 
     const fspPrefixes = ['8152'];
     const isValidFspPrefix = fspPrefixes.includes(merchantId.slice(0, 4));
@@ -720,52 +628,25 @@ export class RiskRadarSaveService {
       `FSP MID prefix check: ${merchantId.slice(0, 4)}, isValidFspPrefix: ${isValidFspPrefix}`
     );
 
-    const isDivertFSPFlagSet = inFSPQueue ? inFSPQueue.isDiverted : false;
-    this.logger.log(`Current FSP divert flag status: ${isDivertFSPFlagSet}`);
-
     if (isValidFspPrefix) {
-      if (inFSPQueue) {
-        this.logger.log(
-          `Updating existing FSP divert queue for MID: ${merchantId}`
+      this.logger.log(
+        `Adding new entry to FSP divert queue for MID: ${merchantId}`
+      );
+      try {
+        await this.divertQueueFspRepository.insert({
+          merchantId: Number(merchantId),
+          isDiverted: false,
+          divertFlagNotes: 'Manual remove from divert via Risk Radar',
+          createDate: new Date(),
+          createdBy,
+        });
+        this.logger.log(`Added to FSP divert queue successfully`);
+      } catch (error: unknown) {
+        const typedError = error as ErrorWithMessage;
+        this.logger.error(
+          `Error adding to FSP divert queue: ${typedError.message}`
         );
-        try {
-          await this.divertQueueFspRepository.update(
-            { id: inFSPQueue.id },
-            {
-              isDiverted: false,
-              divertFlagNotes: 'Manual remove from divert via Risk Radar',
-              createDate: new Date(),
-              createdBy,
-            }
-          );
-          this.logger.log(`Updated FSP divert queue successfully`);
-        } catch (error: unknown) {
-          const typedError = error as ErrorWithMessage;
-          this.logger.error(
-            `Error updating FSP divert queue: ${typedError.message}`
-          );
-          throw error;
-        }
-      } else {
-        this.logger.log(
-          `Adding new entry to FSP divert queue for MID: ${merchantId}`
-        );
-        try {
-          await this.divertQueueFspRepository.insert({
-            merchantId: Number(merchantId),
-            isDiverted: false,
-            divertFlagNotes: 'Manual remove from divert via Risk Radar',
-            createDate: new Date(),
-            createdBy,
-          });
-          this.logger.log(`Added to FSP divert queue successfully`);
-        } catch (error: unknown) {
-          const typedError = error as ErrorWithMessage;
-          this.logger.error(
-            `Error adding to FSP divert queue: ${typedError.message}`
-          );
-          throw error;
-        }
+        throw error;
       }
     }
 
