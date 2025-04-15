@@ -1582,13 +1582,13 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                 <table className="w-full table-auto">
                   <thead>
                     <tr className="bg-gray-2 dark:bg-meta-4 text-center">
-                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white text-left">
                         Note
                       </th>
                       <th className="p-4 py-1 font-medium text-black dark:text-white">
                         Date Created
                       </th>
-                      <th className="p-4 py-1 font-medium text-black dark:text-white">
+                      <th className="p-4 py-1 font-medium text-black dark:text-white text-left">
                         Created By
                       </th>
                       <th className="p-4 py-1 font-medium text-black dark:text-white">
@@ -1598,9 +1598,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   </thead>
                   <tbody>
                     {paginatedNotes?.map((note) => (
-                      <tr key={`${note.pkNotes}`} className="text-center">
+                      <tr key={`${note.pkNotes}`}>
                         <td
-                          className={`border-b border-[#eee] px-4 py-2 dark:border-strokedark ${
+                          className={`border-b border-[#eee] px-4 py-2 dark:border-strokedark text-left ${
                             note.isPinned
                               ? 'text-red-500'
                               : 'text-black dark:text-white'
@@ -1608,13 +1608,13 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                         >
                           {note.sNotes}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-center">
                           {formatDate(note.dtCreated)}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-left">
                           {note.sUserCreated}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-center">
                           <div className="">
                             <input
                               type="checkbox"
@@ -1646,7 +1646,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   totalPages={totalNotesPages}
                   onPageChange={setNotesPage}
                 />
-                <div className="flex items-center gap-4 justify-center mt-[5px]">
+                <div className="flex items-center gap-4 mt-4 px-2">
                   <input
                     type="text"
                     value={noteRequest.sNotes ?? ''}
@@ -1663,40 +1663,42 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                       }));
                     }}
                     placeholder="New Note"
-                    className="max-w-[400px] rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                    className="flex-1 min-w-[200px] rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                   />
-                  <div className="flex items-center gap-2">
-                    <span>pinned</span>
-                    <input
-                      type="checkbox"
-                      id="pin"
-                      className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
-                      disabled={false}
-                      checked={noteRequest.isPinned}
-                      onChange={(e) => {
-                        setNoteRequest((prev) => ({
-                          ...prev,
-                          isPinned: e.target.checked,
-                        }));
+                  <div className="flex items-center gap-4 shrink-0">
+                    <label className="flex items-center gap-2 whitespace-nowrap">
+                      <span>Pinned</span>
+                      <input
+                        type="checkbox"
+                        id="pin"
+                        className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
+                        disabled={false}
+                        checked={noteRequest.isPinned}
+                        onChange={(e) => {
+                          setNoteRequest((prev) => ({
+                            ...prev,
+                            isPinned: e.target.checked,
+                          }));
 
-                        // Track that isPinnedNote has changed
-                        setChangedFields((prev) => ({
-                          ...prev,
-                          isPinnedNote: true,
-                        }));
+                          // Track that isPinnedNote has changed
+                          setChangedFields((prev) => ({
+                            ...prev,
+                            isPinnedNote: true,
+                          }));
+                        }}
+                      />
+                    </label>
+                    <button
+                      className="inline-flex w-[100px] items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90 disabled:opacity-70 disabled:cursor-not-allowed"
+                      type="button"
+                      disabled={isSaving}
+                      onClick={() => {
+                        handleSaveMerchantData().catch(() => {});
                       }}
-                    />
+                    >
+                      {isSaving ? 'Saving...' : 'Save'}
+                    </button>
                   </div>
-                  <button
-                    className="inline-flex w-[100px] items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-white hover:bg-opacity-90 disabled:opacity-70 disabled:cursor-not-allowed"
-                    type="button"
-                    disabled={isSaving}
-                    onClick={() => {
-                      handleSaveMerchantData().catch(() => {});
-                    }}
-                  >
-                    {isSaving ? 'Saving...' : 'Save'}
-                  </button>
                 </div>
               </div>
             )}
