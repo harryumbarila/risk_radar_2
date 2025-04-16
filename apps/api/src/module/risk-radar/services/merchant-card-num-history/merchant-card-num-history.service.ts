@@ -76,7 +76,7 @@ export class MerchantCardNumHistoryService {
 
       this.logger.info('Starting to format DFT256 transactions');
       const formattedTransactions = transactionData
-        .map((t) => {
+        .map((t: DFT256Transaction): TransactionData | null => {
           try {
             return this.formatTransaction(t, maskedCardNumber);
           } catch (error) {
@@ -101,13 +101,16 @@ export class MerchantCardNumHistoryService {
 
       this.logger.info('Starting to format reporting search data');
       const formattedReportings = reportingSearch
-        .map((rs) => {
+        .map((rs: CLXReportingSearch): TransactionData | null => {
           try {
             return this.formatReportingSearch(rs);
           } catch (error) {
             const logError = this.formatError(error);
             this.logger.error(
-              { error: logError, siteId: rs.siteId },
+              {
+                error: logError,
+                siteId: rs.siteId,
+              },
               'Error formatting reporting search data'
             );
             return null;
@@ -123,7 +126,7 @@ export class MerchantCardNumHistoryService {
       // Sort transactions
       const groupedTransactions = [
         ...formattedTransactions,
-        ...formattedReportings
+        ...formattedReportings,
       ];
 
       this.logger.info(
