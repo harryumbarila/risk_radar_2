@@ -16,11 +16,13 @@ async function bootstrap() {
     new FastifyAdapter()
   );
 
+  // TODO: Remove this once we have a proper CORS policy
   app.enableCors({
     origin: [
       'https://dashboard.taluspay-staging.com',
       'https://dashboard.taluspay.com',
       'http://localhost:3000',
+      'http://localhost:3001',
     ],
     credentials: true,
   });
