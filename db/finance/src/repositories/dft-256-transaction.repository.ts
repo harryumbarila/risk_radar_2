@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Raw } from 'typeorm';
 
 import { DFT256Transaction } from '../entities/dft-256-transaction';
 
@@ -17,8 +17,13 @@ export class DFT256TransactionRepository extends Repository<DFT256Transaction> {
   ): Promise<DFT256Transaction[]> {
     return this.find({
       where: {
-        cardLast4Digits: last4Digits,
-        cardFirst6Digits: first6Digits,
+        cardLast4Digits: Raw((alias) => `${alias} = CAST(:last4 as varchar)`, {
+          last4: last4Digits,
+        }),
+        cardFirst6Digits: Raw(
+          (alias) => `${alias} = CAST(:first6 as varchar)`,
+          { first6: first6Digits }
+        ),
       },
       relations: {
         batch: true,

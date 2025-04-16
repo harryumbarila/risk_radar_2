@@ -51,72 +51,29 @@ export class MerchantCardNumHistoryService {
       const first6Digits = cardNumber.slice(0, 6);
       const last4Digits = cardNumber.slice(-4);
 
-      this.logger.info(
-        'Fetching transactions from DFT256TransactionRepository'
-      );
-      let transactionData: DFT256Transaction[] = [];
-      try {
-        transactionData =
-          await this.dft256TransactionRepository.getTransactionsForCard(
-            first6Digits,
-            last4Digits
-          );
-        this.logger.info(
-          { count: transactionData.length },
-          'DFT256 transactions fetched'
-        );
-      } catch (error) {
-        const logError = this.formatError(error);
-        this.logger.error(
-          { error: logError },
-          'Error fetching DFT256 transactions'
-        );
-        transactionData = [];
-      }
+      const [transactionData, reportingSearch] = await Promise.all([
+        this.dft256TransactionRepository
+          .getTransactionsForCard(first6Digits, last4Digits)
+          .catch((error) => {
+            const logError = this.formatError(error);
+            this.logger.error(
+              { error: logError },
+              'Error fetching DFT256 transactions'
+            );
+            return [];
+          }),
+        this.clxReportingSearchRepository
+          .getReportingForCard(first6Digits, last4Digits)
+          .catch((error) => {
+            const logError = this.formatError(error);
+            this.logger.error(
+              { error: logError },
+              'Error fetching reporting search data'
+            );
+            return [];
+          }),
+      ]);
 
-      this.logger.info('Fetching reporting search data');
-      let reportingSearch: CLXReportingSearch[] = [];
-      try {
-        reportingSearch =
-          await this.clxReportingSearchRepository.getReportingForCard(
-            first6Digits,
-            last4Digits
-          );
-        this.logger.info(
-          { count: reportingSearch.length },
-          'Reporting search data fetched'
-        );
-      } catch (error) {
-        const logError = this.formatError(error);
-        this.logger.error(
-          { error: logError },
-          'Error fetching reporting search data'
-        );
-        reportingSearch = [];
-      }
-
-      this.logger.info('Fetching legacy transactions');
-      let legacyTransactions: DFT256TransactionFromLegacySystem[] = [];
-      try {
-        legacyTransactions =
-          await this.legacyTransactionRepository.getTransactionsForCard(
-            first6Digits,
-            last4Digits
-          );
-        this.logger.info(
-          { count: legacyTransactions.length },
-          'Legacy transactions fetched'
-        );
-      } catch (error) {
-        const logError = this.formatError(error);
-        this.logger.error(
-          { error: logError },
-          'Error fetching legacy transactions'
-        );
-        legacyTransactions = [];
-      }
-
-      // Format data to keep consistency
       this.logger.info('Starting to format DFT256 transactions');
       const formattedTransactions = transactionData
         .map((t) => {
@@ -163,32 +120,10 @@ export class MerchantCardNumHistoryService {
         'Reporting search data formatted'
       );
 
-      this.logger.info('Starting to format legacy transactions');
-      const formattedLegacyTransaction = legacyTransactions
-        .map((lt) => {
-          try {
-            return this.formatLegacyTransaction(lt, maskedCardNumber);
-          } catch (error) {
-            const logError = this.formatError(error);
-            this.logger.error(
-              { error: logError, mid: lt.merchantId },
-              'Error formatting legacy transaction'
-            );
-            return null;
-          }
-        })
-        .filter((l): l is TransactionData => l !== null);
-
-      this.logger.info(
-        { count: formattedLegacyTransaction.length },
-        'Legacy transactions formatted'
-      );
-
       // Sort transactions
       const groupedTransactions = [
         ...formattedTransactions,
-        ...formattedReportings,
-        ...formattedLegacyTransaction,
+        ...formattedReportings
       ];
 
       this.logger.info(
@@ -196,7 +131,6 @@ export class MerchantCardNumHistoryService {
           totalCount: groupedTransactions.length,
           dft256Count: formattedTransactions.length,
           reportingCount: formattedReportings.length,
-          legacyCount: formattedLegacyTransaction.length,
         },
         'Successfully processed card transaction history'
       );
