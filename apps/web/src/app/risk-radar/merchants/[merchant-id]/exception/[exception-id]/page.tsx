@@ -8,7 +8,7 @@
 import { Breadcrumb, Loader } from '@denali/ui';
 import { useAuth } from '@frontegg/nextjs';
 import classNames from 'classnames';
-import dayjs from 'dayjs';
+import { format } from 'date-fns';
 import { notFound } from 'next/navigation';
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
@@ -634,7 +634,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     let newTemplate = templateText;
     newTemplate = newTemplate.replaceAll(
       '@dtTransDate',
-      dayjs(currentTransException.transactionDate).format('MM/DD/YYYY') // display
+      format(currentTransException.transactionDate, 'MM/dd/yyyy')
     );
 
     newTemplate = newTemplate.replaceAll(
