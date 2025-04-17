@@ -64,7 +64,7 @@ export class PushNoteToIrisService {
         {
           id: Number(noteId),
         },
-        { irisMemoRequestDate: new Date() }
+        { irisMemoRequestDate: () => 'GETDATE()' }
       );
     } catch (error) {
       // TODO: Find a reusable way to handle this
