@@ -10,6 +10,7 @@ type Props = Omit<InputHTMLAttributes<HTMLInputElement>, 'name'> & {
   control: Control<RiskRadarFilterState>;
   rules?: Record<string, unknown>;
   error?: string;
+  label?: string;
 };
 
 export const SystemRadioSelect: FC<Props> = ({
@@ -18,6 +19,7 @@ export const SystemRadioSelect: FC<Props> = ({
   control,
   rules,
   error,
+  label,
   ...props
 }) => {
   return (
@@ -28,12 +30,14 @@ export const SystemRadioSelect: FC<Props> = ({
       render={({ field, fieldState }) => (
         <div>
           <div className="mb-5">
-            <label
-              className="mb-3 block text-sm font-medium text-black dark:text-white"
-              htmlFor="system"
-            >
-              Select System
-            </label>
+            {label ? (
+              <label
+                className="mb-3 block text-sm font-medium text-black dark:text-white"
+                htmlFor="system"
+              >
+                {label}
+              </label>
+            ) : null}
             <div className="flex gap-6.5 flex-wrap">
               {options.map((o) => (
                 <div key={o.value} className="flex items-center">
