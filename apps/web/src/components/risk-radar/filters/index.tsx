@@ -1,4 +1,3 @@
-import { endOfDay, format, parseISO, startOfDay } from 'date-fns';
 import type { FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -42,18 +41,6 @@ export const RiskRadarFilters: FC<{
 
   const handleSubmit = methods.handleSubmit((data) => {
     const modifiedData = { ...data };
-
-    // If start date and end date are the same, set end date to the end of the day
-    if (modifiedData.startDate === modifiedData.endDate) {
-      const startDate = parseISO(modifiedData.startDate);
-      const endDate = parseISO(modifiedData.endDate);
-
-      const startOfDayDate = startOfDay(startDate);
-      const endOfDayDate = endOfDay(endDate);
-
-      modifiedData.startDate = format(startOfDayDate, "yyyy-MM-dd'T'HH:mm:ss");
-      modifiedData.endDate = format(endOfDayDate, "yyyy-MM-dd'T'HH:mm:ss");
-    }
     onSubmit?.(modifiedData);
   });
 
