@@ -159,7 +159,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
   const searchParams = useSearchParams();
 
-  const exceptionId = searchParams?.get('exception') || '';
+  const exceptionId = searchParams?.get('exceptionId') || '';
 
   const { user } = useAuth();
   const itemsPerPage = 10;
@@ -1243,6 +1243,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             'inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
             {
               '!opacity-100': activeTab === 'exceptions',
+              '!cursor-not-allowed': !exceptionId,
             }
           )}
           disabled={!exceptionId}
