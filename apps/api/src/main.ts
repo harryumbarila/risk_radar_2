@@ -10,6 +10,10 @@ import { writeFileSync } from 'fs';
 import { AppModule } from './app.module';
 import { config } from './config';
 
+// TODO: Handle as a env variable
+// eslint-disable-next-line no-restricted-properties
+process.env.TZ = 'America/Chicago';
+
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
