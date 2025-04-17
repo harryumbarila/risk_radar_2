@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { addDays, startOfDay } from 'date-fns';
 import { InjectPinoLogger } from 'nestjs-pino';
 import { Logger } from 'pino';
 
@@ -43,17 +44,17 @@ export class ExceptionsListService {
 
     // Use the query builder to get the query with all joins
     let query = this.buildFullQuery();
-    const formattedStartDate = new Date(startDate).toISOString().split('T')[0]; // 'YYYY-MM-DD'
-    const formattedEndDate = new Date(endDate).toISOString().split('T')[0];
+    const startDateISO = startOfDay(startDate).toISOString();
+    const nextDayISO = startOfDay(addDays(endDate, 1)).toISOString();
 
     // Apply initial filters
     query
       .where('exception.bHidden = :isHidden', { isHidden: false })
       .andWhere(
-        'CAST(exception.dtCreated AS DATE) BETWEEN :startDate AND :endDate',
+        `exception.dtCreated >= :startDate AND exception.dtCreated < :nextDay`,
         {
-          startDate: formattedStartDate,
-          endDate: formattedEndDate,
+          startDate: startDateISO,
+          nextDay: nextDayISO,
         }
       );
 
