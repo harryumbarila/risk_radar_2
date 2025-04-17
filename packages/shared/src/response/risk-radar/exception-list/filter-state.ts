@@ -18,6 +18,8 @@ export type RiskRadarFilterState = {
   sourceType?: number;
   page: number;
   pageSize: number;
+  sortBy?: string;
+  sortDirection?: 'ASC' | 'DESC';
 };
 
 export const defaultRiskRadarFilters: RiskRadarFilterState = {
@@ -33,4 +35,6 @@ export const defaultRiskRadarFilters: RiskRadarFilterState = {
   sourceType: undefined,
   page: 1,
   pageSize: 10,
+  sortBy: undefined,
+  sortDirection: undefined,
 };
