@@ -1238,22 +1238,21 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         >
           Contact
         </button>
-        {exceptionId ? (
-          <button
-            className={classNames(
-              'inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
-              {
-                '!opacity-100': activeTab === 'exceptions',
-              }
-            )}
-            type="button"
-            onClick={() => {
-              setActiveTab('exceptions');
-            }}
-          >
-            Exceptions
-          </button>
-        ) : null}
+        <button
+          className={classNames(
+            'inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
+            {
+              '!opacity-100': activeTab === 'exceptions',
+            }
+          )}
+          disabled={!exceptionId}
+          type="button"
+          onClick={() => {
+            setActiveTab('exceptions');
+          }}
+        >
+          Exceptions
+        </button>
 
         <button
           className={classNames(

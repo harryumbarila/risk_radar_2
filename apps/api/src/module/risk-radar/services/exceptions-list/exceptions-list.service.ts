@@ -20,9 +20,6 @@ export class ExceptionsListService {
   ) {}
 
   public async getExceptionList(data: ExceptionListInputDto) {
-
-    
-
     const {
       startDate,
       endDate,
@@ -49,7 +46,6 @@ export class ExceptionsListService {
 
     // Use the query builder to get the query with all joins
     let query = this.buildFullQuery(data);
- 
 
     // Apply initial filters
     query = this.applyFilters(query, {
@@ -125,29 +121,28 @@ export class ExceptionsListService {
       assignedToUser,
     }: any
   ) {
+    // Convert startDate and endDate to America/Chicago time, then adjust to UTC
+    const startDateSQL = getUTCDateString(new Date(startDate)); // '2025-03-24 00:00:00'
+    const nextDaySQL = getUTCDateString(
+      new Date(endDate.setUTCDate(endDate.getUTCDate() + 1))
+    );
 
-     // Convert startDate and endDate to America/Chicago time, then adjust to UTC
-     const startDateSQL = getUTCDateString(new Date(startDate)); // '2025-03-24 00:00:00'
-     const nextDaySQL = getUTCDateString(
-       new Date(endDate.setUTCDate(endDate.getUTCDate() + 1))
-     );
- 
-     // Apply the filters in your query
-     query
-       .where('exception.bHidden = :isHidden', { isHidden: false })
-       .andWhere(
-         `exception.dtCreated >= :startDate AND exception.dtCreated < :nextDay`,
-         {
-           startDate: startDateSQL,
-           nextDay: nextDaySQL,
-         }
-       );
+    // Apply the filters in your query
+    query
+      .where('exception.bHidden = :isHidden', { isHidden: false })
+      .andWhere(
+        `exception.dtCreated >= CAST(:startDate AS DATETIME) AND exception.dtCreated < CAST(:endDate AS DATETIME)`,
+        {
+          startDate: startDateSQL,
+          endDate: nextDaySQL,
+        }
+      );
 
     if (!viewAllExceptions) {
       query.andWhere(
         '(exception.iTotalPoints > 20 OR (exception.iNegDailyBatches IS NOT NULL AND exception.iNegDailyBatches > 0))'
       );
-    } 
+    }
 
     if (processor) {
       switch (processor) {
@@ -216,7 +211,7 @@ export class ExceptionsListService {
   private applySorting(query: any, params?: ExceptionListInputDto) {
     if (params?.sortBy) {
       const direction = params.sortDirection || SortDirection.DESC;
-      
+
       // Handle special cases for joined fields
       switch (params.sortBy) {
         case SortColumn.ACTIVATION_DATE:
@@ -232,18 +227,27 @@ export class ExceptionsListService {
           query.orderBy('autoApproval.dtIrisUpdated', direction);
           break;
         case SortColumn.RISK_WATCH:
-          query.orderBy('CASE WHEN merchParam.bRiskWatch = 1 THEN 1 ELSE 0 END', direction);
+          query.orderBy(
+            'CASE WHEN merchParam.bRiskWatch = 1 THEN 1 ELSE 0 END',
+            direction
+          );
           break;
         case SortColumn.DIVERT:
-          query.orderBy('CASE WHEN exception.bDivert = 1 THEN 1 ELSE 0 END', direction);
+          query.orderBy(
+            'CASE WHEN exception.bDivert = 1 THEN 1 ELSE 0 END',
+            direction
+          );
           break;
         case SortColumn.AMEX_OPT_BLUE:
-          query.orderBy('CASE WHEN amexBatch.sAMEXOptBlueInd = \'Y\' THEN 1 ELSE 0 END', direction);
+          query.orderBy(
+            "CASE WHEN amexBatch.sAMEXOptBlueInd = 'Y' THEN 1 ELSE 0 END",
+            direction
+          );
           break;
         default:
           query.orderBy(`exception.${params.sortBy}`, direction);
       }
-      
+
       // Add secondary sort by ID to ensure consistent ordering
       // Only add iTotalPoints as secondary sort if we're not already sorting by it
       if (params.sortBy !== SortColumn.TOTAL_POINTS) {
@@ -404,7 +408,7 @@ export class ExceptionsListService {
         'iris..LeadsBusinessInformation',
         'leadsInfo',
         'leadsInfo.LeadId = leads.Id'
-      )
+      );
 
     return query;
   }
