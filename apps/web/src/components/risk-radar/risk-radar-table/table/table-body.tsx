@@ -9,6 +9,7 @@ import type { RiskRadarExceptionsListRow } from '@/shared/response';
 import { Loader } from '@/ui/common';
 
 import type { RiskRadarTableColumn } from './base-columns';
+import { SortHeaderCell } from './sort-header-cell';
 
 type Props = {
   exceptionList: RiskRadarExceptionsListRow[];
@@ -17,6 +18,9 @@ type Props = {
   totalRecords: number;
   columns: RiskRadarTableColumn[];
   dataStatus?: CommonStatus;
+  sortBy?: string;
+  sortDirection?: 'ASC' | 'DESC';
+  onSort?: (column: string) => void;
 };
 
 export const TableBody: FC<Props> = ({
@@ -26,6 +30,9 @@ export const TableBody: FC<Props> = ({
   totalRecords,
   columns,
   dataStatus,
+  sortBy,
+  sortDirection,
+  onSort,
 }) => {
   // As we have a lot of columns if there is no data we hide them to see the not data available message
   const columnsToRender = dataStatus || !exceptionList.length ? [] : columns;
@@ -59,8 +66,17 @@ export const TableBody: FC<Props> = ({
     header: HeaderContext<RiskRadarExceptionsListRow, unknown>
   ): ReactNode => {
     const headerDef = header.column.columnDef.header;
+    const columnId = header.column.id;
+
     if (typeof headerDef === 'string') {
-      return headerDef;
+      return (
+        <SortHeaderCell
+          label={headerDef}
+          sortDirection={columnId === sortBy ? sortDirection : null}
+          onSort={() => onSort?.(columnId)}
+          enableSorting={header.column.getCanSort()}
+        />
+      );
     }
     if (typeof headerDef === 'function') {
       return headerDef(header) as ReactNode;
@@ -101,9 +117,9 @@ export const TableBody: FC<Props> = ({
       <table className="datatable-table w-full table-auto !border-collapse break-words px-4 md:px-8 align-middle">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
-            <tr>
+            <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <th>
+                <th key={header.id}>
                   <div className="flex items-center">
                     <span>
                       {header.isPlaceholder

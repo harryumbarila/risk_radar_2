@@ -76,6 +76,30 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
     fetchData({ ...filters, page });
   };
 
+  // Sorting
+  const handleSort = (column: string): void => {
+    let newDirection: 'ASC' | 'DESC' | undefined;
+
+    if (filters.sortBy === column) {
+      if (filters.sortDirection === 'ASC') {
+        newDirection = 'DESC';
+      } else if (filters.sortDirection === 'DESC') {
+        newDirection = undefined;
+      } else {
+        newDirection = 'ASC';
+      }
+    } else {
+      newDirection = 'ASC';
+    }
+
+    fetchData({
+      ...filters,
+      sortBy: newDirection ? column : undefined,
+      sortDirection: newDirection,
+      page: 1,
+    });
+  };
+
   const columns = useRiskRadarTableColumns({
     data: exceptionList?.data ?? [],
     filters,
@@ -99,6 +123,9 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
           exceptionList={exceptionList?.data ?? []}
           totalRecords={exceptionList?.totalRecords ?? 0}
           dataStatus={dataStatus}
+          sortBy={filters.sortBy}
+          sortDirection={filters.sortDirection}
+          onSort={handleSort}
         />
 
         <TablePagination

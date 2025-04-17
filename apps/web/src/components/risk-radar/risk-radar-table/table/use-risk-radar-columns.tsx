@@ -81,6 +81,7 @@ export const useRiskRadarTableColumns = ({
         const rowNumber = pageOffset + row.index + 1;
         return String(rowNumber);
       },
+      enableSorting: false,
     });
 
     // Reviewed column
@@ -115,6 +116,7 @@ export const useRiskRadarTableColumns = ({
               />
             );
           },
+          enableSorting: false,
         });
         break;
 
@@ -143,6 +145,7 @@ export const useRiskRadarTableColumns = ({
               />
             );
           },
+          enableSorting: false,
         });
         break;
 
@@ -150,12 +153,15 @@ export const useRiskRadarTableColumns = ({
         reviewedColumn = columnHelper.accessor('sNTUserID', {
           header: 'Assigned to',
           cell: ({ row }) => row.original.sNTUserID,
+          enableSorting: false,
         });
         break;
 
       default: // Reviewed
         reviewedColumn = columnHelper.accessor('sUserReviewed', {
           header: 'Reviewed',
+          id: 'sUserReviewed',
+          enableSorting: false,
         });
         break;
     }
