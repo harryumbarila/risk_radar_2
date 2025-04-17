@@ -43,14 +43,19 @@ export class ExceptionsListService {
 
     // Use the query builder to get the query with all joins
     let query = this.buildFullQuery();
+    const formattedStartDate = new Date(startDate).toISOString().split('T')[0]; // 'YYYY-MM-DD'
+    const formattedEndDate = new Date(endDate).toISOString().split('T')[0];
 
     // Apply initial filters
     query
       .where('exception.bHidden = :isHidden', { isHidden: false })
-      .andWhere('exception.createdAt BETWEEN :startDate AND :endDate', {
-        startDate,
-        endDate,
-      });
+      .andWhere(
+        'CAST(exception.dtCreated AS DATE) BETWEEN :startDate AND :endDate',
+        {
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
+        }
+      );
 
     if (!viewAllExceptions) {
       query.andWhere(
