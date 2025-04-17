@@ -8,6 +8,7 @@
 import { Breadcrumb, Loader } from '@denali/ui';
 import { useAuth } from '@frontegg/nextjs';
 import classNames from 'classnames';
+import { format } from 'date-fns';
 import { notFound } from 'next/navigation';
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
@@ -306,6 +307,8 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         isRiskWatch: data?.businessInfo?.isRiskWatch || false,
         isAutoHoldEnabled: data?.businessInfo?.isAutoHoldWhiteLabel || false,
       });
+
+      setEmail(data.businessInfo.contactEmail || '');
 
       // Update merchantStateData
       setMerchantStateData({
@@ -631,17 +634,23 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     let newTemplate = templateText;
     newTemplate = newTemplate.replaceAll(
       '@dtTransDate',
-      currentTransException.transactionDate
+      format(currentTransException.transactionDate, 'MM/dd/yyyy')
     );
 
     newTemplate = newTemplate.replaceAll(
       '@dAuthAmt',
-      currentTransException.authAmount.toString()
+      new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      }).format(currentTransException.authAmount)
     );
 
     newTemplate = newTemplate.replaceAll(
       '@dTransAmt',
-      currentTransException.transactionAmount.toString()
+      new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      }).format(currentTransException.transactionAmount)
     );
 
     newTemplate = newTemplate.replaceAll(

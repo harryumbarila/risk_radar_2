@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectPinoLogger } from 'nestjs-pino';
 import { Logger } from 'pino';
 
+import { getUTCDateString } from '@/api/utils/date-formatter';
 import { RiskRadarExceptionsJeffRepository } from '@/finance-db/repositories';
 import { LeadRepository } from '@/iris-db/repositories';
 
@@ -19,6 +20,9 @@ export class ExceptionsListService {
   ) {}
 
   public async getExceptionList(data: ExceptionListInputDto) {
+
+    
+
     const {
       startDate,
       endDate,
@@ -45,6 +49,7 @@ export class ExceptionsListService {
 
     // Use the query builder to get the query with all joins
     let query = this.buildFullQuery(data);
+ 
 
     // Apply initial filters
     query = this.applyFilters(query, {
@@ -120,12 +125,23 @@ export class ExceptionsListService {
       assignedToUser,
     }: any
   ) {
-    query
-      .where('exception.bHidden = :isHidden', { isHidden: false })
-      .andWhere('exception.dtCreated BETWEEN :startDate AND :endDate', {
-        startDate,
-        endDate,
-      });
+
+     // Convert startDate and endDate to America/Chicago time, then adjust to UTC
+     const startDateSQL = getUTCDateString(new Date(startDate)); // '2025-03-24 00:00:00'
+     const nextDaySQL = getUTCDateString(
+       new Date(endDate.setUTCDate(endDate.getUTCDate() + 1))
+     );
+ 
+     // Apply the filters in your query
+     query
+       .where('exception.bHidden = :isHidden', { isHidden: false })
+       .andWhere(
+         `exception.dtCreated >= :startDate AND exception.dtCreated < :nextDay`,
+         {
+           startDate: startDateSQL,
+           nextDay: nextDaySQL,
+         }
+       );
 
     if (!viewAllExceptions) {
       query.andWhere(
