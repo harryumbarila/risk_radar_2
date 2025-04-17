@@ -31,8 +31,6 @@ export class PushNoteToIrisService {
 
   public async pushNoteToIris(input: PushNoteToIrisInputDto): Promise<unknown> {
     const { merchantId, noteId } = input;
-    const currentDate = new Date();
-
     // Get & format note
     const note = await this.riskRadarNotesRepository.findOne({
       where: { id: noteId, irisMemoRequestDate: null },
@@ -44,7 +42,7 @@ export class PushNoteToIrisService {
 
     // Format the date using the 109 format from SQL Server
     const stringFormattedDate = format(
-      currentDate,
+      note.createdAt,
       'MMM dd yyyy hh:mm:ss.SSSaa'
     );
 
@@ -66,7 +64,7 @@ export class PushNoteToIrisService {
         {
           id: Number(noteId),
         },
-        { irisMemoRequestDate: currentDate }
+        { irisMemoRequestDate: () => 'GETDATE()' }
       );
     } catch (error) {
       // TODO: Find a reusable way to handle this
