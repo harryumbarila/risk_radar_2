@@ -439,3 +439,6 @@ input[type='search']::-webkit-search-cancel-button {
 [x-cloak] {
   display: none !important;
 }
+p {
+  @apply text-sm font-normal text-black;
+}

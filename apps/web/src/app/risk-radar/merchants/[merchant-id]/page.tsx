@@ -9,7 +9,7 @@ import { Breadcrumb, Loader } from '@denali/ui';
 import { useAuth } from '@frontegg/nextjs';
 import classNames from 'classnames';
 import { format } from 'date-fns';
-import { notFound } from 'next/navigation';
+import { notFound, useSearchParams } from 'next/navigation';
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -155,7 +155,12 @@ type ChangedFields = {
 };
 
 const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
-  const { 'merchant-id': merchantId, 'exception-id': exceptionId } = params;
+  const { 'merchant-id': merchantId } = params;
+
+  const searchParams = useSearchParams();
+
+  const exceptionId = searchParams?.get('exception') || '';
+
   const { user } = useAuth();
   const itemsPerPage = 10;
 
@@ -221,7 +226,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
   // Always call hooks but with conditional parameters
   const { data: transactionExceptionsData } = useTransactionExceptions(
-    activeTab === 'exceptions' ? exceptionId : null
+    activeTab === 'exceptions' && exceptionId ? exceptionId : null
   );
 
   const { data: merchantNotesData, refetch: notesRefetch } = useMerchantNotes(
@@ -1233,20 +1238,23 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         >
           Contact
         </button>
-        <button
-          className={classNames(
-            'inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
-            {
-              '!opacity-100': activeTab === 'exceptions',
-            }
-          )}
-          type="button"
-          onClick={() => {
-            setActiveTab('exceptions');
-          }}
-        >
-          Exceptions
-        </button>
+        {exceptionId ? (
+          <button
+            className={classNames(
+              'inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
+              {
+                '!opacity-100': activeTab === 'exceptions',
+              }
+            )}
+            type="button"
+            onClick={() => {
+              setActiveTab('exceptions');
+            }}
+          >
+            Exceptions
+          </button>
+        ) : null}
+
         <button
           className={classNames(
             'inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',

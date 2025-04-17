@@ -21,7 +21,7 @@ export const StatusAndOtherCard: FC<Props> = ({ statuses, users }) => {
   const status = watch('status');
 
   return (
-    <RiskRadarCard title="Exception Status, MID and DBA/SIC">
+    <RiskRadarCard>
       <div className="flex flex-col">
         <div className="space-y-3">
           <StatusSelect control={control} options={statuses} />

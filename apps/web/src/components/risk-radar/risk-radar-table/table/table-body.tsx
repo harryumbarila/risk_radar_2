@@ -29,14 +29,13 @@ export const TableBody: FC<Props> = ({
 }) => {
   // As we have a lot of columns if there is no data we hide them to see the not data available message
   const columnsToRender = dataStatus || !exceptionList.length ? [] : columns;
-
   const goToMerchantDetails = (
-    merchantId: string,
-    exceptionId: number
+    merchantId?: string,
+    exceptionId?: number
   ): void => {
-    if (merchantId && exceptionId) {
+    if (merchantId) {
       window.open(
-        `/risk-radar/merchants/${merchantId}/exception/${exceptionId}`,
+        `/risk-radar/merchants/${merchantId}${exceptionId ? `?exceptionId=${exceptionId}` : ''}`,
         '_blank'
       );
     }
@@ -131,18 +130,14 @@ export const TableBody: FC<Props> = ({
                 const isLast = row.getVisibleCells().length === index + 1;
                 return (
                   <td
-                    className={classNames('cursor-pointer', {
-                      '!cursor-not-allowed':
-                        !cell.row.original.sMID ||
-                        !cell.row.original.pkRiskRadarExceptions,
-                    })}
+                    className={classNames('cursor-pointer')}
                     key={cell.id}
                     onClick={() => {
                       // Last column is interactive
                       if (isLast) return;
 
                       goToMerchantDetails(
-                        cell.row.original.sMID,
+                        cell.row.original.sMID || cell.row.original.irisMId,
                         cell.row.original.pkRiskRadarExceptions
                       );
                     }}
