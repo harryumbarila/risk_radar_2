@@ -11,6 +11,9 @@ export type CardHistory = {
   cardNumber: string;
   debitNetworkIdentifier: string | null;
   netDepositAmount: number;
+  issuerBank?: string;
+  issuerCountry?: string;
+  issuerPhone?: string;
 };
 
 type UseCardHistoryReturnType = {

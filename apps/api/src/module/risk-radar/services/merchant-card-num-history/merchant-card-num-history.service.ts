@@ -11,6 +11,7 @@ import type {
 import {
   DFT256TransactionFromLegacySystemRepository,
   DFT256TransactionRepository,
+  RiskRadarIssuingBankRepository,
 } from '@/finance-db/repositories';
 import { SortType } from '@/shared/request';
 import type {
@@ -32,6 +33,7 @@ export class MerchantCardNumHistoryService {
     private readonly dft256TransactionRepository: DFT256TransactionRepository,
     private readonly clxReportingSearchRepository: ClxReportingRepository,
     private readonly legacyTransactionRepository: DFT256TransactionFromLegacySystemRepository,
+    private readonly issuingBankRepository: RiskRadarIssuingBankRepository,
     @InjectPinoLogger(MerchantCardNumHistoryService.name)
     private readonly logger: Logger
   ) {}
@@ -50,6 +52,10 @@ export class MerchantCardNumHistoryService {
 
       const first6Digits = cardNumber.slice(0, 6);
       const last4Digits = cardNumber.slice(-4);
+
+      const issuerInfo = await this.issuingBankRepository.findOne({
+        where: { bin: first6Digits },
+      });
 
       const [transactionData, reportingSearch] = await Promise.all([
         this.dft256TransactionRepository
@@ -78,7 +84,12 @@ export class MerchantCardNumHistoryService {
       const formattedTransactions = transactionData
         .map((t: DFT256Transaction): TransactionData | null => {
           try {
-            return this.formatTransaction(t, maskedCardNumber);
+            return {
+              ...this.formatTransaction(t, maskedCardNumber),
+              issuerBank: issuerInfo?.issuerName,
+              issuerCountry: issuerInfo?.issuerCountry,
+              issuerPhone: issuerInfo?.issuerPhone,
+            };
           } catch (error) {
             const logError = this.formatError(error);
             this.logger.error(
@@ -103,7 +114,12 @@ export class MerchantCardNumHistoryService {
       const formattedReportings = reportingSearch
         .map((rs: CLXReportingSearch): TransactionData | null => {
           try {
-            return this.formatReportingSearch(rs);
+            return {
+              ...this.formatReportingSearch(rs),
+              issuerBank: issuerInfo?.issuerName,
+              issuerCountry: issuerInfo?.issuerCountry,
+              issuerPhone: issuerInfo?.issuerPhone,
+            };
           } catch (error) {
             const logError = this.formatError(error);
             this.logger.error(
