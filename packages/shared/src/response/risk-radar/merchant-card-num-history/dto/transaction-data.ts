@@ -9,4 +9,7 @@ export type TransactionData = {
   cardNumber: string;
   debitNetworkIdentifier?: string;
   netDepositAmount?: number;
+  issuerBank?: string;
+  issuerCountry?: string;
+  issuerPhone?: string;
 };
