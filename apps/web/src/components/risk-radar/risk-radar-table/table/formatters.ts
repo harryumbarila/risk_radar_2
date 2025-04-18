@@ -4,6 +4,7 @@ import { formatInTimeZone } from 'date-fns-tz';
 import {
   DEFAULT_BLANK_VALUE,
   DEFAULT_NO_VALUE,
+  DEFAULT_TIME_ZONE,
   DEFAULT_YES_VALUE,
   DEFAULT_ZERO_VALUE,
 } from './default-values';
@@ -59,11 +60,15 @@ export const parseDate = (value: unknown): Date | null => {
 export const formatDate = (value: unknown): string => {
   const parsedDate = parseDate(value);
   if (!parsedDate || !isValid(parsedDate)) return DEFAULT_BLANK_VALUE;
-  return formatInTimeZone(parsedDate, 'UTC', 'MM/dd/yyyy hh:mm:ss a');
+  return formatInTimeZone(
+    parsedDate,
+    DEFAULT_TIME_ZONE,
+    'MM/dd/yyyy hh:mm:ss a'
+  );
 };
 
 export const formatDateWithoutTime = (value: unknown): string => {
   const parsedDate = parseDate(value);
   if (!parsedDate || !isValid(parsedDate)) return DEFAULT_BLANK_VALUE;
-  return formatInTimeZone(parsedDate, 'UTC', 'MM/dd/yyyy');
+  return formatInTimeZone(parsedDate, DEFAULT_TIME_ZONE, 'MM/dd/yyyy');
 };
