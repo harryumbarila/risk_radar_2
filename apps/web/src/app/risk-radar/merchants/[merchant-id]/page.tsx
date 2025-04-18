@@ -407,10 +407,23 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     (data?.processingSummaries?.length || 0) / ITEMS_PER_PAGE
   );
 
-  // Calculate pagination values
+  // Calculate pagination values with strict enforcement
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
+  const endIndex = Math.min(
+    startIndex + itemsPerPage,
+    cardNumberData?.length || 0
+  );
   const currentItems = cardNumberData?.slice(startIndex, endIndex) || [];
+
+  // Calculate total pages
+  const totalPages = Math.ceil((cardNumberData?.length || 0) / itemsPerPage);
+
+  // Ensure currentPage stays within bounds
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(Math.max(1, totalPages));
+    }
+  }, [currentPage, totalPages]);
 
   // Calculate paginated data for same tax ID merchants
   const paginatedSameTaxIdMerchants =
@@ -803,7 +816,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     Issuer Bank:
                   </p>
                   <p className="text-sm text-black dark:text-white">
-                    {cardHistory[0]?.issuerBank || 'N/A'}
+                    {cardHistory[0]?.issuerBank || ''}
                   </p>
                 </div>
                 <div>
@@ -811,7 +824,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     Issuer Country:
                   </p>
                   <p className="text-sm text-black dark:text-white">
-                    {cardHistory[0]?.issuerCountry || 'N/A'}
+                    {cardHistory[0]?.issuerCountry || ''}
                   </p>
                 </div>
                 <div>
@@ -819,7 +832,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     Issuer Phone:
                   </p>
                   <p className="text-sm text-black dark:text-white">
-                    {cardHistory[0]?.issuerPhone || 'N/A'}
+                    {cardHistory[0]?.issuerPhone || ''}
                   </p>
                 </div>
               </div>
@@ -866,40 +879,44 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                       </tr>
                     </thead>
                     <tbody>
-                      {currentItems.map((card: CardHistory) => (
-                        <tr key={`${card.mid}-${card.transactionDate}`}>
-                          <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                            {card.mid}
-                          </td>
-                          <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                            {formatDateWithoutTime(card.transactionDate)}
-                          </td>
-                          <td className="border-b border-[#eee] p-4 dark:border-strokedark text-right text-black dark:text-white">
-                            ${card.amount.toFixed(2)}
-                          </td>
-                          <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                            {card.posEntryMode}
-                          </td>
-                          <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                            {card.avsResponseCode}
-                          </td>
-                          <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                            {card.authCode}
-                          </td>
-                          <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                            {card.cardNumber}
-                          </td>
-                          <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                            {card.debitNetworkIdentifier || ''}
-                          </td>
-                          <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                            {formatDateWithoutTime(card.transmissionDate)}
-                          </td>
-                          <td className="border-b border-[#eee] p-4 dark:border-strokedark text-right text-black dark:text-white">
-                            ${card.netDepositAmount.toFixed(2)}
-                          </td>
-                        </tr>
-                      ))}
+                      {currentItems.map((card: CardHistory, index: number) => {
+                        // Create a unique identifier using multiple fields and index
+                        const uniqueId = `${card.mid}-${card.transactionDate}-${card.cardNumber}-${card.amount}-${index}`;
+                        return (
+                          <tr key={uniqueId} className="text-center">
+                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                              {card.mid}
+                            </td>
+                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                              {formatDateWithoutTime(card.transactionDate)}
+                            </td>
+                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-right text-black dark:text-white">
+                              ${card.amount.toFixed(2)}
+                            </td>
+                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                              {card.posEntryMode}
+                            </td>
+                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                              {card.avsResponseCode}
+                            </td>
+                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                              {card.authCode}
+                            </td>
+                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                              {card.cardNumber}
+                            </td>
+                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                              {card.debitNetworkIdentifier || ''}
+                            </td>
+                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                              {formatDateWithoutTime(card.transmissionDate)}
+                            </td>
+                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-right text-black dark:text-white">
+                              ${card.netDepositAmount.toFixed(2)}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -907,13 +924,14 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               {/* Pagination */}
               <div className="flex items-center justify-between p-4 border-t border-stroke dark:border-strokedark">
                 <div className="text-sm text-black dark:text-white">
-                  Showing {startIndex + 1} to {endIndex} of {cardHistory.length}{' '}
-                  entries
+                  Showing {Math.min(cardHistory?.length || 0, startIndex + 1)}{' '}
+                  to {Math.min(cardHistory?.length || 0, endIndex)} of{' '}
+                  {cardHistory?.length || 0} entries
                 </div>
                 <div className="flex space-x-2">
                   <button
                     type="button"
-                    onClick={() => setCurrentPage(currentPage - 1)}
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                     disabled={currentPage === 1}
                     className="rounded-md border border-stroke px-4 py-2 text-sm font-medium text-black disabled:opacity-50 dark:border-strokedark dark:text-white"
                   >
@@ -921,8 +939,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                    disabled={endIndex === cardHistory.length}
+                    onClick={() =>
+                      setCurrentPage(Math.min(totalPages, currentPage + 1))
+                    }
+                    disabled={currentPage >= totalPages}
                     className="rounded-md border border-stroke px-4 py-2 text-sm font-medium text-black disabled:opacity-50 dark:border-strokedark dark:text-white"
                   >
                     Next
