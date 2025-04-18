@@ -803,7 +803,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     Issuer Bank:
                   </p>
                   <p className="text-sm text-black dark:text-white">
-                    {cardHistory[0]?.issuerBank || 'N/A'}
+                    {cardHistory[0]?.issuerBank || ''}
                   </p>
                 </div>
                 <div>
@@ -811,7 +811,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     Issuer Country:
                   </p>
                   <p className="text-sm text-black dark:text-white">
-                    {cardHistory[0]?.issuerCountry || 'N/A'}
+                    {cardHistory[0]?.issuerCountry || ''}
                   </p>
                 </div>
                 <div>
@@ -819,7 +819,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     Issuer Phone:
                   </p>
                   <p className="text-sm text-black dark:text-white">
-                    {cardHistory[0]?.issuerPhone || 'N/A'}
+                    {cardHistory[0]?.issuerPhone || ''}
                   </p>
                 </div>
               </div>
