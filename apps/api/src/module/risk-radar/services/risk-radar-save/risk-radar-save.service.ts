@@ -92,7 +92,7 @@ export class RiskRadarSaveService {
 
       // Only fetch exception data if we're changing exception status
       let exceptionJeff: RiskRadarExceptionsJeffEntity | null = null;
-      if (clickedStatus !== undefined) {
+      if (clickedStatus !== undefined && exceptionId) {
         this.logger.log(
           `Step 2: Fetching exception data for exceptionId: ${exceptionId}`
         );

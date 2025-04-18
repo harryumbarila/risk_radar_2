@@ -13,7 +13,8 @@ export class RiskRadarSaveInputDto {
   public merchantId: string;
 
   @IsInt()
-  public exceptionId: number;
+  @IsOptional()
+  public exceptionId?: number;
 
   @IsOptional()
   @IsBoolean()
