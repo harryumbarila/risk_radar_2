@@ -824,7 +824,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                 </div>
               </div>
               <div className="p-4 border-b border-stroke dark:border-strokedark">
-                <h3 className="text-lg font-semibold text-black dark:text-white">Card # History</h3>
+                <h3 className="text-lg font-semibold text-black dark:text-white">
+                  Card # History
+                </h3>
               </div>
               <div className="flex-1 overflow-hidden">
                 <div className="h-full overflow-y-auto">
