@@ -791,88 +791,120 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       <Popup
         isOpen={isPopupActive}
         onClose={() => setIsPopupActive(false)}
-        title={activePopup == PopupType.Email ? 'Send Email' : 'Card # History'}
+        title={activePopup == PopupType.Email ? 'Send Email' : ''}
       >
         {activePopup == PopupType.CardHistory ? (
-          <div className="grid grid-cols-1 gap-4">
-            <div className="max-w-full overflow-hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-              <div className="max-h-[600px] overflow-x-auto">
-                <table className="w-full table-auto">
-                  <thead>
-                    <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                      <th className="min-w-[100px] p-4 font-medium text-black dark:text-white">
-                        MID
-                      </th>
-                      <th className="min-w-[120px] p-4 font-medium text-black dark:text-white">
-                        Trans Date
-                      </th>
-                      <th className="min-w-[100px] p-4 font-medium text-black dark:text-white">
-                        Amount
-                      </th>
-                      <th className="min-w-[80px] p-4 font-medium text-black dark:text-white">
-                        POS
-                      </th>
-                      <th className="min-w-[60px] p-4 font-medium text-black dark:text-white">
-                        AVS
-                      </th>
-                      <th className="min-w-[100px] p-4 font-medium text-black dark:text-white">
-                        Auth Code
-                      </th>
-                      <th className="min-w-[120px] p-4 font-medium text-black dark:text-white">
-                        Card #
-                      </th>
-                      <th className="min-w-[100px] p-4 font-medium text-black dark:text-white">
-                        DB Net
-                      </th>
-                      <th className="min-w-[120px] p-4 font-medium text-black dark:text-white">
-                        Trans. Date
-                      </th>
-                      <th className="min-w-[100px] p-4 font-medium text-black dark:text-white">
-                        Net Amt
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentItems.map((card: CardHistory) => (
-                      <tr key={`${card.mid}-${card.transactionDate}`}>
-                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
-                          {card.mid}
-                        </td>
-                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
-                          {formatDate(card.transactionDate)}
-                        </td>
-                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
-                          ${card.amount.toFixed(2)}
-                        </td>
-                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
-                          {card.posEntryMode}
-                        </td>
-                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
-                          {card.avsResponseCode}
-                        </td>
-                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
-                          {card.authCode}
-                        </td>
-                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
-                          {card.cardNumber}
-                        </td>
-                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
-                          {card.debitNetworkIdentifier || '-'}
-                        </td>
-                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
-                          {formatDate(card.transmissionDate)}
-                        </td>
-                        <td className="border-b border-[#eee] p-4 dark:border-strokedark">
-                          ${card.netDepositAmount.toFixed(2)}
-                        </td>
+          <div className="h-full">
+            <div className="max-w-full h-full flex flex-col bg-white dark:bg-boxdark">
+              {/* Issuer Information */}
+              <div className="grid grid-cols-3 gap-4 p-4 border-b border-stroke dark:border-strokedark">
+                <div>
+                  <p className="text-sm font-semibold text-black dark:text-white">
+                    Issuer Bank:
+                  </p>
+                  <p className="text-sm text-black dark:text-white">
+                    {cardHistory[0]?.issuerBank || 'N/A'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-black dark:text-white">
+                    Issuer Country:
+                  </p>
+                  <p className="text-sm text-black dark:text-white">
+                    {cardHistory[0]?.issuerCountry || 'N/A'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-black dark:text-white">
+                    Issuer Phone:
+                  </p>
+                  <p className="text-sm text-black dark:text-white">
+                    {cardHistory[0]?.issuerPhone || 'N/A'}
+                  </p>
+                </div>
+              </div>
+              <div className="p-4 border-b border-stroke dark:border-strokedark">
+                <h3 className="text-lg font-semibold text-black dark:text-white">Card # History</h3>
+              </div>
+              <div className="flex-1 overflow-hidden">
+                <div className="h-full overflow-y-auto">
+                  <table className="w-full table-auto">
+                    <thead className="sticky top-0 bg-gray-100 dark:bg-meta-4">
+                      <tr>
+                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                          MID
+                        </th>
+                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                          Trans Date
+                        </th>
+                        <th className="p-4 py-1 font-medium text-black dark:text-white text-right">
+                          Trans Amt
+                        </th>
+                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                          POS
+                        </th>
+                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                          AVS
+                        </th>
+                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                          Auth Code
+                        </th>
+                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                          Card #
+                        </th>
+                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                          DB Net
+                        </th>
+                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                          Transmission Date
+                        </th>
+                        <th className="p-4 py-1 font-medium text-black dark:text-white text-right">
+                          Net Dep. Amt
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {currentItems.map((card: CardHistory) => (
+                        <tr key={`${card.mid}-${card.transactionDate}`}>
+                          <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                            {card.mid}
+                          </td>
+                          <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                            {formatDateWithoutTime(card.transactionDate)}
+                          </td>
+                          <td className="border-b border-[#eee] p-4 dark:border-strokedark text-right text-black dark:text-white">
+                            ${card.amount.toFixed(2)}
+                          </td>
+                          <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                            {card.posEntryMode}
+                          </td>
+                          <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                            {card.avsResponseCode}
+                          </td>
+                          <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                            {card.authCode}
+                          </td>
+                          <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                            {card.cardNumber}
+                          </td>
+                          <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                            {card.debitNetworkIdentifier || ''}
+                          </td>
+                          <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                            {formatDateWithoutTime(card.transmissionDate)}
+                          </td>
+                          <td className="border-b border-[#eee] p-4 dark:border-strokedark text-right text-black dark:text-white">
+                            ${card.netDepositAmount.toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
               {/* Pagination */}
-              <div className="flex items-center justify-between border-t border-stroke p-4 dark:border-strokedark">
-                <div className="text-sm text-gray-500 dark:text-gray-400">
+              <div className="flex items-center justify-between p-4 border-t border-stroke dark:border-strokedark">
+                <div className="text-sm text-black dark:text-white">
                   Showing {startIndex + 1} to {endIndex} of {cardHistory.length}{' '}
                   entries
                 </div>
