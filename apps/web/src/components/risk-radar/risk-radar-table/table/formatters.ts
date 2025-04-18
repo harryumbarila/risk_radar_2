@@ -57,14 +57,11 @@ export const parseDate = (value: unknown): Date | null => {
   return parsedDate;
 };
 
-export const formatDate = (value: unknown): string => {
-  const parsedDate = parseDate(value);
-  if (!parsedDate || !isValid(parsedDate)) return DEFAULT_BLANK_VALUE;
-  return formatInTimeZone(
-    parsedDate,
-    DEFAULT_TIME_ZONE,
-    'MM/dd/yyyy hh:mm:ss a'
-  );
+export const formatDate = (value?: Date | string): string => {
+  if (value === undefined || value === null) return DEFAULT_BLANK_VALUE;
+  // const parsedDate = parseDate(value);
+  // if (!parsedDate || !isValid(parsedDate)) return DEFAULT_BLANK_VALUE;
+  return formatInTimeZone(value, DEFAULT_TIME_ZONE, 'MM/dd/yyyy hh:mm:ss a');
 };
 
 export const formatDateWithoutTime = (value: unknown): string => {
