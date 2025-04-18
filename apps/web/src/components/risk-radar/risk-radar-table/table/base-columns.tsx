@@ -23,7 +23,7 @@ export const baseColumns = [
   columnHelper.accessor(
     (row) => row.sDBA || row.leadName || DEFAULT_BLANK_VALUE,
     {
-      id: 'dba',
+      id: 'sDBA',
       header: 'DBA',
     }
   ),

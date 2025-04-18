@@ -15,7 +15,7 @@ export const ExceptionTypeCard: FC<Props> = ({ exceptionTypes }) => {
   const { control } = useFormContext<RiskRadarFilterState>();
 
   return (
-    <RiskRadarCard title="Exception Type">
+    <RiskRadarCard>
       <ExceptionTypesSelect
         control={control}
         name="categories"

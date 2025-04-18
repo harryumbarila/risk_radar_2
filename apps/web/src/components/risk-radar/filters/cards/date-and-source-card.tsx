@@ -17,22 +17,32 @@ export const DateAndSourceCard: FC<DateAndSourceCardProps> = ({ systems }) => {
   const {
     register,
     control,
+    watch,
     formState: { errors },
   } = useFormContext<RiskRadarFilterState>();
 
+  const startDate = watch('startDate');
   return (
-    <RiskRadarCard title="Exception Date And Source">
+    <RiskRadarCard>
       <div className="flex flex-row gap-4 w-full max-2xl:flex-col mb-4">
         <DateInput
           {...register('startDate', { required: 'Start date is required' })}
-          label="Start Date"
+          label="Exception Start Date"
           className="w-1/2 max-2xl:w-full"
           error={errors.startDate?.message}
         />
         <DateInput
-          {...register('endDate', { required: 'End date is required' })}
-          label="End Date"
+          {...register('endDate', {
+            required: 'End date is required',
+            min: {
+              value: startDate,
+              message: 'End date must be after start date',
+            },
+          })}
+          label="Exception End Date"
           className="w-1/2 max-2xl:w-full"
+          disabled={!startDate}
+          min={startDate}
           error={errors.endDate?.message}
         />
       </div>

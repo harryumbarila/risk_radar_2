@@ -8,8 +8,8 @@
 import { Breadcrumb, Loader } from '@denali/ui';
 import { useAuth } from '@frontegg/nextjs';
 import classNames from 'classnames';
-import dayjs from 'dayjs';
-import { notFound } from 'next/navigation';
+import { format } from 'date-fns';
+import { notFound, useSearchParams } from 'next/navigation';
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -155,7 +155,12 @@ type ChangedFields = {
 };
 
 const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
-  const { 'merchant-id': merchantId, 'exception-id': exceptionId } = params;
+  const { 'merchant-id': merchantId } = params;
+
+  const searchParams = useSearchParams();
+
+  const exceptionId = searchParams?.get('exceptionId') || '';
+
   const { user } = useAuth();
   const itemsPerPage = 10;
 
@@ -221,7 +226,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
   // Always call hooks but with conditional parameters
   const { data: transactionExceptionsData } = useTransactionExceptions(
-    activeTab === 'exceptions' ? exceptionId : null
+    activeTab === 'exceptions' && exceptionId ? exceptionId : null
   );
 
   const { data: merchantNotesData, refetch: notesRefetch } = useMerchantNotes(
@@ -634,7 +639,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     let newTemplate = templateText;
     newTemplate = newTemplate.replaceAll(
       '@dtTransDate',
-      dayjs(currentTransException.transactionDate).format('MM/DD/YYYY') // display
+      format(currentTransException.transactionDate, 'MM/dd/yyyy')
     );
 
     newTemplate = newTemplate.replaceAll(
@@ -1238,8 +1243,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             'inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
             {
               '!opacity-100': activeTab === 'exceptions',
+              '!cursor-not-allowed': !exceptionId,
             }
           )}
+          disabled={!exceptionId}
           type="button"
           onClick={() => {
             setActiveTab('exceptions');
@@ -1247,6 +1254,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         >
           Exceptions
         </button>
+
         <button
           className={classNames(
             'inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
