@@ -1,4 +1,6 @@
+import { ArrowUturnLeftIcon } from '@heroicons/react/24/solid';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type { FC } from 'react';
 
 type BreadcrumbProps = {
@@ -7,12 +9,18 @@ type BreadcrumbProps = {
 };
 
 export const Breadcrumb: FC<BreadcrumbProps> = ({ pageName, extra }) => {
+  const router = useRouter();
   return (
     <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <h2 className="text-title-md2 font-semibold text-black dark:text-white">
-        {pageName}
-        {extra && ` - ${extra}`}
-      </h2>
+      <div className="flex items-center gap-2">
+        <button type="button" className="size-6" onClick={() => router.back()}>
+          <ArrowUturnLeftIcon />
+        </button>
+        <h2 className="text-title-md2 font-semibold text-black dark:text-white">
+          {pageName}
+          {extra && ` - ${extra}`}
+        </h2>
+      </div>
 
       <nav>
         <ol className="flex items-center gap-2">
