@@ -58,10 +58,15 @@ export const parseDate = (value: unknown): Date | null => {
 };
 
 export const formatDate = (value?: Date | string): string => {
-  if (value === undefined || value === null) return DEFAULT_BLANK_VALUE;
-  // const parsedDate = parseDate(value);
-  // if (!parsedDate || !isValid(parsedDate)) return DEFAULT_BLANK_VALUE;
-  return formatInTimeZone(value, DEFAULT_TIME_ZONE, 'MM/dd/yyyy hh:mm:ss a');
+  try {
+    // const parsedDate = parseDate(value);
+    // if (!parsedDate || !isValid(parsedDate)) return DEFAULT_BLANK_VALUE;
+    if (!value) return DEFAULT_BLANK_VALUE;
+
+    return formatInTimeZone(value, DEFAULT_TIME_ZONE, 'MM/dd/yyyy hh:mm:ss a');
+  } catch (error) {
+    return DEFAULT_BLANK_VALUE;
+  }
 };
 
 export const formatDateWithoutTime = (value: unknown): string => {
