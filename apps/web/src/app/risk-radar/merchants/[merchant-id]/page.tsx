@@ -800,7 +800,11 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
   return (
     <DefaultLayout>
-      <Breadcrumb pageName="Merchant profile" extra={`MID: ${merchantId}`} />
+      <Breadcrumb
+        pageName="Merchant profile"
+        extra={`MID: ${merchantId}`}
+        enableBackButton
+      />
       <Popup
         isOpen={isPopupActive}
         onClose={() => setIsPopupActive(false)}
