@@ -145,6 +145,8 @@ export class RiskRadarNotesRepository extends Repository<RiskRadarNotesEntity> {
       userCreated,
       notes,
       notesTypeId: 5,
+      irisMemoRequestDate: () => 'GETDATE()',
+      irisMemoRequestFulfilledDate: () => 'GETDATE()',
     });
   }
 
