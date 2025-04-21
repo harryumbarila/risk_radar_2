@@ -1570,13 +1570,17 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                       <tr
                         // eslint-disable-next-line react/no-array-index-key
                         key={`${exception.transactionId}-${index}`}
-                        className="text-left"
+                        className="text-center"
                       >
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                          {formatDate(exception.transactionDate)}
+                          <span className="block text-left">
+                            {formatDate(exception.transactionDate)}
+                          </span>
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                          ${exception.authAmount}
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
+                          <span className="block text-right">
+                            ${exception.authAmount}
+                          </span>
                         </td>
                         <td
                           className="border-b border-[#eee] px-4 py-2 dark:border-strokedark"
@@ -1586,7 +1590,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                             setCurrentTransException(exception);
                           }}
                         >
-                          ${exception.transactionAmount}
+                          <span className="block text-right">
+                            ${exception.transactionAmount}
+                          </span>
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {exception.posEntryMode}
@@ -1605,8 +1611,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                             setActivePopup(PopupType.CardHistory);
                           }}
                         >
-                          {exception.cardNumber}{' '}
-                          {exception.transactionId?.slice(-4)}
+                          <span className="block text-left">
+                            {exception.cardNumber}{' '}
+                            {exception.transactionId?.slice(-4)}
+                          </span>
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {exception.debitNetworkIdentifier}
