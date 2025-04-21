@@ -135,19 +135,28 @@ export class RiskRadarNotesRepository extends Repository<RiskRadarNotesEntity> {
     mid: string,
     isDiverted: boolean,
     userCreated: string
-  ): Promise<void> {
+  ): Promise<number> {
     const notes = isDiverted
       ? 'Account put on divert'
       : 'Account removed from divert';
 
-    await this.insert({
+    const result = await this.insert({
       mid,
       userCreated,
       notes,
       notesTypeId: 5,
-      irisMemoRequestDate: () => 'GETDATE()',
-      irisMemoRequestFulfilledDate: () => 'GETDATE()',
     });
+
+    // Helper function to safely get a number
+    const toNumber = (value: unknown): number | undefined => {
+      return typeof value === 'number' ? value : undefined;
+    };
+
+    const id = toNumber(result.identifiers[0]?.id);
+    if (id === undefined) {
+      throw new Error('Failed to get ID of inserted note');
+    }
+    return id;
   }
 
   public async getNotesByMid(mid: string): Promise<RiskRadarNote[]> {

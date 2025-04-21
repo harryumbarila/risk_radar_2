@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 
+import { PushNoteToIrisService } from '@/api/module/risk-radar/services/push-note-to-iris/push-note-to-iris.service';
 import { DSMSalesConfirmationRepository } from '@/dsm-db/repositories';
 import { EZEnrollGenAccountRepository } from '@/ez-enroll-db/repositories';
 import { EZEnrollPccGenAccountRepository } from '@/ez-enroll-pcc-db/repositories';
@@ -41,7 +42,8 @@ export class RiskRadarSaveService {
     private readonly ezEnrollGenAccountRepository: EZEnrollGenAccountRepository,
     private readonly ezEnrollPccGenAccountRepository: EZEnrollPccGenAccountRepository,
     private readonly dsmSalesConfirmationRepository: DSMSalesConfirmationRepository,
-    private readonly snapSalesConfirmationRepository: SnapPccSalesConfirmationRepository
+    private readonly snapSalesConfirmationRepository: SnapPccSalesConfirmationRepository,
+    private readonly pushNoteToIrisService: PushNoteToIrisService
   ) {}
 
   public async saveRiskRadar(data: RiskRadarSaveInputDto) {
@@ -261,12 +263,31 @@ export class RiskRadarSaveService {
             `Divert status changed from ${merchAdj.isDivert} to ${isDiverted}`
           );
           try {
-            await this.notesRepository.createDivertChangedNotes(
-              merchantId,
-              isDiverted,
-              createdBy
-            );
-            this.logger.log(`Divert changed notes created successfully`);
+            // Create divert notes and get the note ID
+            let noteId: number;
+            try {
+              noteId = await this.notesRepository.createDivertChangedNotes(
+                merchantId,
+                isDiverted,
+                createdBy
+              );
+
+              // Push the divert change note to IRIS with the note ID
+              await this.pushNoteToIrisService.pushDivertChangeToIris(
+                merchantId,
+                isDiverted,
+                createdBy,
+                noteId
+              );
+
+              this.logger.log(`Divert changed notes created successfully`);
+            } catch (error: unknown) {
+              const typedError = error as ErrorWithMessage;
+              this.logger.error(
+                `Error creating Divert changed notes: ${typedError.message}`
+              );
+              throw error;
+            }
           } catch (error: unknown) {
             const typedError = error as ErrorWithMessage;
             this.logger.error(
