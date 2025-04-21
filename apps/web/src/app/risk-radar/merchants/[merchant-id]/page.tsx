@@ -203,7 +203,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const [changedFields, setChangedFields] = useState<ChangedFields>({});
 
   // Move activeTab state declaration to before it's used
-  const [activeTab, setActiveTab] = useState<string>('contact');
+  const [activeTab, setActiveTab] = useState<string>('exceptions');
 
   // Add tab-specific loading states
   const [isExceptionsLoading, setIsExceptionsLoading] =
@@ -1566,7 +1566,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                       <tr
                         // eslint-disable-next-line react/no-array-index-key
                         key={`${exception.transactionId}-${index}`}
-                        className="text-center"
+                        className="text-left"
                       >
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {formatDate(exception.transactionDate)}
