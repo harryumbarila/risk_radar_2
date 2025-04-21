@@ -1,6 +1,9 @@
+'use client';
+
 import type { CellContext, HeaderContext } from '@tanstack/react-table';
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import classNames from 'classnames';
+import { useRouter } from 'next/navigation';
 import type { FC, ReactNode } from 'react';
 import { useMemo } from 'react';
 
@@ -34,6 +37,8 @@ export const TableBody: FC<Props> = ({
   sortDirection,
   onSort,
 }) => {
+  const router = useRouter();
+
   // As we have a lot of columns if there is no data we hide them to see the not data available message
   const columnsToRender = dataStatus || !exceptionList.length ? [] : columns;
   const goToMerchantDetails = (
@@ -41,9 +46,8 @@ export const TableBody: FC<Props> = ({
     exceptionId?: number
   ): void => {
     if (merchantId) {
-      window.open(
-        `/risk-radar/merchants/${merchantId}${exceptionId ? `?exceptionId=${exceptionId}` : ''}`,
-        '_blank'
+      router.push(
+        `/risk-radar/merchants/${merchantId}${exceptionId ? `?exceptionId=${exceptionId}` : ''}`
       );
     }
   };

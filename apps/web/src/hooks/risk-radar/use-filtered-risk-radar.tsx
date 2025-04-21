@@ -6,7 +6,7 @@ import type {
   RiskRadarExceptionsListRow,
   RiskRadarFilterState,
 } from '@/shared/response';
-import { defaultRiskRadarFilters } from '@/shared/response/risk-radar/exception-list/filter-state';
+import { useRiskRadarFilterStore } from '@/stores/risk-radar-filter';
 
 export type UseFilteredRiskRadarReturnType = {
   filters: RiskRadarFilterState;
@@ -20,9 +20,7 @@ export type UseFilteredRiskRadarReturnType = {
 export const useFilteredRiskRadar = (): UseFilteredRiskRadarReturnType => {
   const { makeRequest } = useBaseApi();
 
-  const [filters, setFilters] = useState<RiskRadarFilterState>(
-    defaultRiskRadarFilters
-  );
+  const { filters, setFilters } = useRiskRadarFilterStore();
 
   const [data, setData] =
     useState<PaginatedAPIResponse<RiskRadarExceptionsListRow> | null>(null);
@@ -52,9 +50,7 @@ export const useFilteredRiskRadar = (): UseFilteredRiskRadarReturnType => {
   ): Promise<void> => {
     setIsLoading(true);
     try {
-      const queryParams = createQuery(
-        filtersToApply ?? defaultRiskRadarFilters
-      );
+      const queryParams = createQuery(filtersToApply ?? filters);
 
       const result = await makeRequest<
         PaginatedAPIResponse<RiskRadarExceptionsListRow>
