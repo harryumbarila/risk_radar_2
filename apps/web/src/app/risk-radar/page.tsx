@@ -2,7 +2,7 @@
 
 import { Breadcrumb } from '@denali/ui';
 import type { FC } from 'react';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { DefaultLayout } from '@/components/layouts/default-layout';
 import { RiskRadarFilters } from '@/components/risk-radar/filters';
@@ -12,6 +12,11 @@ import { RiskRadarTable } from '@/web/src/components/risk-radar/risk-radar-table
 
 const RiskRadar: FC = () => {
   const { data, isLoading, error, fetchData, filters } = useFilteredRiskRadar();
+
+  useEffect(() => {
+    fetchData(filters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const status = useMemo<CommonStatus | undefined>(() => {
     if (isLoading) return 'loading';
