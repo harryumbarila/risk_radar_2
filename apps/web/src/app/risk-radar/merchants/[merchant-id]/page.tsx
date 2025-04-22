@@ -743,7 +743,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       setIsSendingEmail(false);
     }
   };
-
   if (!merchantId) {
     notFound();
   }
@@ -1132,11 +1131,19 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <strong>Net Balance:</strong>
             </p>
             <p>
-              {formatCurrency(
-                merchantContactInfo?.netSettlementBalance || 0,
-                2,
-                true
-              )}
+              <span
+                className={`${
+                  merchantContactInfo!.netSettlementBalance >= 0
+                    ? 'text-black dark:text-white font-bold'
+                    : 'text-red-500 dark:text-red-400'
+                }`}
+              >
+                {formatCurrency(
+                  merchantContactInfo?.netSettlementBalance || 0,
+                  2,
+                  true
+                )}
+              </span>
             </p>
           </div>
         </div>
