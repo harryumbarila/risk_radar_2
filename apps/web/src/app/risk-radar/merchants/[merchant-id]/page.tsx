@@ -1574,7 +1574,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                       >
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           <span className="block text-left">
-                            {formatDate(exception.transactionDate)}
+                            {formatDate(
+                              exception.transactionDate,
+                              'MM/dd/yyyy kk:mm:ss'
+                            )}
                           </span>
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
