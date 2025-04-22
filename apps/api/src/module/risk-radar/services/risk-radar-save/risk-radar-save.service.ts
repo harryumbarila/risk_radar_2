@@ -274,7 +274,7 @@ export class RiskRadarSaveService {
                 { merchantId, isDiverted, createdBy },
                 'Calling notesRepository.createDivertChangedNotes'
               );
-              
+
               const startTime = Date.now();
               noteId = await this.notesRepository.createDivertChangedNotes(
                 merchantId,
@@ -282,7 +282,7 @@ export class RiskRadarSaveService {
                 createdBy
               );
               const duration = Date.now() - startTime;
-              
+
               this.logger.debug(
                 { merchantId, noteId, duration },
                 'Successfully created divert note'
@@ -293,7 +293,7 @@ export class RiskRadarSaveService {
                 { merchantId, noteId },
                 `Step 8b: Pushing divert change note to IRIS`
               );
-              
+
               const irisStartTime = Date.now();
               await this.pushNoteToIrisService.pushDivertChangeToIris(
                 merchantId,
@@ -302,7 +302,7 @@ export class RiskRadarSaveService {
                 noteId
               );
               const irisDuration = Date.now() - irisStartTime;
-              
+
               this.logger.debug(
                 { merchantId, noteId, irisDuration },
                 'Successfully pushed divert note to IRIS'
@@ -359,10 +359,15 @@ export class RiskRadarSaveService {
       // Create notes depending on received status - only if clickedStatus is provided
       if (clickedStatus !== undefined) {
         if (clickedStatus === 'rev') {
-          this.logger.log(`Step 10a: Processing review status for exception ${exceptionId}`);
-          
+          this.logger.log(
+            `Step 10a: Processing review status for exception ${exceptionId}`
+          );
+
           // Check if this exception was recently reviewed by someone else
-          if (exceptionJeff.exceptionStatusId === 2 && exceptionJeff.userReviewed) {
+          if (
+            exceptionJeff.exceptionStatusId === 2 &&
+            exceptionJeff.userReviewed
+          ) {
             this.logger.warn(
               `Exception ${exceptionId} was already reviewed by ${exceptionJeff.userReviewed}. 
               Rejecting duplicate review attempt by ${createdBy}.`
@@ -371,11 +376,12 @@ export class RiskRadarSaveService {
               `This exception was already reviewed by ${exceptionJeff.userReviewed}. Only the first review is accepted.`
             );
           }
-          
+
           // Add an in-memory lock to prevent concurrent reviews of the same exception
           const reviewKey = `exception-${exceptionId}`;
           if (RiskRadarSaveService.inProgressReviews.has(reviewKey)) {
-            const currentReviewer = RiskRadarSaveService.inProgressReviews.get(reviewKey);
+            const currentReviewer =
+              RiskRadarSaveService.inProgressReviews.get(reviewKey);
             this.logger.warn(
               `Exception ${exceptionId} is currently being reviewed by ${currentReviewer}. 
               Rejecting concurrent review attempt by ${createdBy}.`
@@ -384,18 +390,24 @@ export class RiskRadarSaveService {
               `This exception is currently being reviewed by ${currentReviewer}. Please try again later.`
             );
           }
-          
+
           try {
             // Set the lock
             RiskRadarSaveService.inProgressReviews.set(reviewKey, createdBy);
-            this.logger.debug(`Lock acquired for exception ${exceptionId} by ${createdBy}`);
-            
+            this.logger.debug(
+              `Lock acquired for exception ${exceptionId} by ${createdBy}`
+            );
+
             // Double-check the database for most current state before proceeding
             const freshException = await this.exceptionsJeffRepository.findOne({
-              where: { id: exceptionId }
+              where: { id: exceptionId },
             });
-            
-            if (freshException && freshException.exceptionStatusId === 2 && freshException.userReviewed) {
+
+            if (
+              freshException &&
+              freshException.exceptionStatusId === 2 &&
+              freshException.userReviewed
+            ) {
               this.logger.warn(
                 `Exception ${exceptionId} was already reviewed by ${freshException.userReviewed}. 
                 Detected during lock check. Rejecting review attempt by ${createdBy}.`
@@ -404,17 +416,21 @@ export class RiskRadarSaveService {
                 `This exception was already reviewed by ${freshException.userReviewed}. Only the first review is accepted.`
               );
             }
-            
+
             exceptionJeff.exceptionStatusId = 2;
             exceptionJeff.userReviewed = createdBy;
 
             await this.notesRepository.createReviewNotes(merchantId, createdBy);
-            this.logger.log(`Review notes created successfully for exception ${exceptionId}`);
-            
+            this.logger.log(
+              `Review notes created successfully for exception ${exceptionId}`
+            );
+
             // Explicitly save the exception data immediately to prevent race conditions
             this.logger.log(`Saving exception data for ${exceptionId}`);
             await this.exceptionsJeffRepository.save(exceptionJeff);
-            this.logger.log(`Exception data saved successfully for ${exceptionId}`);
+            this.logger.log(
+              `Exception data saved successfully for ${exceptionId}`
+            );
           } finally {
             // Always release the lock, even if an error occurs
             RiskRadarSaveService.inProgressReviews.delete(reviewKey);
