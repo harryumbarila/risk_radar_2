@@ -203,7 +203,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const [changedFields, setChangedFields] = useState<ChangedFields>({});
 
   // Move activeTab state declaration to before it's used
-  const [activeTab, setActiveTab] = useState<string>('contact');
+  const [activeTab, setActiveTab] = useState<string>('exceptions');
 
   // Add tab-specific loading states
   const [isExceptionsLoading, setIsExceptionsLoading] =
@@ -800,7 +800,11 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
   return (
     <DefaultLayout>
-      <Breadcrumb pageName="Merchant profile" extra={`MID: ${merchantId}`} />
+      <Breadcrumb
+        pageName="Merchant profile"
+        extra={`MID: ${merchantId}`}
+        enableBackButton
+      />
       <Popup
         isOpen={isPopupActive}
         onClose={() => setIsPopupActive(false)}
@@ -1569,10 +1573,14 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                         className="text-center"
                       >
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                          {formatDate(exception.transactionDate)}
+                          <span className="block text-left">
+                            {formatDate(exception.transactionDate)}
+                          </span>
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                          ${exception.authAmount}
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
+                          <span className="block text-right">
+                            ${exception.authAmount}
+                          </span>
                         </td>
                         <td
                           className="border-b border-[#eee] px-4 py-2 dark:border-strokedark"
@@ -1582,7 +1590,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                             setCurrentTransException(exception);
                           }}
                         >
-                          ${exception.transactionAmount}
+                          <span className="block text-right">
+                            ${exception.transactionAmount}
+                          </span>
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {exception.posEntryMode}
@@ -1601,8 +1611,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                             setActivePopup(PopupType.CardHistory);
                           }}
                         >
-                          {exception.cardNumber}{' '}
-                          {exception.transactionId?.slice(-4)}
+                          <span className="block text-left">
+                            {exception.cardNumber}{' '}
+                            {exception.transactionId?.slice(-4)}
+                          </span>
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {exception.debitNetworkIdentifier}

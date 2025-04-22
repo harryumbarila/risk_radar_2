@@ -10,6 +10,7 @@
       "@/css/*": ["./src/css/*"],
       "@/components/*": ["./src/components/*"],
       "@/hooks/*": ["./src/hooks/*"],
+      "@/stores/*": ["./src/stores/*"],
       "@/types/*": ["./src/types/*"],
       "@/auth0-config": ["./src/auth0-config.ts"],
       "@/config/*": ["./src/config/*"],

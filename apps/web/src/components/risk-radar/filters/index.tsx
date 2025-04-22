@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import type { RiskRadarFilterState } from '@/shared/response';
-import { defaultRiskRadarFilters } from '@/shared/response';
+import { useRiskRadarFilterStore } from '@/stores/risk-radar-filter';
 import { useExceptionData } from '@/web/src/hooks/risk-radar/use-exception-data';
 
 import { DateAndSourceCard } from './cards/date-and-source-card';
@@ -13,6 +13,7 @@ export const RiskRadarFilters: FC<{
   onSubmit?: (data: RiskRadarFilterState) => void;
 }> = ({ onSubmit }) => {
   const { data: exceptionData } = useExceptionData();
+  const { filters } = useRiskRadarFilterStore();
 
   const exceptionTypes = exceptionData?.exception_type.map((type) => ({
     value: type.pk,
@@ -35,7 +36,7 @@ export const RiskRadarFilters: FC<{
   }));
 
   const methods = useForm<RiskRadarFilterState>({
-    defaultValues: defaultRiskRadarFilters,
+    defaultValues: filters,
     mode: 'onChange',
   });
 

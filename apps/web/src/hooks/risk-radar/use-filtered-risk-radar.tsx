@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import useBaseApi from '@/hooks/use-base-api';
 import type { PaginatedAPIResponse } from '@/shared/common';
@@ -6,7 +6,7 @@ import type {
   RiskRadarExceptionsListRow,
   RiskRadarFilterState,
 } from '@/shared/response';
-import { defaultRiskRadarFilters } from '@/shared/response/risk-radar/exception-list/filter-state';
+import { useRiskRadarFilterStore } from '@/stores/risk-radar-filter';
 
 export type UseFilteredRiskRadarReturnType = {
   filters: RiskRadarFilterState;
@@ -20,9 +20,7 @@ export type UseFilteredRiskRadarReturnType = {
 export const useFilteredRiskRadar = (): UseFilteredRiskRadarReturnType => {
   const { makeRequest } = useBaseApi();
 
-  const [filters, setFilters] = useState<RiskRadarFilterState>(
-    defaultRiskRadarFilters
-  );
+  const { filters, setFilters } = useRiskRadarFilterStore();
 
   const [data, setData] =
     useState<PaginatedAPIResponse<RiskRadarExceptionsListRow> | null>(null);
@@ -47,28 +45,27 @@ export const useFilteredRiskRadar = (): UseFilteredRiskRadarReturnType => {
     return urlQueryParams.toString();
   };
 
-  const fetchData = async (
-    filtersToApply: RiskRadarFilterState
-  ): Promise<void> => {
-    setIsLoading(true);
-    try {
-      const queryParams = createQuery(
-        filtersToApply ?? defaultRiskRadarFilters
-      );
+  const fetchData = useCallback(
+    async (filtersToApply: RiskRadarFilterState): Promise<void> => {
+      setIsLoading(true);
+      try {
+        const queryParams = createQuery(filtersToApply ?? filters);
 
-      const result = await makeRequest<
-        PaginatedAPIResponse<RiskRadarExceptionsListRow>
-      >(`/v1/risk-radar/exception-list?${queryParams}`);
+        const result = await makeRequest<
+          PaginatedAPIResponse<RiskRadarExceptionsListRow>
+        >(`/v1/risk-radar/exception-list?${queryParams}`);
 
-      setFilters(filtersToApply);
-      setData(result);
-      setError(null);
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        setFilters(filtersToApply);
+        setData(result);
+        setError(null);
+      } catch (err) {
+        setError(err as Error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [filters, makeRequest, setFilters]
+  );
 
   return { filters, setFilters, data, isLoading, error, fetchData };
 };
