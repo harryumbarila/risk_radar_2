@@ -1619,8 +1619,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           </span>
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
-                          <span className="block text-right">
-                            ${exception.authAmount}
+                          <span
+                            className={`block text-right ${exception.authAmount >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                          >
+                            {formatCurrency(exception.authAmount)}
                           </span>
                         </td>
                         <td
@@ -1637,8 +1639,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                             );
                           }}
                         >
-                          <span className="block text-right">
-                            ${exception.transactionAmount}
+                          <span
+                            className={`block text-right ${exception.transactionAmount >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                          >
+                            {formatCurrency(exception.transactionAmount)}
                           </span>
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
@@ -1648,7 +1652,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           {exception.avsResponseCode}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                          {exception.authCode}
+                          {exception.authCode || ''}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           <span className="block text-left">
