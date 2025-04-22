@@ -1752,7 +1752,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                               : 'text-black dark:text-white'
                           }`}
                         >
-                          {note.sNotes}
+                          {note.bPinnedNotes === '*'
+                            ? `*${note.sNotes}`
+                            : note.sNotes}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-center">
                           {formatDate(note.dtCreated)}
@@ -1813,7 +1815,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   />
                   <div className="flex items-center gap-4 shrink-0">
                     <label className="flex items-center gap-2 whitespace-nowrap">
-                      <span>Pinned</span>
+                      <span className="text-red-500 font-bold">* Pinned</span>
                       <input
                         type="checkbox"
                         id="pin"
