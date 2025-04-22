@@ -164,10 +164,14 @@ export class TsysExceptionTransactionService {
     batchIds: number[],
     binSearch?: string
   ): Promise<TransactionResult[]> {
+    if (batchIds.length === 0) {
+      return [];
+    }
     const transactions = await this.batchRepository
       .createQueryBuilder('b')
       .select([
         't.dtTrans AS transactionDate',
+        't.dTransAmt AS transactionAmount',
         't.sPOSEntryMode AS posEntryMode',
         'pos.sPOSEntryMode AS sPOSEntryMode',
         't.sAVSRespCode AS avsResponseCode',
@@ -205,13 +209,13 @@ export class TsysExceptionTransactionService {
 
     const transformed = transactions.map<TransactionResult>((t) => ({
       transactionDate: t.transactionDate,
-      transactionAmount: Number(t.dAuthAmt ?? 0),
-      posEntryMode: `${t.posEntryMode.slice(0, 2)} ${t.sPOSEntryMode}`.trim(),
+      transactionAmount: Number(t.transactionAmount ?? 0),
+      posEntryMode: `${t.posEntryMode?.slice(0, 2)} ${t.sPOSEntryMode}`.trim(),
       avsResponseCode: t.avsResponseCode ?? t.diavsResponseCode ?? '',
       authCode: String(t.authCode) ?? '',
       cardNumber: `${t.sCardNumF6}******${t.sCardNumL4}`,
       debitNetworkIdentifier: t.sDebitNetworkIdentifier ?? '',
-      transactionId: t.sTransID.slice(-4) ?? '',
+      transactionId: t.sTransID?.slice(-4) ?? '',
       authAmount: Number(t.dAuthAmt ?? 0),
       exceptionList: this.getExceptionList(t),
       exceptionTitle: this.getExceptionTitle(t),
@@ -272,12 +276,12 @@ export class TsysExceptionTransactionService {
     const transformed = transactions.map<TransactionResult>((t) => ({
       transactionDate: t.transactionDate,
       transactionAmount: Number(t.transamount ?? 0),
-      posEntryMode: `${t.posmode.slice(0, 2)} ${t.sPOSEntryMode}`.trim() ?? '',
+      posEntryMode: `${t.posmode?.slice(0, 2)} ${t.sPOSEntryMode}`.trim() ?? '',
       avsResponseCode: '',
       authCode: String(t.authnum) ?? '',
       cardNumber: t.cardnum_truncated.replace('x', '*') ?? '',
       debitNetworkIdentifier: '',
-      transactionId: t.transactionid.slice(-4) ?? '',
+      transactionId: t.transactionid?.slice(-4) ?? '',
       authAmount: Number(t.authamt ?? 0),
       exceptionList: '3',
       exceptionTitle: 'Auth Decl',

@@ -50,6 +50,9 @@ export class MerchantExceptionDetailService {
     @InjectDataSource('finance')
     private readonly financeDataSource: DataSource,
 
+    @InjectDataSource('connector')
+    private readonly connectorDataSource: DataSource,
+
     @InjectPinoLogger(MerchantExceptionDetailService.name)
     private readonly logger: Logger
   ) {}
@@ -129,6 +132,39 @@ export class MerchantExceptionDetailService {
 
     const swipedPercentageTransCount =
       swipedPercentTransCountQuery[0]?.iSwipedPercBasedOnTransCntCurrMonth || 0;
+
+    // Get net settlement balance from SnapShotvwNetSettlementBalanceActive
+    this.logger.info(
+      {
+        exceptionId: pkRiskRadarExceptions,
+        mid: sMID,
+        user: sUser,
+      },
+      'Getting net settlement balance from tblSnapShotvwNetSettlementBalanceActive'
+    );
+
+    let netSettlementBalance = 0;
+    try {
+      const netSettlementResult = await this.connectorDataSource.query(
+        `
+        SELECT dSettlementBalance 
+        FROM tblSnapShotvwNetSettlementBalanceActive 
+        WHERE sMID = @0
+        `,
+        [sMID]
+      );
+
+      netSettlementBalance = netSettlementResult?.[0]?.dSettlementBalance || 0;
+      this.logger.debug(
+        { mid: sMID, netSettlementBalance },
+        'Retrieved net settlement balance'
+      );
+    } catch (error) {
+      this.logger.error(
+        { mid: sMID, error },
+        'Error retrieving net settlement balance'
+      );
+    }
 
     // Get activated date from vwLeadsStatus
     this.logger.info(
@@ -229,7 +265,8 @@ export class MerchantExceptionDetailService {
         exception,
         uwNewAccountHoldAllowRiskToEdit,
         swipedPercentageTransCount,
-        activatedDate
+        activatedDate,
+        netSettlementBalance
       ),
       owners: this.buildOwners(owners),
       processingSummaries: this.mapProcessingSummaries(processingSummaries),
@@ -276,7 +313,8 @@ export class MerchantExceptionDetailService {
     exception: any,
     uwNewAccountHoldAllowRiskToEdit: boolean,
     swipedPercentageTransCount: number,
-    activatedDate: string | null
+    activatedDate: string | null,
+    netSettlementBalance: number
   ): MerchantBusinessInfoDto {
     const businessInfoDto: MerchantBusinessInfoDto = {
       dbaName: businessInfo?.dbaName || '',
@@ -314,7 +352,7 @@ export class MerchantExceptionDetailService {
       exceptionStatusId: exception?.exceptionStatusId || 0,
       hasCashAdvance: services?.merchantCashAdvance === 'No' ? 'No' : 'Yes',
       isRiskWatch: merchAdjParam?.isRiskWatch || false,
-      netSettlementBalance: 0, // This would come from a cross-database query
+      netSettlementBalance,
       swipedPercentageTransCount, // Now using the calculated value from the query
       channel: partnerAndSalesAgent?.channel || '',
       isa: partnerAndSalesAgent?.solutionConsultant || '',

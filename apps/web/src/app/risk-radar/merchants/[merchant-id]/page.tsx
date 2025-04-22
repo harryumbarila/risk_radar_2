@@ -302,6 +302,19 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   // Add isSendingEmail state
   const [isSendingEmail, setIsSendingEmail] = useState<boolean>(false);
 
+  // Add new state for tracking loading states
+  const [isCardHistoryLoading, setIsCardHistoryLoading] =
+    useState<boolean>(false);
+  const [isEmailTemplateLoading, setIsEmailTemplateLoading] =
+    useState<boolean>(false);
+
+  // Add an effect to clear the card history loading state when data is received
+  useEffect(() => {
+    if (isCardHistoryLoading && cardNumberData) {
+      setIsCardHistoryLoading(false);
+    }
+  }, [cardNumberData, isCardHistoryLoading]);
+
   // Update merchantStateData when data changes
   useEffect(() => {
     if (data) {
@@ -377,8 +390,8 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
   // Calculate paginated data
   const paginatedExceptions = transactionExceptionsData?.slice(
-    (exceptionsPage - 1) * ITEMS_PER_PAGE,
-    exceptionsPage * ITEMS_PER_PAGE
+    (exceptionsPage - 1) * 50,
+    exceptionsPage * 50
   );
   const paginatedNotes = merchantNotesData?.slice(
     (notesPage - 1) * ITEMS_PER_PAGE,
@@ -730,7 +743,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       setIsSendingEmail(false);
     }
   };
-
   if (!merchantId) {
     notFound();
   }
@@ -814,238 +826,263 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           <div className="h-full">
             <div className="max-w-full h-full flex flex-col bg-white dark:bg-boxdark">
               {/* Issuer Information */}
-              <div className="grid grid-cols-3 gap-4 p-4 border-b border-stroke dark:border-strokedark">
-                <div>
-                  <p className="text-sm font-semibold text-black dark:text-white">
-                    Issuer Bank:
-                  </p>
-                  <p className="text-sm text-black dark:text-white">
-                    {cardHistory[0]?.issuerBank || ''}
-                  </p>
+              {isCardHistoryLoading ? (
+                <div className="flex-1 flex justify-center items-center">
+                  <Loader />
                 </div>
-                <div>
-                  <p className="text-sm font-semibold text-black dark:text-white">
-                    Issuer Country:
-                  </p>
-                  <p className="text-sm text-black dark:text-white">
-                    {cardHistory[0]?.issuerCountry || ''}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-black dark:text-white">
-                    Issuer Phone:
-                  </p>
-                  <p className="text-sm text-black dark:text-white">
-                    {cardHistory[0]?.issuerPhone || ''}
-                  </p>
-                </div>
-              </div>
-              <div className="p-4 border-b border-stroke dark:border-strokedark">
-                <h3 className="text-lg font-semibold text-black dark:text-white">
-                  Card # History
-                </h3>
-              </div>
-              <div className="flex-1 overflow-hidden">
-                <div className="h-full overflow-y-auto">
-                  <table className="w-full table-auto">
-                    <thead className="sticky top-0 bg-gray-100 dark:bg-meta-4">
-                      <tr>
-                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                          MID
-                        </th>
-                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                          Trans Date
-                        </th>
-                        <th className="p-4 py-1 font-medium text-black dark:text-white text-right">
-                          Trans Amt
-                        </th>
-                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                          POS
-                        </th>
-                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                          AVS
-                        </th>
-                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                          Auth Code
-                        </th>
-                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                          Card #
-                        </th>
-                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                          DB Net
-                        </th>
-                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                          Transmission Date
-                        </th>
-                        <th className="p-4 py-1 font-medium text-black dark:text-white text-right">
-                          Net Dep. Amt
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {currentItems.map((card: CardHistory, index: number) => {
-                        // Create a unique identifier using multiple fields and index
-                        const uniqueId = `${card.mid}-${card.transactionDate}-${card.cardNumber}-${card.amount}-${index}`;
-                        return (
-                          <tr key={uniqueId} className="text-center">
-                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                              {card.mid}
-                            </td>
-                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                              {formatDateWithoutTime(card.transactionDate)}
-                            </td>
-                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-right text-black dark:text-white">
-                              ${card.amount.toFixed(2)}
-                            </td>
-                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                              {card.posEntryMode}
-                            </td>
-                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                              {card.avsResponseCode}
-                            </td>
-                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                              {card.authCode}
-                            </td>
-                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                              {card.cardNumber}
-                            </td>
-                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                              {card.debitNetworkIdentifier || ''}
-                            </td>
-                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                              {formatDateWithoutTime(card.transmissionDate)}
-                            </td>
-                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-right text-black dark:text-white">
-                              ${card.netDepositAmount.toFixed(2)}
-                            </td>
+              ) : (
+                <>
+                  <div className="grid grid-cols-3 gap-4 p-4 border-b border-stroke dark:border-strokedark">
+                    <div>
+                      <p className="text-sm font-semibold text-black dark:text-white">
+                        Issuer Bank:
+                      </p>
+                      <p className="text-sm text-black dark:text-white">
+                        {cardHistory[0]?.issuerBank || ''}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-black dark:text-white">
+                        Issuer Country:
+                      </p>
+                      <p className="text-sm text-black dark:text-white">
+                        {cardHistory[0]?.issuerCountry || ''}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-black dark:text-white">
+                        Issuer Phone:
+                      </p>
+                      <p className="text-sm text-black dark:text-white">
+                        {cardHistory[0]?.issuerPhone || ''}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="p-4 border-b border-stroke dark:border-strokedark">
+                    <h3 className="text-lg font-semibold text-black dark:text-white">
+                      Card # History
+                    </h3>
+                  </div>
+                  <div className="flex-1 overflow-hidden">
+                    <div className="h-full overflow-y-auto">
+                      <table className="w-full table-auto">
+                        <thead className="sticky top-0 bg-gray-100 dark:bg-meta-4">
+                          <tr>
+                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                              MID
+                            </th>
+                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                              Trans Date
+                            </th>
+                            <th className="p-4 py-1 font-medium text-black dark:text-white text-right">
+                              Trans Amt
+                            </th>
+                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                              POS
+                            </th>
+                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                              AVS
+                            </th>
+                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                              Auth Code
+                            </th>
+                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                              Card #
+                            </th>
+                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                              DB Net
+                            </th>
+                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                              Transmission Date
+                            </th>
+                            <th className="p-4 py-1 font-medium text-black dark:text-white text-right">
+                              Net Dep. Amt
+                            </th>
                           </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              {/* Pagination */}
-              <div className="flex items-center justify-between p-4 border-t border-stroke dark:border-strokedark">
-                <div className="text-sm text-black dark:text-white">
-                  Showing {Math.min(cardHistory?.length || 0, startIndex + 1)}{' '}
-                  to {Math.min(cardHistory?.length || 0, endIndex)} of{' '}
-                  {cardHistory?.length || 0} entries
-                </div>
-                <div className="flex space-x-2">
-                  <button
-                    type="button"
-                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                    disabled={currentPage === 1}
-                    className="rounded-md border border-stroke px-4 py-2 text-sm font-medium text-black disabled:opacity-50 dark:border-strokedark dark:text-white"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setCurrentPage(Math.min(totalPages, currentPage + 1))
-                    }
-                    disabled={currentPage >= totalPages}
-                    className="rounded-md border border-stroke px-4 py-2 text-sm font-medium text-black disabled:opacity-50 dark:border-strokedark dark:text-white"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
+                        </thead>
+                        <tbody>
+                          {currentItems.map(
+                            (card: CardHistory, index: number) => {
+                              // Create a unique identifier using multiple fields and index
+                              const uniqueId = `${card.mid}-${card.transactionDate}-${card.cardNumber}-${card.amount}-${index}`;
+                              return (
+                                <tr key={uniqueId} className="text-center">
+                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                                    {card.mid}
+                                  </td>
+                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                                    {formatDateWithoutTime(
+                                      card.transactionDate
+                                    )}
+                                  </td>
+                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-right text-black dark:text-white">
+                                    ${card.amount.toFixed(2)}
+                                  </td>
+                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                                    {card.posEntryMode}
+                                  </td>
+                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                                    {card.avsResponseCode}
+                                  </td>
+                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                                    {card.authCode}
+                                  </td>
+                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                                    {card.cardNumber}
+                                  </td>
+                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                                    {card.debitNetworkIdentifier || ''}
+                                  </td>
+                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                                    {formatDateWithoutTime(
+                                      card.transmissionDate
+                                    )}
+                                  </td>
+                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-right text-black dark:text-white">
+                                    ${card.netDepositAmount.toFixed(2)}
+                                  </td>
+                                </tr>
+                              );
+                            }
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  {/* Pagination */}
+                  <div className="flex items-center justify-between p-4 border-t border-stroke dark:border-strokedark">
+                    <div className="text-sm text-black dark:text-white">
+                      Showing{' '}
+                      {Math.min(cardHistory?.length || 0, startIndex + 1)} to{' '}
+                      {Math.min(cardHistory?.length || 0, endIndex)} of{' '}
+                      {cardHistory?.length || 0} entries
+                    </div>
+                    <div className="flex space-x-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCurrentPage(Math.max(1, currentPage - 1))
+                        }
+                        disabled={currentPage === 1}
+                        className="rounded-md border border-stroke px-4 py-2 text-sm font-medium text-black disabled:opacity-50 dark:border-strokedark dark:text-white"
+                      >
+                        Previous
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCurrentPage(Math.min(totalPages, currentPage + 1))
+                        }
+                        disabled={currentPage >= totalPages}
+                        className="rounded-md border border-stroke px-4 py-2 text-sm font-medium text-black disabled:opacity-50 dark:border-strokedark dark:text-white"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         ) : activePopup == PopupType.Email ? (
           <div className="max-w bg-white p-6 rounded-lg shadow-lg">
-            {/* Template Dropdown */}
-            <div className="mb-4">
-              <label
-                className="block text-sm font-medium text-gray-700"
-                htmlFor="email-template"
-              >
-                Template:
-              </label>
-              <select
-                className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                value={templateData.templateId?.toString() || ''}
-                onChange={(e) => {
-                  const templateId = e.target.value
-                    ? parseInt(e.target.value, 10)
-                    : null;
-                  setTemplateData((prev) => ({
-                    ...prev,
-                    templateId,
-                  }));
-                  const selectedTemplate = emailTemplates?.find(
-                    (template: EmailTemplate) => template.id === templateId
-                  )?.templateEmailBody;
-                  if (selectedTemplate) {
-                    replaceEmailTemplateParameters(selectedTemplate);
+            {isEmailTemplateLoading ? (
+              <div className="flex justify-center items-center p-8">
+                <Loader />
+              </div>
+            ) : (
+              <>
+                {/* Template Dropdown */}
+                <div className="mb-4">
+                  <label
+                    className="block text-sm font-medium text-gray-700"
+                    htmlFor="email-template"
+                  >
+                    Template:
+                  </label>
+                  <select
+                    className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                    value={templateData.templateId?.toString() || ''}
+                    onChange={(e) => {
+                      const templateId = e.target.value
+                        ? parseInt(e.target.value, 10)
+                        : null;
+                      setTemplateData((prev) => ({
+                        ...prev,
+                        templateId,
+                      }));
+                      const selectedTemplate = emailTemplates?.find(
+                        (template: EmailTemplate) => template.id === templateId
+                      )?.templateEmailBody;
+                      if (selectedTemplate) {
+                        replaceEmailTemplateParameters(selectedTemplate);
+                      }
+                    }}
+                  >
+                    <option value="">Select a template</option>
+                    {emailTemplates.map((template: EmailTemplate) => (
+                      <option key={template.id} value={template.id}>
+                        {template.templateName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Email Recipient */}
+                <div className="mb-4">
+                  <label
+                    className="block text-sm font-medium text-gray-700"
+                    htmlFor="email-recipient"
+                  >
+                    E-Mail Recipient:
+                  </label>
+                  <input
+                    type="email"
+                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter recipient email"
+                  />
+                </div>
+
+                {/* Email Body */}
+                <div className="mb-4">
+                  <label
+                    className="block text-sm font-medium text-gray-700"
+                    htmlFor="email-body"
+                  >
+                    E-Mail Body Content:
+                  </label>
+                  <textarea
+                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                    rows={4}
+                    value={templateData.body}
+                    onChange={(e) =>
+                      setTemplateData((prev) => ({
+                        ...prev,
+                        body: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter email content..."
+                  />
+                </div>
+
+                {/* Send Button */}
+                <button
+                  type="button"
+                  onClick={handleSendEmail}
+                  disabled={
+                    isSendingEmail ||
+                    !email ||
+                    !templateData.body ||
+                    templateData.templateId === null
                   }
-                }}
-              >
-                <option value="">Select a template</option>
-                {emailTemplates.map((template: EmailTemplate) => (
-                  <option key={template.id} value={template.id}>
-                    {template.templateName}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Email Recipient */}
-            <div className="mb-4">
-              <label
-                className="block text-sm font-medium text-gray-700"
-                htmlFor="email-recipient"
-              >
-                E-Mail Recipient:
-              </label>
-              <input
-                type="email"
-                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter recipient email"
-              />
-            </div>
-
-            {/* Email Body */}
-            <div className="mb-4">
-              <label
-                className="block text-sm font-medium text-gray-700"
-                htmlFor="email-body"
-              >
-                E-Mail Body Content:
-              </label>
-              <textarea
-                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                rows={4}
-                value={templateData.body}
-                onChange={(e) =>
-                  setTemplateData((prev) => ({
-                    ...prev,
-                    body: e.target.value,
-                  }))
-                }
-                placeholder="Enter email content..."
-              />
-            </div>
-
-            {/* Send Button */}
-            <button
-              type="button"
-              onClick={handleSendEmail}
-              disabled={
-                isSendingEmail ||
-                !email ||
-                !templateData.body ||
-                templateData.templateId === null
-              }
-              className="w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSendingEmail ? 'Sending...' : 'Send Email'}
-            </button>
+                  className="w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSendingEmail ? 'Sending...' : 'Send Email'}
+                </button>
+              </>
+            )}
           </div>
         ) : null}
       </Popup>
@@ -1094,11 +1131,19 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <strong>Net Balance:</strong>
             </p>
             <p>
-              {formatCurrency(
-                merchantContactInfo?.netSettlementBalance || 0,
-                2,
-                true
-              )}
+              <span
+                className={`${
+                  merchantContactInfo!.netSettlementBalance >= 0
+                    ? 'text-black dark:text-white font-bold'
+                    : 'text-red-500 dark:text-red-400'
+                }`}
+              >
+                {formatCurrency(
+                  merchantContactInfo?.netSettlementBalance || 0,
+                  2,
+                  true
+                )}
+              </span>
             </p>
           </div>
         </div>
@@ -1119,11 +1164,14 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <strong>Merchant Type:</strong>
             </p>
             <p>{merchantProfile?.sMerchantType}</p>
-
-            <p className="text-black dark:text-white">
-              <strong>Talus Pay:</strong>
-            </p>
-            <p>{merchantProfile?.bIsTalusPayMerchant ? 'Yes' : 'No'}</p>
+            {merchantProfile?.bIsTalusPayMerchant ? (
+              <>
+                <p className="text-black dark:text-white">
+                  <strong>Talus Pay:</strong>
+                </p>
+                <p className="text-red-600 font-bold">Yes</p>
+              </>
+            ) : null}
           </div>
         </div>
         {/* Column 3 */}
@@ -1204,7 +1252,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   : 'Review'}
               </button>
 
-              {riskException?.fkRiskExceptionStatus === 2 && (
+              {riskException?.fkRiskExceptionStatus === 1 && (
                 <button
                   className={`inline-flex items-center justify-center rounded-lg border px-4 py-1 text-white transition-colors
                 ${
@@ -1574,24 +1622,35 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                       >
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           <span className="block text-left">
-                            {formatDate(exception.transactionDate)}
+                            {formatDate(
+                              exception.transactionDate,
+                              'MM/dd/yyyy kk:mm:ss'
+                            )}
                           </span>
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
                           <span className="block text-right">
-                            ${exception.authAmount}
+                            {formatCurrency(exception.authAmount)}
                           </span>
                         </td>
                         <td
-                          className="border-b border-[#eee] px-4 py-2 dark:border-strokedark"
+                          className="border-b border-[#eee] px-4 py-2 dark:border-strokedark cursor-pointer text-blue-600 hover:text-blue-800 hover:underline"
                           onClick={() => {
+                            setIsEmailTemplateLoading(true);
                             setIsPopupActive(true);
                             setActivePopup(PopupType.Email);
                             setCurrentTransException(exception);
+                            // Clear the loading state after a short delay to ensure the popup is visible
+                            setTimeout(
+                              () => setIsEmailTemplateLoading(false),
+                              500
+                            );
                           }}
                         >
-                          <span className="block text-right">
-                            ${exception.transactionAmount}
+                          <span
+                            className={`block text-right ${exception.transactionAmount >= 0 ? 'text-blue-600' : 'text-red-600'}`}
+                          >
+                            {formatCurrency(exception.transactionAmount)}
                           </span>
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
@@ -1601,19 +1660,23 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           {exception.avsResponseCode}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                          {exception.authCode}
+                          {exception.authCode || ''}
                         </td>
-                        <td
-                          className="border-b border-[#eee] px-4 py-2 dark:border-strokedark"
-                          onClick={() => {
-                            setIsPopupActive(true);
-                            setCurrentTransException(exception);
-                            setActivePopup(PopupType.CardHistory);
-                          }}
-                        >
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           <span className="block text-left">
-                            {exception.cardNumber}{' '}
-                            {exception.transactionId?.slice(-4)}
+                            <button
+                              type="button"
+                              className="cursor-pointer text-blue-600 hover:text-blue-800 hover:underline"
+                              onClick={() => {
+                                setIsCardHistoryLoading(true);
+                                setIsPopupActive(true);
+                                setCurrentTransException(exception);
+                                setActivePopup(PopupType.CardHistory);
+                              }}
+                            >
+                              {exception.cardNumber}
+                            </button>
+                            {` ${exception.transactionId?.slice(-4)}`}
                           </span>
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
@@ -1684,12 +1747,14 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                       <tr key={`${note.pkNotes}`}>
                         <td
                           className={`border-b border-[#eee] px-4 py-2 dark:border-strokedark text-left ${
-                            note.isPinned
-                              ? 'text-red-500'
+                            note.bPinnedNotes === '*'
+                              ? 'text-red-500 font-bold'
                               : 'text-black dark:text-white'
                           }`}
                         >
-                          {note.sNotes}
+                          {note.bPinnedNotes === '*'
+                            ? `*${note.sNotes}`
+                            : note.sNotes}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-center">
                           {formatDate(note.dtCreated)}
@@ -1750,7 +1815,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   />
                   <div className="flex items-center gap-4 shrink-0">
                     <label className="flex items-center gap-2 whitespace-nowrap">
-                      <span>Pinned</span>
+                      <span className="text-red-500 font-bold">* Pinned</span>
                       <input
                         type="checkbox"
                         id="pin"
@@ -1977,8 +2042,8 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               </thead>
               <tbody>
                 {paginatedVolume?.map((vol) => (
-                  <tr key={`${vol.year}-${vol.month}`} className="text-center">
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                  <tr key={`${vol.year}-${vol.month}`} className="text-right">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-left">
                       {vol.month} {vol.year}
                     </td>
                     <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">

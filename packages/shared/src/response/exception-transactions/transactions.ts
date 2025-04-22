@@ -31,6 +31,7 @@ export type FSPTransaction = {
 
 export type TSYSTransactionFromBatch = {
   transactionDate: Date;
+  transactionAmount: number;
   posEntryMode: string;
   sPOSEntryMode: string;
   avsResponseCode: string;
