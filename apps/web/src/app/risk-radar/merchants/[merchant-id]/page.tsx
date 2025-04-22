@@ -390,8 +390,8 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
   // Calculate paginated data
   const paginatedExceptions = transactionExceptionsData?.slice(
-    (exceptionsPage - 1) * ITEMS_PER_PAGE,
-    exceptionsPage * ITEMS_PER_PAGE
+    (exceptionsPage - 1) * 50,
+    exceptionsPage * 50
   );
   const paginatedNotes = merchantNotesData?.slice(
     (notesPage - 1) * ITEMS_PER_PAGE,
