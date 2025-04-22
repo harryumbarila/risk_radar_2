@@ -6,7 +6,7 @@ export interface MerchantNotesResponseDto {
   dtCreated: string;
   sUserCreated: string;
   dtIrisMemoRequest: string;
-  isPinned: boolean;
+  bPinnedNotes: string;
   dtIrisMemoRequestFulfilled: string;
   bPushedToIris: boolean;
   pkRiskRadarNotes: number;
