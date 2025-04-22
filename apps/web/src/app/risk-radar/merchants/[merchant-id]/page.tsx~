@@ -2047,7 +2047,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                       {vol.month} {vol.year}
                     </td>
                     <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                      ${vol.volume.toLocaleString()}
+                      {formatCurrency(vol.volume}
                     </td>
                     <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       ${vol.averageTicket.toLocaleString()}
