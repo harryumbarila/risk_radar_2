@@ -1648,7 +1648,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           }}
                         >
                           <span
-                            className={`block text-right ${exception.transactionAmount >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                            className={`block text-right ${exception.transactionAmount >= 0 ? 'text-blue-600' : 'text-red-600'}`}
                           >
                             {formatCurrency(exception.transactionAmount)}
                           </span>
