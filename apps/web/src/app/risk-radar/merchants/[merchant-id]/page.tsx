@@ -1629,9 +1629,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           </span>
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
-                          <span
-                            className={`block text-right ${exception.authAmount >= 0 ? 'text-green-600' : 'text-red-600'}`}
-                          >
+                          <span className="block text-right">
                             {formatCurrency(exception.authAmount)}
                           </span>
                         </td>
@@ -2042,8 +2040,8 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               </thead>
               <tbody>
                 {paginatedVolume?.map((vol) => (
-                  <tr key={`${vol.year}-${vol.month}`} className="text-center">
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                  <tr key={`${vol.year}-${vol.month}`} className="text-right">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-left">
                       {vol.month} {vol.year}
                     </td>
                     <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
