@@ -164,6 +164,9 @@ export class TsysExceptionTransactionService {
     batchIds: number[],
     binSearch?: string
   ): Promise<TransactionResult[]> {
+    if (batchIds.length === 0) {
+      return [];
+    }
     const transactions = await this.batchRepository
       .createQueryBuilder('b')
       .select([

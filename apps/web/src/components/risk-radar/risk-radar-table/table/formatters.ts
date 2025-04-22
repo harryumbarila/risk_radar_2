@@ -45,27 +45,33 @@ export const formatBoolean = (value: unknown): string => {
   return value === 'Yes' ? DEFAULT_YES_VALUE : DEFAULT_NO_VALUE;
 };
 
-export const parseDate = (value: unknown): Date | null => {
+export const parseDate = (
+  value: unknown,
+  format = 'MM/dd/yyyy hh:mm:ss a'
+): Date | null => {
   let parsedDate: Date;
   try {
     parsedDate = new Date(String(value));
     if (!isValid(parsedDate)) return null;
   } catch {
     // If that fails, try the custom format
-    parsedDate = parse(String(value), 'MM/dd/yyyy hh:mm:ss a', new Date());
+    parsedDate = parse(String(value), format, new Date());
   }
   return parsedDate;
 };
 
-export const formatDate = (value?: Date | string): string => {
+export const formatDate = (
+  value?: Date | string,
+  format = 'MM/dd/yyyy hh:mm:ss a'
+): string => {
   try {
-    // const parsedDate = parseDate(value);
-    // if (!parsedDate || !isValid(parsedDate)) return DEFAULT_BLANK_VALUE;
     if (!value) return DEFAULT_BLANK_VALUE;
 
-    return formatInTimeZone(value, DEFAULT_TIME_ZONE, 'MM/dd/yyyy hh:mm:ss a');
+    return formatInTimeZone(value, DEFAULT_TIME_ZONE, format);
   } catch (error) {
-    return DEFAULT_BLANK_VALUE;
+    const parsedDate = parseDate(value);
+    if (!parsedDate || !isValid(parsedDate)) return DEFAULT_BLANK_VALUE;
+    return formatInTimeZone(parsedDate, DEFAULT_TIME_ZONE, format);
   }
 };
 
