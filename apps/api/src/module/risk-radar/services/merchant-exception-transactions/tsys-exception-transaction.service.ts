@@ -171,6 +171,7 @@ export class TsysExceptionTransactionService {
       .createQueryBuilder('b')
       .select([
         't.dtTrans AS transactionDate',
+        't.dTransAmt AS transactionAmount',
         't.sPOSEntryMode AS posEntryMode',
         'pos.sPOSEntryMode AS sPOSEntryMode',
         't.sAVSRespCode AS avsResponseCode',
@@ -208,7 +209,7 @@ export class TsysExceptionTransactionService {
 
     const transformed = transactions.map<TransactionResult>((t) => ({
       transactionDate: t.transactionDate,
-      transactionAmount: Number(t.dAuthAmt ?? 0),
+      transactionAmount: Number(t.transactionAmount ?? 0),
       posEntryMode: `${t.posEntryMode.slice(0, 2)} ${t.sPOSEntryMode}`.trim(),
       avsResponseCode: t.avsResponseCode ?? t.diavsResponseCode ?? '',
       authCode: String(t.authCode) ?? '',
