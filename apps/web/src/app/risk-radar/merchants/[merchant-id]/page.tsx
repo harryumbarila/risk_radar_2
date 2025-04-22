@@ -1159,7 +1159,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             <p>{merchantProfile?.sMerchantType}</p>
             {merchantProfile?.bIsTalusPayMerchant ? (
               <>
-                <p className="text-red-600 dark:text-white">
+                <p className="text-black dark:text-white">
                   <strong>Talus Pay:</strong>
                 </p>
                 <p className="text-red-600 font-bold">Yes</p>
