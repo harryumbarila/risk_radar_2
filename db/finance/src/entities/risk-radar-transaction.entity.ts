@@ -2,13 +2,13 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('tblRiskRadarTransaction', { schema: 'Finance.dbo' })
 export class RiskRadarTransaction {
-  @PrimaryColumn({ name: 'pkDFT256Transaction' })
+  @PrimaryColumn({ name: 'pkDFT256Transaction', type: 'int' })
   public transactionId: number;
 
-  @Column({ name: 'fkDFT256Batch', nullable: true })
+  @Column({ name: 'fkDFT256Batch', type: 'int', nullable: true })
   public batchId?: number;
 
-  @Column({ name: 'iTransSeqNum', nullable: true })
+  @Column({ name: 'iTransSeqNum', type: 'int', nullable: true })
   public transactionSequenceNumber?: number;
 
   @Column({
@@ -54,7 +54,7 @@ export class RiskRadarTransaction {
   @Column({ name: 'sAVSRespCode', type: 'varchar', length: 1, nullable: true })
   public avsResponseCode?: string;
 
-  @Column({ name: 'dtCreated', type: 'datetime' })
+  @Column({ name: 'dtCreated', type: 'datetime', nullable: false })
   public createdDate: Date;
 
   @Column({ name: 'sTransID', type: 'varchar', length: 15, nullable: true })
@@ -69,28 +69,32 @@ export class RiskRadarTransaction {
   })
   public authorizationAmount?: number;
 
-  @Column({ name: 'iATPoints', nullable: true })
+  @Column({ name: 'iATPoints', type: 'int', nullable: true })
   public atPoints?: number;
 
-  @Column({ name: 'iDuplCardPoints', nullable: true })
+  @Column({ name: 'iDuplCardPoints', type: 'int', nullable: true })
   public duplicateCardPoints?: number;
 
-  @Column({ name: 'iDuplBINPoints', nullable: true })
+  @Column({ name: 'iDuplBINPoints', type: 'int', nullable: true })
   public duplicateBinPoints?: number;
 
-  @Column({ name: 'iLatePostTransPoints', nullable: true })
+  @Column({ name: 'iLatePostTransPoints', type: 'int', nullable: true })
   public latePostedTransactionPoints?: number;
 
-  @Column({ name: 'iFgnkeyedTransPoints', nullable: true })
+  @Column({ name: 'iFgnkeyedTransPoints', type: 'int', nullable: true })
   public foreignKeyedTransactionPoints?: number;
 
-  @Column({ name: 'iNoAuthTransPoints', nullable: true })
+  @Column({ name: 'iNoAuthTransPoints', type: 'int', nullable: true })
   public noAuthorizationTransactionPoints?: number;
 
-  @Column({ name: 'iAuthCaptureAmtLargeVariationPoints', nullable: true })
+  @Column({
+    name: 'iAuthCaptureAmtLargeVariationPoints',
+    type: 'int',
+    nullable: true,
+  })
   public authCaptureAmountLargeVariationPoints?: number;
 
-  @Column({ name: 'iMotoIoAVSPoints', nullable: true })
+  @Column({ name: 'iMotoIoAVSPoints', type: 'int', nullable: true })
   public motoIoAvsPoints?: number;
 
   @Column({ name: 'sCardExp', type: 'varchar', length: 4, nullable: true })
@@ -112,13 +116,13 @@ export class RiskRadarTransaction {
   })
   public diaAvsResponseCode?: string;
 
-  @Column({ name: 'iHTPoints', nullable: true })
+  @Column({ name: 'iHTPoints', type: 'int', nullable: true })
   public htPoints?: number;
 
-  @Column({ name: 'iCreditTransPoint', nullable: true })
+  @Column({ name: 'iCreditTransPoint', type: 'int', nullable: true })
   public creditTransactionPoints?: number;
 
-  @Column({ name: 'iSalesChannelRulePoints', nullable: true })
+  @Column({ name: 'iSalesChannelRulePoints', type: 'int', nullable: true })
   public salesChannelRulePoints?: number;
 
   @Column({ name: 'dtCreated_getdate', type: 'datetime', nullable: true })
