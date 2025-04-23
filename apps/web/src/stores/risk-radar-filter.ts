@@ -23,7 +23,7 @@ const defaultRiskRadarFilters: RiskRadarFilterState = {
   dbaNameOrSIC: undefined,
   sourceType: undefined,
   page: 1,
-  pageSize: 10,
+  pageSize: 50,
 };
 
 export const useRiskRadarFilterStore = create<RiskRadarFilterStore>()(
@@ -38,7 +38,7 @@ export const useRiskRadarFilterStore = create<RiskRadarFilterStore>()(
       },
     })),
     {
-      name: 'risk-radar-filters',
+      name: 'risk-radar-filters-store',
     }
   )
 );
