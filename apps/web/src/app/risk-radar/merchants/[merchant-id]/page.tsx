@@ -1095,28 +1095,32 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             <p className="text-black dark:text-white">
               <strong>DBA Name:</strong>
             </p>
-            <p>{merchantContactInfo?.dbaName}</p>
+            <p className="text-black dark:text-white">
+              {merchantContactInfo?.dbaName}
+            </p>
 
             {/* Address */}
             <p className="text-black dark:text-white">
               <strong>Address:</strong>
             </p>
-            <p>
+            <p className="text-black dark:text-white">
               {merchantProfile?.sDBAAddress || merchantContactInfo?.dbaAddress}
             </p>
 
             <p className="text-black dark:text-white">
               <strong>City:</strong>{' '}
             </p>
-            <div className="flex justify-between gap-2">
-              <p>{merchantProfile?.sDBACity || merchantContactInfo?.dbaCity}</p>
+            <div className="flex justify-between gap-2 text-black dark:text-white">
+              <p className="text-black dark:text-white">
+                {merchantProfile?.sDBACity || merchantContactInfo?.dbaCity}
+              </p>
 
-              <p>
+              <p className="text-black dark:text-white">
                 <strong>ST:</strong>{' '}
                 {merchantProfile?.sDBAState || merchantContactInfo?.dbaState}
               </p>
 
-              <p>
+              <p className="text-black dark:text-white">
                 <strong>ZIP:</strong>{' '}
                 {merchantProfile?.sDBAZip || merchantContactInfo?.dbaZip}
               </p>
@@ -1125,7 +1129,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             <p className="text-black dark:text-white">
               <strong>Activated:</strong>
             </p>
-            <p>{formatDate(merchantProfile?.sActivationDate)}</p>
+            <p className="text-black dark:text-white">
+              {formatDate(merchantProfile?.sActivationDate)}
+            </p>
 
             <p className="text-black dark:text-white">
               <strong>Net Balance:</strong>
@@ -1153,22 +1159,28 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             <p className="text-black dark:text-white">
               <strong>Ownership:</strong>
             </p>
-            <p>{merchantProfile?.sOwnershipType}</p>
+            <p className="text-black dark:text-white">
+              {merchantProfile?.sOwnershipType}
+            </p>
 
             <p className="text-black dark:text-white">
               <strong>SIC:</strong>
             </p>
-            <p>{merchantProfile?.sSIC}</p>
+            <p className="text-black dark:text-white">
+              {merchantProfile?.sSIC}
+            </p>
 
             <p className="text-black dark:text-white">
               <strong>Merchant Type:</strong>
             </p>
-            <p>{merchantProfile?.sMerchantType}</p>
-            <p className="text-red-500 dark:text-red-400">
+            <p className="text-black dark:text-white">
+              {merchantProfile?.sMerchantType}
+            </p>
+            <p className="text-black dark:text-white">
               <strong>Talus Pay:</strong>
             </p>
             {merchantProfile?.bIsTalusPayMerchant ? (
-              <p className="font-bold">Yes</p>
+              <p className="text-red-500 dark:text-red-400 font-bold">Yes</p>
             ) : null}
           </div>
         </div>
