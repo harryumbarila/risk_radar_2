@@ -54,7 +54,7 @@ export const ExceptionTypesSelect: FC<Props> = ({
                   </option>
                 ))}
               </select>
-              <span className="text-xs text-gray-500 dark:text-gray-400">
+              <span className="text-xs text-black dark:text-white">
                 Hold Ctrl (Windows) or Command (Mac) to select multiple options
               </span>
               <div className="grid grid-cols-2 divide-x-2 divide-dashed divide-gray-500 dark:divide-white">
