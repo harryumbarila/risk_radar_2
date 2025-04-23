@@ -159,6 +159,6 @@ export const baseColumns = [
   }),
   columnHelper.accessor('dtCreated', {
     header: 'Exception Created',
-    cell: ({ getValue }) => formatDate(getValue()),
+    cell: ({ getValue }) => formatDate(getValue() || new Date()),
   }),
 ];

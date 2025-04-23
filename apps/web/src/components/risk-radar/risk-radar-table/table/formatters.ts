@@ -37,7 +37,7 @@ export const formatCurrency = (
 
 export const formatScore = (value: unknown): string => {
   const numValue = Number(value);
-  if (numValue === 0) return DEFAULT_ZERO_VALUE;
+  if (value === undefined || numValue === 0) return DEFAULT_ZERO_VALUE;
   return numValue.toFixed(0);
 };
 
