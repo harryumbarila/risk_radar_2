@@ -32,7 +32,12 @@ export default function useBaseApi(): {
 
     const response = await fetch(fullUrl, requestOptions);
     if (!response.ok) {
-      throw new Error(`Error: ${response.statusText}`);
+      const responseBody = (await response.json()) as {
+        error: string;
+        message: string;
+        statusCode: number;
+      };
+      throw new Error(`Error: ${responseBody.error} ${responseBody.message}`);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return

@@ -308,6 +308,11 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const [isEmailTemplateLoading, setIsEmailTemplateLoading] =
     useState<boolean>(false);
 
+  // Add a state for tracking review status
+  const [reviewStatus, setReviewStatus] = useState<
+    'none' | 'reviewing' | 'reviewed'
+  >('none');
+
   // Add an effect to clear the card history loading state when data is received
   useEffect(() => {
     if (isCardHistoryLoading && cardNumberData) {
@@ -456,7 +461,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     notesRefetch();
   };
 
-  // Helper function to save only changed fields
+  // Update the saveChangedFields function to properly throw errors
   const saveChangedFields = async (
     singleFieldUpdate?: Record<string, unknown>
   ): Promise<void> => {
@@ -469,12 +474,19 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
       // If we're saving a single field immediately, just use that
       if (singleFieldUpdate) {
-        await saveMerchantdata({
+        const response = await saveMerchantdata({
           merchantId,
           exceptionId: parseInt(exceptionId, 10),
           createdBy: user.name,
           ...singleFieldUpdate,
         });
+        // If the API returns an error message, throw it
+        if (response && typeof response === 'object' && 'message' in response) {
+          const message = response.message as string;
+          if (message && message.includes('already reviewed')) {
+            throw new Error(message);
+          }
+        }
       } else {
         // Construct payload with only changed fields
         const payload: SaveMerchantDataParams = {
@@ -511,7 +523,15 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           payload.isAutoHoldEnabled = merchantStateData.isAutoHoldEnabled;
         }
 
-        await saveMerchantdata(payload);
+        const response = await saveMerchantdata(payload);
+
+        // If the API returns an error message, throw it
+        if (response && typeof response === 'object' && 'message' in response) {
+          const message = response.message as string;
+          if (message && message.includes('already reviewed')) {
+            throw new Error(message);
+          }
+        }
       }
 
       // Reset changed fields after successful save
@@ -519,10 +539,64 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
       refetch();
       notesRefetch();
-    } catch (err) {
-      // console.error(err);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  // Modified handleClickOnReviewButton to handle the review process
+  const handleClickOnReviewButton = async (): Promise<void> => {
+    if (user?.name) {
+      if (reviewStatus === 'reviewed') {
+        // If already reviewed, don't do anything
+        return;
+      }
+
+      try {
+        // Set to reviewing state immediately
+        setReviewStatus('reviewing');
+
+        const newStatus =
+          merchantStateData.clickedStatus === 'rev' ? 'none' : 'rev';
+        setMerchantStateData((prev) => ({
+          ...prev,
+          clickedStatus: newStatus,
+        }));
+
+        setChangedFields((prev) => ({
+          ...prev,
+          clickedStatus: true,
+        }));
+
+        await saveChangedFields({ clickedStatus: newStatus });
+
+        // If successful, set to reviewed
+        if (newStatus === 'rev') {
+          setReviewStatus('reviewed');
+        } else {
+          setReviewStatus('none');
+        }
+      } catch (error) {
+        // The error message is now properly exposed by the enhanced hook
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+
+        if (errorMessage.includes('already reviewed')) {
+          // Mark as reviewed if already reviewed
+          setReviewStatus('reviewed');
+          // Also update merchant state
+          setMerchantStateData((prev) => ({
+            ...prev,
+            clickedStatus: 'rev',
+          }));
+          toast.info('This exception was already reviewed by someone else.');
+        } else {
+          // Reset to normal state if other error
+          setReviewStatus('none');
+          // Display the error message directly - it's now properly formatted
+          toast.error(`${errorMessage}`);
+        }
+      }
     }
   };
 
@@ -598,24 +672,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     }));
 
     if (user?.name) {
-      await saveChangedFields({ clickedStatus: newStatus });
-    }
-  };
-
-  const handleClickOnReviewButton = async (): Promise<void> => {
-    if (user?.name) {
-      const newStatus =
-        merchantStateData.clickedStatus === 'rev' ? 'none' : 'rev';
-      setMerchantStateData((prev) => ({
-        ...prev,
-        clickedStatus: newStatus,
-      }));
-
-      setChangedFields((prev) => ({
-        ...prev,
-        clickedStatus: true,
-      }));
-
       await saveChangedFields({ clickedStatus: newStatus });
     }
   };
@@ -1135,7 +1191,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                 className={`${
                   merchantContactInfo!.netSettlementBalance >= 0
                     ? 'text-black dark:text-white font-bold'
-                    : 'text-red-500 dark:text-red-400'
+                    : 'text-red-500 dark:text-red-400 font-bold'
                 }`}
               >
                 {formatCurrency(
@@ -1233,21 +1289,29 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <button
                 className={`inline-flex items-center justify-center rounded-lg border px-4 py-1 text-white transition-colors
               ${
-                merchantStateData.clickedStatus === 'rev'
-                  ? 'border-green-600 bg-green-600 hover:bg-green-700'
-                  : riskException?.fkRiskExceptionStatus === 2
-                    ? 'border-gray-600 bg-gray-600 cursor-not-allowed'
-                    : 'border-primary bg-primary hover:bg-opacity-90'
+                reviewStatus === 'reviewing' ||
+                merchantStateData.clickedStatus === 'rev' ||
+                reviewStatus === 'reviewed' ||
+                riskException?.fkRiskExceptionStatus === 2
+                  ? 'border-gray-400 bg-gray-400 cursor-not-allowed'
+                  : 'border-primary bg-primary hover:bg-opacity-90'
               }`}
                 type="button"
-                disabled={riskException?.fkRiskExceptionStatus === 2}
+                disabled={
+                  riskException?.fkRiskExceptionStatus === 2 ||
+                  reviewStatus == 'reviewed' ||
+                  reviewStatus == 'reviewing'
+                }
                 onClick={() => {
                   handleClickOnReviewButton().catch(() => {});
                 }}
               >
-                {merchantStateData.clickedStatus === 'rev'
-                  ? 'Reviewed'
-                  : 'Review'}
+                {reviewStatus === 'reviewing'
+                  ? 'Reviewing...'
+                  : reviewStatus === 'reviewed' ||
+                      merchantStateData.clickedStatus === 'rev'
+                    ? 'Reviewed'
+                    : 'Review'}
               </button>
 
               {riskException?.fkRiskExceptionStatus === 1 && (
