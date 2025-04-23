@@ -390,8 +390,8 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
   // Calculate paginated data
   const paginatedExceptions = transactionExceptionsData?.slice(
-    (exceptionsPage - 1) * 50,
-    exceptionsPage * 50
+    (exceptionsPage - 1) * ITEMS_PER_PAGE,
+    exceptionsPage * ITEMS_PER_PAGE
   );
   const paginatedNotes = merchantNotesData?.slice(
     (notesPage - 1) * ITEMS_PER_PAGE,
@@ -925,7 +925,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                                     {card.avsResponseCode}
                                   </td>
                                   <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                                    {card.authCode}
+                                    {card.authCode || ''}
                                   </td>
                                   <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
                                     {card.cardNumber}
@@ -1164,13 +1164,11 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <strong>Merchant Type:</strong>
             </p>
             <p>{merchantProfile?.sMerchantType}</p>
+            <p className="text-red-500 dark:text-red-400">
+              <strong>Talus Pay:</strong>
+            </p>
             {merchantProfile?.bIsTalusPayMerchant ? (
-              <>
-                <p className="text-black dark:text-white">
-                  <strong>Talus Pay:</strong>
-                </p>
-                <p className="text-red-600 font-bold">Yes</p>
-              </>
+              <p className="font-bold">Yes</p>
             ) : null}
           </div>
         </div>
@@ -1206,7 +1204,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               />
 
               {/* Divert */}
-              <p className="text-black dark:text-white">
+              <p className="text-red-500 dark:text-red-400">
                 <strong>Divert:</strong>
               </p>
               <input
@@ -1663,7 +1661,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           {exception.authCode || ''}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                          <span className="block text-left">
+                          <span className="block text-center">
                             <button
                               type="button"
                               className="cursor-pointer text-blue-600 hover:text-blue-800 hover:underline"
@@ -1904,7 +1902,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {formatDateWithoutTime(chargeback.dtTrans)}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
                           ${chargeback.dAmt.toFixed(2)}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
@@ -2042,23 +2040,23 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               </thead>
               <tbody>
                 {paginatedVolume?.map((vol) => (
-                  <tr key={`${vol.year}-${vol.month}`} className="text-right">
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-left">
+                  <tr key={`${vol.year}-${vol.month}`} className="text-center">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       {vol.month} {vol.year}
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
                       ${vol.volume.toLocaleString()}
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
                       ${vol.averageTicket.toLocaleString()}
                     </td>
                     <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       {vol.swipedPercentage.toFixed(2)}%
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
                       ${vol.highestTicket.toLocaleString()}
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
                       ${vol.totalChargebacks.toLocaleString()}
                     </td>
                     <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
