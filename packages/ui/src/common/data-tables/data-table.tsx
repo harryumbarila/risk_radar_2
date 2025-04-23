@@ -105,7 +105,7 @@ export const DataTable = <Entry extends BaseModel>(
                           <div
                             aria-hidden="true"
                             {...{
-                              className: `flex items-center gap-2 text-black dark:text-white ${
+                              className: `flex  items-center gap-2 ${
                                 header.column.getCanSort()
                                   ? 'cursor-pointer select-none'
                                   : ''
@@ -119,13 +119,13 @@ export const DataTable = <Entry extends BaseModel>(
                             )}
                             {{
                               asc: (
-                                <ArrowUpIcon className="size-4 text-black dark:text-white" />
+                                <ArrowUpIcon className="size-4 text-green-600" />
                               ),
                               desc: (
-                                <ArrowDownIcon className="size-4 text-black dark:text-white" />
+                                <ArrowDownIcon className="size-4 text-green-600" />
                               ),
                             }[header.column.getIsSorted() as string] ?? (
-                              <ArrowsUpDownIcon className="size-4 text-black dark:text-white" />
+                              <ArrowsUpDownIcon className="size-4" />
                             )}
                           </div>
                         )}
@@ -140,15 +140,12 @@ export const DataTable = <Entry extends BaseModel>(
                 return (
                   <tr
                     key={row.id}
-                    className={`bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600 ${onSelectRow ? 'bg-gray-600' : ''}`}
+                    className={`bg-white dark:bg-gray-800 hover:bg-gray-50  dark:hover:bg-gray-600 ${onSelectRow ? 'bg-gray-600' : ''}`}
                     onClick={onSelectRowItem(row.original)}
                   >
                     {row.getVisibleCells().map((cell) => {
                       return (
-                        <td
-                          key={cell.id}
-                          className="text-black dark:text-white"
-                        >
+                        <td key={cell.id}>
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()
@@ -166,8 +163,8 @@ export const DataTable = <Entry extends BaseModel>(
           className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
           aria-label="Table navigation"
         >
-          <span className="text-sm font-normal text-black dark:text-white mb-4 md:mb-0 block w-full md:inline md:w-auto">
-            <span className="font-semibold text-black dark:text-white">
+          <span className="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">
+            <span className="font-semibold text-gray-900 dark:text-white">
               {table.getState().pagination.pageIndex + 1} of{' '}
               {table.getPageCount().toLocaleString()}
             </span>{' '}
@@ -175,12 +172,12 @@ export const DataTable = <Entry extends BaseModel>(
 
           <div className="flex gap-5">
             <div className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
-              <span className="flex items-center justify-center px-3 h-8 ms-0 text-black dark:text-white">
+              <span className="flex items-center justify-center px-3 h-8 ms-0">
                 Entries per Page
               </span>
               <select
                 id="underline_select"
-                className="h-full py-0 pl-0 pr-8 text-sm text-black dark:text-white bg-transparent border-0"
+                className="h-full py-0 pl-0 pr-8 text-sm text-gray-500 bg-transparent border-0"
                 onChange={(e) => {
                   table.setPageSize(Number(e.target.value));
                 }}

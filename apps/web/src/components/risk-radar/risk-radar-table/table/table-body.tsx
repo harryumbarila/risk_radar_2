@@ -118,16 +118,13 @@ export const TableBody: FC<Props> = ({
 
   return (
     <div className="overflow-x-auto">
-      <table className="datatable-table w-full table-auto !border-collapse break-words px-4 md:px-8 align-middle text-black dark:text-white ">
+      <table className="datatable-table w-full table-auto !border-collapse break-words px-4 md:px-8 align-middle">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <th key={header.id}>
-                  <div
-                    className="flex items-center"
-                    style={{ fontWeight: 'bold' }}
-                  >
+                  <div className="flex items-center">
                     <span>
                       {header.isPlaceholder
                         ? null

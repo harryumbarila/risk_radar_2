@@ -203,7 +203,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const [changedFields, setChangedFields] = useState<ChangedFields>({});
 
   // Move activeTab state declaration to before it's used
-  const [activeTab, setActiveTab] = useState<string>('contact');
+  const [activeTab, setActiveTab] = useState<string>('exceptions');
 
   // Add tab-specific loading states
   const [isExceptionsLoading, setIsExceptionsLoading] =
@@ -302,6 +302,19 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   // Add isSendingEmail state
   const [isSendingEmail, setIsSendingEmail] = useState<boolean>(false);
 
+  // Add new state for tracking loading states
+  const [isCardHistoryLoading, setIsCardHistoryLoading] =
+    useState<boolean>(false);
+  const [isEmailTemplateLoading, setIsEmailTemplateLoading] =
+    useState<boolean>(false);
+
+  // Add an effect to clear the card history loading state when data is received
+  useEffect(() => {
+    if (isCardHistoryLoading && cardNumberData) {
+      setIsCardHistoryLoading(false);
+    }
+  }, [cardNumberData, isCardHistoryLoading]);
+
   // Update merchantStateData when data changes
   useEffect(() => {
     if (data) {
@@ -377,8 +390,8 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
   // Calculate paginated data
   const paginatedExceptions = transactionExceptionsData?.slice(
-    (exceptionsPage - 1) * ITEMS_PER_PAGE,
-    exceptionsPage * ITEMS_PER_PAGE
+    (exceptionsPage - 1) * 50,
+    exceptionsPage * 50
   );
   const paginatedNotes = merchantNotesData?.slice(
     (notesPage - 1) * ITEMS_PER_PAGE,
@@ -730,7 +743,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       setIsSendingEmail(false);
     }
   };
-
   if (!merchantId) {
     notFound();
   }
@@ -800,7 +812,11 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
   return (
     <DefaultLayout>
-      <Breadcrumb pageName="Merchant profile" extra={`MID: ${merchantId}`} />
+      <Breadcrumb
+        pageName="Merchant profile"
+        extra={`MID: ${merchantId}`}
+        enableBackButton
+      />
       <Popup
         isOpen={isPopupActive}
         onClose={() => setIsPopupActive(false)}
@@ -810,238 +826,263 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           <div className="h-full">
             <div className="max-w-full h-full flex flex-col bg-white dark:bg-boxdark">
               {/* Issuer Information */}
-              <div className="grid grid-cols-3 gap-4 p-4 border-b border-stroke dark:border-strokedark">
-                <div>
-                  <p className="text-sm font-semibold text-black dark:text-white">
-                    Issuer Bank:
-                  </p>
-                  <p className="text-sm text-black dark:text-white">
-                    {cardHistory[0]?.issuerBank || ''}
-                  </p>
+              {isCardHistoryLoading ? (
+                <div className="flex-1 flex justify-center items-center">
+                  <Loader />
                 </div>
-                <div>
-                  <p className="text-sm font-semibold text-black dark:text-white">
-                    Issuer Country:
-                  </p>
-                  <p className="text-sm text-black dark:text-white">
-                    {cardHistory[0]?.issuerCountry || ''}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-black dark:text-white">
-                    Issuer Phone:
-                  </p>
-                  <p className="text-sm text-black dark:text-white">
-                    {cardHistory[0]?.issuerPhone || ''}
-                  </p>
-                </div>
-              </div>
-              <div className="p-4 border-b border-stroke dark:border-strokedark">
-                <h3 className="text-lg font-semibold text-black dark:text-white">
-                  Card # History
-                </h3>
-              </div>
-              <div className="flex-1 overflow-hidden">
-                <div className="h-full overflow-y-auto">
-                  <table className="w-full table-auto">
-                    <thead className="sticky top-0 bg-gray-100 dark:bg-meta-4">
-                      <tr>
-                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                          MID
-                        </th>
-                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                          Trans Date
-                        </th>
-                        <th className="p-4 py-1 font-medium text-black dark:text-white text-right">
-                          Trans Amt
-                        </th>
-                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                          POS
-                        </th>
-                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                          AVS
-                        </th>
-                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                          Auth Code
-                        </th>
-                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                          Card #
-                        </th>
-                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                          DB Net
-                        </th>
-                        <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                          Transmission Date
-                        </th>
-                        <th className="p-4 py-1 font-medium text-black dark:text-white text-right">
-                          Net Dep. Amt
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {currentItems.map((card: CardHistory, index: number) => {
-                        // Create a unique identifier using multiple fields and index
-                        const uniqueId = `${card.mid}-${card.transactionDate}-${card.cardNumber}-${card.amount}-${index}`;
-                        return (
-                          <tr key={uniqueId} className="text-center">
-                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                              {card.mid}
-                            </td>
-                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                              {formatDateWithoutTime(card.transactionDate)}
-                            </td>
-                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-right text-black dark:text-white">
-                              ${card.amount.toFixed(2)}
-                            </td>
-                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                              {card.posEntryMode}
-                            </td>
-                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                              {card.avsResponseCode}
-                            </td>
-                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                              {card.authCode}
-                            </td>
-                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                              {card.cardNumber}
-                            </td>
-                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                              {card.debitNetworkIdentifier || ''}
-                            </td>
-                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                              {formatDateWithoutTime(card.transmissionDate)}
-                            </td>
-                            <td className="border-b border-[#eee] p-4 dark:border-strokedark text-right text-black dark:text-white">
-                              ${card.netDepositAmount.toFixed(2)}
-                            </td>
+              ) : (
+                <>
+                  <div className="grid grid-cols-3 gap-4 p-4 border-b border-stroke dark:border-strokedark">
+                    <div>
+                      <p className="text-sm font-semibold text-black dark:text-white">
+                        Issuer Bank:
+                      </p>
+                      <p className="text-sm text-black dark:text-white">
+                        {cardHistory[0]?.issuerBank || ''}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-black dark:text-white">
+                        Issuer Country:
+                      </p>
+                      <p className="text-sm text-black dark:text-white">
+                        {cardHistory[0]?.issuerCountry || ''}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-black dark:text-white">
+                        Issuer Phone:
+                      </p>
+                      <p className="text-sm text-black dark:text-white">
+                        {cardHistory[0]?.issuerPhone || ''}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="p-4 border-b border-stroke dark:border-strokedark">
+                    <h3 className="text-lg font-semibold text-black dark:text-white">
+                      Card # History
+                    </h3>
+                  </div>
+                  <div className="flex-1 overflow-hidden">
+                    <div className="h-full overflow-y-auto">
+                      <table className="w-full table-auto">
+                        <thead className="sticky top-0 bg-gray-100 dark:bg-meta-4">
+                          <tr>
+                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                              MID
+                            </th>
+                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                              Trans Date
+                            </th>
+                            <th className="p-4 py-1 font-medium text-black dark:text-white text-right">
+                              Trans Amt
+                            </th>
+                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                              POS
+                            </th>
+                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                              AVS
+                            </th>
+                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                              Auth Code
+                            </th>
+                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                              Card #
+                            </th>
+                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                              DB Net
+                            </th>
+                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
+                              Transmission Date
+                            </th>
+                            <th className="p-4 py-1 font-medium text-black dark:text-white text-right">
+                              Net Dep. Amt
+                            </th>
                           </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              {/* Pagination */}
-              <div className="flex items-center justify-between p-4 border-t border-stroke dark:border-strokedark">
-                <div className="text-sm text-black dark:text-white">
-                  Showing {Math.min(cardHistory?.length || 0, startIndex + 1)}{' '}
-                  to {Math.min(cardHistory?.length || 0, endIndex)} of{' '}
-                  {cardHistory?.length || 0} entries
-                </div>
-                <div className="flex space-x-2">
-                  <button
-                    type="button"
-                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                    disabled={currentPage === 1}
-                    className="rounded-md border border-stroke px-4 py-2 text-sm font-medium text-black disabled:opacity-50 dark:border-strokedark dark:text-white"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setCurrentPage(Math.min(totalPages, currentPage + 1))
-                    }
-                    disabled={currentPage >= totalPages}
-                    className="rounded-md border border-stroke px-4 py-2 text-sm font-medium text-black disabled:opacity-50 dark:border-strokedark dark:text-white"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
+                        </thead>
+                        <tbody>
+                          {currentItems.map(
+                            (card: CardHistory, index: number) => {
+                              // Create a unique identifier using multiple fields and index
+                              const uniqueId = `${card.mid}-${card.transactionDate}-${card.cardNumber}-${card.amount}-${index}`;
+                              return (
+                                <tr key={uniqueId} className="text-center">
+                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                                    {card.mid}
+                                  </td>
+                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                                    {formatDateWithoutTime(
+                                      card.transactionDate
+                                    )}
+                                  </td>
+                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-right text-black dark:text-white">
+                                    ${card.amount.toFixed(2)}
+                                  </td>
+                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                                    {card.posEntryMode}
+                                  </td>
+                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                                    {card.avsResponseCode}
+                                  </td>
+                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                                    {card.authCode}
+                                  </td>
+                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                                    {card.cardNumber}
+                                  </td>
+                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                                    {card.debitNetworkIdentifier || ''}
+                                  </td>
+                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
+                                    {formatDateWithoutTime(
+                                      card.transmissionDate
+                                    )}
+                                  </td>
+                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-right text-black dark:text-white">
+                                    ${card.netDepositAmount.toFixed(2)}
+                                  </td>
+                                </tr>
+                              );
+                            }
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  {/* Pagination */}
+                  <div className="flex items-center justify-between p-4 border-t border-stroke dark:border-strokedark">
+                    <div className="text-sm text-black dark:text-white">
+                      Showing{' '}
+                      {Math.min(cardHistory?.length || 0, startIndex + 1)} to{' '}
+                      {Math.min(cardHistory?.length || 0, endIndex)} of{' '}
+                      {cardHistory?.length || 0} entries
+                    </div>
+                    <div className="flex space-x-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCurrentPage(Math.max(1, currentPage - 1))
+                        }
+                        disabled={currentPage === 1}
+                        className="rounded-md border border-stroke px-4 py-2 text-sm font-medium text-black disabled:opacity-50 dark:border-strokedark dark:text-white"
+                      >
+                        Previous
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCurrentPage(Math.min(totalPages, currentPage + 1))
+                        }
+                        disabled={currentPage >= totalPages}
+                        className="rounded-md border border-stroke px-4 py-2 text-sm font-medium text-black disabled:opacity-50 dark:border-strokedark dark:text-white"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         ) : activePopup == PopupType.Email ? (
           <div className="max-w bg-white p-6 rounded-lg shadow-lg">
-            {/* Template Dropdown */}
-            <div className="mb-4">
-              <label
-                className="block text-sm font-medium text-gray-700"
-                htmlFor="email-template"
-              >
-                Template:
-              </label>
-              <select
-                className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                value={templateData.templateId?.toString() || ''}
-                onChange={(e) => {
-                  const templateId = e.target.value
-                    ? parseInt(e.target.value, 10)
-                    : null;
-                  setTemplateData((prev) => ({
-                    ...prev,
-                    templateId,
-                  }));
-                  const selectedTemplate = emailTemplates?.find(
-                    (template: EmailTemplate) => template.id === templateId
-                  )?.templateEmailBody;
-                  if (selectedTemplate) {
-                    replaceEmailTemplateParameters(selectedTemplate);
+            {isEmailTemplateLoading ? (
+              <div className="flex justify-center items-center p-8">
+                <Loader />
+              </div>
+            ) : (
+              <>
+                {/* Template Dropdown */}
+                <div className="mb-4">
+                  <label
+                    className="block text-sm font-medium text-gray-700"
+                    htmlFor="email-template"
+                  >
+                    Template:
+                  </label>
+                  <select
+                    className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                    value={templateData.templateId?.toString() || ''}
+                    onChange={(e) => {
+                      const templateId = e.target.value
+                        ? parseInt(e.target.value, 10)
+                        : null;
+                      setTemplateData((prev) => ({
+                        ...prev,
+                        templateId,
+                      }));
+                      const selectedTemplate = emailTemplates?.find(
+                        (template: EmailTemplate) => template.id === templateId
+                      )?.templateEmailBody;
+                      if (selectedTemplate) {
+                        replaceEmailTemplateParameters(selectedTemplate);
+                      }
+                    }}
+                  >
+                    <option value="">Select a template</option>
+                    {emailTemplates.map((template: EmailTemplate) => (
+                      <option key={template.id} value={template.id}>
+                        {template.templateName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Email Recipient */}
+                <div className="mb-4">
+                  <label
+                    className="block text-sm font-medium text-gray-700"
+                    htmlFor="email-recipient"
+                  >
+                    E-Mail Recipient:
+                  </label>
+                  <input
+                    type="email"
+                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter recipient email"
+                  />
+                </div>
+
+                {/* Email Body */}
+                <div className="mb-4">
+                  <label
+                    className="block text-sm font-medium text-gray-700"
+                    htmlFor="email-body"
+                  >
+                    E-Mail Body Content:
+                  </label>
+                  <textarea
+                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                    rows={4}
+                    value={templateData.body}
+                    onChange={(e) =>
+                      setTemplateData((prev) => ({
+                        ...prev,
+                        body: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter email content..."
+                  />
+                </div>
+
+                {/* Send Button */}
+                <button
+                  type="button"
+                  onClick={handleSendEmail}
+                  disabled={
+                    isSendingEmail ||
+                    !email ||
+                    !templateData.body ||
+                    templateData.templateId === null
                   }
-                }}
-              >
-                <option value="">Select a template</option>
-                {emailTemplates.map((template: EmailTemplate) => (
-                  <option key={template.id} value={template.id}>
-                    {template.templateName}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Email Recipient */}
-            <div className="mb-4">
-              <label
-                className="block text-sm font-medium text-gray-700"
-                htmlFor="email-recipient"
-              >
-                E-Mail Recipient:
-              </label>
-              <input
-                type="email"
-                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter recipient email"
-              />
-            </div>
-
-            {/* Email Body */}
-            <div className="mb-4">
-              <label
-                className="block text-sm font-medium text-gray-700"
-                htmlFor="email-body"
-              >
-                E-Mail Body Content:
-              </label>
-              <textarea
-                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                rows={4}
-                value={templateData.body}
-                onChange={(e) =>
-                  setTemplateData((prev) => ({
-                    ...prev,
-                    body: e.target.value,
-                  }))
-                }
-                placeholder="Enter email content..."
-              />
-            </div>
-
-            {/* Send Button */}
-            <button
-              type="button"
-              onClick={handleSendEmail}
-              disabled={
-                isSendingEmail ||
-                !email ||
-                !templateData.body ||
-                templateData.templateId === null
-              }
-              className="w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSendingEmail ? 'Sending...' : 'Send Email'}
-            </button>
+                  className="w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSendingEmail ? 'Sending...' : 'Send Email'}
+                </button>
+              </>
+            )}
           </div>
         ) : null}
       </Popup>
@@ -1051,96 +1092,93 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark col-span-2">
           <div className="grid grid-cols-[max-content_1fr] gap-x-4 font-mono">
             {/* DBA Name */}
-            <p className="text-black dark:text-white text-[15px]">
+            <p className="text-black dark:text-white">
               <strong>DBA Name:</strong>
             </p>
-            <p className="text-black dark:text-white text-[15px]">
-              {merchantContactInfo?.dbaName}
-            </p>
+            <p>{merchantContactInfo?.dbaName}</p>
 
             {/* Address */}
-            <p className="text-black dark:text-white text-[15px]">
+            <p className="text-black dark:text-white">
               <strong>Address:</strong>
             </p>
-            <p className="text-black dark:text-white text-[15px]">
+            <p>
               {merchantProfile?.sDBAAddress || merchantContactInfo?.dbaAddress}
             </p>
 
-            <p className="text-black dark:text-white text-[15px]">
+            <p className="text-black dark:text-white">
               <strong>City:</strong>{' '}
             </p>
-            <div className="flex justify-between gap-2 text-black dark:text-white">
-              <p className="text-black dark:text-white text-[15px]">
-                {merchantProfile?.sDBACity || merchantContactInfo?.dbaCity}
-              </p>
+            <div className="flex justify-between gap-2">
+              <p>{merchantProfile?.sDBACity || merchantContactInfo?.dbaCity}</p>
 
-              <p className="text-black dark:text-white text-[15px]">
+              <p>
                 <strong>ST:</strong>{' '}
                 {merchantProfile?.sDBAState || merchantContactInfo?.dbaState}
               </p>
 
-              <p className="text-black dark:text-white text-[15px]">
+              <p>
                 <strong>ZIP:</strong>{' '}
                 {merchantProfile?.sDBAZip || merchantContactInfo?.dbaZip}
               </p>
             </div>
 
-            <p className="text-black dark:text-white text-[15px]">
+            <p className="text-black dark:text-white">
               <strong>Activated:</strong>
             </p>
-            <p className="text-black dark:text-white text-[15px]">
-              {formatDate(merchantProfile?.sActivationDate)}
-            </p>
+            <p>{formatDate(merchantProfile?.sActivationDate)}</p>
 
-            <p className="text-black dark:text-white text-[15px]">
+            <p className="text-black dark:text-white">
               <strong>Net Balance:</strong>
             </p>
-            <p className="text-black dark:text-white text-[15px]">
-              {formatCurrency(
-                merchantContactInfo?.netSettlementBalance || 0,
-                2,
-                true
-              )}
+            <p>
+              <span
+                className={`${
+                  merchantContactInfo!.netSettlementBalance >= 0
+                    ? 'text-black dark:text-white font-bold'
+                    : 'text-red-500 dark:text-red-400'
+                }`}
+              >
+                {formatCurrency(
+                  merchantContactInfo?.netSettlementBalance || 0,
+                  2,
+                  true
+                )}
+              </span>
             </p>
           </div>
         </div>
         {/* Column 2 */}
         <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark col-span-2">
           <div className="grid grid-cols-[max-content_1fr] gap-x-4 font-mono">
-            <p className="text-black dark:text-white text-[15px]">
+            <p className="text-black dark:text-white">
               <strong>Ownership:</strong>
             </p>
-            <p className="text-black dark:text-white text-[15px]">
-              {merchantProfile?.sOwnershipType}
-            </p>
+            <p>{merchantProfile?.sOwnershipType}</p>
 
-            <p className="text-black dark:text-white text-[15px]">
+            <p className="text-black dark:text-white">
               <strong>SIC:</strong>
             </p>
-            <p className="text-black dark:text-white text-[15px]">
-              {merchantProfile?.sSIC}
-            </p>
+            <p>{merchantProfile?.sSIC}</p>
 
-            <p className="text-black dark:text-white text-[15px]">
+            <p className="text-black dark:text-white">
               <strong>Merchant Type:</strong>
             </p>
-            <p className="text-black dark:text-white text-[15px]">
-              {merchantProfile?.sMerchantType}
-            </p>
-
-            <p className="text-black dark:text-white text-[15px]">
-              <strong>Talus Pay:</strong>
-            </p>
-            <p className="text-black dark:text-white text-[15px]">
-              {merchantProfile?.bIsTalusPayMerchant ? 'Yes' : 'No'}
-            </p>
+            <p>{merchantProfile?.sMerchantType}</p>
+            {merchantProfile?.bIsTalusPayMerchant ? (
+              <>
+                <p className="text-black dark:text-white">
+                  <strong>Talus Pay:</strong>
+                </p>
+                <p className="text-red-600 font-bold">Yes</p>
+              </>
+            ) : null}
           </div>
         </div>
         {/* Column 3 */}
         <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark col-span-2">
           <div className="flex flex-row gap-x-1">
             <div className="grid grid-cols-[max-content_1fr] gap-x-4 font-mono">
-              <p className="text-black dark:text-white text-[15px]">
+              <p className="text-black dark:text-white">
                 <strong>Risk Watch:</strong>
               </p>
               <input
@@ -1152,7 +1190,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                 }
               />
 
-              <p className="text-black dark:text-white text-[15px]">
+              <p className="text-black dark:text-white">
                 <strong>Auto Hold White List:</strong>
               </p>
               <input
@@ -1168,7 +1206,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               />
 
               {/* Divert */}
-              <p className="text-black dark:text-white text-[15px]">
+              <p className="text-black dark:text-white">
                 <strong>Divert:</strong>
               </p>
               <input
@@ -1181,10 +1219,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                 }
               />
 
-              <p className="text-black dark:text-white text-[15px]">
+              <p className="text-black dark:text-white">
                 <strong>Curr. Month Swipe Cnt (%):</strong>{' '}
               </p>
-              <p className="text-black dark:text-white text-[15px]">
+              <p>
                 {merchantProfile?.iSwipedPercBasedOnTransCntCurrMonth || ''}
               </p>
             </div>
@@ -1214,7 +1252,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   : 'Review'}
               </button>
 
-              {riskException?.fkRiskExceptionStatus === 2 && (
+              {riskException?.fkRiskExceptionStatus === 1 && (
                 <button
                   className={`inline-flex items-center justify-center rounded-lg border px-4 py-1 text-white transition-colors
                 ${
@@ -1239,49 +1277,49 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
       <section className="mb-4">
         <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
-          <div className="grid grid-cols-4 text-black dark:text-white text-center ">
-            <p className="text-black dark:text-white text-[15px] ">
+          <div className="grid grid-cols-4 text-black dark:text-white text-center">
+            <p className="text-black dark:text-white">
               <strong>Channel:</strong> {merchantProfile?.sChannel}
             </p>
-            <p className="text-black dark:text-white text-[15px]">
+            <p className="text-black dark:text-white">
               <strong>Reseller:</strong> {merchantProfile?.sReseller}
             </p>
-            <p className="text-black dark:text-white text-[15px]">
+            <p className="text-black dark:text-white">
               <strong>Referral Partner:</strong>{' '}
               {merchantProfile?.sReferralPartner}
             </p>
-            <p className="text-black dark:text-white text-[15px]">
+            <p className="text-black dark:text-white">
               <strong>Solution Consultant:</strong>{' '}
               {merchantProfile?.sSolutionConsultant || ''}
             </p>
           </div>
           <hr className="my-2 border-t border-gray-300" />
           <div className="grid grid-cols-4 text-black dark:text-white text-center">
-            <p className="text-black dark:text-white text-[15px]">
+            <p>
               <strong>MV:</strong> {formatCurrency(merchantProfile?.iMV$, 0)}
-              <span className="text-black dark:text-white">
+              <span className="text-gray-500 dark:text-gray-400">
                 {' '}
                 (UW Appr.- {formatCurrency(merchantProfile?.iUWApprMV, 0)})
               </span>
             </p>
-            <p className="text-black dark:text-white text-[15px]">
+            <p>
               <strong>AT:</strong> {formatCurrency(merchantProfile?.iAT$, 0)}
-              <span className="text-black dark:text-white">
+              <span className="text-gray-500 dark:text-gray-400">
                 {' '}
                 (UW Appr.- {formatCurrency(merchantProfile?.iUWApprAT, 0)})
               </span>
             </p>
-            <p className="text-black dark:text-white text-[15px]">
+            <p>
               <strong>HT:</strong> {formatCurrency(merchantProfile?.iHT$, 0)}
-              <span className=" text-black dark:text-white  ">
+              <span className="text-gray-500 dark:text-gray-400">
                 {' '}
                 (UW Appr.- {formatCurrency(merchantProfile?.iUWApprHT, 0)})
               </span>
             </p>
-            <p className="text-black dark:text-white text-[15px]">
+            <p>
               <strong>Swipe Vol:</strong>{' '}
               {`${merchantProfile?.iSwipeVolPerc}%` || ''}
-              <span className=" text-black dark:text-white">
+              <span className="text-gray-500 dark:text-gray-400">
                 {' '}
                 (UW Appr.- {`${merchantProfile?.iUWApprSwipeVolPerc}%` || ''})
               </span>
@@ -1394,44 +1432,32 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     <p className="text-black dark:text-white">
                       <strong>Contact Name:</strong>
                     </p>
-                    <p className="text-black dark:text-white">
-                      {data?.owners?.[0]?.name || ''}
-                    </p>
+                    <p>{data?.owners?.[0]?.name || ''}</p>
 
                     <p className="text-black dark:text-white">
                       <strong>Phone #:</strong>
                     </p>
-                    <p className="text-black dark:text-white">
-                      {merchantContactInfo?.contactPhoneNumber || ''}
-                    </p>
+                    <p>{merchantContactInfo?.contactPhoneNumber || ''}</p>
 
                     <p className="text-black dark:text-white">
                       <strong>Fax #:</strong>
                     </p>
-                    <p className="text-black dark:text-white">
-                      {merchantContactInfo?.dbaFax || ''}
-                    </p>
+                    <p>{merchantContactInfo?.dbaFax || ''}</p>
 
                     <p className="text-black dark:text-white">
                       <strong>Mobile #:</strong>
                     </p>
-                    <p className="text-black dark:text-white">
-                      {merchantContactInfo?.contactPhoneNumber || ''}
-                    </p>
+                    <p>{merchantContactInfo?.contactPhoneNumber || ''}</p>
 
                     <p className="text-black dark:text-white">
                       <strong>Email:</strong>{' '}
                     </p>
-                    <p className="text-black dark:text-white">
-                      {merchantContactInfo?.contactEmail || ''}
-                    </p>
+                    <p>{merchantContactInfo?.contactEmail || ''}</p>
 
                     <p className="text-black dark:text-white">
                       <strong>Web Site:</strong>{' '}
                     </p>
-                    <p className="text-black dark:text-white">
-                      {merchantContactInfo?.website || ''}
-                    </p>
+                    <p>{merchantContactInfo?.website || ''}</p>
                   </div>
 
                   <div className="flex flex-row items-center">
@@ -1485,36 +1511,26 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   <p className="mb-1 text-black dark:text-white">
                     <strong>Name:</strong>
                   </p>
-                  <p className="text-black dark:text-white">
-                    {data?.owners?.[0]?.name || ''}
-                  </p>
+                  <p>{data?.owners?.[0]?.name || ''}</p>
 
                   <p className="mb-1 text-black dark:text-white">
                     <strong>Addr:</strong>
                   </p>
-                  <p className="text-black dark:text-white">
-                    {data?.businessInfo?.legalAddress || ''}
-                  </p>
+                  <p>{data?.businessInfo?.legalAddress || ''}</p>
                   <p className="mb-1 text-black dark:text-white">
                     <strong>City:</strong>
                   </p>
-                  <p className="text-black dark:text-white">
-                    {data?.businessInfo?.legalCity || ''}
-                  </p>
+                  <p>{data?.businessInfo?.legalCity || ''}</p>
 
                   <p className="mb-1 text-black dark:text-white">
                     <strong>ST:</strong>
                   </p>
-                  <p className="text-black dark:text-white">
-                    {data?.businessInfo?.legalState || ''}
-                  </p>
+                  <p>{data?.businessInfo?.legalState || ''}</p>
 
                   <p className="mb-1 text-black dark:text-white">
                     <strong>Zip:</strong>
                   </p>
-                  <p className="text-black dark:text-white">
-                    {data?.businessInfo?.legalZip || ''}
-                  </p>
+                  <p>{data?.businessInfo?.legalZip || ''}</p>
                 </div>
               </div>
             </div>
@@ -1537,16 +1553,16 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   <tbody>
                     {data?.owners?.map((owner) => (
                       <tr key={owner.ownerCode} className="text-center">
-                        <td className="border-b border-[#eee] p-2 dark:border-strokedark text-black dark:text-white">
+                        <td className="border-b border-[#eee] p-2 dark:border-strokedark">
                           {owner.name}
                         </td>
-                        <td className="border-b border-[#eee] p-2 dark:border-strokedark text-black dark:text-white">
+                        <td className="border-b border-[#eee] p-2 dark:border-strokedark">
                           {owner.ssn4}
                         </td>
-                        <td className="border-b border-[#eee] p-2 dark:border-strokedark text-black dark:text-white">
+                        <td className="border-b border-[#eee] p-2 dark:border-strokedark">
                           {owner.dob}
                         </td>
-                        <td className="border-b border-[#eee] p-2 dark:border-strokedark text-black dark:text-white">
+                        <td className="border-b border-[#eee] p-2 dark:border-strokedark">
                           {/* No driver's license data available */}
                         </td>
                       </tr>
@@ -1604,20 +1620,31 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                         key={`${exception.transactionId}-${index}`}
                         className="text-center"
                       >
-                        <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
-                          {formatDate(exception.transactionDate)}
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                          <span className="block text-left">
+                            {formatDate(
+                              exception.transactionDate,
+                              'MM/dd/yyyy kk:mm:ss'
+                            )}
+                          </span>
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right dark:text-white  text-black ">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
                           <span className="block text-right">
                             {formatCurrency(exception.authAmount)}
                           </span>
                         </td>
                         <td
-                          className="border-b border-[#eee] px-4 py-2 dark:border-strokedark  cursor-pointer text-blue-600 dark:text-blue-500 hover:underline"
+                          className="border-b border-[#eee] px-4 py-2 dark:border-strokedark cursor-pointer text-blue-600 hover:text-blue-800 hover:underline"
                           onClick={() => {
+                            setIsEmailTemplateLoading(true);
                             setIsPopupActive(true);
                             setActivePopup(PopupType.Email);
                             setCurrentTransException(exception);
+                            // Clear the loading state after a short delay to ensure the popup is visible
+                            setTimeout(
+                              () => setIsEmailTemplateLoading(false),
+                              500
+                            );
                           }}
                         >
                           <span
@@ -1626,30 +1653,36 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                             {formatCurrency(exception.transactionAmount)}
                           </span>
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {exception.posEntryMode}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {exception.avsResponseCode}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
-                          {exception.authCode}
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                          {exception.authCode || ''}
                         </td>
-                        <td
-                          className="border-b border-[#eee] px-4 py-2  dark:border-strokedark  cursor-pointer text-blue-600 dark:text-blue-500 hover:underline"
-                          onClick={() => {
-                            setIsPopupActive(true);
-                            setCurrentTransException(exception);
-                            setActivePopup(PopupType.CardHistory);
-                          }}
-                        >
-                          {exception.cardNumber}{' '}
-                          {exception.transactionId?.slice(-4)}
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                          <span className="block text-left">
+                            <button
+                              type="button"
+                              className="cursor-pointer text-blue-600 hover:text-blue-800 hover:underline"
+                              onClick={() => {
+                                setIsCardHistoryLoading(true);
+                                setIsPopupActive(true);
+                                setCurrentTransException(exception);
+                                setActivePopup(PopupType.CardHistory);
+                              }}
+                            >
+                              {exception.cardNumber}
+                            </button>
+                            {` ${exception.transactionId?.slice(-4)}`}
+                          </span>
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {exception.debitNetworkIdentifier}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {exception.exceptionList &&
                             exception.exceptionList
                               .split(' ')
@@ -1713,9 +1746,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     {paginatedNotes?.map((note) => (
                       <tr key={`${note.pkNotes}`}>
                         <td
-                          className={`border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white  text-left ${
-                            note.bPinnedNotes
-                              ? 'text-red-500'
+                          className={`border-b border-[#eee] px-4 py-2 dark:border-strokedark text-left ${
+                            note.bPinnedNotes === '*'
+                              ? 'text-red-500 font-bold'
                               : 'text-black dark:text-white'
                           }`}
                         >
@@ -1723,16 +1756,13 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                             ? `*${note.sNotes}`
                             : note.sNotes}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2  dark:border-strokedark  text-center">
-                          <p className="text-black dark:text-white">
-                            {' '}
-                            {formatDate(note.dtCreated)}{' '}
-                          </p>
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-center">
+                          {formatDate(note.dtCreated)}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white  text-left">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-left">
                           {note.sUserCreated}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white  text-center">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-center">
                           <div className="">
                             <input
                               type="checkbox"
@@ -1868,31 +1898,31 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                         key={`${chargeback.sCaseNumber}`}
                         className="text-center"
                       >
-                        <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {chargeback.sCaseNumber}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {formatDateWithoutTime(chargeback.dtTrans)}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           ${chargeback.dAmt.toFixed(2)}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {chargeback.sCardNum}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {chargeback.sPaymentType}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {formatDateWithoutTime(chargeback.dtReceived)}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {chargeback.sReferenceNum}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {chargeback.ReasonCodeDescription}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {formatDate(chargeback.dtCreated)}
                         </td>
                       </tr>
@@ -1915,7 +1945,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         )}
         {activeTab === 'sameTaxId' && (
           <>
-            <h2 className="mb-2 text-xl font-semibold dark:border-strokedark text-black dark:text-white">
+            <h2 className="mb-2 text-xl font-semibold text-black dark:text-white">
               Merchants with Same Tax ID
             </h2>
             <div className="grid grid-cols-1 gap-4">
@@ -1958,7 +1988,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                 </div>
               ) : (
                 <div className="p-4 border border-gray-200 rounded-md">
-                  <p className="text-gray-600 text-black dark:text-white ">
+                  <p className="text-gray-600">
                     No other merchants found with the same Tax ID.
                   </p>
                 </div>
@@ -1973,11 +2003,11 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         <h2 className="mb-2 text-xl font-semibold text-black dark:text-white">
           Volume
         </h2>
-        <div className="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1 ">
+        <div className="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
           <div className="max-w-full overflow-x-auto">
             <table className="w-full table-auto">
               <thead>
-                <tr className="text-black dark:text-white text-center">
+                <tr className="bg-gray-2 dark:bg-meta-4 text-center">
                   <th className="p-4 py-1 font-medium text-black dark:text-white">
                     Month/Year
                   </th>
@@ -2012,35 +2042,35 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               </thead>
               <tbody>
                 {paginatedVolume?.map((vol) => (
-                  <tr key={`${vol.year}-${vol.month}`} className="text-center">
-                    <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                  <tr key={`${vol.year}-${vol.month}`} className="text-right">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-left">
                       {vol.month} {vol.year}
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       ${vol.volume.toLocaleString()}
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       ${vol.averageTicket.toLocaleString()}
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       {vol.swipedPercentage.toFixed(2)}%
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       ${vol.highestTicket.toLocaleString()}
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       ${vol.totalChargebacks.toLocaleString()}
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       {vol.visaChargebackPercentage.toFixed(2)}%
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       {vol.mastercardChargebackPercentage.toFixed(2)}%
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       {vol.discoverChargebackPercentage.toFixed(2)}%
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 text-black dark:border-strokedark dark:text-white">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       {vol.amexChargebackPercentage.toFixed(2)}%
                     </td>
                   </tr>
@@ -2082,10 +2112,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                       .filter((_, index: number) => index % 4 === colIndex)
                       .map((legend) => (
                         <tr key={legend.id} className="text-center">
-                          <td className="border-b border-[#eee] px-4 py-5 text-black dark:border-strokedark dark:text-white">
+                          <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                             {legend.id}
                           </td>
-                          <td className="border-b border-[#eee] px-4 py-5 text-black dark:border-strokedark dark:text-white">
+                          <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                             {legend.description}
                           </td>
                         </tr>
