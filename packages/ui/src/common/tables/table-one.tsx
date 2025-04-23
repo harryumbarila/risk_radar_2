@@ -56,27 +56,27 @@ export const TableOne: FC = () => {
       <div className="flex flex-col">
         <div className="grid grid-cols-3 rounded-sm bg-gray-2 dark:bg-meta-4 sm:grid-cols-5">
           <div className="p-2.5 xl:p-5">
-            <h5 className="text-sm font-medium uppercase text-black dark:text-white xsm:text-base">
+            <h5 className="text-sm font-medium uppercase xsm:text-base">
               Source
             </h5>
           </div>
           <div className="p-2.5 text-center xl:p-5">
-            <h5 className="text-sm font-medium uppercase text-black dark:text-white xsm:text-base">
+            <h5 className="text-sm font-medium uppercase xsm:text-base">
               Visitors
             </h5>
           </div>
           <div className="p-2.5 text-center xl:p-5">
-            <h5 className="text-sm font-medium uppercase text-black dark:text-white xsm:text-base">
+            <h5 className="text-sm font-medium uppercase xsm:text-base">
               Revenues
             </h5>
           </div>
           <div className="hidden p-2.5 text-center sm:block xl:p-5">
-            <h5 className="text-sm font-medium uppercase text-black dark:text-white xsm:text-base">
+            <h5 className="text-sm font-medium uppercase xsm:text-base">
               Sales
             </h5>
           </div>
           <div className="hidden p-2.5 text-center sm:block xl:p-5">
-            <h5 className="text-sm font-medium uppercase text-black dark:text-white xsm:text-base">
+            <h5 className="text-sm font-medium uppercase xsm:text-base">
               Conversion
             </h5>
           </div>
@@ -105,7 +105,7 @@ export const TableOne: FC = () => {
             </div>
 
             <div className="flex items-center justify-center p-2.5 xl:p-5">
-              <p className="text-black dark:text-white">${brand.revenues}</p>
+              <p className="text-meta-3">${brand.revenues}</p>
             </div>
 
             <div className="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
@@ -113,7 +113,7 @@ export const TableOne: FC = () => {
             </div>
 
             <div className="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
-              <p className="text-black dark:text-white">{brand.conversion}%</p>
+              <p className="text-meta-5">{brand.conversion}%</p>
             </div>
           </div>
         ))}

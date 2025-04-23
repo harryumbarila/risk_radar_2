@@ -66,19 +66,27 @@ export const TableFive: React.FC = () => {
           {/* table header start */}
           <div className="grid grid-cols-12 bg-[#F9FAFB] px-5 py-4 dark:bg-meta-4 lg:px-7.5 2xl:px-11">
             <div className="col-span-3">
-              <h5 className="font-medium text-black dark:text-white">NAME</h5>
+              <h5 className="font-medium text-[#637381] dark:text-bodydark">
+                NAME
+              </h5>
             </div>
 
             <div className="col-span-3">
-              <h5 className="font-medium text-black dark:text-white">TITLE</h5>
+              <h5 className="font-medium text-[#637381] dark:text-bodydark">
+                TITLE
+              </h5>
             </div>
 
             <div className="col-span-3">
-              <h5 className="font-medium text-black dark:text-white">EMAIL</h5>
+              <h5 className="font-medium text-[#637381] dark:text-bodydark">
+                EMAIL
+              </h5>
             </div>
 
             <div className="col-span-2">
-              <h5 className="font-medium text-black dark:text-white">ROLE</h5>
+              <h5 className="font-medium text-[#637381] dark:text-bodydark">
+                ROLE
+              </h5>
             </div>
           </div>
           {/* table header end */}
@@ -91,19 +99,27 @@ export const TableFive: React.FC = () => {
                 className="grid grid-cols-12 border-t border-[#EEEEEE] px-5 py-4 dark:border-strokedark lg:px-7.5 2xl:px-11"
               >
                 <div className="col-span-3">
-                  <p className="text-black dark:text-white">{user.name}</p>
+                  <p className="text-[#637381] dark:text-bodydark">
+                    {user.name}
+                  </p>
                 </div>
 
                 <div className="col-span-3">
-                  <p className="text-black dark:text-white">{user.title}</p>
+                  <p className="text-[#637381] dark:text-bodydark">
+                    {user.title}
+                  </p>
                 </div>
 
                 <div className="col-span-3">
-                  <p className="text-black dark:text-white">{user.email}</p>
+                  <p className="text-[#637381] dark:text-bodydark">
+                    {user.email}
+                  </p>
                 </div>
 
                 <div className="col-span-2">
-                  <p className="text-black dark:text-white">{user.role}</p>
+                  <p className="text-[#637381] dark:text-bodydark">
+                    {user.role}
+                  </p>
                 </div>
 
                 <div className="col-span-1">
