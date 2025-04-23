@@ -204,7 +204,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const [changedFields, setChangedFields] = useState<ChangedFields>({});
 
   // Move activeTab state declaration to before it's used
-  const [activeTab, setActiveTab] = useState<string>('exceptions');
+  const [activeTab, setActiveTab] = useState<string>(
+    exceptionId ? 'exceptions' : 'contact'
+  );
 
   // Add tab-specific loading states
   const [isExceptionsLoading, setIsExceptionsLoading] =
@@ -1236,7 +1238,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             <p className="text-black dark:text-white text-[15px]">
               {merchantProfile?.sMerchantType}
             </p>
-            <p className="text-red-500 dark:text-red-400 text-[15px]">
+            <p className="text-black dark:text-white text-[15px]">
               <strong>Talus Pay:</strong>
             </p>
             {merchantProfile?.bIsTalusPayMerchant ? (
@@ -2043,13 +2045,13 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           </div>
         )}
         {activeTab === 'netsettlement' && (
-          <h2 className="mb-2 text-xl font-semibold text-black dark:text-white">
-            Coming soon
+          <h2 className="mb-2 text-xl font-semibold text-red-500 dark:text-red-400">
+            Coming soon…
           </h2>
         )}
         {activeTab === 'sameTaxId' && (
           <>
-            <h2 className="mb-2 text-xl font-semibold text-black dark:text-white text-black dark:text-white">
+            <h2 className="mb-2 text-xl font-semibold text-black dark:text-white">
               Merchants with Same Tax ID
             </h2>
             <div className="grid grid-cols-1 gap-4">
