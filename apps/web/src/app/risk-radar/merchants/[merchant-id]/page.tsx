@@ -9,7 +9,7 @@ import { Breadcrumb, Loader } from '@denali/ui';
 import { useAuth } from '@frontegg/nextjs';
 import classNames from 'classnames';
 import { format } from 'date-fns';
-import { notFound, useSearchParams } from 'next/navigation';
+import { notFound, useRouter, useSearchParams } from 'next/navigation';
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -156,6 +156,7 @@ type ChangedFields = {
 
 const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const { 'merchant-id': merchantId } = params;
+  const router = useRouter();
 
   const searchParams = useSearchParams();
 
@@ -390,8 +391,8 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
   // Calculate paginated data
   const paginatedExceptions = transactionExceptionsData?.slice(
-    (exceptionsPage - 1) * 50,
-    exceptionsPage * 50
+    (exceptionsPage - 1) * ITEMS_PER_PAGE,
+    exceptionsPage * ITEMS_PER_PAGE
   );
   const paginatedNotes = merchantNotesData?.slice(
     (notesPage - 1) * ITEMS_PER_PAGE,
@@ -599,6 +600,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
     if (user?.name) {
       await saveChangedFields({ clickedStatus: newStatus });
+      router.push('/risk-radar');
     }
   };
 
@@ -617,6 +619,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       }));
 
       await saveChangedFields({ clickedStatus: newStatus });
+      router.push('/risk-radar');
     }
   };
 
@@ -925,7 +928,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                                     {card.avsResponseCode}
                                   </td>
                                   <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                                    {card.authCode}
+                                    {card.authCode || ''}
                                   </td>
                                   <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
                                     {card.cardNumber}
@@ -1095,28 +1098,32 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             <p className="text-black dark:text-white">
               <strong>DBA Name:</strong>
             </p>
-            <p>{merchantContactInfo?.dbaName}</p>
+            <p className="text-black dark:text-white">
+              {merchantContactInfo?.dbaName}
+            </p>
 
             {/* Address */}
             <p className="text-black dark:text-white">
               <strong>Address:</strong>
             </p>
-            <p>
+            <p className="text-black dark:text-white">
               {merchantProfile?.sDBAAddress || merchantContactInfo?.dbaAddress}
             </p>
 
             <p className="text-black dark:text-white">
               <strong>City:</strong>{' '}
             </p>
-            <div className="flex justify-between gap-2">
-              <p>{merchantProfile?.sDBACity || merchantContactInfo?.dbaCity}</p>
+            <div className="flex justify-between gap-2 text-black dark:text-white">
+              <p className="text-black dark:text-white">
+                {merchantProfile?.sDBACity || merchantContactInfo?.dbaCity}
+              </p>
 
-              <p>
+              <p className="text-black dark:text-white">
                 <strong>ST:</strong>{' '}
                 {merchantProfile?.sDBAState || merchantContactInfo?.dbaState}
               </p>
 
-              <p>
+              <p className="text-black dark:text-white">
                 <strong>ZIP:</strong>{' '}
                 {merchantProfile?.sDBAZip || merchantContactInfo?.dbaZip}
               </p>
@@ -1125,7 +1132,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             <p className="text-black dark:text-white">
               <strong>Activated:</strong>
             </p>
-            <p>{formatDate(merchantProfile?.sActivationDate)}</p>
+            <p className="text-black dark:text-white">
+              {formatDate(merchantProfile?.sActivationDate)}
+            </p>
 
             <p className="text-black dark:text-white">
               <strong>Net Balance:</strong>
@@ -1153,24 +1162,28 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             <p className="text-black dark:text-white">
               <strong>Ownership:</strong>
             </p>
-            <p>{merchantProfile?.sOwnershipType}</p>
+            <p className="text-black dark:text-white">
+              {merchantProfile?.sOwnershipType}
+            </p>
 
             <p className="text-black dark:text-white">
               <strong>SIC:</strong>
             </p>
-            <p>{merchantProfile?.sSIC}</p>
+            <p className="text-black dark:text-white">
+              {merchantProfile?.sSIC}
+            </p>
 
             <p className="text-black dark:text-white">
               <strong>Merchant Type:</strong>
             </p>
-            <p>{merchantProfile?.sMerchantType}</p>
+            <p className="text-black dark:text-white">
+              {merchantProfile?.sMerchantType}
+            </p>
+            <p className="text-black dark:text-white">
+              <strong>Talus Pay:</strong>
+            </p>
             {merchantProfile?.bIsTalusPayMerchant ? (
-              <>
-                <p className="text-black dark:text-white">
-                  <strong>Talus Pay:</strong>
-                </p>
-                <p className="text-red-600 font-bold">Yes</p>
-              </>
+              <p className="text-red-500 dark:text-red-400 font-bold">Yes</p>
             ) : null}
           </div>
         </div>
@@ -1206,7 +1219,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               />
 
               {/* Divert */}
-              <p className="text-black dark:text-white">
+              <p className="text-red-500 dark:text-red-400">
                 <strong>Divert:</strong>
               </p>
               <input
@@ -1663,7 +1676,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           {exception.authCode || ''}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
-                          <span className="block text-left">
+                          <span className="block text-center">
                             <button
                               type="button"
                               className="cursor-pointer text-blue-600 hover:text-blue-800 hover:underline"
@@ -1904,7 +1917,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                           {formatDateWithoutTime(chargeback.dtTrans)}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
                           ${chargeback.dAmt.toFixed(2)}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
@@ -2042,23 +2055,23 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               </thead>
               <tbody>
                 {paginatedVolume?.map((vol) => (
-                  <tr key={`${vol.year}-${vol.month}`} className="text-right">
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-left">
+                  <tr key={`${vol.year}-${vol.month}`} className="text-center">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       {vol.month} {vol.year}
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
                       ${vol.volume.toLocaleString()}
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
                       ${vol.averageTicket.toLocaleString()}
                     </td>
                     <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
                       {vol.swipedPercentage.toFixed(2)}%
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
                       ${vol.highestTicket.toLocaleString()}
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
                       ${vol.totalChargebacks.toLocaleString()}
                     </td>
                     <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
