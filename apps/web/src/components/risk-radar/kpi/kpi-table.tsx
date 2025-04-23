@@ -69,10 +69,10 @@ export const KpiTable: React.FC<KpiTableProps> = ({ data }) => {
       <tbody>
         {tableData.map((row) => (
           <tr key={row.kpi}>
-            <td className="border-b border-[#eee] px-3 py-2 text-xs dark:border-strokedark">
+            <td className="border-b border-[#eee] px-3 py-2 text-xs text-black dark:border-strokedark dark:text-white">
               {row.kpi}
             </td>
-            <td className="border-b border-[#eee] px-3 py-2 text-xs dark:border-strokedark">
+            <td className="border-b border-[#eee] px-3 py-2 text-xs text-black dark:border-strokedark dark:text-white">
               {row.count}
               {row.countPercent && (
                 <span className="text-xs text-meta-3">
@@ -81,7 +81,7 @@ export const KpiTable: React.FC<KpiTableProps> = ({ data }) => {
                 </span>
               )}
             </td>
-            <td className="border-b border-[#eee] px-3 py-2 text-xs dark:border-strokedark">
+            <td className="border-b border-[#eee] px-3 py-2 text-xs text-black dark:border-strokedark dark:text-white">
               {row.volume}
               {row.volumePercent && (
                 <span className="text-xs text-meta-3">

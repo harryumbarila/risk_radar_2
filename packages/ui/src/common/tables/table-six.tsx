@@ -82,23 +82,19 @@ export const TableSix: React.FC = () => {
               className="grid grid-cols-12 border-t border-[#EEEEEE] px-5 py-4 dark:border-strokedark lg:px-7.5 2xl:px-11"
             >
               <div className="col-span-3">
-                <p className="text-[#637381] dark:text-bodydark">{item.name}</p>
+                <p className="text-black dark:text-white">{item.name}</p>
               </div>
 
               <div className="col-span-3">
-                <p className="text-[#637381] dark:text-bodydark">
-                  {item.position}
-                </p>
+                <p className="text-black dark:text-white">{item.position}</p>
               </div>
 
               <div className="col-span-3">
-                <p className="text-[#637381] dark:text-bodydark">
-                  {item.email}
-                </p>
+                <p className="text-black dark:text-white">{item.email}</p>
               </div>
 
               <div className="col-span-2">
-                <p className="text-[#637381] dark:text-bodydark">{item.role}</p>
+                <p className="text-black dark:text-white">{item.role}</p>
               </div>
               <div className="relative col-span-1">
                 <DropdownFour classes={getDropdownClasses(index)} />
