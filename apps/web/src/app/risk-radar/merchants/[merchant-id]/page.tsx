@@ -1152,18 +1152,18 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark col-span-2">
           <div className="grid grid-cols-[max-content_1fr] gap-x-4 font-mono">
             {/* DBA Name */}
-            <p className="text-black dark:text-white">
+            <p className="text-black dark:text-white text-[15px]">
               <strong>DBA Name:</strong>
             </p>
-            <p className="text-black dark:text-white">
+            <p className="text-black dark:text-white text-[15px]">
               {merchantContactInfo?.dbaName}
             </p>
 
             {/* Address */}
-            <p className="text-black dark:text-white">
+            <p className="text-black dark:text-white text-[15px]">
               <strong>Address:</strong>
             </p>
-            <p className="text-black dark:text-white">
+            <p className="text-black dark:text-white text-[15px]">
               {merchantProfile?.sDBAAddress || merchantContactInfo?.dbaAddress}
             </p>
 
@@ -1171,37 +1171,37 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <strong>City:</strong>{' '}
             </p>
             <div className="flex justify-between gap-2 text-black dark:text-white">
-              <p className="text-black dark:text-white">
+              <p className="text-black dark:text-white text-[15px]">
                 {merchantProfile?.sDBACity || merchantContactInfo?.dbaCity}
               </p>
 
-              <p className="text-black dark:text-white">
+              <p className="text-black dark:text-white text-[15px]">
                 <strong>ST:</strong>{' '}
                 {merchantProfile?.sDBAState || merchantContactInfo?.dbaState}
               </p>
 
-              <p className="text-black dark:text-white">
+              <p className="text-black dark:text-white text-[15px]">
                 <strong>ZIP:</strong>{' '}
                 {merchantProfile?.sDBAZip || merchantContactInfo?.dbaZip}
               </p>
             </div>
 
-            <p className="text-black dark:text-white">
+            <p className="text-black dark:text-white text-[15px]">
               <strong>Activated:</strong>
             </p>
-            <p className="text-black dark:text-white">
+            <p className="text-black dark:text-white text-[15px]">
               {formatDate(merchantProfile?.sActivationDate)}
             </p>
 
-            <p className="text-black dark:text-white">
+            <p className="text-black dark:text-white text-[15px]">
               <strong>Net Balance:</strong>
             </p>
             <p>
               <span
                 className={`${
                   merchantContactInfo!.netSettlementBalance >= 0
-                    ? 'text-black dark:text-white font-bold'
-                    : 'text-red-500 dark:text-red-400 font-bold'
+                    ? 'text-black dark:text-white font-bold text-[15px]'
+                    : 'text-red-500 dark:text-red-400 font-bold text-[15px]'
                 }`}
               >
                 {formatCurrency(
@@ -1216,27 +1216,27 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         {/* Column 2 */}
         <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark col-span-2">
           <div className="grid grid-cols-[max-content_1fr] gap-x-4 font-mono">
-            <p className="text-black dark:text-white">
+            <p className="text-black dark:text-white text-[15px]">
               <strong>Ownership:</strong>
             </p>
-            <p className="text-black dark:text-white">
+            <p className="text-black dark:text-white text-[15px]">
               {merchantProfile?.sOwnershipType}
             </p>
 
-            <p className="text-black dark:text-white">
+            <p className="text-black dark:text-white text-[15px]">
               <strong>SIC:</strong>
             </p>
-            <p className="text-black dark:text-white">
+            <p className="text-black dark:text-white text-[15px]">
               {merchantProfile?.sSIC}
             </p>
 
-            <p className="text-black dark:text-white">
+            <p className="text-black dark:text-white text-[15px]">
               <strong>Merchant Type:</strong>
             </p>
-            <p className="text-black dark:text-white">
+            <p className="text-black dark:text-white text-[15px]">
               {merchantProfile?.sMerchantType}
             </p>
-            <p className="text-black dark:text-white">
+            <p className="text-red-500 dark:text-red-400 text-[15px]">
               <strong>Talus Pay:</strong>
             </p>
             {merchantProfile?.bIsTalusPayMerchant ? (
@@ -1248,7 +1248,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark col-span-2">
           <div className="flex flex-row gap-x-1">
             <div className="grid grid-cols-[max-content_1fr] gap-x-4 font-mono">
-              <p className="text-black dark:text-white">
+              <p className="text-black dark:text-white text-[15px]">
                 <strong>Risk Watch:</strong>
               </p>
               <input
@@ -1260,7 +1260,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                 }
               />
 
-              <p className="text-black dark:text-white">
+              <p className="text-black dark:text-white text-[15px]">
                 <strong>Auto Hold White List:</strong>
               </p>
               <input
@@ -1289,10 +1289,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                 }
               />
 
-              <p className="text-black dark:text-white">
+              <p className="text-black dark:text-white text-[15px]">
                 <strong>Curr. Month Swipe Cnt (%):</strong>{' '}
               </p>
-              <p>
+              <p className="text-black dark:text-white text-[15px]">
                 {merchantProfile?.iSwipedPercBasedOnTransCntCurrMonth || ''}
               </p>
             </div>
@@ -1356,48 +1356,48 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       <section className="mb-4">
         <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
           <div className="grid grid-cols-4 text-black dark:text-white text-center">
-            <p className="text-black dark:text-white">
+            <p className="text-black dark:text-white text-[15px]">
               <strong>Channel:</strong> {merchantProfile?.sChannel}
             </p>
-            <p className="text-black dark:text-white">
+            <p className="text-black dark:text-white text-[15px]">
               <strong>Reseller:</strong> {merchantProfile?.sReseller}
             </p>
-            <p className="text-black dark:text-white">
+            <p className="text-black dark:text-white text-[15px]">
               <strong>Referral Partner:</strong>{' '}
               {merchantProfile?.sReferralPartner}
             </p>
-            <p className="text-black dark:text-white">
+            <p className="text-black dark:text-white text-[15px]">
               <strong>Solution Consultant:</strong>{' '}
               {merchantProfile?.sSolutionConsultant || ''}
             </p>
           </div>
           <hr className="my-2 border-t border-gray-300" />
           <div className="grid grid-cols-4 text-black dark:text-white text-center">
-            <p>
+            <p className="text-black dark:text-white text-[15px]">
               <strong>MV:</strong> {formatCurrency(merchantProfile?.iMV$, 0)}
-              <span className="text-gray-500 dark:text-gray-400">
+              <span className="text-gray-500 dark:text-gray-400 text-black dark:text-white">
                 {' '}
                 (UW Appr.- {formatCurrency(merchantProfile?.iUWApprMV, 0)})
               </span>
             </p>
-            <p>
+            <p className="text-black dark:text-white text-[15px]">
               <strong>AT:</strong> {formatCurrency(merchantProfile?.iAT$, 0)}
-              <span className="text-gray-500 dark:text-gray-400">
+              <span className="text-gray-500 dark:text-gray-400 text-black dark:text-white">
                 {' '}
                 (UW Appr.- {formatCurrency(merchantProfile?.iUWApprAT, 0)})
               </span>
             </p>
-            <p>
+            <p className="text-black dark:text-white text-[15px]">
               <strong>HT:</strong> {formatCurrency(merchantProfile?.iHT$, 0)}
-              <span className="text-gray-500 dark:text-gray-400">
+              <span className="text-gray-500 dark:text-gray-400 text-black dark:text-white">
                 {' '}
                 (UW Appr.- {formatCurrency(merchantProfile?.iUWApprHT, 0)})
               </span>
             </p>
-            <p>
+            <p className="text-black dark:text-white text-[15px]">
               <strong>Swipe Vol:</strong>{' '}
               {`${merchantProfile?.iSwipeVolPerc}%` || ''}
-              <span className="text-gray-500 dark:text-gray-400">
+              <span className="text-gray-500 dark:text-gray-400 text-black dark:text-white">
                 {' '}
                 (UW Appr.- {`${merchantProfile?.iUWApprSwipeVolPerc}%` || ''})
               </span>
@@ -1510,32 +1510,44 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     <p className="text-black dark:text-white">
                       <strong>Contact Name:</strong>
                     </p>
-                    <p>{data?.owners?.[0]?.name || ''}</p>
+                    <p className="text-black dark:text-white">
+                      {data?.owners?.[0]?.name || ''}
+                    </p>
 
                     <p className="text-black dark:text-white">
                       <strong>Phone #:</strong>
                     </p>
-                    <p>{merchantContactInfo?.contactPhoneNumber || ''}</p>
+                    <p className="text-black dark:text-white">
+                      {merchantContactInfo?.contactPhoneNumber || ''}
+                    </p>
 
                     <p className="text-black dark:text-white">
                       <strong>Fax #:</strong>
                     </p>
-                    <p>{merchantContactInfo?.dbaFax || ''}</p>
+                    <p className="text-black dark:text-white">
+                      {merchantContactInfo?.dbaFax || ''}
+                    </p>
 
                     <p className="text-black dark:text-white">
                       <strong>Mobile #:</strong>
                     </p>
-                    <p>{merchantContactInfo?.contactPhoneNumber || ''}</p>
+                    <p className="text-black dark:text-white">
+                      {merchantContactInfo?.contactPhoneNumber || ''}
+                    </p>
 
                     <p className="text-black dark:text-white">
                       <strong>Email:</strong>{' '}
                     </p>
-                    <p>{merchantContactInfo?.contactEmail || ''}</p>
+                    <p className="text-black dark:text-white">
+                      {merchantContactInfo?.contactEmail || ''}
+                    </p>
 
                     <p className="text-black dark:text-white">
                       <strong>Web Site:</strong>{' '}
                     </p>
-                    <p>{merchantContactInfo?.website || ''}</p>
+                    <p className="text-black dark:text-white">
+                      {merchantContactInfo?.website || ''}
+                    </p>
                   </div>
 
                   <div className="flex flex-row items-center">
@@ -1589,26 +1601,36 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   <p className="mb-1 text-black dark:text-white">
                     <strong>Name:</strong>
                   </p>
-                  <p>{data?.owners?.[0]?.name || ''}</p>
+                  <p className="text-black dark:text-white">
+                    {data?.owners?.[0]?.name || ''}
+                  </p>
 
                   <p className="mb-1 text-black dark:text-white">
                     <strong>Addr:</strong>
                   </p>
-                  <p>{data?.businessInfo?.legalAddress || ''}</p>
+                  <p className="text-black dark:text-white">
+                    {data?.businessInfo?.legalAddress || ''}
+                  </p>
                   <p className="mb-1 text-black dark:text-white">
                     <strong>City:</strong>
                   </p>
-                  <p>{data?.businessInfo?.legalCity || ''}</p>
+                  <p className="text-black dark:text-white">
+                    {data?.businessInfo?.legalCity || ''}
+                  </p>
 
                   <p className="mb-1 text-black dark:text-white">
                     <strong>ST:</strong>
                   </p>
-                  <p>{data?.businessInfo?.legalState || ''}</p>
+                  <p className="text-black dark:text-white">
+                    {data?.businessInfo?.legalState || ''}
+                  </p>
 
                   <p className="mb-1 text-black dark:text-white">
                     <strong>Zip:</strong>
                   </p>
-                  <p>{data?.businessInfo?.legalZip || ''}</p>
+                  <p className="text-black dark:text-white">
+                    {data?.businessInfo?.legalZip || ''}
+                  </p>
                 </div>
               </div>
             </div>
@@ -1631,16 +1653,16 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   <tbody>
                     {data?.owners?.map((owner) => (
                       <tr key={owner.ownerCode} className="text-center">
-                        <td className="border-b border-[#eee] p-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] p-2 dark:border-strokedark text-black dark:text-white">
                           {owner.name}
                         </td>
-                        <td className="border-b border-[#eee] p-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] p-2 dark:border-strokedark text-black dark:text-white">
                           {owner.ssn4}
                         </td>
-                        <td className="border-b border-[#eee] p-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] p-2 dark:border-strokedark text-black dark:text-white">
                           {owner.dob}
                         </td>
-                        <td className="border-b border-[#eee] p-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] p-2 dark:border-strokedark text-black dark:text-white">
                           {/* No driver's license data available */}
                         </td>
                       </tr>
@@ -1698,7 +1720,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                         key={`${exception.transactionId}-${index}`}
                         className="text-center"
                       >
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
                           <span className="block text-left">
                             {formatDate(
                               exception.transactionDate,
@@ -1706,7 +1728,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                             )}
                           </span>
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
                           <span className="block text-right">
                             {formatCurrency(exception.authAmount)}
                           </span>
@@ -1731,16 +1753,16 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                             {formatCurrency(exception.transactionAmount)}
                           </span>
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
                           {exception.posEntryMode}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
                           {exception.avsResponseCode}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
                           {exception.authCode || ''}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
                           <span className="block text-center">
                             <button
                               type="button"
@@ -1757,10 +1779,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                             {` ${exception.transactionId?.slice(-4)}`}
                           </span>
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
                           {exception.debitNetworkIdentifier}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
                           {exception.exceptionList &&
                             exception.exceptionList
                               .split(' ')
@@ -1835,10 +1857,14 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                             : note.sNotes}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-center">
-                          {formatDate(note.dtCreated)}
+                          <p className="text-black dark:text-white">
+                            {formatDate(note.dtCreated)}
+                          </p>
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-left">
-                          {note.sUserCreated}
+                          <p className="text-black dark:text-white">
+                            {note.sUserCreated}
+                          </p>
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-center">
                           <div className="">
@@ -1976,31 +2002,31 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                         key={`${chargeback.sCaseNumber}`}
                         className="text-center"
                       >
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
                           {chargeback.sCaseNumber}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
                           {formatDateWithoutTime(chargeback.dtTrans)}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
                           ${chargeback.dAmt.toFixed(2)}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
                           {chargeback.sCardNum}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
                           {chargeback.sPaymentType}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
                           {formatDateWithoutTime(chargeback.dtReceived)}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
                           {chargeback.sReferenceNum}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
                           {chargeback.ReasonCodeDescription}
                         </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
                           {formatDate(chargeback.dtCreated)}
                         </td>
                       </tr>
@@ -2023,7 +2049,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         )}
         {activeTab === 'sameTaxId' && (
           <>
-            <h2 className="mb-2 text-xl font-semibold text-black dark:text-white">
+            <h2 className="mb-2 text-xl font-semibold text-black dark:text-white text-black dark:text-white">
               Merchants with Same Tax ID
             </h2>
             <div className="grid grid-cols-1 gap-4">
@@ -2066,7 +2092,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                 </div>
               ) : (
                 <div className="p-4 border border-gray-200 rounded-md">
-                  <p className="text-gray-600">
+                  <p className="text-gray-600 text-black dark:text-white">
                     No other merchants found with the same Tax ID.
                   </p>
                 </div>
@@ -2085,7 +2111,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           <div className="max-w-full overflow-x-auto">
             <table className="w-full table-auto">
               <thead>
-                <tr className="bg-gray-2 dark:bg-meta-4 text-center">
+                <tr className="bg-gray-2 dark:bg-meta-4 text-center text-black dark:text-white">
                   <th className="p-4 py-1 font-medium text-black dark:text-white">
                     Month/Year
                   </th>
@@ -2121,34 +2147,34 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               <tbody>
                 {paginatedVolume?.map((vol) => (
                   <tr key={`${vol.year}-${vol.month}`} className="text-center">
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
                       {vol.month} {vol.year}
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
                       ${vol.volume.toLocaleString()}
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
                       ${vol.averageTicket.toLocaleString()}
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
                       {vol.swipedPercentage.toFixed(2)}%
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
                       ${vol.highestTicket.toLocaleString()}
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
                       ${vol.totalChargebacks.toLocaleString()}
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
                       {vol.visaChargebackPercentage.toFixed(2)}%
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
                       {vol.mastercardChargebackPercentage.toFixed(2)}%
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
                       {vol.discoverChargebackPercentage.toFixed(2)}%
                     </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark">
+                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
                       {vol.amexChargebackPercentage.toFixed(2)}%
                     </td>
                   </tr>
@@ -2190,10 +2216,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                       .filter((_, index: number) => index % 4 === colIndex)
                       .map((legend) => (
                         <tr key={legend.id} className="text-center">
-                          <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                          <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark text-black dark:text-white">
                             {legend.id}
                           </td>
-                          <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                          <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark text-black dark:text-white">
                             {legend.description}
                           </td>
                         </tr>
