@@ -34,7 +34,7 @@ export const defaultRiskRadarFilters: RiskRadarFilterState = {
   dbaNameOrSIC: undefined,
   sourceType: undefined,
   page: 1,
-  pageSize: 10,
+  pageSize: 50,
   sortBy: undefined,
   sortDirection: undefined,
 };
