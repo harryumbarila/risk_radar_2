@@ -9,7 +9,7 @@ import { Breadcrumb, Loader } from '@denali/ui';
 import { useAuth } from '@frontegg/nextjs';
 import classNames from 'classnames';
 import { format } from 'date-fns';
-import { notFound, useSearchParams } from 'next/navigation';
+import { notFound, useRouter, useSearchParams } from 'next/navigation';
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -156,6 +156,7 @@ type ChangedFields = {
 
 const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const { 'merchant-id': merchantId } = params;
+  const router = useRouter();
 
   const searchParams = useSearchParams();
 
@@ -599,6 +600,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
     if (user?.name) {
       await saveChangedFields({ clickedStatus: newStatus });
+      router.push('/risk-radar');
     }
   };
 
@@ -617,6 +619,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       }));
 
       await saveChangedFields({ clickedStatus: newStatus });
+      router.push('/risk-radar');
     }
   };
 
