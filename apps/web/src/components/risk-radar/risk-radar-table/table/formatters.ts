@@ -25,7 +25,11 @@ export const formatCurrency = (
     !returnZero &&
     (value === undefined || value === null || Number(value) === 0)
   ) {
-    return DEFAULT_BLANK_VALUE;
+    return Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits,
+    }).format(Number(0));
   }
 
   return Intl.NumberFormat('en-US', {
