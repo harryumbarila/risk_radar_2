@@ -900,7 +900,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                         Issuer Bank:
                       </p>
                       <p className="text-sm text-black dark:text-white">
-                        {cardHistory[0]?.issuerBank || ''}
+                        {cardHistory[0]?.issuerBank || 'No data available'}
                       </p>
                     </div>
                     <div>
@@ -908,7 +908,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                         Issuer Country:
                       </p>
                       <p className="text-sm text-black dark:text-white">
-                        {cardHistory[0]?.issuerCountry || ''}
+                        {cardHistory[0]?.issuerCountry || 'No data available'}
                       </p>
                     </div>
                     <div>
@@ -916,7 +916,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                         Issuer Phone:
                       </p>
                       <p className="text-sm text-black dark:text-white">
-                        {cardHistory[0]?.issuerPhone || ''}
+                        {cardHistory[0]?.issuerPhone || 'No data available'}
                       </p>
                     </div>
                   </div>
@@ -1116,8 +1116,8 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     E-Mail Body Content:
                   </label>
                   <textarea
-                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                    rows={4}
+                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-black text-sm focus:ring-blue-500 focus:border-blue-500"
+                    rows={11}
                     value={templateData.body}
                     onChange={(e) =>
                       setTemplateData((prev) => ({
@@ -2011,7 +2011,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           {formatDateWithoutTime(chargeback.dtTrans)}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
-                          ${chargeback.dAmt.toFixed(2)}
+                          ${formatCurrency(chargeback.dAmt.toFixed(2))}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
                           {chargeback.sCardNum}
