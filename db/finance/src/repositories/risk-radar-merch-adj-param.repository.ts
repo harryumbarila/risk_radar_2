@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
-import { Repository } from 'typeorm';
+import { MssqlParameter, Repository } from 'typeorm';
 
 import { RiskRadarMerchAdjParamEntity } from '../entities/risk-radar-merch-adj-param.entity';
 
@@ -17,8 +17,10 @@ export class RiskRadarMerchAdjParamRepository extends Repository<RiskRadarMerchA
   public async findByMerchantId(
     merchantId: string
   ): Promise<RiskRadarMerchAdjParamEntity | null> {
-    return this.findOne({
-      where: { mid: merchantId },
-    });
+    return this.createQueryBuilder('merchAdjParam')
+      .where('merchAdjParam.mid = :mid', {
+        mid: new MssqlParameter(merchantId, 'varchar', 16),
+      })
+      .getOne();
   }
 }

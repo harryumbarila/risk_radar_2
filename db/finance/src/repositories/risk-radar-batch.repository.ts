@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
-import { In, Repository } from 'typeorm';
+import { In, MssqlParameter, Repository } from 'typeorm';
 
 import { RiskRadarBatch } from '../entities/risk-radar-batch.entity';
 
@@ -17,7 +17,9 @@ export class RiskRadarBatchRepository extends Repository<RiskRadarBatch> {
   public async hasAMEXOptBlue(merchantId: string): Promise<boolean> {
     const batch = await this.createQueryBuilder('batch')
       .select('batch.sAMEXOptBlueInd')
-      .where('batch.sMID = :merchantId', { merchantId })
+      .where('batch.sMID = :merchantId', {
+        merchantId: new MssqlParameter(merchantId, 'varchar', 16),
+      })
       .andWhere('batch.sAMEXOptBlueInd = :indicator', { indicator: 'Y' })
       .orderBy('batch.pkDFT256Batch', 'DESC')
       .take(1)
@@ -28,9 +30,15 @@ export class RiskRadarBatchRepository extends Repository<RiskRadarBatch> {
   public async getMultipleAMEXOptBlue(
     merchantIds: string[]
   ): Promise<string[]> {
+    // For multiple merchants, we'll handle array parameters differently
+    // Each value in the array will be properly typed when used in the query
     const merchants = await this.createQueryBuilder('batch')
       .select('DISTINCT batch.sMID', 'merchantId')
-      .where('batch.sMID IN (:...merchantIds)', { merchantIds })
+      .where('batch.sMID IN (:...merchantIds)', {
+        merchantIds: merchantIds.map(
+          (mid) => new MssqlParameter(mid, 'varchar', 16)
+        ),
+      })
       .andWhere('batch.sAMEXOptBlueInd = :indicator', { indicator: 'Y' })
       .getRawMany();
     return merchants.map((m: { merchantId: string }) => m.merchantId);
@@ -41,16 +49,14 @@ export class RiskRadarBatchRepository extends Repository<RiskRadarBatch> {
     dates: Date[],
     cycles: string[]
   ): Promise<RiskRadarBatch[]> {
-    const batches = await this.find({
-      select: ['pkDFT256Batch'],
-      where: {
-        sMID: mid,
-        dtTransmission: In(dates),
-        sCycle: In(cycles),
-      },
-    });
-
-    return batches;
+    return this.createQueryBuilder('batch')
+      .select('batch.pkDFT256Batch')
+      .where('batch.sMID = :mid', {
+        mid: new MssqlParameter(mid, 'varchar', 16),
+      })
+      .andWhere('batch.dtTransmission IN (:...dates)', { dates })
+      .andWhere('batch.sCycle IN (:...cycles)', { cycles })
+      .getMany();
   }
 
   public async getBatches(batchesIds: number[]): Promise<RiskRadarBatch[]> {

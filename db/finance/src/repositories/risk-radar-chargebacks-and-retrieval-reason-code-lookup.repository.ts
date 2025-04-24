@@ -60,7 +60,7 @@ export class ChargebacksAndRetrievalReasonCodeLookupRepository extends Repositor
           '0 as bP2ChargebacksExists',
         ])
         .from('DataWarehouse.AccessOne.ChargebackDataPull', 'cdp')
-        .where('MerchantNumber = :mid', { mid })
+        .where('MerchantNumber = CAST(:mid AS varchar(16))', { mid })
         .orderBy('ReportDate', 'DESC')
         .limit(100)
         .getRawMany<ChargebackTransaction>();
@@ -90,7 +90,7 @@ export class ChargebacksAndRetrievalReasonCodeLookupRepository extends Repositor
         'cb.sCaseNumber',
       ])
       .from(ChargeBacksEntity, 'cb')
-      .where('cb.sMID = :mid', { mid })
+      .where('cb.sMID = CAST(:mid AS varchar(16))', { mid })
       .orderBy('cb.dtReceived', 'DESC')
       .limit(100)
       .getRawMany<ChargebackWithoutP2>();
@@ -100,7 +100,7 @@ export class ChargebacksAndRetrievalReasonCodeLookupRepository extends Repositor
       .createQueryBuilder()
       .select('COUNT(*)', 'count')
       .from('connector..tblProlificP2Chargebacks', 'p2')
-      .where('p2.be_merch_num = :merchNum', {
+      .where('p2.be_merch_num = CAST(:merchNum AS varchar(20))', {
         merchNum: `848700${mid.slice(-8)}`,
       })
       .getRawOne<P2ChargebackCount>();
@@ -109,7 +109,7 @@ export class ChargebacksAndRetrievalReasonCodeLookupRepository extends Repositor
       .createQueryBuilder()
       .select('COUNT(*)', 'count')
       .from('connector..tblProlificP2ChargebacksWorked', 'p2w')
-      .where('p2w.be_merch_num = :merchNum', {
+      .where('p2w.be_merch_num = CAST(:merchNum AS varchar(20))', {
         merchNum: `848700${mid.slice(-8)}`,
       })
       .getRawOne<P2ChargebackCount>();
@@ -118,7 +118,7 @@ export class ChargebacksAndRetrievalReasonCodeLookupRepository extends Repositor
       .createQueryBuilder()
       .select('COUNT(*)', 'count')
       .from('connector..tblProlificP2ChargebacksAdjustment', 'p2a')
-      .where('p2a.be_merch_num = :merchNum', {
+      .where('p2a.be_merch_num = CAST(:merchNum AS varchar(20))', {
         merchNum: `848700${mid.slice(-8)}`,
       })
       .getRawOne<P2ChargebackCount>();

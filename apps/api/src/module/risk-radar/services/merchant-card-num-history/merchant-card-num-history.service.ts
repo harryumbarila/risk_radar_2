@@ -53,9 +53,7 @@ export class MerchantCardNumHistoryService {
       const first6Digits = cardNumber.slice(0, 6);
       const last4Digits = cardNumber.slice(-4);
 
-      const issuerInfo = await this.issuingBankRepository.findOne({
-        where: { bin: first6Digits },
-      });
+      const issuerInfo = await this.issuingBankRepository.findByBin(first6Digits);
 
       const [transactionData, reportingSearch] = await Promise.all([
         this.dft256TransactionRepository

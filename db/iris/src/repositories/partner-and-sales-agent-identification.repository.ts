@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
-import { In, Repository } from 'typeorm';
+import { In, MssqlParameter, Repository } from 'typeorm';
 
 import { PartnerAndSalesAgentIdentificationEntity } from '../entities/partner-and-sales-agent-identification.entity';
 
@@ -30,5 +30,18 @@ export class PartnerAndSalesAgentIdentificationRepository extends Repository<Par
         mid: In(merchantIds),
       },
     });
+  }
+
+  /**
+   * Find partner by merchant ID with proper varchar casting
+   */
+  public async findByMerchantId(
+    merchantId: string
+  ): Promise<PartnerAndSalesAgentIdentificationEntity | null> {
+    return this.createQueryBuilder('partner')
+      .where('partner.mid = :mid', {
+        mid: new MssqlParameter(merchantId, 'varchar', 16),
+      })
+      .getOne();
   }
 }
