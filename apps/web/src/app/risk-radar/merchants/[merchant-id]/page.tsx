@@ -2093,7 +2093,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         <h2 className="mb-2 text-xl font-semibold text-black dark:text-white">
           Volume
         </h2>
-        <div className="rounded-sm border border-stroke bg-white px-2 py-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-4.5">
+        <div className="rounded-sm border border-stroke bg-white px-2 py-2 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-2">
           <div className="max-w-full flex flex-col lg:flex-row gap-3 overflow-x-auto">
             <VolumeTable data={paginatedVolume?.slice(0, 6) || []} />
             <VolumeTable data={paginatedVolume?.slice(6) || []} />

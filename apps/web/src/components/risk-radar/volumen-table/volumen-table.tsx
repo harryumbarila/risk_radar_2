@@ -21,9 +21,9 @@ type Props = {
 
 export const VolumeTable: FC<Props> = ({ data }) => {
   return (
-    <table className="w-full lg:w-1/2  table-auto text-[10px] border rounded-sm border-gray-400">
+    <table className="w-full lg:w-1/2 table-auto text-[12px] rounded-sm">
       <thead>
-        <tr className="border-b border-gray-400 bg-gray-2 dark:bg-meta-4 text-center text-black dark:text-white">
+        <tr className="bg-gray-100 dark:bg-meta-4 text-center text-black dark:text-white">
           {tableHeaders.map((header) => (
             <th
               key={header.name}
@@ -38,7 +38,7 @@ export const VolumeTable: FC<Props> = ({ data }) => {
         {data.map((vol) => (
           <tr
             key={`${vol.year}-${vol.month}`}
-            className="text-center border-b border-gray-400 odd:bg-white even:bg-gray-50 dark:odd:bg-transparent dark:even:bg-meta-4"
+            className="text-center odd:bg-white even:bg-gray-100 dark:odd:bg-transparent dark:even:bg-meta-4"
           >
             <td className="font-bold dark:border-strokedark text-black dark:text-white">
               {vol.month} {vol.year}
