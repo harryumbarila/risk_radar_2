@@ -2,33 +2,43 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'tblMerchantTIN', schema: 'dbo', database: 'CrescentView' })
 export class MerchantTIN {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'pkMerchantTIN' })
   public pkMerchantTIN: number;
 
-  @Column({ type: 'int', nullable: true })
-  public fkAppointment?: number;
+  @Column({
+    name: 'fkAppointment',
+    type: 'varchar',
+    length: 20,
+    nullable: true,
+  })
+  public fkAppointment?: string;
 
-  @Column({ type: 'varchar', length: 16 })
+  @Column({ name: 'sMID', type: 'varchar', length: 16, nullable: true })
   public sMID: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  public sCompany?: string;
+  @Column({ name: 'sCompany', type: 'varchar', length: 3, nullable: false })
+  public sCompany: string;
 
-  @Column({ type: 'varchar', length: 9, nullable: true })
+  @Column({ name: 'sTIN', type: 'varchar', length: 9, nullable: true })
   public sTIN?: string;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ name: 'dtSentToIRS', type: 'datetime', nullable: true })
   public dtSentToIRS?: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ name: 'dtReceivedFromIRS', type: 'datetime', nullable: true })
   public dtReceivedFromIRS?: Date;
 
-  @Column({ type: 'int', nullable: true })
-  public fkIRSCode?: number;
+  @Column({ name: 'fkIRSCode', type: 'int', nullable: false })
+  public fkIRSCode: number;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({
+    name: 'sMerchantNameSent',
+    type: 'varchar',
+    length: 40,
+    nullable: true,
+  })
   public sMerchantNameSent?: string;
 
-  @Column({ type: 'datetime', nullable: true })
-  public dtCreated?: Date;
+  @Column({ name: 'dtCreated', type: 'datetime', nullable: false })
+  public dtCreated: Date;
 }
