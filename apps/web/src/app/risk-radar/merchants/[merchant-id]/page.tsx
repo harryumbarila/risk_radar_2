@@ -878,28 +878,28 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                 <>
                   <div className="grid grid-cols-3 gap-4 p-4 border-b border-stroke dark:border-strokedark">
                     <div>
-                      <p className="text-sm font-semibold text-black dark:text-white">
+                      <span className="text-sm font-semibold text-black dark:text-white">
                         Issuer Bank:
-                      </p>
-                      <p className="text-sm text-black dark:text-white">
-                        {cardHistory[0]?.issuerBank || 'No data available'}
-                      </p>
+                      </span>
+                      <span className="text-sm text-black dark:text-white">
+                        {cardHistory[0]?.issuerBank || ' No data available'}
+                      </span>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-black dark:text-white">
+                      <span className="text-sm font-semibold text-black dark:text-white">
                         Issuer Country:
-                      </p>
-                      <p className="text-sm text-black dark:text-white">
-                        {cardHistory[0]?.issuerCountry || 'No data available'}
-                      </p>
+                      </span>
+                      <span className="text-sm text-black dark:text-white">
+                        {cardHistory[0]?.issuerCountry || ' No data available'}
+                      </span>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-black dark:text-white">
+                      <span className="text-sm font-semibold text-black dark:text-white">
                         Issuer Phone:
-                      </p>
-                      <p className="text-sm text-black dark:text-white">
-                        {cardHistory[0]?.issuerPhone || 'No data available'}
-                      </p>
+                      </span>
+                      <span className="text-sm text-black dark:text-white">
+                        {cardHistory[0]?.issuerPhone || ' No data available'}
+                      </span>
                     </div>
                   </div>
                   <div className="p-4 border-b border-stroke dark:border-strokedark">
@@ -1039,13 +1039,13 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                 {/* Template Dropdown */}
                 <div className="mb-4">
                   <label
-                    className="block text-sm font-medium text-gray-700"
+                    className="block text-sm font-medium text-black"
                     htmlFor="email-template"
                   >
                     Template:
                   </label>
                   <select
-                    className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 w-full text-black rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
                     value={templateData.templateId?.toString() || ''}
                     onChange={(e) => {
                       const templateId = e.target.value
@@ -1075,14 +1075,14 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                 {/* Email Recipient */}
                 <div className="mb-4">
                   <label
-                    className="block text-sm font-medium text-gray-700"
+                    className="block text-sm font-medium text-black"
                     htmlFor="email-recipient"
                   >
                     E-Mail Recipient:
                   </label>
                   <input
                     type="email"
-                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-black text-sm focus:ring-blue-500 focus:border-blue-500"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter recipient email"
@@ -1995,7 +1995,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           {formatDateWithoutTime(chargeback.dtTrans)}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
-                          ${formatCurrency(chargeback.dAmt.toFixed(2))}
+                          {formatCurrency(chargeback.dAmt.toFixed(2))}
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
                           {chargeback.sCardNum}
