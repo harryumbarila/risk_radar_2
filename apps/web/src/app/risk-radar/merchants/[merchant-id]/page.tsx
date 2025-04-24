@@ -27,6 +27,7 @@ import {
   formatDate,
   formatDateWithoutTime,
 } from '@/web/src/components/risk-radar/risk-radar-table/table/formatters';
+import { VolumeTable } from '@/web/src/components/risk-radar/volumen-table/volumen-table';
 import { useEmailTemplates } from '@/web/src/hooks/risk-radar/use-email-templates';
 import type { CardHistory } from '@/web/src/hooks/risk-radar/use-get-card-history';
 import { useCardHistory } from '@/web/src/hooks/risk-radar/use-get-card-history';
@@ -39,6 +40,7 @@ import type { SaveMerchantDataParams } from '@/web/src/hooks/risk-radar/use-save
 import { useSaveMerchantData } from '@/web/src/hooks/risk-radar/use-save-merchant-data';
 import { useSendExceptionMemoEmail } from '@/web/src/hooks/risk-radar/use-send-exception-memo-email';
 import { useTransactionExceptions } from '@/web/src/hooks/risk-radar/use-transaction-exceptions';
+import type { VolumenType } from '@/web/src/types/exception';
 
 type MerchantContactResponse = {
   businessInfo: {
@@ -92,20 +94,7 @@ type MerchantContactResponse = {
     dob: string;
     ownerCode: string;
   }>;
-  processingSummaries: Array<{
-    year: number;
-    month: string;
-    volume: number;
-    averageTicket: number;
-    swipedPercentage: number;
-    highestTicket: number;
-    chargebackAmount: number;
-    totalChargebacks: number;
-    visaChargebackPercentage: number;
-    mastercardChargebackPercentage: number;
-    discoverChargebackPercentage: number;
-    amexChargebackPercentage: number;
-  }>;
+  processingSummaries: VolumenType[];
   exceptionTypes: Array<{
     id: number;
     description: string;
@@ -294,7 +283,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const [exceptionsPage, setExceptionsPage] = useState(1);
   const [notesPage, setNotesPage] = useState(1);
   const [chargebacksPage, setChargebacksPage] = useState(1);
-  const [volumePage, setVolumePage] = useState(1);
 
   // Add new state for Same Tax ID pagination
   const [sameTaxIdPage, setSameTaxIdPage] = useState(1);
@@ -409,10 +397,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     (chargebacksPage - 1) * ITEMS_PER_PAGE,
     chargebacksPage * ITEMS_PER_PAGE
   );
-  const paginatedVolume = data?.processingSummaries?.slice(
-    (volumePage - 1) * ITEMS_PER_PAGE,
-    volumePage * ITEMS_PER_PAGE
-  );
+  const paginatedVolume = data?.processingSummaries;
 
   // Calculate total pages
   const totalExceptionsPages = Math.ceil(
@@ -423,9 +408,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   );
   const totalChargebacksPages = Math.ceil(
     (merchantChargebacksData?.length || 0) / ITEMS_PER_PAGE
-  );
-  const totalVolumePages = Math.ceil(
-    (data?.processingSummaries?.length || 0) / ITEMS_PER_PAGE
   );
 
   // Calculate pagination values with strict enforcement
@@ -1752,7 +1734,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                           <span
                             className={`block text-right ${exception.transactionAmount >= 0 ? 'text-blue-600' : 'text-red-600'}`}
                           >
-                            {formatCurrency(exception.transactionAmount)}
+                            {exception.transactionAmount >= 0
+                              ? formatCurrency(exception.transactionAmount)
+                              : `(${formatCurrency(Math.abs(exception.transactionAmount))})`}
                           </span>
                         </td>
                         <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
@@ -2109,85 +2093,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         <h2 className="mb-2 text-xl font-semibold text-black dark:text-white">
           Volume
         </h2>
-        <div className="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
-          <div className="max-w-full overflow-x-auto">
-            <table className="w-full table-auto">
-              <thead>
-                <tr className="bg-gray-2 dark:bg-meta-4 text-center text-black dark:text-white">
-                  <th className="p-4 py-1 font-medium text-black dark:text-white">
-                    Month/Year
-                  </th>
-                  <th className="p-4 py-1 font-medium text-black dark:text-white">
-                    Volume
-                  </th>
-                  <th className="p-4 py-1 font-medium text-black dark:text-white">
-                    Avg Ticket
-                  </th>
-                  <th className="p-4 py-1 font-medium text-black dark:text-white">
-                    Swiped %
-                  </th>
-                  <th className="p-4 py-1 font-medium text-black dark:text-white">
-                    Highest Ticket
-                  </th>
-                  <th className="p-4 py-1 font-medium text-black dark:text-white">
-                    Total CB
-                  </th>
-                  <th className="p-4 py-1 font-medium text-black dark:text-white">
-                    V CB %
-                  </th>
-                  <th className="p-4 py-1 font-medium text-black dark:text-white">
-                    MC CB %
-                  </th>
-                  <th className="p-4 py-1 font-medium text-black dark:text-white">
-                    Disc CB %
-                  </th>
-                  <th className="p-4 py-1 font-medium text-black dark:text-white">
-                    Amex CB %
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedVolume?.map((vol) => (
-                  <tr key={`${vol.year}-${vol.month}`} className="text-center">
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
-                      {vol.month} {vol.year}
-                    </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
-                      ${vol.volume.toLocaleString()}
-                    </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
-                      ${vol.averageTicket.toLocaleString()}
-                    </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
-                      {vol.swipedPercentage.toFixed(2)}%
-                    </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
-                      ${vol.highestTicket.toLocaleString()}
-                    </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
-                      ${vol.totalChargebacks.toLocaleString()}
-                    </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
-                      {vol.visaChargebackPercentage.toFixed(2)}%
-                    </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
-                      {vol.mastercardChargebackPercentage.toFixed(2)}%
-                    </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
-                      {vol.discoverChargebackPercentage.toFixed(2)}%
-                    </td>
-                    <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
-                      {vol.amexChargebackPercentage.toFixed(2)}%
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <Pagination
-              currentPage={volumePage}
-              totalPages={totalVolumePages}
-              onPageChange={setVolumePage}
-            />
+        <div className="rounded-sm border border-stroke bg-white px-2 py-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-4.5">
+          <div className="max-w-full flex flex-col lg:flex-row gap-3 overflow-x-auto">
+            <VolumeTable data={paginatedVolume?.slice(0, 6) || []} />
+            <VolumeTable data={paginatedVolume?.slice(6) || []} />
           </div>
         </div>
       </section>
