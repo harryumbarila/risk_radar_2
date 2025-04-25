@@ -12,7 +12,6 @@ type AttributionFormContainerProps = {
   generationMode: GenerationFormMode;
   canWrite: boolean;
   updateSelectedPartnerName: (partnerName: string) => void;
-
   leadData?: IrisBasicInfoResponseDto;
   isLoading?: boolean;
   isDisabled?: boolean;

@@ -2,7 +2,7 @@
 
 import { Breadcrumb, showNotification } from '@denali/ui';
 import { useAuth } from '@frontegg/nextjs';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useDebounce } from 'use-debounce';
 
@@ -127,6 +127,10 @@ const AttributionUrl: React.FC = () => {
     setGeneratedLink('');
   };
 
+  const isDisabled = useMemo(() => {
+    return generationMode === GenerationFormMode.EXISTING_LEAD && !isValidLead;
+  }, [generationMode, isValidLead]);
+
   return (
     <DefaultLayout>
       <Breadcrumb pageName="Attribution URL Generator" />
@@ -150,10 +154,7 @@ const AttributionUrl: React.FC = () => {
                 updateSelectedPartnerName={updateSelectedPartnerName}
                 leadData={leadBasicInfoData}
                 isLoading={isLeadBasicInfoLoading}
-                isDisabled={
-                  !isValidLead &&
-                  generationMode === GenerationFormMode.EXISTING_LEAD
-                }
+                isDisabled={isDisabled}
               />
               {generatedLink && (
                 <AttributionResult generatedLink={generatedLink} />
