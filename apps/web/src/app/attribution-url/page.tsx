@@ -21,7 +21,8 @@ const AttributionUrl: React.FC = () => {
 
   const { data: usersData, isLoading: usersLoading } = useUsersData();
 
-  const [generationMode, setGenerationMode] = useState<GenerationMode>('simple');
+  const [generationMode, setGenerationMode] =
+    useState<GenerationMode>('simple');
   const [existingLeadId, setExistingLeadId] = useState('');
   const [irisUser, setIrisUser] = useState('');
   const [channel, setChannel] = useState('');
@@ -68,7 +69,7 @@ const AttributionUrl: React.FC = () => {
 
       // Construct simple attribution object for existing lead
       const attributionData: Record<string, string> = {
-        lead_id: existingLeadId
+        lead_id: existingLeadId,
       };
 
       // Convert to Base64
@@ -200,16 +201,19 @@ const AttributionUrl: React.FC = () => {
         <div className="p-6.5">
           {/* Generation Mode Switch */}
           <div className="mb-4.5">
-            <label className="mb-2.5 block text-black dark:text-white">
+            <label
+              htmlFor="generation-mode"
+              className="mb-2.5 block text-black dark:text-white"
+            >
               Link Generation Mode
             </label>
-            <div className="flex gap-4">
+            <div className="flex gap-4" id="generation-mode">
               <label className="flex items-center">
                 <input
                   type="radio"
                   value="simple"
                   checked={generationMode === 'simple'}
-                  onChange={(e) => {
+                  onChange={() => {
                     setGenerationMode('simple');
                     setGeneratedLink('');
                     setIrisUser('');
@@ -226,7 +230,7 @@ const AttributionUrl: React.FC = () => {
                   type="radio"
                   value="advanced"
                   checked={generationMode === 'advanced'}
-                  onChange={(e) => {
+                  onChange={() => {
                     setGenerationMode('advanced');
                     setGeneratedLink('');
                     setExistingLeadId('');
@@ -280,7 +284,10 @@ const AttributionUrl: React.FC = () => {
                     >
                       <option value="">Select IRIS User</option>
                       {usersData?.data?.map((filteredUser) => (
-                        <option key={filteredUser.value} value={filteredUser.value}>
+                        <option
+                          key={filteredUser.value}
+                          value={filteredUser.value}
+                        >
                           {filteredUser.label}
                         </option>
                       ))}
@@ -366,13 +373,19 @@ const AttributionUrl: React.FC = () => {
           <button
             onClick={handleGenerateLink}
             className={`flex w-full justify-center rounded p-3 font-medium text-gray ${
-              forResource('ATTRIBUTION_LINK').canWrite && 
-              (generationMode === 'simple' ? existingLeadId.trim() !== '' : (irisUser !== '' && channel !== ''))
+              forResource('ATTRIBUTION_LINK').canWrite &&
+              (generationMode === 'simple'
+                ? existingLeadId.trim() !== ''
+                : irisUser !== '' && channel !== '')
                 ? 'bg-primary hover:bg-opacity-90'
                 : 'bg-gray-400 cursor-not-allowed'
             }`}
-            disabled={!forResource('ATTRIBUTION_LINK').canWrite || 
-              (generationMode === 'simple' ? existingLeadId.trim() === '' : (irisUser === '' || channel === ''))}
+            disabled={
+              !forResource('ATTRIBUTION_LINK').canWrite ||
+              (generationMode === 'simple'
+                ? existingLeadId.trim() === ''
+                : irisUser === '' || channel === '')
+            }
             type="button"
           >
             Generate Link
