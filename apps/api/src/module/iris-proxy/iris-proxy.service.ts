@@ -4,6 +4,7 @@ import axios from 'axios';
 
 import { IrisClient } from '@/api/shared/module/iris/iris.client';
 import type { LeadDetailResponse } from '@/shared/response';
+import type { IrisBasicInfoResponseDto } from '@/shared/response/iris-proxy';
 
 import type {
   LeadUserAssignedInputDto,
@@ -190,6 +191,44 @@ export class IrisProxyService {
           HttpStatus.INTERNAL_SERVER_ERROR
         );
       }
+      throw new HttpException(
+        `Failed to get lead: ${error}`,
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  public async getLeadBasicInfo(
+    leadId: number
+  ): Promise<IrisBasicInfoResponseDto> {
+    try {
+      const { data } = await this.client.get<LeadDetailResponse>(
+        `/api/v1/leads/${leadId}`
+      );
+
+      const dbaName = data.details
+        .find((detail) => detail.name === 'Lead Data')
+        ?.fields.find((field) => field.field === 'DBA Name')?.value;
+
+      const contactPhone = data.details
+        .find((detail) => detail.name === 'Lead Data')
+        ?.fields.find((field) => field.field === 'Contact Phone #')?.value;
+
+      const contactEmail = data.details
+        .find((detail) => detail.name === 'Lead Data')
+        ?.fields.find((field) => field.field === 'Contact Email')?.value;
+
+      return { dbaName, contactPhone, contactEmail };
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new HttpException(
+          `Failed to get lead: ${error.message}.`,
+          error?.response?.status || HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      }
+
+      this.logger.error(error);
+
       throw new HttpException(
         `Failed to get lead: ${error}`,
         HttpStatus.INTERNAL_SERVER_ERROR
