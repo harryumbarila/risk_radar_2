@@ -125,6 +125,7 @@ export const DataTable = <Entry extends BaseModel>(
                   const align = (
                     header.column.columnDef?.meta as Record<string, unknown>
                   )?.align;
+                  const canSort = header.column.getCanSort();
 
                   return (
                     <th key={header.id}>
@@ -135,8 +136,7 @@ export const DataTable = <Entry extends BaseModel>(
                             className: clsx(
                               'flex w-full items-center font-bold text-black dark:text-white gap-2',
                               {
-                                'cursor-pointer select-none':
-                                  header.column.getCanSort(),
+                                'cursor-pointer select-none': canSort,
                                 'justify-start': align === 'left',
                                 'justify-center': align === 'center',
                                 'justify-end': align === 'right',
@@ -149,14 +149,15 @@ export const DataTable = <Entry extends BaseModel>(
                             header.column.columnDef.header,
                             header.getContext()
                           )}
-                          {{
-                            asc: (
-                              <ArrowUpIcon className="size-4 text-green-600" />
-                            ),
-                            desc: (
-                              <ArrowDownIcon className="size-4 text-green-600" />
-                            ),
-                          }[header.column.getIsSorted() as string] ?? (
+                          {(canSort &&
+                            {
+                              asc: (
+                                <ArrowUpIcon className="size-4 text-green-600" />
+                              ),
+                              desc: (
+                                <ArrowDownIcon className="size-4 text-green-600" />
+                              ),
+                            }[header.column.getIsSorted() as string]) ?? (
                             <ArrowsUpDownIcon className="size-4" />
                           )}
                         </div>

@@ -54,6 +54,7 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
         ),
         footer: (info) => info.column.id,
         enableSorting: true,
+        sortingFn: 'datetime',
         meta: {
           align: 'center',
         },
@@ -163,7 +164,7 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
           align: 'center',
         },
       }),
-      columnHelper.accessor('transactionId', {
+      columnHelper.accessor('debitNetworkIdentifier', {
         header: () => 'PIN',
         cell: (info) => (
           <DynamicCell
@@ -205,7 +206,7 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
           </td>
         ),
         footer: (info) => info.column.id,
-        enableSorting: true,
+        enableSorting: false,
         meta: {
           align: 'center',
         },
