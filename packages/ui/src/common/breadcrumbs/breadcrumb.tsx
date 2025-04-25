@@ -16,7 +16,7 @@ export const Breadcrumb: FC<BreadcrumbProps> = ({
 }) => {
   const router = useRouter();
   return (
-    <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center gap-2">
         {enableBackButton ? (
           <button
