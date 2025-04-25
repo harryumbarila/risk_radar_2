@@ -1126,9 +1126,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         ) : null}
       </Popup>
 
-      <section className="mb-4 grid grid-cols-6 gap-4">
+      <section className="mb-2 grid grid-cols-6 gap-2">
         {/* Column 1 */}
-        <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark col-span-2">
+        <div className="rounded-sm border border-stroke bg-white p-2 shadow-default dark:border-strokedark dark:bg-boxdark col-span-2">
           <div className="grid grid-cols-[max-content_1fr] gap-x-4 font-mono">
             {/* DBA Name */}
             <p className="text-black dark:text-white text-[15px]">
@@ -1193,7 +1193,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           </div>
         </div>
         {/* Column 2 */}
-        <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark col-span-2">
+        <div className="rounded-sm border border-stroke bg-white p-2 shadow-default dark:border-strokedark dark:bg-boxdark col-span-2">
           <div className="grid grid-cols-[max-content_1fr] gap-x-4 font-mono">
             <p className="text-black dark:text-white text-[15px]">
               <strong>Ownership:</strong>
@@ -1224,7 +1224,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           </div>
         </div>
         {/* Column 3 */}
-        <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark col-span-2">
+        <div className="rounded-sm border border-stroke bg-white p-2 shadow-default dark:border-strokedark dark:bg-boxdark col-span-2">
           <div className="flex flex-row gap-x-1">
             <div className="grid grid-cols-[max-content_1fr] gap-x-4 font-mono">
               <p className="text-black dark:text-white text-[15px]">
@@ -1332,48 +1332,48 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         </div>
       </section>
 
-      <section className="mb-4">
-        <div className="rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
+      <section className="mb-2">
+        <div className="rounded-sm border border-stroke bg-white p-1 shadow-default dark:border-strokedark dark:bg-boxdark">
           <div className="grid grid-cols-4 text-black dark:text-white text-center">
-            <p className="text-black dark:text-white text-[15px]">
+            <p className="text-black dark:text-white text-sm">
               <strong>Channel:</strong> {merchantProfile?.sChannel}
             </p>
-            <p className="text-black dark:text-white text-[15px]">
+            <p className="text-black dark:text-white text-sm">
               <strong>Reseller:</strong> {merchantProfile?.sReseller}
             </p>
-            <p className="text-black dark:text-white text-[15px]">
+            <p className="text-black dark:text-white text-sm">
               <strong>Referral Partner:</strong>{' '}
               {merchantProfile?.sReferralPartner}
             </p>
-            <p className="text-black dark:text-white text-[15px]">
+            <p className="text-black dark:text-white text-sm">
               <strong>Solution Consultant:</strong>{' '}
               {merchantProfile?.sSolutionConsultant || ''}
             </p>
           </div>
           <hr className="my-2 border-t border-gray-300" />
           <div className="grid grid-cols-4 text-black dark:text-white text-center">
-            <p className="text-black dark:text-white text-[15px]">
+            <p className="text-black dark:text-white text-sm">
               <strong>MV:</strong> {formatCurrency(merchantProfile?.iMV$, 0)}
               <span className="text-gray-500 dark:text-gray-400 text-black dark:text-white">
                 {' '}
                 (UW Appr.- {formatCurrency(merchantProfile?.iUWApprMV, 0)})
               </span>
             </p>
-            <p className="text-black dark:text-white text-[15px]">
+            <p className="text-black dark:text-white text-sm">
               <strong>AT:</strong> {formatCurrency(merchantProfile?.iAT$, 0)}
               <span className="text-gray-500 dark:text-gray-400 text-black dark:text-white">
                 {' '}
                 (UW Appr.- {formatCurrency(merchantProfile?.iUWApprAT, 0)})
               </span>
             </p>
-            <p className="text-black dark:text-white text-[15px]">
+            <p className="text-black dark:text-white text-sm">
               <strong>HT:</strong> {formatCurrency(merchantProfile?.iHT$, 0)}
               <span className="text-gray-500 dark:text-gray-400 text-black dark:text-white">
                 {' '}
                 (UW Appr.- {formatCurrency(merchantProfile?.iUWApprHT, 0)})
               </span>
             </p>
-            <p className="text-black dark:text-white text-[15px]">
+            <p className="text-black dark:text-white text-sm">
               <strong>Swipe Vol:</strong>{' '}
               {`${merchantProfile?.iSwipeVolPerc}%` || ''}
               <span className="text-gray-500 dark:text-gray-400 text-black dark:text-white">
@@ -1477,7 +1477,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       </nav>
 
       {/* Contact Tab Content */}
-      <section className="mb-4 rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
+      <section className="mb-2 rounded-sm border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
         {activeTab === 'contact' && (
           <>
             <div className="grid grid-cols-2 gap-4">
@@ -1962,7 +1962,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       </section>
 
       {/* Volume Table */}
-      <section className="mb-4">
+      <section className="mb-2">
         <h2 className="mb-2 text-xl font-semibold text-black dark:text-white">
           Volume
         </h2>
@@ -1973,7 +1973,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           </div>
         </div>
       </section>
-      <section className="mb-4">
+      <section className="mb-2">
         <h2 className="mb-2 text-xl font-semibold text-black dark:text-white">
           Exception type legend
         </h2>
