@@ -1,5 +1,6 @@
 'use client';
 
+import type { BaseModel } from '@denali/shared';
 import {
   ArrowDownIcon,
   ArrowsUpDownIcon,
@@ -19,8 +20,6 @@ import {
 import clsx from 'clsx';
 import React from 'react';
 
-import type { BaseModel } from '@/ui/types';
-
 import type { DataTableProps } from './data-table-model';
 
 export const DataTable = <Entry extends BaseModel>(
@@ -33,6 +32,10 @@ export const DataTable = <Entry extends BaseModel>(
     onSetPagination,
     initialItemsPerPage,
     data,
+    fontSize = 'medium',
+    enablePagination = true,
+    tableClassName,
+    tableContainerClassName,
   } = props;
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -91,79 +94,107 @@ export const DataTable = <Entry extends BaseModel>(
   }
 
   return (
-    <div className="mx-auto max-w-screen-xl px-10 lg:px-12">
-      <div className="bg-[#F9FAFB] dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden border-[#D9D9D9]">
-        <div className="overflow-x-auto">
-          <table className="datatable-table w-full table-auto !border-collapse break-words px-4 md:px-8">
-            <thead>
-              {table.getCenterHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
+    <div
+      className={clsx(
+        'bg-[#F9FAFB] dark:bg-gray-800 relative sm:rounded-lg overflow-hidden border border-[#D9D9D9]',
+        {
+          'text-[12px]': fontSize === 'small',
+          'text-base': fontSize === 'medium',
+          'text-lg': fontSize === 'large',
+        }
+      )}
+    >
+      <div
+        className={clsx(
+          'overflow-x-auto overflow-y-auto',
+          tableContainerClassName
+        )}
+      >
+        <table
+          className={clsx(
+            'w-full table-auto border-collapse break-words px-2 md:px-1',
+            tableClassName
+          )}
+        >
+          <thead className="sticky top-0 bg-gray-100 dark:bg-meta-4">
+            {table.getCenterHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  const align = (
+                    header.column.columnDef?.meta as Record<string, unknown>
+                  )?.align;
+
+                  return (
+                    <th key={header.id}>
+                      {!header.isPlaceholder && (
+                        <div
+                          aria-hidden="true"
+                          {...{
+                            className: clsx(
+                              'flex w-full items-center font-bold text-black dark:text-white gap-2',
+                              {
+                                'cursor-pointer select-none':
+                                  header.column.getCanSort(),
+                                'justify-start': align === 'left',
+                                'justify-center': align === 'center',
+                                'justify-end': align === 'right',
+                              }
+                            ),
+                            onClick: header.column.getToggleSortingHandler(),
+                          }}
+                        >
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                          {{
+                            asc: (
+                              <ArrowUpIcon className="size-4 text-green-600" />
+                            ),
+                            desc: (
+                              <ArrowDownIcon className="size-4 text-green-600" />
+                            ),
+                          }[header.column.getIsSorted() as string] ?? (
+                            <ArrowsUpDownIcon className="size-4" />
+                          )}
+                        </div>
+                      )}
+                    </th>
+                  );
+                })}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.map((row) => {
+              return (
+                <tr
+                  key={row.id}
+                  className={`odd:bg-white even:bg-gray-100 dark:odd:bg-transparent dark:even:bg-meta-4 bg-white dark:bg-gray-800 hover:bg-gray-100  dark:hover:bg-gray-600 ${onSelectRow ? 'bg-gray-600' : ''}`}
+                  onClick={onSelectRowItem(row.original)}
+                >
+                  {row.getVisibleCells().map((cell) => {
                     return (
-                      <th key={header.id}>
-                        {!header.isPlaceholder && (
-                          <div
-                            aria-hidden="true"
-                            {...{
-                              className: `flex  items-center gap-2 ${
-                                header.column.getCanSort()
-                                  ? 'cursor-pointer select-none'
-                                  : ''
-                              }`,
-                              onClick: header.column.getToggleSortingHandler(),
-                            }}
-                          >
-                            {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                            {{
-                              asc: (
-                                <ArrowUpIcon className="size-4 text-green-600" />
-                              ),
-                              desc: (
-                                <ArrowDownIcon className="size-4 text-green-600" />
-                              ),
-                            }[header.column.getIsSorted() as string] ?? (
-                              <ArrowsUpDownIcon className="size-4" />
-                            )}
-                          </div>
+                      <React.Fragment key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
                         )}
-                      </th>
+                      </React.Fragment>
                     );
                   })}
                 </tr>
-              ))}
-            </thead>
-            <tbody>
-              {table.getRowModel().rows.map((row) => {
-                return (
-                  <tr
-                    key={row.id}
-                    className={`bg-white dark:bg-gray-800 hover:bg-gray-50  dark:hover:bg-gray-600 ${onSelectRow ? 'bg-gray-600' : ''}`}
-                    onClick={onSelectRowItem(row.original)}
-                  >
-                    {row.getVisibleCells().map((cell) => {
-                      return (
-                        <td key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      {enablePagination ? (
         <nav
           className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
           aria-label="Table navigation"
         >
-          <span className="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">
+          <span className="font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">
             <span className="font-semibold text-gray-900 dark:text-white">
               {table.getState().pagination.pageIndex + 1} of{' '}
               {table.getPageCount().toLocaleString()}
@@ -171,13 +202,13 @@ export const DataTable = <Entry extends BaseModel>(
           </span>
 
           <div className="flex gap-5">
-            <div className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
+            <div className="inline-flex -space-x-px rtl:space-x-reverse h-8">
               <span className="flex items-center justify-center px-3 h-8 ms-0">
                 Entries per Page
               </span>
               <select
                 id="underline_select"
-                className="h-full py-0 pl-0 pr-8 text-sm text-gray-500 bg-transparent border-0"
+                className="h-full py-0 pl-0 pr-8 text-gray-500 bg-transparent border-0"
                 onChange={(e) => {
                   table.setPageSize(Number(e.target.value));
                 }}
@@ -190,7 +221,7 @@ export const DataTable = <Entry extends BaseModel>(
                 <option value={50}>50</option>
               </select>
             </div>
-            <div className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-5 self-center">
+            <div className="inline-flex -space-x-px rtl:space-x-reverse h-5 self-center">
               <button
                 type="button"
                 className={clsx(
@@ -224,7 +255,7 @@ export const DataTable = <Entry extends BaseModel>(
             </div>
           </div>
         </nav>
-      </div>
+      ) : null}
     </div>
   );
 };

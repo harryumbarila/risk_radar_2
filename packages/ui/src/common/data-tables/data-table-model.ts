@@ -1,6 +1,5 @@
+import type { PaginationResponse } from '@denali/shared';
 import type { ColumnDef, PaginationState } from '@tanstack/react-table';
-
-import type { PaginationResponse } from '@/ui/types';
 
 export type DataTableProps<BaseModel> = {
   title?: string;
@@ -10,4 +9,8 @@ export type DataTableProps<BaseModel> = {
   onSelectRow?: (arg: BaseModel) => void; // On row selection
   onSetPagination: (arg: PaginationState) => void; // Pagination
   initialItemsPerPage: number;
+  enablePagination?: boolean;
+  fontSize?: 'small' | 'medium' | 'large';
+  tableClassName?: string;
+  tableContainerClassName?: string;
 };

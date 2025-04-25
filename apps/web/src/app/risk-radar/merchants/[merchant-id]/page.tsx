@@ -20,7 +20,7 @@ import type {
   EmailTemplate,
   TransactionExceptionResponseDto,
 } from '@/shared/response';
-import { Tooltip } from '@/ui/common/tool-tips/risk-tooltip';
+import { ExceptionsTable } from '@/web/src/components/risk-radar/exceptions-table/exceptions-table';
 import { Popup } from '@/web/src/components/risk-radar/popups/popups';
 import {
   formatCurrency,
@@ -39,7 +39,6 @@ import { usePushNoteToIris } from '@/web/src/hooks/risk-radar/use-push-note-to-i
 import type { SaveMerchantDataParams } from '@/web/src/hooks/risk-radar/use-save-merchant-data';
 import { useSaveMerchantData } from '@/web/src/hooks/risk-radar/use-save-merchant-data';
 import { useSendExceptionMemoEmail } from '@/web/src/hooks/risk-radar/use-send-exception-memo-email';
-import { useTransactionExceptions } from '@/web/src/hooks/risk-radar/use-transaction-exceptions';
 import type { VolumenType } from '@/web/src/types/exception';
 
 type MerchantContactResponse = {
@@ -217,9 +216,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   };
 
   // Always call hooks but with conditional parameters
-  const { data: transactionExceptionsData } = useTransactionExceptions(
-    activeTab === 'exceptions' && exceptionId ? exceptionId : null
-  );
+  // const { data: transactionExceptionsData } = useTransactionExceptions(
+  //   activeTab === 'exceptions' && exceptionId ? exceptionId : null
+  // );
 
   const { data: merchantNotesData, refetch: notesRefetch } = useMerchantNotes(
     activeTab === 'notes' ? merchantId : null
@@ -248,7 +247,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   // Monitor data loading states
   useEffect(() => {
     if (activeTab === 'exceptions') {
-      setIsExceptionsLoading(!transactionExceptionsData);
+      // setIsExceptionsLoading(!transactionExceptionsData);
     } else if (activeTab === 'notes') {
       setIsNotesLoading(!merchantNotesData);
     } else if (activeTab === 'chargebacks') {
@@ -258,7 +257,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     }
   }, [
     activeTab,
-    transactionExceptionsData,
+    // transactionExceptionsData,
     merchantNotesData,
     merchantChargebacksData,
     merchantsWithSameTaxIdData,
@@ -385,10 +384,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   }, [merchantStateData.preferredContact, originalData.preferredContact]);
 
   // Calculate paginated data
-  const paginatedExceptions = transactionExceptionsData?.slice(
-    (exceptionsPage - 1) * ITEMS_PER_PAGE,
-    exceptionsPage * ITEMS_PER_PAGE
-  );
+  // const paginatedExceptions = transactionExceptionsData?.slice(
+  //   (exceptionsPage - 1) * ITEMS_PER_PAGE,
+  //   exceptionsPage * ITEMS_PER_PAGE
+  // );
   const paginatedNotes = merchantNotesData?.slice(
     (notesPage - 1) * ITEMS_PER_PAGE,
     notesPage * ITEMS_PER_PAGE
@@ -400,9 +399,9 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const paginatedVolume = data?.processingSummaries;
 
   // Calculate total pages
-  const totalExceptionsPages = Math.ceil(
-    (transactionExceptionsData?.length || 0) / ITEMS_PER_PAGE
-  );
+  // const totalExceptionsPages = Math.ceil(
+  //   (transactionExceptionsData?.length || 0) / ITEMS_PER_PAGE
+  // );
   const totalNotesPages = Math.ceil(
     (merchantNotesData?.length || 0) / ITEMS_PER_PAGE
   );
@@ -1099,7 +1098,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                   </label>
                   <textarea
                     className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-black text-sm focus:ring-blue-500 focus:border-blue-500"
-                    rows={11}
+                    rows={25}
                     value={templateData.body}
                     onChange={(e) =>
                       setTemplateData((prev) => ({
@@ -1658,150 +1657,29 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           </>
         )}
         {activeTab === 'exceptions' && (
-          <div className="grid grid-cols-1 gap-4">
-            {isExceptionsLoading ? (
-              <div className="flex justify-center items-center p-8">
-                <Loader />
-              </div>
-            ) : (
-              <div className="max-w-full overflow-x-auto">
-                <table className="w-full table-auto">
-                  <thead>
-                    <tr className="bg-gray-2 dark:bg-meta-4 text-center">
-                      <th className="p-4 py-1 font-medium text-black dark:text-white">
-                        Trans Date
-                      </th>
-                      <th className="p-4 py-1 font-medium text-black dark:text-white">
-                        Auth Amt
-                      </th>
-                      <th className="p-4 py-1 font-medium text-black dark:text-white">
-                        Trans Amt
-                      </th>
-                      <th className="p-4 py-1 font-medium text-black dark:text-white">
-                        POS
-                      </th>
-                      <th className="p-4 py-1 font-medium text-black dark:text-white">
-                        AVS
-                      </th>
-                      <th className="p-4 py-1 font-medium text-black dark:text-white">
-                        Auth Code
-                      </th>
-                      <th className="p-4 py-1 font-medium text-black dark:text-white">
-                        Card #
-                      </th>
-                      <th className="p-4 py-1 font-medium text-black dark:text-white">
-                        PIN
-                      </th>
-                      <th className="p-4 py-1 font-medium text-black dark:text-white">
-                        Eligible Exceptions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedExceptions?.map((exception, index) => (
-                      <tr
-                        // eslint-disable-next-line react/no-array-index-key
-                        key={`${exception.transactionId}-${index}`}
-                        className="text-center"
-                      >
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
-                          <span className="block text-left">
-                            {formatDate(
-                              exception.transactionDate,
-                              'MM/dd/yyyy kk:mm:ss'
-                            )}
-                          </span>
-                        </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-right text-black dark:text-white">
-                          <span className="block text-right">
-                            {formatCurrency(exception.authAmount)}
-                          </span>
-                        </td>
-                        <td
-                          className="border-b border-[#eee] px-4 py-2 dark:border-strokedark cursor-pointer text-blue-600 hover:text-blue-800 hover:underline"
-                          onClick={() => {
-                            setIsEmailTemplateLoading(true);
-                            setIsPopupActive(true);
-                            setActivePopup(PopupType.Email);
-                            setCurrentTransException(exception);
-                            // Clear the loading state after a short delay to ensure the popup is visible
-                            setTimeout(
-                              () => setIsEmailTemplateLoading(false),
-                              500
-                            );
-                          }}
-                        >
-                          <span
-                            className={`block text-right ${exception.transactionAmount >= 0 ? 'text-blue-600' : 'text-red-600'}`}
-                          >
-                            {exception.transactionAmount >= 0
-                              ? formatCurrency(exception.transactionAmount)
-                              : `(${formatCurrency(Math.abs(exception.transactionAmount))})`}
-                          </span>
-                        </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
-                          {exception.posEntryMode}
-                        </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
-                          {exception.avsResponseCode}
-                        </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
-                          {exception.authCode || ''}
-                        </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
-                          <span className="block text-center">
-                            <button
-                              type="button"
-                              className="cursor-pointer text-blue-600 hover:text-blue-800 hover:underline"
-                              onClick={() => {
-                                setIsCardHistoryLoading(true);
-                                setIsPopupActive(true);
-                                setCurrentTransException(exception);
-                                setActivePopup(PopupType.CardHistory);
-                              }}
-                            >
-                              {exception.cardNumber}
-                            </button>
-                            {` ${exception.transactionId?.slice(-4)}`}
-                          </span>
-                        </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
-                          {exception.debitNetworkIdentifier}
-                        </td>
-                        <td className="border-b border-[#eee] px-4 py-2 dark:border-strokedark text-black dark:text-white">
-                          {exception.exceptionList &&
-                            exception.exceptionList
-                              .split(' ')
-                              .filter((r) => !!r && r !== '-')
-                              .map((exceptionNumber) => (
-                                <Tooltip
-                                  key={exceptionNumber}
-                                  text={
-                                    data?.exceptionTypes?.filter(
-                                      (exceptionType) =>
-                                        exceptionType.id ===
-                                        parseInt(exceptionNumber, 10)
-                                    )[0]?.description ?? ''
-                                  }
-                                >
-                                  <span className="cursor-pointer m-[4px] text-blue-600 underline">
-                                    {exceptionNumber}
-                                  </span>
-                                </Tooltip>
-                              ))}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                <Pagination
-                  currentPage={exceptionsPage}
-                  totalPages={totalExceptionsPages}
-                  onPageChange={setExceptionsPage}
-                />
-              </div>
-            )}
-          </div>
+          <ExceptionsTable
+            exceptionId={
+              activeTab === 'exceptions' && exceptionId
+                ? exceptionId
+                : undefined
+            }
+            exceptionTypes={data?.exceptionTypes}
+            onTransactionAmountClick={(exception) => {
+              setIsEmailTemplateLoading(true);
+              setIsPopupActive(true);
+              setActivePopup(PopupType.Email);
+              setCurrentTransException(exception);
+              // Clear the loading state after a short delay to ensure the popup is visible
+              setTimeout(() => setIsEmailTemplateLoading(false), 500);
+            }}
+            onCardNumberClick={(exception) => {
+              console.log({ exception });
+              setIsCardHistoryLoading(true);
+              setIsPopupActive(true);
+              setCurrentTransException(exception);
+              setActivePopup(PopupType.CardHistory);
+            }}
+          />
         )}
         {activeTab === 'notes' && (
           <div className="grid grid-cols-1 gap-4">
