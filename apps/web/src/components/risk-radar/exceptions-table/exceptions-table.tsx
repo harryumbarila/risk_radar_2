@@ -263,7 +263,7 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
   return (
     <div>
       <DataTable
-        tableContainerClassName="max-h-[500px]"
+        tableContainerClassName="max-h-[220px]"
         columns={columns}
         data={entries}
         isLoading={isLoading}

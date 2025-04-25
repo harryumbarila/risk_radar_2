@@ -101,7 +101,7 @@ export const DataTable = <Entry extends BaseModel>(
         'bg-[#F9FAFB] dark:bg-gray-800 relative sm:rounded-lg overflow-hidden border border-[#D9D9D9]',
         {
           'text-[12px]': fontSize === 'small',
-          'text-base': fontSize === 'medium',
+          'text-sm': fontSize === 'medium',
           'text-lg': fontSize === 'large',
         }
       )}
@@ -118,7 +118,7 @@ export const DataTable = <Entry extends BaseModel>(
             tableClassName
           )}
         >
-          <thead className="sticky top-0 bg-gray-100 dark:bg-meta-4">
+          <thead className="sticky top-0 z-10 bg-gray-100 dark:bg-meta-4">
             {table.getCenterHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
