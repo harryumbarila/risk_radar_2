@@ -21,7 +21,7 @@ type Props = {
 
 export const VolumeTable: FC<Props> = ({ data }) => {
   return (
-    <table className="w-full lg:w-1/2 table-auto text-[12px] rounded-sm">
+    <table className="w-full lg:w-1/2 table-auto text-sm rounded-sm">
       <thead>
         <tr className="bg-gray-100 dark:bg-meta-4 text-center text-black dark:text-white">
           {tableHeaders.map((header) => (

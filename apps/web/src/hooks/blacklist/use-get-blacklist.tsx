@@ -1,6 +1,5 @@
+import type { BaseModel, PaginationResponse } from '@denali/shared';
 import React from 'react';
-
-import type { BaseModel, PaginationResponse } from '@/ui/types';
 
 export type BlacklistedEntry = {
   returnCode: string;

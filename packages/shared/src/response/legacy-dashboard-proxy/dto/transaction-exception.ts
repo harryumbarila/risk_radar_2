@@ -1,4 +1,6 @@
-export interface TransactionExceptionResponseDto {
+import type { BaseModel } from '@/shared/common/base';
+
+export interface TransactionExceptionResponseDto extends BaseModel {
   transactionDate: string;
   transactionAmount: number;
   posEntryMode: string;

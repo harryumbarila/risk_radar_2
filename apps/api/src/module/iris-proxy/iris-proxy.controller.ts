@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { Public } from '@/api/shared/auth/decorator/public.decorator';
 import { IrisClient } from '@/api/shared/module/iris/iris.client';
 import type {
+  IrisBasicInfoResponseDto,
   IrisChannelsResponseDto,
   IrisFilteredUsersResponseDto,
   IrisLeadSourcesResponseDto,
@@ -118,5 +119,20 @@ export class IrisProxyController {
         },
       ],
     };
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'The lead basic info.',
+  })
+  @ApiOperation({
+    operationId: 'lead-basic-info',
+    summary: 'Get lead basic info',
+  })
+  @Get('lead-basic-info/:leadId')
+  public leadBasicInfo(
+    @Param('leadId') leadId: number
+  ): Promise<IrisBasicInfoResponseDto> {
+    return this.irisProxyService.getLeadBasicInfo(leadId);
   }
 }

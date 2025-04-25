@@ -1,12 +1,17 @@
 import type { Row } from '@tanstack/react-table';
+import type { HTMLAttributes } from 'react';
 
-type TextCell = {
+type BaseCell = {
+  customValue?: string | number;
+} & HTMLAttributes<HTMLTableCellElement>;
+
+type TextCell = BaseCell & {
   type: 'text';
   value: string | number;
   className?: string;
 };
 
-type NumberCell = {
+type NumberCell = BaseCell & {
   type: 'number';
   value: number;
   className?: string;
@@ -15,21 +20,21 @@ type NumberCell = {
   suffix?: string;
 };
 
-type DateCell = {
+type DateCell = BaseCell & {
   type: 'date';
   value: string | number | Date;
   className?: string;
   formatOptions?: Intl.DateTimeFormatOptions;
 };
 
-type Status = {
+type Status = BaseCell & {
   type: 'status';
   value: boolean;
   className?: string;
   labels?: [active: string, inactive: string];
 };
 
-type ActionsCell<T> = {
+type ActionsCell<T> = BaseCell & {
   type: 'actions';
   row: Row<T>;
   className?: string;
