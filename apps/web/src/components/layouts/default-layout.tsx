@@ -30,7 +30,7 @@ export const DefaultLayout: FC<PropsWithChildren> = ({ children }) => {
 
           {/* <!-- ===== Main Content Start ===== --> */}
           <main>
-            <div className="p-4 md:p-6 2xl:p-10">{children}</div>
+            <div className="p-2 md:p-3 2xl:p-5">{children}</div>
           </main>
           {/* <!-- ===== Main Content End ===== --> */}
         </div>
