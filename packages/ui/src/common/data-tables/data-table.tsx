@@ -86,7 +86,9 @@ export const DataTable = <Entry extends BaseModel>(
 
   // TODO: Implement loading based on app design
   if (isLoading) {
-    return <>Loading</>;
+    return (
+      <div className="flex justify-center items-center p-8">Loading...</div>
+    );
   }
   // TODO: Implement no data view based on app design
   if (data.data?.length === 0) {

@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unstable-nested-components */
-import { DataTable, DynamicCell } from '@denali/ui';
+import { DataTable, DynamicCell, Loader } from '@denali/ui';
 import type { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import type { FC } from 'react';
@@ -247,6 +247,14 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
         pageCount: Math.ceil(totalCount / pageSize),
       };
     }, [data, pageIndex, pageSize]);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center p-8">
+        <Loader />
+      </div>
+    );
+  }
 
   if (!entries) {
     return <div>Not found</div>;
