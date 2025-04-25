@@ -46,7 +46,8 @@ export const DataTable = <Entry extends BaseModel>(
     });
 
   React.useEffect(() => {
-    onSetPagination?.({ pageIndex, pageSize });
+    // onSetPagination?.({ pageIndex, pageSize });
+    setPagination?.({ pageIndex, pageSize });
   }, [pageIndex, pageSize, onSetPagination]);
 
   const pagination = React.useMemo(
@@ -59,7 +60,8 @@ export const DataTable = <Entry extends BaseModel>(
   const table = useReactTable({
     data: data.data,
     columns,
-    pageCount: data?.pageCount ?? -1,
+
+    // pageCount: data?.pageCount ?? -1,
     state: {
       sorting,
       pagination,
@@ -75,9 +77,10 @@ export const DataTable = <Entry extends BaseModel>(
         pageSize: initialItemsPerPage,
       },
     },
-    manualPagination: true,
     debugTable: true,
-    autoResetPageIndex: false,
+    // TODO: Backend Pagination
+    // manualPagination: true,
+    // autoResetPageIndex: false,
   });
 
   const onSelectRowItem = (entry: Entry) => {
