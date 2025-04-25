@@ -211,7 +211,7 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
         },
       }),
     ] as ColumnDef<TransactionExceptionResponseDto>[];
-  }, [exceptionTypes, onCardNumberClick]);
+  }, [exceptionTypes, onCardNumberClick, onTransactionAmountClick]);
 
   const entries =
     useMemo((): PaginationResponse<TransactionExceptionResponseDto> | null => {

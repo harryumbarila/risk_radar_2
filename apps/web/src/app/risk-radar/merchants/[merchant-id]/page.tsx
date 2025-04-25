@@ -197,8 +197,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   );
 
   // Add tab-specific loading states
-  const [isExceptionsLoading, setIsExceptionsLoading] =
-    useState<boolean>(false);
+
   const [isNotesLoading, setIsNotesLoading] = useState<boolean>(false);
   const [isChargebacksLoading, setIsChargebacksLoading] =
     useState<boolean>(false);
@@ -246,9 +245,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
 
   // Monitor data loading states
   useEffect(() => {
-    if (activeTab === 'exceptions') {
-      // setIsExceptionsLoading(!transactionExceptionsData);
-    } else if (activeTab === 'notes') {
+    if (activeTab === 'notes') {
       setIsNotesLoading(!merchantNotesData);
     } else if (activeTab === 'chargebacks') {
       setIsChargebacksLoading(!merchantChargebacksData);
@@ -279,7 +276,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   });
 
   // Add pagination states
-  const [exceptionsPage, setExceptionsPage] = useState(1);
   const [notesPage, setNotesPage] = useState(1);
   const [chargebacksPage, setChargebacksPage] = useState(1);
 
@@ -1673,7 +1669,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               setTimeout(() => setIsEmailTemplateLoading(false), 500);
             }}
             onCardNumberClick={(exception) => {
-              console.log({ exception });
               setIsCardHistoryLoading(true);
               setIsPopupActive(true);
               setCurrentTransException(exception);
