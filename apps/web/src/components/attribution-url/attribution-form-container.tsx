@@ -2,6 +2,7 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { useUsersData } from '@/hooks/attribution-url/use-users-data';
+import type { IrisBasicInfoResponseDto } from '@/shared/response/iris-proxy';
 import type { FormValues } from '@/types/attribution-url';
 import { GenerationFormMode } from '@/types/attribution-url';
 
@@ -11,15 +12,26 @@ type AttributionFormContainerProps = {
   generationMode: GenerationFormMode;
   canWrite: boolean;
   updateSelectedPartnerName: (partnerName: string) => void;
+
+  leadData?: IrisBasicInfoResponseDto;
+  isLoading?: boolean;
+  isDisabled?: boolean;
 };
 
 export const AttributionFormContainer: React.FC<
   AttributionFormContainerProps
-> = ({ generationMode, canWrite, updateSelectedPartnerName }) => {
+> = ({
+  generationMode,
+  canWrite,
+  leadData,
+  isLoading,
+  isDisabled,
+  updateSelectedPartnerName,
+}) => {
   const {
     register,
     setValue,
-    formState: { errors },
+    formState: { errors, isDirty },
     trigger,
   } = useFormContext<FormValues>();
 
@@ -237,6 +249,24 @@ export const AttributionFormContainer: React.FC<
               errors.existingLeadId ? 'border-danger' : 'border-stroke'
             } bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary`}
           />
+
+          {leadData && !isLoading && (
+            <div className="mt-2 text-sm text-gray-500 italic">
+              <p>
+                Creating URL for <b>{leadData.dbaName}</b> with contact
+                information: <b>{leadData.contactPhone}</b> /{' '}
+                <b>{leadData.contactEmail}</b>
+              </p>
+            </div>
+          )}
+
+          {isDirty && !leadData && !isLoading && (
+            <div className="mt-2 text-sm text-danger">
+              There is no lead data for the provided lead ID. Please check the
+              lead ID and try again.
+            </div>
+          )}
+
           {errors.existingLeadId && (
             <span className="text-sm text-danger">
               {errors.existingLeadId.message}
@@ -246,8 +276,8 @@ export const AttributionFormContainer: React.FC<
       )}
 
       <SubmitButton
-        canWrite={canWrite}
-        hasErrors={Object.keys(errors).length > 0}
+        isLoading={isLoading}
+        isDisabled={isDisabled || Object.keys(errors).length > 0 || !canWrite}
       />
     </>
   );

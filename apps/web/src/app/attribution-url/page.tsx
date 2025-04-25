@@ -4,12 +4,14 @@ import { Breadcrumb, showNotification } from '@denali/ui';
 import { useAuth } from '@frontegg/nextjs';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useDebounce } from 'use-debounce';
 
 import { AttributionFormContainer } from '@/components/attribution-url/attribution-form-container';
 import { AttributionResult } from '@/components/attribution-url/attribution-result';
 import { GenerationModeSelector } from '@/components/attribution-url/generation-mode-selector';
 import { DefaultLayout } from '@/components/layouts/default-layout';
 import { clientConfig } from '@/config/client';
+import { useLeadBasicInfo } from '@/hooks/attribution-url/use-lead-basic-info';
 import { useLeadSources } from '@/hooks/attribution-url/use-lead-sources';
 import { useSourceMatcher } from '@/hooks/attribution-url/use-source-matcher';
 import type {
@@ -39,6 +41,16 @@ const AttributionUrl: React.FC = () => {
 
   const { watch, handleSubmit, setValue } = methods;
   const generationMode = watch('generationMode');
+
+  // Get lead basic info to validate
+  const leadId = watch('existingLeadId');
+  const [debouncedLeadId] = useDebounce(leadId, 800);
+
+  const { data: leadBasicInfoData, isLoading: isLeadBasicInfoLoading } =
+    useLeadBasicInfo(debouncedLeadId);
+
+  const isValidLead =
+    leadBasicInfoData?.dbaName && leadBasicInfoData.contactPhone;
 
   const [generatedLink, setGeneratedLink] = React.useState('');
   const [selectedPartnerName, setSelectedPartnerName] =
@@ -136,6 +148,12 @@ const AttributionUrl: React.FC = () => {
                 generationMode={generationMode}
                 canWrite={forResource('ATTRIBUTION_LINK').canWrite}
                 updateSelectedPartnerName={updateSelectedPartnerName}
+                leadData={leadBasicInfoData}
+                isLoading={isLeadBasicInfoLoading}
+                isDisabled={
+                  !isValidLead &&
+                  generationMode === GenerationFormMode.EXISTING_LEAD
+                }
               />
               {generatedLink && (
                 <AttributionResult generatedLink={generatedLink} />
