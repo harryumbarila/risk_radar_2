@@ -25,4 +25,5 @@ module.exports = {
       },
     ],
   },
+  ignorePatterns: ['react-table-config.d.ts'],
 };
