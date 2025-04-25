@@ -1,3 +1,4 @@
+export * from './dto/iris-basic-info';
 export * from './dto/iris-channels';
 export * from './dto/iris-filtered-users';
 export * from './dto/iris-lead-assigned';
