@@ -5,7 +5,6 @@ import { createColumnHelper } from '@tanstack/react-table';
 import type { FC } from 'react';
 import React, { useMemo } from 'react';
 
-import type { PaginationResponse } from '@/shared/common';
 import type { TransactionExceptionResponseDto } from '@/shared/response';
 import { Tooltip } from '@/ui/common/tool-tips/risk-tooltip';
 import {
@@ -214,41 +213,6 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
     ] as ColumnDef<TransactionExceptionResponseDto>[];
   }, [exceptionTypes, onCardNumberClick, onTransactionAmountClick]);
 
-  const entries =
-    useMemo((): PaginationResponse<TransactionExceptionResponseDto> | null => {
-      if (!data || !Array.isArray(data)) {
-        return null;
-      }
-
-      const totalCount = data.length;
-      const startIndex = pageIndex * pageSize;
-      const endIndex = startIndex + pageSize;
-
-      // Handle empty state or out-of-bounds
-      if (startIndex >= totalCount) {
-        return {
-          data: [],
-          count: 0,
-          total: totalCount,
-          page: pageIndex,
-          pageCount: Math.ceil(totalCount / pageSize),
-        };
-      }
-
-      const paginatedEntries = data.slice(startIndex, endIndex);
-
-      return {
-        data: paginatedEntries.map((item) => ({
-          ...item,
-          id: item.transactionId,
-        })),
-        count: paginatedEntries.length,
-        total: totalCount,
-        page: pageIndex,
-        pageCount: Math.ceil(totalCount / pageSize),
-      };
-    }, [data, pageIndex, pageSize]);
-
   if (isLoading) {
     return (
       <div className="flex justify-center items-center p-8">
@@ -257,7 +221,7 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
     );
   }
 
-  if (!entries) {
+  if (!data) {
     return <div>Not found</div>;
   }
 
@@ -266,7 +230,16 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
       <DataTable
         tableContainerClassName="max-h-[220px]"
         columns={columns}
-        data={entries}
+        data={{
+          data: data.map((item) => ({
+            ...item,
+            id: item.transactionId,
+          })),
+          count: data.length,
+          total: data.length,
+          page: pageIndex,
+          pageCount: Math.ceil(data.length / pageSize),
+        }}
         isLoading={isLoading}
         initialItemsPerPage={ITEMS_PER_PAGE}
         onSetPagination={setPagination}
