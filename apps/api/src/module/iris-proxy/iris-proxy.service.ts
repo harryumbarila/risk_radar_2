@@ -207,16 +207,18 @@ export class IrisProxyService {
       );
 
       const dbaName = data.details
-        .find((detail) => detail.name === 'Lead Data')
+        .find((detail) => detail.name === 'Business Information')
         ?.fields.find((field) => field.field === 'DBA Name')?.value;
 
       const contactPhone = data.details
-        .find((detail) => detail.name === 'Lead Data')
-        ?.fields.find((field) => field.field === 'Contact Phone #')?.value;
+        .find((detail) => detail.name === 'Business Information')
+        ?.fields.find((field) => field.field === 'Contact Phone Number')?.value;
 
       const contactEmail = data.details
-        .find((detail) => detail.name === 'Lead Data')
-        ?.fields.find((field) => field.field === 'Contact Email')?.value;
+        .find((detail) => detail.name === 'Business Information')
+        ?.fields.find(
+          (field) => field.field === 'Contact Email Address'
+        )?.value;
 
       return { dbaName, contactPhone, contactEmail };
     } catch (error) {
