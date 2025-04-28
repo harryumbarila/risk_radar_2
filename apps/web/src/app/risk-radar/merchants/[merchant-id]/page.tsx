@@ -1478,22 +1478,22 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         </div>
         <div>
           <Popover
-            popoverClassName="w-[600px]"
+            popoverClassName="w-[200px] md:w-[700px]"
             content={
-              <div className="grid grid-cols-4 gap-4">
-                {[0, 1, 2, 3].map((colIndex) => (
+              <div className="grid md:grid-cols-3 grid-cols-1 gap-4">
+                {[0, 1, 2].map((colIndex) => (
                   <div
                     key={colIndex}
                     className="rounded-sm border border-stroke bg-white text-sm  shadow-default dark:border-strokedark dark:bg-boxdark "
                   >
                     <div className="max-w-full overflow-x-auto">
-                      <table className="w-full table-auto">
+                      <table className="w-full table-auto text-xs">
                         <thead>
                           <tr className="bg-gray-2 dark:bg-meta-4 text-center">
-                            <th className="font-medium text-black dark:text-white">
+                            <th className="font-bold text-black dark:text-white">
                               ID
                             </th>
-                            <th className="font-medium text-black dark:text-white">
+                            <th className="font-bold text-left text-black dark:text-white">
                               Exception
                             </th>
                           </tr>
@@ -1501,14 +1501,14 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                         <tbody>
                           {(data?.exceptionTypes ?? [])
                             .filter(
-                              (_, index: number) => index % 4 === colIndex
+                              (_, index: number) => index % 3 === colIndex
                             )
                             .map((legend) => (
                               <tr key={legend.id} className="text-center">
-                                <td className="border-b border-[#eee] dark:border-strokedark text-black dark:text-white">
+                                <td className="border-b border-[#eee] dark:border-strokedark text-centeralign-top text-black font-bold dark:text-white">
                                   {legend.id}
                                 </td>
-                                <td className="border-b border-[#eee] dark:border-strokedark text-black dark:text-white">
+                                <td className="border-b border-[#eee] dark:border-strokedark text-left text-black dark:text-white">
                                   {legend.description}
                                 </td>
                               </tr>
@@ -1523,7 +1523,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           >
             <button
               className={classNames(
-                'inline-flex items-center justify-center rounded-lg border border-primary text-sm bg-primary px-4 py-1 text-white hover:bg-opacity-90  rounded-b-none'
+                'inline-flex items-center justify-center rounded-lg border text-sm bg-green-400 px-4 py-1 text-white hover:bg-opacity-90  rounded-b-none'
               )}
               type="button"
             >
