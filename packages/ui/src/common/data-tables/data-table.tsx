@@ -197,7 +197,7 @@ export const DataTable = <Entry extends BaseModel>(
       </div>
       {enablePagination ? (
         <nav
-          className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
+          className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 px-2"
           aria-label="Table navigation"
         >
           <span className="font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">
