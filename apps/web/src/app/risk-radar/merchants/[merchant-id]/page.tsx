@@ -1505,7 +1505,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                             )
                             .map((legend) => (
                               <tr key={legend.id} className="text-center">
-                                <td className="border-b border-[#eee] dark:border-strokedark text-centeralign-top text-black font-bold dark:text-white">
+                                <td className="border-b border-[#eee] dark:border-strokedark text-center align-top text-black font-bold dark:text-white">
                                   {legend.id}
                                 </td>
                                 <td className="border-b border-[#eee] dark:border-strokedark text-left text-black dark:text-white">
