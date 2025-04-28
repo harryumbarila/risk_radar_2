@@ -5,7 +5,7 @@
 
 'use client';
 
-import { Breadcrumb, Loader } from '@denali/ui';
+import { Breadcrumb, Loader, Popover } from '@denali/ui';
 import { useAuth } from '@frontegg/nextjs';
 import classNames from 'classnames';
 import { format } from 'date-fns';
@@ -1386,94 +1386,151 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       </section>
 
       {/* Tabs */}
-      <nav className="flex gap-1 px-1">
-        <button
-          className={classNames(
-            'inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
-            {
-              '!opacity-100': activeTab === 'contact',
-            }
-          )}
-          type="button"
-          onClick={() => {
-            setActiveTab('contact');
-          }}
-        >
-          Contact
-        </button>
-        <button
-          className={classNames(
-            'inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
-            {
-              '!opacity-100': activeTab === 'exceptions',
-              '!cursor-not-allowed': !exceptionId,
-            }
-          )}
-          disabled={!exceptionId}
-          type="button"
-          onClick={() => {
-            setActiveTab('exceptions');
-          }}
-        >
-          Exceptions
-        </button>
+      <nav className="flex justify-between">
+        <div className="flex gap-1 px-1">
+          <button
+            className={classNames(
+              'inline-flex items-center justify-center rounded-lg border border-primary text-sm bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
+              {
+                '!opacity-100': activeTab === 'contact',
+              }
+            )}
+            type="button"
+            onClick={() => {
+              setActiveTab('contact');
+            }}
+          >
+            Contact
+          </button>
+          <button
+            className={classNames(
+              'inline-flex items-center justify-center rounded-lg border border-primary text-sm bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
+              {
+                '!opacity-100': activeTab === 'exceptions',
+                '!cursor-not-allowed': !exceptionId,
+              }
+            )}
+            disabled={!exceptionId}
+            type="button"
+            onClick={() => {
+              setActiveTab('exceptions');
+            }}
+          >
+            Exceptions
+          </button>
 
-        <button
-          className={classNames(
-            'inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
-            {
-              '!opacity-100': activeTab === 'notes',
+          <button
+            className={classNames(
+              'inline-flex items-center justify-center rounded-lg border border-primary text-sm bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
+              {
+                '!opacity-100': activeTab === 'notes',
+              }
+            )}
+            type="button"
+            onClick={() => {
+              setActiveTab('notes');
+            }}
+          >
+            Notes
+          </button>
+          <button
+            className={classNames(
+              'inline-flex items-center justify-center rounded-lg border border-primary text-sm bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
+              {
+                '!opacity-100': activeTab === 'chargebacks',
+              }
+            )}
+            type="button"
+            onClick={() => {
+              setActiveTab('chargebacks');
+            }}
+          >
+            Chargebacks
+          </button>
+          <button
+            className={classNames(
+              'inline-flex items-center justify-center rounded-lg border border-primary text-sm bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
+              {
+                '!opacity-100': activeTab === 'netsettlement',
+              }
+            )}
+            type="button"
+            onClick={() => {
+              setActiveTab('netsettlement');
+            }}
+          >
+            NetSettlement
+          </button>
+          <button
+            className={classNames(
+              'inline-flex items-center justify-center rounded-lg border border-primary text-sm bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
+              {
+                '!opacity-100': activeTab === 'sameTaxId',
+              }
+            )}
+            type="button"
+            onClick={() => {
+              setActiveTab('sameTaxId');
+            }}
+          >
+            Match
+          </button>
+        </div>
+        <div>
+          <Popover
+            popoverClassName="w-[600px]"
+            content={
+              <div className="grid grid-cols-4 gap-4">
+                {[0, 1, 2, 3].map((colIndex) => (
+                  <div
+                    key={colIndex}
+                    className="rounded-sm border border-stroke bg-white text-sm  shadow-default dark:border-strokedark dark:bg-boxdark "
+                  >
+                    <div className="max-w-full overflow-x-auto">
+                      <table className="w-full table-auto">
+                        <thead>
+                          <tr className="bg-gray-2 dark:bg-meta-4 text-center">
+                            <th className="font-medium text-black dark:text-white">
+                              ID
+                            </th>
+                            <th className="font-medium text-black dark:text-white">
+                              Exception
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(data?.exceptionTypes ?? [])
+                            .filter(
+                              (_, index: number) => index % 4 === colIndex
+                            )
+                            .map((legend) => (
+                              <tr key={legend.id} className="text-center">
+                                <td className="border-b border-[#eee] dark:border-strokedark text-black dark:text-white">
+                                  {legend.id}
+                                </td>
+                                <td className="border-b border-[#eee] dark:border-strokedark text-black dark:text-white">
+                                  {legend.description}
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ))}
+              </div>
             }
-          )}
-          type="button"
-          onClick={() => {
-            setActiveTab('notes');
-          }}
-        >
-          Notes
-        </button>
-        <button
-          className={classNames(
-            'inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
-            {
-              '!opacity-100': activeTab === 'chargebacks',
-            }
-          )}
-          type="button"
-          onClick={() => {
-            setActiveTab('chargebacks');
-          }}
-        >
-          Chargebacks
-        </button>
-        <button
-          className={classNames(
-            'inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
-            {
-              '!opacity-100': activeTab === 'netsettlement',
-            }
-          )}
-          type="button"
-          onClick={() => {
-            setActiveTab('netsettlement');
-          }}
-        >
-          NetSettlement
-        </button>
-        <button
-          className={classNames(
-            'inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-1 text-white hover:bg-opacity-90 opacity-60 rounded-b-none',
-            {
-              '!opacity-100': activeTab === 'sameTaxId',
-            }
-          )}
-          type="button"
-          onClick={() => {
-            setActiveTab('sameTaxId');
-          }}
-        >
-          Match
-        </button>
+          >
+            <button
+              className={classNames(
+                'inline-flex items-center justify-center rounded-lg border border-primary text-sm bg-primary px-4 py-1 text-white hover:bg-opacity-90  rounded-b-none'
+              )}
+              type="button"
+            >
+              Exception type legend
+            </button>
+          </Popover>
+        </div>
       </nav>
 
       {/* Contact Tab Content */}
@@ -1971,48 +2028,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             <VolumeTable data={paginatedVolume?.slice(0, 6) || []} />
             <VolumeTable data={paginatedVolume?.slice(6) || []} />
           </div>
-        </div>
-      </section>
-      <section className="mb-2">
-        <h2 className="mb-2 text-xl font-semibold text-black dark:text-white">
-          Exception type legend
-        </h2>
-        <div className="grid grid-cols-4 gap-4">
-          {[0, 1, 2, 3].map((colIndex) => (
-            <div
-              key={colIndex}
-              className="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5"
-            >
-              <div className="max-w-full overflow-x-auto">
-                <table className="w-full table-auto">
-                  <thead>
-                    <tr className="bg-gray-2 dark:bg-meta-4 text-center">
-                      <th className="p-4 font-medium text-black dark:text-white">
-                        ID
-                      </th>
-                      <th className="p-4 font-medium text-black dark:text-white">
-                        Exception
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(data?.exceptionTypes ?? [])
-                      .filter((_, index: number) => index % 4 === colIndex)
-                      .map((legend) => (
-                        <tr key={legend.id} className="text-center">
-                          <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark text-black dark:text-white">
-                            {legend.id}
-                          </td>
-                          <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark text-black dark:text-white">
-                            {legend.description}
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          ))}
         </div>
       </section>
     </DefaultLayout>

@@ -108,6 +108,7 @@ export * from './paginations/pagination-one';
 export * from './paginations/pagination-three';
 export * from './paginations/pagination-two';
 export * from './popovers';
+export * from './popovers/popover';
 export * from './popovers/popovers-bottom';
 export * from './popovers/popovers-left';
 export * from './popovers/popovers-one';
