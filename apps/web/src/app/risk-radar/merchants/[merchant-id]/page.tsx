@@ -411,7 +411,19 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     startIndex + itemsPerPage,
     cardNumberData?.length || 0
   );
-  const currentItems = cardNumberData?.slice(startIndex, endIndex) || [];
+  const currentItems = (cardNumberData || [])
+    .sort((a, b) => {
+      const midA = a.mid || '';
+      const midB = b.mid || '';
+      const dateA = a.transmissionDate || '';
+      const dateB = b.transmissionDate || '';
+
+      const midCompare = midB.localeCompare(midA); // Descending by mid
+      if (midCompare !== 0) return midCompare;
+
+      return dateB.localeCompare(dateA); // Descending by transmissionDate
+    })
+    .slice(startIndex, endIndex);
 
   // Calculate total pages
   const totalPages = Math.ceil((cardNumberData?.length || 0) / itemsPerPage);
@@ -1523,7 +1535,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           >
             <button
               className={classNames(
-                'inline-flex items-center justify-center rounded-lg border text-sm bg-green-400 px-4 py-1 text-white hover:bg-opacity-90  rounded-b-none'
+                'inline-flex items-center justify-center rounded-lg border text-sm bg-green-700 px-4 py-1 text-white hover:bg-opacity-90  rounded-b-none'
               )}
               type="button"
             >

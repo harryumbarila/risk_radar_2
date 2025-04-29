@@ -59,7 +59,7 @@ export const ExceptionTypesSelect: FC<Props> = ({
               </span>
               <div className="grid grid-cols-2 divide-x-2 divide-dashed divide-gray-500 dark:divide-white">
                 <button
-                  className="text-sm text-green-500"
+                  className="text-sm font-bold text-green-700"
                   type="button"
                   onClick={() => {
                     field.onChange(options.map((o) => o.value));
@@ -68,7 +68,7 @@ export const ExceptionTypesSelect: FC<Props> = ({
                   Select All
                 </button>
                 <button
-                  className="text-sm text-red-500"
+                  className="text-sm font-bold text-red-500"
                   type="button"
                   onClick={() => {
                     field.onChange([]);
