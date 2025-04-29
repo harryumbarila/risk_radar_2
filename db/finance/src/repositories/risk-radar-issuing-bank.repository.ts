@@ -10,7 +10,7 @@ export class RiskRadarIssuingBankRepository extends Repository<RiskRadarIssuingB
   public constructor(@InjectDataSource('finance') dataSource: DataSource) {
     super(RiskRadarIssuingBank, dataSource.createEntityManager());
   }
-  
+
   /**
    * Find issuing bank by BIN with proper varchar casting
    */

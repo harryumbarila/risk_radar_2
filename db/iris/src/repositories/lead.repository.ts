@@ -10,7 +10,7 @@ export class LeadRepository extends Repository<LeadEntity> {
   public constructor(@InjectDataSource('iris') dataSource: DataSource) {
     super(LeadEntity, dataSource.createEntityManager());
   }
-  
+
   /**
    * Find lead by merchant ID with proper varchar casting
    */
