@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import type { DataSource, Repository } from 'typeorm';
-import { MoreThan } from 'typeorm';
+import { MssqlParameter } from 'typeorm';
 
 import {
   ChargeBacksEntity,
@@ -93,13 +93,14 @@ export class MerchantExceptionDetailRepository {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    // Get all chargebacks for this merchant in the last 30 days
-    const chargebacks = await this.chargeBacksRepository.find({
-      where: {
-        mid,
-        createdDate: MoreThan(thirtyDaysAgo),
-      },
-    });
+    // Get all chargebacks for this merchant in the last 30 days using explicit varchar casting
+    const chargebacks = await this.chargeBacksRepository
+      .createQueryBuilder('chargebacks')
+      .where('chargebacks.mid = :mid', {
+        mid: new MssqlParameter(mid, 'varchar', 16),
+      })
+      .andWhere('chargebacks.createdDate > :thirtyDaysAgo', { thirtyDaysAgo })
+      .getMany();
 
     // Count CHG and IRR types
     const chg = chargebacks.filter((cb) => cb.type === 'CHG').length;
@@ -163,7 +164,7 @@ export class MerchantExceptionDetailRepository {
         ISNULL(cb.dACBPerc, 0) AS amexChargebackPercentage
       FROM @temp t
       LEFT JOIN Finance.dbo.tblDDTMonthlyProcessingSummary s 
-        ON s.iYear = t.iYear AND s.iMonth = t.iMonth AND s.sMID = @0
+        ON s.iYear = t.iYear AND s.iMonth = t.iMonth AND s.sMID = CAST(@0 AS varchar(16))
       LEFT JOIN (
         -- Chargebacks summary subquery 
         SELECT 
@@ -185,7 +186,7 @@ export class MerchantExceptionDetailRepository {
             sCardNum,
             dAmt
           FROM Finance.dbo.tblChargeBacks
-          WHERE sMID = @0
+          WHERE sMID = CAST(@0 AS varchar(16))
         ) cb
         GROUP BY cb.iYear, cb.iMonth
       ) cb ON cb.iYear = t.iYear AND cb.iMonth = t.iMonth

@@ -28,10 +28,11 @@ export class RiskRadarService {
     params: SendExceptionMemoEmailDto
   ): Promise<string> {
     const { mid, emailBody, emailTemplateId, emailRecipient, user } = params;
+    const midAsVarchar = String(mid);
 
     // Find data
     const lead = await this.leadsRepository.findOneBy({
-      irisMId: String(mid),
+      irisMId: midAsVarchar,
       isArchived: false,
     });
 
@@ -87,10 +88,10 @@ export class RiskRadarService {
         [emailRecipient, replyTo, subject, emailBody]
       );
 
-      // Record the action in notes
+      // Record the action in notes - using explicit cast for MID
       await this.riskRadarNotesRepository.insert({
         notesTypeId: 1,
-        mid: mid.toString(),
+        mid: midAsVarchar,
         notes: `Sent an email to ${emailRecipient} titled ${subject}`,
         userCreated: user,
       });

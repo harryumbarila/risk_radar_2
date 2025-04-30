@@ -140,13 +140,13 @@ export class TsysExceptionTransactionService {
       .innerJoin(
         'tblRiskRadarMerchAdjParam',
         'param',
-        `param.sMID = batch.sMID AND (
+        `param.sMID = CAST(batch.sMID AS varchar(16)) AND (
           (monitor.iAccountType = 0) OR
           (monitor.iAccountType = 1 AND param.bNextDayFundingAcct = 0) OR
           (monitor.iAccountType = 2 AND param.bNextDayFundingAcct = 1)
         )`
       )
-      .where('batch.sMID = :mid', { mid })
+      .where('batch.sMID = CAST(:mid AS varchar(16))', { mid })
       .andWhere('monitor.sDayOfTheFunding = :dayOfTheFunding', {
         dayOfTheFunding,
       })
@@ -257,7 +257,7 @@ export class TsysExceptionTransactionService {
         'pos',
         'pos.sPOSEntryCode = LEFT(dd.posmode, 2)'
       )
-      .where('dd.MID = :sMID', { sMID: mid })
+      .where('dd.MID = CAST(:sMID AS varchar(16))', { sMID: mid })
       .andWhere('dd.transdate BETWEEN :dtStartAuth AND :dtEndAuth', {
         dtStartAuth,
         dtEndAuth,

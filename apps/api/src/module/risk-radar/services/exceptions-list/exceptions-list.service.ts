@@ -83,12 +83,13 @@ export class ExceptionsListService {
 
     // Fallback to leads if no merchant exceptions are found (Merchant is always needed if id is provided)
     if (exceptions.length === 0 && merchantId) {
-      const merchantFromLeads = await this.leadsRepository.find({
-        select: ['id', 'irisMId', 'leadName'],
-        where: {
-          irisMId: merchantId,
-        },
-      });
+      const merchantFromLeads = await this.leadsRepository
+        .createQueryBuilder('lead')
+        .select(['lead.id', 'lead.irisMId', 'lead.leadName'])
+        .where('lead.irisMId = CAST(:merchantId AS varchar(16))', {
+          merchantId,
+        })
+        .getMany();
 
       return {
         pageSize,
@@ -148,7 +149,7 @@ export class ExceptionsListService {
       switch (processor) {
         case 1:
           query.andWhere(
-            'SUBSTRING(exception.sMID, 1, 4) IN (:...processorType1)',
+            'SUBSTRING(CAST(exception.sMID AS varchar(16)), 1, 4) IN (:...processorType1)',
             {
               processorType1: ['5611', '7905'],
             }
@@ -156,7 +157,7 @@ export class ExceptionsListService {
           break;
         case 2:
           query.andWhere(
-            'SUBSTRING(exception.sMID, 1, 4) IN (:...processorType2)',
+            'SUBSTRING(CAST(exception.sMID AS varchar(16)), 1, 4) IN (:...processorType2)',
             {
               processorType2: ['8152'],
             }
@@ -180,12 +181,12 @@ export class ExceptionsListService {
 
     // OR assignments
     if (merchantId) {
-      query.andWhere('exception.sMID = :merchantId', {
+      query.andWhere('exception.sMID = CAST(:merchantId AS varchar(16))', {
         merchantId,
       });
     } else if (dbaNameOrSIC) {
       query.andWhere(
-        '(exception.sDBA LIKE :dbaFilter OR leadsInfo.DBAName LIKE :dbaFilter OR leadsInfo.MccCode LIKE :sicFilter)',
+        '(CAST(exception.sDBA AS varchar(50)) LIKE CAST(:dbaFilter AS varchar(50)) OR CAST(leadsInfo.DBAName AS varchar(150)) LIKE CAST(:dbaFilter AS varchar(50)) OR CAST(leadsInfo.MccCode AS varchar(4)) LIKE CAST(:sicFilter AS varchar(50)))',
         {
           dbaFilter: `%${dbaNameOrSIC}%`,
           sicFilter: `%${dbaNameOrSIC}%`,
@@ -329,7 +330,7 @@ export class ExceptionsListService {
         'bRiskWatch'
       )
       .addSelect(
-        "(SELECT CASE WHEN p.bDivert = 1 THEN 'Yes' ELSE NULL END FROM tblRiskRadarMerchAdjParam p WHERE p.sMID = exception.sMID)",
+        "(SELECT CASE WHEN p.bDivert = 1 THEN 'Yes' ELSE NULL END FROM tblRiskRadarMerchAdjParam p WHERE p.sMID = CAST(exception.sMID AS varchar(16)))",
         'bDivert'
       )
       .addSelect('partners.sChannel', 'sChannel')
@@ -338,7 +339,7 @@ export class ExceptionsListService {
       .addSelect('partners.sSolutionConsultant', 'sSolutionConsultant')
       .addSelect('partners.sISV', 'sISV')
       .addSelect(
-        "(SELECT CASE WHEN TOP_BATCH.sAMEXOptBlueInd = 'Y' THEN 'Yes' ELSE NULL END FROM (SELECT TOP 1 batch.sAMEXOptBlueInd FROM tblRiskRadarBatch batch WHERE batch.sMID = exception.sMID ORDER BY batch.pkDFT256Batch DESC) AS TOP_BATCH)",
+        "(SELECT CASE WHEN TOP_BATCH.sAMEXOptBlueInd = 'Y' THEN 'Yes' ELSE NULL END FROM (SELECT TOP 1 batch.sAMEXOptBlueInd FROM tblRiskRadarBatch batch WHERE batch.sMID = CAST(exception.sMID AS varchar(16)) ORDER BY batch.pkDFT256Batch DESC) AS TOP_BATCH)",
         'sAMEXOptBlueInd'
       )
       .addSelect('leadsInfo.DBAName', 'DBAName')
@@ -347,19 +348,19 @@ export class ExceptionsListService {
       .leftJoin(
         'connector..tblSnapShotvwLeadsStatusActive',
         'leadsStatus',
-        'leadsStatus.sMID = exception.sMID AND leadsStatus.iOrder = 1'
+        'leadsStatus.sMID = CAST(exception.sMID AS varchar(16)) AND leadsStatus.iOrder = 1'
       )
       // Left join to connector..tblSnapShotvwNetSettlementBalanceActive
       .leftJoin(
         'connector..tblSnapShotvwNetSettlementBalanceActive',
         'netSettlement',
-        'netSettlement.sMID = exception.sMID AND netSettlement.iOrder = 1'
+        'netSettlement.sMID = CAST(exception.sMID AS varchar(16)) AND netSettlement.iOrder = 1'
       )
       // Left join to iris..tblAutoApproval and iris..leads
       .leftJoin(
         'iris..leads',
         'irisLeads',
-        'irisLeads.IrisMId = exception.sMID AND irisLeads.IsArchived = 0'
+        'irisLeads.IrisMId = CAST(exception.sMID AS varchar(16)) AND irisLeads.IsArchived = 0'
       )
       .leftJoin(
         'iris..tblAutoApproval',
@@ -376,13 +377,13 @@ export class ExceptionsListService {
       .leftJoin(
         'tblRiskRadarMerchAdjParam',
         'merchParam',
-        'merchParam.sMID = exception.sMID'
+        'merchParam.sMID = CAST(exception.sMID AS varchar(16))'
       )
       // Left join to iris..tblPartnerAndSalesAgentIdentification
       .leftJoin(
         'iris..tblPartnerAndSalesAgentIdentification',
         'partners',
-        'partners.sMID = exception.sMID'
+        'partners.sMID = CAST(exception.sMID AS varchar(16))'
       )
       // Left join to get AMEX Opt Blue indicator
       .leftJoin(

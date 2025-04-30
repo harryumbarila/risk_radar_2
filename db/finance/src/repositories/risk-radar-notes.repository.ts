@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
-import { Repository } from 'typeorm';
+import { MssqlParameter, Repository } from 'typeorm';
 
 import { RiskRadarNotesEntity } from '../entities/risk-radar-notes.entity';
 
@@ -170,7 +170,9 @@ export class RiskRadarNotesRepository extends Repository<RiskRadarNotesEntity> {
         'notes.irisMemoRequestDate as dtIrisMemoRequest',
         'notes.irisMemoRequestFulfilledDate as dtIrisMemoRequestFulfilled',
       ])
-      .where('notes.mid = :mid', { mid })
+      .where('notes.mid = :mid', {
+        mid: new MssqlParameter(mid, 'varchar', 16),
+      })
       .andWhere('notes.isHidden = :isHidden', { isHidden: false })
       .orderBy('CASE WHEN notes.notesTypeId = 6 THEN 0 ELSE 1 END')
       .addOrderBy('notes.createdAt', 'DESC')

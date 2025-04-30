@@ -34,10 +34,8 @@ export class MerchantWithSameTaxIdService {
     );
 
     try {
-      // Step 1: Find the lead by merchantId
-      const lead = await this.leadRepository.findOne({
-        where: { irisMId: merchantId },
-      });
+      // Step 1: Find the lead by merchantId using the optimized method with explicit varchar casting
+      const lead = await this.leadRepository.findByMerchantId(merchantId);
 
       if (!lead || !lead.id) {
         this.logger.info(`No lead found for merchant ID: ${merchantId}`);
@@ -60,21 +58,22 @@ export class MerchantWithSameTaxIdService {
         `Tax ID found for merchant ID: ${merchantId} - ${taxId}`
       );
 
-      // Use hardcoded schema name since metadata might not provide it correctly
+      // Use parameterized query with explicit CAST for all string parameters
       const query = `
         SELECT DISTINCT l.IrisMId as irisMId
         FROM Iris.dbo.Leads l
         INNER JOIN Iris.dbo.LeadsBusinessInformation info ON info.LeadId = l.Id
-        WHERE info.FederalTaxId = '${taxId}'
-          AND l.IrisMId != '${merchantId}'
+        WHERE info.FederalTaxId = CAST(@0 AS varchar(20))
+          AND l.IrisMId != CAST(@1 AS varchar(16))
           AND DATALENGTH(l.IrisMId) > 5
         ORDER BY l.IrisMId
       `;
 
-      // Cast the result to the defined interface
-      const queryResults = (await this.leadRepository.query(
-        query
-      )) as MerchantIdResult[];
+      // Cast the result to the defined interface, using parameterized query
+      const queryResults = (await this.leadRepository.query(query, [
+        taxId,
+        merchantId,
+      ])) as MerchantIdResult[];
 
       // Extract merchant IDs from the result
       const merchantIds = queryResults.map((result) => result.irisMId);
