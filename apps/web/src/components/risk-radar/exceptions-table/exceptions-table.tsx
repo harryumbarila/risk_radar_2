@@ -105,7 +105,7 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
         },
       }),
       columnHelper.accessor('posEntryMode', {
-        header: () => 'Post',
+        header: () => 'POS',
         cell: (info) => (
           <DynamicCell
             type="text"
