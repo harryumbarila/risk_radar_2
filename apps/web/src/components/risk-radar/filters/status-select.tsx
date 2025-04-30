@@ -17,7 +17,7 @@ export const StatusSelect = forwardRef<HTMLSelectElement, Props>(
     return (
       <div className="flex flex-col gap-3 h-full">
         <label
-          className="mb-1 block text-sm font-medium text-black dark:text-white"
+          className="block text-sm font-medium text-black dark:text-white"
           htmlFor="status"
         >
           Exception Status
@@ -32,7 +32,7 @@ export const StatusSelect = forwardRef<HTMLSelectElement, Props>(
                 {...props}
                 {...field}
                 className={classNames(
-                  'w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary',
+                  'w-full rounded border-[1.5px] border-stroke bg-transparent px-2 py-1 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary',
                   {
                     '!border-red-500 focus:border-red-500': !!fieldState.error,
                   }

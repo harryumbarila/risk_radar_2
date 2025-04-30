@@ -176,7 +176,7 @@ export const DataTable = <Entry extends BaseModel>(
               return (
                 <tr
                   key={row.id}
-                  className={`odd:bg-white even:bg-gray-100 dark:odd:bg-transparent dark:even:bg-meta-4 bg-white dark:bg-gray-800 hover:bg-gray-100  dark:hover:bg-gray-600 ${onSelectRow ? 'bg-gray-600' : ''}`}
+                  className={`odd:bg-white even:bg-gray-100 dark:odd:bg-transparent dark:even:bg-meta-4 bg-white dark:bg-gray-800 hover:bg-yellow-100  dark:hover:bg-yellow-600 ${onSelectRow ? 'bg-gray-600' : ''}`}
                   onClick={onSelectRowItem(row.original)}
                 >
                   {row.getVisibleCells().map((cell) => {

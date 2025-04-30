@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import type { FC, PropsWithChildren } from 'react';
 
 type Props = {
   pageSize: number;
@@ -7,12 +7,14 @@ type Props = {
 
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 50];
 
-export const TableHeader: FC<Props> = ({
+export const TableHeader: FC<PropsWithChildren<Props>> = ({
   pageSize,
+  children,
   onEntriesPerPageChange: onRowsPerPageChange,
 }) => {
   return (
     <div className="flex justify-end border-b border-stroke px-8 pb-4 dark:border-strokedark">
+      {children}
       <div className="flex items-center font-medium">
         <select
           value={pageSize}
