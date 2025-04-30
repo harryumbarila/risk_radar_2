@@ -61,11 +61,19 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
       columnHelper.accessor('authAmount', {
         header: () => 'Auth Amt',
         cell: (info) => (
-          <DynamicCell
-            type="text"
-            value={formatCurrency(info.getValue())}
-            className="text-right"
-          />
+          <td className="text-right">
+            {info.row.original.authResponseDescription ? (
+              <Tooltip text={info.row.original.authResponseDescription}>
+                <span className="text-black dark:text-white">
+                  {formatCurrency(info.getValue())}
+                </span>
+              </Tooltip>
+            ) : (
+              <span className="text-black dark:text-white">
+                {formatCurrency(info.getValue())}
+              </span>
+            )}
+          </td>
         ),
         footer: (info) => info.column.id,
         enableSorting: true,
@@ -86,7 +94,7 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
               type="text"
               value={transactionAmount}
               onClick={() => onTransactionAmountClick(info.row.original)}
-              className={`text-right cursor-pointer text-blue-600 hover:text-blue-800 hover:underline ${value >= 0 ? 'text-blue-600' : 'text-red-600'}`}
+              className={`text-right cursor-pointer text-blue-600 hover:text-blue-800 hover:underline dark:text-blue-600 ${value >= 0 ? 'text-blue-600' : 'text-red-600'}`}
             />
           );
         },
@@ -97,7 +105,7 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
         },
       }),
       columnHelper.accessor('posEntryMode', {
-        header: () => 'Post',
+        header: () => 'POS',
         cell: (info) => (
           <DynamicCell
             type="text"

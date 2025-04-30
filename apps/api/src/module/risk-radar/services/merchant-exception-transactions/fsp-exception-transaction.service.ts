@@ -75,9 +75,9 @@ export class FspExceptionTransactionService {
       .leftJoin(
         'finance..tblFSPRiskRadarExceptionPoints',
         'ep',
-        'ep.Id = s.id AND ep.sMID = s.SiteID AND ep.dtExceptionRunDate = :dtFunding AND ep.sExceptionRunTime = :sACHFundingTime'
+        'ep.Id = s.id AND ep.sMID = CAST(s.SiteID AS varchar(16)) AND ep.dtExceptionRunDate = :dtFunding AND ep.sExceptionRunTime = :sACHFundingTime'
       )
-      .where('s.siteId = :mid', { mid })
+      .where('s.siteId = CAST(:mid AS varchar(16))', { mid })
       .andWhere(
         '(s.TransactionDateTime BETWEEN :start AND :end OR ep.Id IS NOT NULL)'
       )

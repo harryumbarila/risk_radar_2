@@ -19,7 +19,7 @@ export const RiskRadarCard: FC<PropsWithChildren<Props>> = ({
         ) : null}
 
         {/* Content */}
-        <div className="p-6.5 pt-7 flex-grow">{children}</div>
+        <div className="p-4 flex-grow">{children}</div>
       </div>
     </div>
   );

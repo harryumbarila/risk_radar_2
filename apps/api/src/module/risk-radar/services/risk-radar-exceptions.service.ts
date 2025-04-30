@@ -119,11 +119,16 @@ export class RiskRadarExceptionsService {
 
     // 3. Apply processor filter
     if (params.iProcessor === 1) {
-      query.andWhere('LEFT(e.sMID, 4) IN (:...processors)', {
-        processors: ['5611', '7905'],
-      });
+      query.andWhere(
+        'LEFT(CAST(e.sMID AS varchar(16)), 4) IN (:...processors)',
+        {
+          processors: ['5611', '7905'],
+        }
+      );
     } else if (params.iProcessor === 2) {
-      query.andWhere('LEFT(e.sMID, 4) = :processor', { processor: '8152' });
+      query.andWhere('LEFT(CAST(e.sMID AS varchar(16)), 4) = :processor', {
+        processor: '8152',
+      });
     } else if (params.iProcessor === 3) {
       query.andWhere('e.iAccountType = :accountType', { accountType: 1 });
     }
@@ -140,7 +145,7 @@ export class RiskRadarExceptionsService {
         params.sMIDSearch !== 'undefined' &&
         params.sMIDSearch !== 'null'
       ) {
-        query.andWhere('e.sMID LIKE :midSearch', {
+        query.andWhere('e.sMID LIKE CAST(:midSearch AS varchar(20))', {
           midSearch: `%${params.sMIDSearch}%`,
         });
       }

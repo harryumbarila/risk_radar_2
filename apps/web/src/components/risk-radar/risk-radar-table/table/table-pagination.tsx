@@ -1,17 +1,23 @@
+import classNames from 'classnames';
 import type { FC } from 'react';
 
 type TablePaginationProps = {
   page: number;
   pageSize: number;
   totalRecords: number;
+  containerClassName?: string;
   onPageChange: (page: number) => void;
+  onEntriesPerPageChange: (pageSize: number) => void;
 };
+const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 50];
 
 export const TablePagination: FC<TablePaginationProps> = ({
   page,
   pageSize,
   totalRecords,
+  containerClassName,
   onPageChange,
+  onEntriesPerPageChange: onRowsPerPageChange,
 }) => {
   const fromRecord = (page - 1) * pageSize + 1;
   const toRecord = Math.min(fromRecord + pageSize - 1, totalRecords);
@@ -87,11 +93,33 @@ export const TablePagination: FC<TablePaginationProps> = ({
   const visiblePages = getVisiblePages();
 
   return (
-    <div className="flex justify-between border-t border-stroke px-8 pt-5 dark:border-strokedark">
-      <p className="font-medium">
-        Showing {totalRecords > 0 ? fromRecord : 0} to {toRecord} of{' '}
-        {totalRecords} entries
-      </p>
+    <div
+      className={classNames(
+        'flex justify-between border-stroke px-8 py-2 dark:border-strokedark',
+        containerClassName
+      )}
+    >
+      <div>
+        <p className="font-medium">
+          Showing {totalRecords > 0 ? fromRecord : 0} to {toRecord} of{' '}
+          {totalRecords} entries
+        </p>
+      </div>
+      <div className="flex items-center font-medium">
+        <select
+          value={pageSize}
+          className="bg-transparent pl-2"
+          onChange={(e) => onRowsPerPageChange(Number(e.target.value))}
+        >
+          {ROWS_PER_PAGE_OPTIONS.map((size) => (
+            <option key={size} value={size}>
+              {size}
+            </option>
+          ))}
+        </select>
+        <p className="pl-2 text-black dark:text-white">Entries Per Page</p>
+      </div>
+
       <div className="flex overflow-x-auto">
         <button
           className="flex cursor-pointer items-center justify-center rounded-md p-1 px-2 hover:bg-primary hover:text-whiter disabled:cursor-not-allowed disabled:opacity-50"

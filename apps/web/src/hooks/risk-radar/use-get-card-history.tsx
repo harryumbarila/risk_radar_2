@@ -1,3 +1,4 @@
+import type { BaseModel } from '@/shared/common';
 import { useApiSWR } from '@/web/src/hooks/use-base-api';
 
 export type CardHistory = {
@@ -14,7 +15,7 @@ export type CardHistory = {
   issuerBank?: string;
   issuerCountry?: string;
   issuerPhone?: string;
-};
+} & BaseModel;
 
 type UseCardHistoryReturnType = {
   data: CardHistory[] | undefined;

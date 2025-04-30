@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { InjectPinoLogger } from 'nestjs-pino';
 import { Logger } from 'pino';
-import { DataSource } from 'typeorm';
+import { DataSource, MssqlParameter } from 'typeorm';
 
 import type {
   MerchantBusinessInfoDto,
@@ -61,12 +61,14 @@ export class MerchantExceptionDetailService {
     request: MerchantExceptionDetailRequestDto
   ): Promise<MerchantExceptionDetailResponseDto> {
     const { pkRiskRadarExceptions, sMID, sUser } = request;
+    // Create a consistent MID as varchar for all queries
+    const midAsVarchar = sMID;
 
     // Log the request
     this.logger.info(
       {
         exceptionId: pkRiskRadarExceptions,
-        mid: sMID,
+        mid: midAsVarchar,
         user: sUser,
       },
       'Getting merchant exception details'
@@ -80,19 +82,19 @@ export class MerchantExceptionDetailService {
     this.logger.info(
       {
         exceptionId: pkRiskRadarExceptions,
-        mid: sMID,
+        mid: midAsVarchar,
         user: sUser,
       },
       'Getting chargebacks count'
     );
     // Get chargebacks count
     const chargebacks =
-      await this.merchantExceptionDetailRepository.getChargebacksCount(sMID);
+      await this.merchantExceptionDetailRepository.getChargebacksCount(midAsVarchar);
 
     this.logger.info(
       {
         exceptionId: pkRiskRadarExceptions,
-        mid: sMID,
+        mid: midAsVarchar,
         user: sUser,
       },
       'Getting UW New Account Hold allow risk to edit'
@@ -101,11 +103,11 @@ export class MerchantExceptionDetailService {
       `
       SELECT 1 
       FROM Iris.dbo.SubscriptionQueueRequestEventJsonSource 
-      WHERE irisMId = @0
+      WHERE irisMId = CAST(@0 AS varchar(20))
         AND dtUW_NewAccountHold_OnDivertCapturedInTalusDB IS NOT NULL
         AND dtUW_NewAccountHold_OffDivertCapturedInTalusDB IS NULL
     `,
-      [sMID]
+      [midAsVarchar]
     );
     const uwNewAccountHoldAllowRiskToEdit = !uwNewAccountHoldQuery.length;
 
@@ -113,7 +115,7 @@ export class MerchantExceptionDetailService {
     this.logger.info(
       {
         exceptionId: pkRiskRadarExceptions,
-        mid: sMID,
+        mid: midAsVarchar,
         user: sUser,
       },
       'Getting current month swiped percentage based on transaction count'
@@ -125,9 +127,9 @@ export class MerchantExceptionDetailService {
       `
       SELECT MAX(ISNULL(iSwipedPercBasedOnTransCnt, 0)) AS iSwipedPercBasedOnTransCntCurrMonth
       FROM Finance..tblDDTMonthlyProcessingSummary
-      WHERE iYear = @0 AND iMonth = @1 AND sMID = @2
+      WHERE iYear = @0 AND iMonth = @1 AND sMID = CAST(@2 AS varchar(16))
       `,
-      [currentYear, currentMonth, sMID]
+      [currentYear, currentMonth, midAsVarchar]
     );
 
     const swipedPercentageTransCount =
@@ -137,7 +139,7 @@ export class MerchantExceptionDetailService {
     this.logger.info(
       {
         exceptionId: pkRiskRadarExceptions,
-        mid: sMID,
+        mid: midAsVarchar,
         user: sUser,
       },
       'Getting net settlement balance from tblSnapShotvwNetSettlementBalanceActive'
@@ -149,19 +151,19 @@ export class MerchantExceptionDetailService {
         `
         SELECT dSettlementBalance 
         FROM tblSnapShotvwNetSettlementBalanceActive 
-        WHERE sMID = @0
+        WHERE sMID = CAST(@0 AS varchar(16))
         `,
-        [sMID]
+        [midAsVarchar]
       );
 
       netSettlementBalance = netSettlementResult?.[0]?.dSettlementBalance || 0;
       this.logger.debug(
-        { mid: sMID, netSettlementBalance },
+        { mid: midAsVarchar, netSettlementBalance },
         'Retrieved net settlement balance'
       );
     } catch (error) {
       this.logger.error(
-        { mid: sMID, error },
+        { mid: midAsVarchar, error },
         'Error retrieving net settlement balance'
       );
     }
@@ -170,7 +172,7 @@ export class MerchantExceptionDetailService {
     this.logger.info(
       {
         exceptionId: pkRiskRadarExceptions,
-        mid: sMID,
+        mid: midAsVarchar,
         user: sUser,
       },
       'Getting activated date from vwLeadsStatus'
@@ -179,20 +181,18 @@ export class MerchantExceptionDetailService {
       `
       SELECT ActivatedDate
       FROM Iris.dbo.vwLeadsStatus
-      WHERE MID = @0
+      WHERE MID = CAST(@0 AS varchar(16))
       `,
-      [sMID]
+      [midAsVarchar]
     );
     const activatedDate = activatedDateQuery[0]?.ActivatedDate || null;
 
     this.logger.info({}, 'Activated date: ' + activatedDate);
-    // Get lead information
-    const lead = await this.leadRepository.findOne({
-      where: { irisMId: sMID, isArchived: false },
-    });
+    // Get lead information using the specialized method
+    const lead = await this.leadRepository.findByMerchantId(midAsVarchar, false);
 
     if (!lead) {
-      throw new Error(`Lead not found for MID: ${sMID}`);
+      throw new Error(`Lead not found for MID: ${midAsVarchar}`);
     }
 
     // Get business information
@@ -201,9 +201,7 @@ export class MerchantExceptionDetailService {
     });
 
     // Get partner and sales agent identification
-    const partnerAndSalesAgent = await this.partnerRepository.findOne({
-      where: { mid: sMID },
-    });
+    const partnerAndSalesAgent = await this.partnerRepository.findByMerchantId(midAsVarchar);
 
     // Get lead services
     const services = await this.leadsServicesRepository.findOne({
@@ -227,10 +225,8 @@ export class MerchantExceptionDetailService {
       where: { id: lead.sourceId },
     });
 
-    // Get merchant adjust parameters
-    const merchAdjParam = await this.riskRadarMerchAdjParamRepository.findOne({
-      where: { mid: sMID },
-    });
+    // Get merchant adjust parameters using the specialized method
+    const merchAdjParam = await this.riskRadarMerchAdjParamRepository.findByMerchantId(midAsVarchar);
 
     // Get owners
     const owners = await this.leadsOwnerRepository.find({
@@ -244,7 +240,7 @@ export class MerchantExceptionDetailService {
     // Get processing summaries
     const processingSummaries =
       await this.merchantExceptionDetailRepository.getMonthlyProcessingSummary(
-        sMID
+        midAsVarchar
       );
 
     // Get exception types

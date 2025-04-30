@@ -12,7 +12,6 @@ import { useAssignExceptionToUser } from '@/web/src/hooks/risk-radar/use-assign-
 import { useReviewExceptionByUsername } from '@/web/src/hooks/risk-radar/use-review-exception-by-username';
 
 import { TableBody } from './table/table-body';
-import { TableHeader } from './table/table-header';
 import { TablePagination } from './table/table-pagination';
 import { useRiskRadarTableColumns } from './table/use-risk-radar-columns';
 
@@ -110,9 +109,13 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
 
   return (
     <div className="flex flex-col gap-5 md:gap-7 2xl:gap-10">
-      <section className="data-table-common data-table-two rounded-sm border border-stroke bg-white py-4 text-xs shadow-default dark:border-strokedark dark:bg-boxdark">
-        <TableHeader
+      <section className="data-table-common data-table-two rounded-sm border border-stroke bg-white text-xs shadow-default dark:border-strokedark dark:bg-boxdark">
+        <TablePagination
+          containerClassName="border-b pb-2"
+          page={filters.page}
           pageSize={filters.pageSize}
+          totalRecords={exceptionList?.totalRecords ?? 0}
+          onPageChange={handlePageChange}
           onEntriesPerPageChange={handlePageSizeChange}
         />
 
@@ -129,10 +132,12 @@ export const RiskRadarTable: React.FC<RiskRadarTableProps> = ({
         />
 
         <TablePagination
+          containerClassName="border-t"
           page={filters.page}
           pageSize={filters.pageSize}
           totalRecords={exceptionList?.totalRecords ?? 0}
           onPageChange={handlePageChange}
+          onEntriesPerPageChange={handlePageSizeChange}
         />
       </section>
     </div>

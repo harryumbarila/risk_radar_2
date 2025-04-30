@@ -43,12 +43,12 @@ export const Popup: React.FC<PopupProps> = ({
     >
       <div
         className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
-                 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-[1100px] max-h-[90vh] overflow-auto"
+                 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 w-[1100px] max-h-[90vh] overflow-auto"
       >
         {/* Close Button */}
         <button
           type="button"
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 text-xl font-bold"
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 text-lg font-bold"
           onClick={onClose}
         >
           ✖

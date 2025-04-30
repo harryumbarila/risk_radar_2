@@ -117,9 +117,9 @@ export const TableBody: FC<Props> = ({
   }, [dataStatus, exceptionList.length]);
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto max-h-[600px]">
       <table className="datatable-table w-full table-auto !border-collapse break-words px-4 md:px-8 align-middle text-black dark:text-white">
-        <thead>
+        <thead className="sticky top-0 z-10 bg-white dark:dark:bg-boxdark">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (

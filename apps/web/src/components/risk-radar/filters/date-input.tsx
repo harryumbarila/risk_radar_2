@@ -14,7 +14,7 @@ export const DateInput = forwardRef<HTMLInputElement, Props>(
     return (
       <div className={classNames('flex flex-col gap-2', className)}>
         <label
-          className="mb-3 block text-sm font-medium text-black dark:text-white"
+          className="block text-sm font-medium text-black dark:text-white"
           htmlFor={name}
         >
           {label}
@@ -27,7 +27,7 @@ export const DateInput = forwardRef<HTMLInputElement, Props>(
             id={name}
             type="date"
             className={classNames(
-              'w-full rounded border-[1.5px] bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:bg-form-input dark:text-white dark:focus:border-primary',
+              'w-full rounded border-[1.5px] bg-transparent px-2 py-1 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:bg-form-input dark:text-white dark:focus:border-primary',
               error
                 ? 'border-red-500 dark:border-red-500'
                 : 'border-stroke dark:border-form-strokedark'

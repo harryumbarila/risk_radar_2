@@ -20,6 +20,7 @@ import type {
   EmailTemplate,
   TransactionExceptionResponseDto,
 } from '@/shared/response';
+import { CardHistoryTable } from '@/web/src/components/risk-radar/card-history-table/card-history-table';
 import { ExceptionsTable } from '@/web/src/components/risk-radar/exceptions-table/exceptions-table';
 import { Popup } from '@/web/src/components/risk-radar/popups/popups';
 import {
@@ -29,8 +30,6 @@ import {
 } from '@/web/src/components/risk-radar/risk-radar-table/table/formatters';
 import { VolumeTable } from '@/web/src/components/risk-radar/volumen-table/volumen-table';
 import { useEmailTemplates } from '@/web/src/hooks/risk-radar/use-email-templates';
-import type { CardHistory } from '@/web/src/hooks/risk-radar/use-get-card-history';
-import { useCardHistory } from '@/web/src/hooks/risk-radar/use-get-card-history';
 import { useMerchant } from '@/web/src/hooks/risk-radar/use-merchant';
 import { useMerchantChargebacks } from '@/web/src/hooks/risk-radar/use-merchant-chargebacks';
 import { useMerchantNotes } from '@/web/src/hooks/risk-radar/use-merchant-notes';
@@ -151,9 +150,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const exceptionId = searchParams?.get('exceptionId') || '';
 
   const { user } = useAuth();
-  const itemsPerPage = 10;
 
-  const [currentPage, setCurrentPage] = useState(1);
   const [currentTransException, setCurrentTransException] =
     useState<TransactionExceptionResponseDto | null>(null);
   const [isPopupActive, setIsPopupActive] = useState<boolean>(false);
@@ -227,16 +224,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     activeTab === 'chargebacks' ? merchantId : null
   );
 
-  // Card history data is only needed when the card history popup is active
-  const { data: cardNumberData } = useCardHistory(
-    // Only load card history data when popup is active with card history
-    isPopupActive &&
-      activePopup === PopupType.CardHistory &&
-      currentTransException
-      ? currentTransException.cardNumber
-      : null
-  );
-
   const { data: emailTemplatesData } = useEmailTemplates();
 
   const { data: merchantsWithSameTaxIdData } = useMerchantsWithSameTaxId(
@@ -289,8 +276,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const [isSendingEmail, setIsSendingEmail] = useState<boolean>(false);
 
   // Add new state for tracking loading states
-  const [isCardHistoryLoading, setIsCardHistoryLoading] =
-    useState<boolean>(false);
   const [isEmailTemplateLoading, setIsEmailTemplateLoading] =
     useState<boolean>(false);
 
@@ -298,13 +283,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const [reviewStatus, setReviewStatus] = useState<
     'none' | 'reviewing' | 'reviewed'
   >('none');
-
-  // Add an effect to clear the card history loading state when data is received
-  useEffect(() => {
-    if (isCardHistoryLoading && cardNumberData) {
-      setIsCardHistoryLoading(false);
-    }
-  }, [cardNumberData, isCardHistoryLoading]);
 
   // Update merchantStateData when data changes
   useEffect(() => {
@@ -404,24 +382,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const totalChargebacksPages = Math.ceil(
     (merchantChargebacksData?.length || 0) / ITEMS_PER_PAGE
   );
-
-  // Calculate pagination values with strict enforcement
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(
-    startIndex + itemsPerPage,
-    cardNumberData?.length || 0
-  );
-  const currentItems = cardNumberData?.slice(startIndex, endIndex) || [];
-
-  // Calculate total pages
-  const totalPages = Math.ceil((cardNumberData?.length || 0) / itemsPerPage);
-
-  // Ensure currentPage stays within bounds
-  useEffect(() => {
-    if (currentPage > totalPages) {
-      setCurrentPage(Math.max(1, totalPages));
-    }
-  }, [currentPage, totalPages]);
 
   // Calculate paginated data for same tax ID merchants
   const paginatedSameTaxIdMerchants =
@@ -842,8 +802,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     fkRiskExceptionStatus: data?.businessInfo?.exceptionStatusId || 0,
   };
 
-  const cardHistory = cardNumberData || [];
-
   const emailTemplates =
     emailTemplatesData!.templates?.length > 0
       ? emailTemplatesData!.templates
@@ -863,165 +821,15 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       >
         {activePopup == PopupType.CardHistory ? (
           <div className="h-full">
-            <div className="max-w-full h-full flex flex-col bg-white dark:bg-boxdark">
-              {/* Issuer Information */}
-              {isCardHistoryLoading ? (
-                <div className="flex-1 flex justify-center items-center">
-                  <Loader />
-                </div>
-              ) : (
-                <>
-                  <div className="grid grid-cols-3 gap-4 p-4 border-b border-stroke dark:border-strokedark">
-                    <div>
-                      <span className="text-sm font-semibold text-black dark:text-white">
-                        Issuer Bank:
-                      </span>
-                      <span className="text-sm text-black dark:text-white">
-                        {cardHistory[0]?.issuerBank || ' No data available'}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-sm font-semibold text-black dark:text-white">
-                        Issuer Country:
-                      </span>
-                      <span className="text-sm text-black dark:text-white">
-                        {cardHistory[0]?.issuerCountry || ' No data available'}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-sm font-semibold text-black dark:text-white">
-                        Issuer Phone:
-                      </span>
-                      <span className="text-sm text-black dark:text-white">
-                        {cardHistory[0]?.issuerPhone || ' No data available'}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="p-4 border-b border-stroke dark:border-strokedark">
-                    <h3 className="text-lg font-semibold text-black dark:text-white">
-                      Card # History
-                    </h3>
-                  </div>
-                  <div className="flex-1 overflow-hidden">
-                    <div className="h-full overflow-y-auto">
-                      <table className="w-full table-auto">
-                        <thead className="sticky top-0 bg-gray-100 dark:bg-meta-4">
-                          <tr>
-                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                              MID
-                            </th>
-                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                              Trans Date
-                            </th>
-                            <th className="p-4 py-1 font-medium text-black dark:text-white text-right">
-                              Trans Amt
-                            </th>
-                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                              POS
-                            </th>
-                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                              AVS
-                            </th>
-                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                              Auth Code
-                            </th>
-                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                              Card #
-                            </th>
-                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                              DB Net
-                            </th>
-                            <th className="p-4 py-1 font-medium text-black dark:text-white text-center">
-                              Transmission Date
-                            </th>
-                            <th className="p-4 py-1 font-medium text-black dark:text-white text-right">
-                              Net Dep. Amt
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {currentItems.map(
-                            (card: CardHistory, index: number) => {
-                              // Create a unique identifier using multiple fields and index
-                              const uniqueId = `${card.mid}-${card.transactionDate}-${card.cardNumber}-${card.amount}-${index}`;
-                              return (
-                                <tr key={uniqueId} className="text-center">
-                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                                    {card.mid}
-                                  </td>
-                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                                    {formatDateWithoutTime(
-                                      card.transactionDate
-                                    )}
-                                  </td>
-                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-right text-black dark:text-white">
-                                    ${card.amount.toFixed(2)}
-                                  </td>
-                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                                    {card.posEntryMode}
-                                  </td>
-                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                                    {card.avsResponseCode}
-                                  </td>
-                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                                    {card.authCode || ''}
-                                  </td>
-                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                                    {card.cardNumber}
-                                  </td>
-                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                                    {card.debitNetworkIdentifier || ''}
-                                  </td>
-                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-center text-black dark:text-white">
-                                    {formatDateWithoutTime(
-                                      card.transmissionDate
-                                    )}
-                                  </td>
-                                  <td className="border-b border-[#eee] p-4 dark:border-strokedark text-right text-black dark:text-white">
-                                    ${card.netDepositAmount.toFixed(2)}
-                                  </td>
-                                </tr>
-                              );
-                            }
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                  {/* Pagination */}
-                  <div className="flex items-center justify-between p-4 border-t border-stroke dark:border-strokedark">
-                    <div className="text-sm text-black dark:text-white">
-                      Showing{' '}
-                      {Math.min(cardHistory?.length || 0, startIndex + 1)} to{' '}
-                      {Math.min(cardHistory?.length || 0, endIndex)} of{' '}
-                      {cardHistory?.length || 0} entries
-                    </div>
-                    <div className="flex space-x-2">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setCurrentPage(Math.max(1, currentPage - 1))
-                        }
-                        disabled={currentPage === 1}
-                        className="rounded-md border border-stroke px-4 py-2 text-sm font-medium text-black disabled:opacity-50 dark:border-strokedark dark:text-white"
-                      >
-                        Previous
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setCurrentPage(Math.min(totalPages, currentPage + 1))
-                        }
-                        disabled={currentPage >= totalPages}
-                        className="rounded-md border border-stroke px-4 py-2 text-sm font-medium text-black disabled:opacity-50 dark:border-strokedark dark:text-white"
-                      >
-                        Next
-                      </button>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
+            <CardHistoryTable
+              cardNumber={
+                isPopupActive &&
+                activePopup === PopupType.CardHistory &&
+                currentTransException
+                  ? currentTransException.cardNumber
+                  : undefined
+              }
+            />
           </div>
         ) : activePopup == PopupType.Email ? (
           <div className="max-w bg-white p-6 rounded-lg shadow-lg">
@@ -1523,7 +1331,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
           >
             <button
               className={classNames(
-                'inline-flex items-center justify-center rounded-lg border text-sm bg-green-400 px-4 py-1 text-white hover:bg-opacity-90  rounded-b-none'
+                'inline-flex items-center justify-center rounded-lg border text-sm bg-green-700 px-4 py-1 text-white hover:bg-opacity-90  rounded-b-none'
               )}
               type="button"
             >
@@ -1726,7 +1534,6 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               setTimeout(() => setIsEmailTemplateLoading(false), 500);
             }}
             onCardNumberClick={(exception) => {
-              setIsCardHistoryLoading(true);
               setIsPopupActive(true);
               setCurrentTransException(exception);
               setActivePopup(PopupType.CardHistory);
