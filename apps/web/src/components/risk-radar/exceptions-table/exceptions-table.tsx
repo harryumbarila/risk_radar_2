@@ -61,11 +61,19 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
       columnHelper.accessor('authAmount', {
         header: () => 'Auth Amt',
         cell: (info) => (
-          <DynamicCell
-            type="text"
-            value={formatCurrency(info.getValue())}
-            className="text-right"
-          />
+          <td className="text-right">
+            {info.row.original.authResponseDescription ? (
+              <Tooltip text={info.row.original.authResponseDescription}>
+                <span className="text-black">
+                  {formatCurrency(info.getValue())}
+                </span>
+              </Tooltip>
+            ) : (
+              <span className="text-black">
+                {formatCurrency(info.getValue())}
+              </span>
+            )}
+          </td>
         ),
         footer: (info) => info.column.id,
         enableSorting: true,
