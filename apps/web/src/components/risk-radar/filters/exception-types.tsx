@@ -23,7 +23,7 @@ export const ExceptionTypesSelect: FC<Props> = ({
   return (
     <div className="flex flex-col gap-3 h-full">
       <label
-        className="mb-1 block text-sm font-medium text-black dark:text-white"
+        className="block text-sm font-medium text-black dark:text-white"
         htmlFor={name}
       >
         Exception Type
@@ -49,7 +49,7 @@ export const ExceptionTypesSelect: FC<Props> = ({
                 value={selectedValues}
               >
                 {options.map((o) => (
-                  <option key={o.value} value={o.value} className="px-3 py-1">
+                  <option key={o.value} value={o.value} className="px-3">
                     {o.label}
                   </option>
                 ))}

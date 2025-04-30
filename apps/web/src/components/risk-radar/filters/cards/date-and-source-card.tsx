@@ -24,7 +24,7 @@ export const DateAndSourceCard: FC<DateAndSourceCardProps> = ({ systems }) => {
   const startDate = watch('startDate');
   return (
     <RiskRadarCard>
-      <div className="flex flex-row gap-4 w-full max-2xl:flex-col mb-4">
+      <div className="flex flex-row gap-2 w-full max-2xl:flex-col mb-4">
         <DateInput
           {...register('startDate', { required: 'Start date is required' })}
           label="Exception Start Date"
@@ -47,7 +47,7 @@ export const DateAndSourceCard: FC<DateAndSourceCardProps> = ({ systems }) => {
         />
       </div>
 
-      <div className="flex flex-row gap-4 w-full xl:flex-col">
+      <div className="flex flex-row gap-2 w-full xl:flex-col">
         <SystemRadioSelect
           control={control}
           name="processor"

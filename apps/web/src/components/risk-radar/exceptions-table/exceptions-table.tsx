@@ -64,12 +64,12 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
           <td className="text-right">
             {info.row.original.authResponseDescription ? (
               <Tooltip text={info.row.original.authResponseDescription}>
-                <span className="text-black">
+                <span className="text-black dark:text-white">
                   {formatCurrency(info.getValue())}
                 </span>
               </Tooltip>
             ) : (
-              <span className="text-black">
+              <span className="text-black dark:text-white">
                 {formatCurrency(info.getValue())}
               </span>
             )}
@@ -94,7 +94,7 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
               type="text"
               value={transactionAmount}
               onClick={() => onTransactionAmountClick(info.row.original)}
-              className={`text-right cursor-pointer text-blue-600 hover:text-blue-800 hover:underline ${value >= 0 ? 'text-blue-600' : 'text-red-600'}`}
+              className={`text-right cursor-pointer text-blue-600 hover:text-blue-800 hover:underline dark:text-blue-600 ${value >= 0 ? 'text-blue-600' : 'text-red-600'}`}
             />
           );
         },

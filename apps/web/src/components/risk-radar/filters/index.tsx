@@ -48,7 +48,7 @@ export const RiskRadarFilters: FC<{
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit} noValidate>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
           <DateAndSourceCard systems={systems ?? []} />
           <ExceptionTypeCard exceptionTypes={exceptionTypes ?? []} />
           <StatusAndOtherCard

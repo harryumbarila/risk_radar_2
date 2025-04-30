@@ -10,7 +10,10 @@ export const DynamicCell = <T,>(
   switch (props.type) {
     case 'text':
       return (
-        <td className={`text-black ${props.className}`} onClick={props.onClick}>
+        <td
+          className={`text-black dark:text-white ${props.className}`}
+          onClick={props.onClick}
+        >
           {props.value}{' '}
         </td>
       );
@@ -20,7 +23,7 @@ export const DynamicCell = <T,>(
         props.formatOptions
       ).format(props.value);
       return (
-        <td className={`text-black ${props.className}`}>
+        <td className={`text-black dark:text-white ${props.className}`}>
           {props.prefix && <span className="mr-1">{props.prefix}</span>}
           {formattedValue}
           {props.suffix && <span className="ml-1">{props.suffix}</span>}
@@ -30,7 +33,7 @@ export const DynamicCell = <T,>(
 
     case 'date':
       return (
-        <td className={`text-black ${props.className}`}>
+        <td className={`text-black dark:text-white ${props.className}`}>
           {new Intl.DateTimeFormat('en-US', props.formatOptions).format(
             new Date(props.value)
           )}

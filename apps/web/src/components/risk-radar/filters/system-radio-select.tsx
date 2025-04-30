@@ -29,16 +29,16 @@ export const SystemRadioSelect: FC<Props> = ({
       rules={rules}
       render={({ field, fieldState }) => (
         <div>
-          <div className="mb-5">
+          <div>
             {label ? (
               <label
-                className="mb-3 block text-sm font-medium text-black dark:text-white"
+                className="block text-sm font-medium text-black dark:text-white"
                 htmlFor="system"
               >
                 {label}
               </label>
             ) : null}
-            <div className="flex gap-6.5 flex-wrap">
+            <div className="flex gap-3 flex-wrap">
               {options.map((o) => (
                 <div key={o.value} className="flex items-center">
                   <input
