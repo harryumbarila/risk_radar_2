@@ -13,7 +13,7 @@ export const TableHeader: FC<PropsWithChildren<Props>> = ({
   onEntriesPerPageChange: onRowsPerPageChange,
 }) => {
   return (
-    <div className="flex justify-end border-b border-stroke px-8 pb-4 dark:border-strokedark">
+    <div className="flex justify-between border-b border-stroke px-8 pb-4 dark:border-strokedark">
       {children}
       <div className="flex items-center font-medium">
         <select
