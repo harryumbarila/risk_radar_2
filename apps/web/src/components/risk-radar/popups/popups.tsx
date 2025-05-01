@@ -5,6 +5,7 @@ type PopupProps = {
   onClose: () => void;
   title?: string;
   children: React.ReactNode;
+  placement?: 'top' | 'bottom' | 'center';
 };
 
 export const Popup: React.FC<PopupProps> = ({
@@ -12,6 +13,7 @@ export const Popup: React.FC<PopupProps> = ({
   onClose,
   title,
   children,
+  placement = 'center',
 }) => {
   // Add body overflow control to prevent scrolling behind the popup
   useEffect(() => {
@@ -28,6 +30,12 @@ export const Popup: React.FC<PopupProps> = ({
 
   if (!isOpen) return null;
 
+  const placementStyles = {
+    top: 'top-10 left-1/2 transform -translate-x-1/2',
+    center: 'top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2',
+    bottom: 'bottom-10 left-1/2 transform -translate-x-1/2',
+  };
+
   return (
     <div
       className="fixed left-0 top-0 w-full h-full bg-black bg-opacity-50 z-[9999]"
@@ -42,8 +50,9 @@ export const Popup: React.FC<PopupProps> = ({
       }}
     >
       <div
-        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
-                 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 w-[1100px] max-h-[90vh] overflow-auto"
+        className={`absolute ${placementStyles[placement]} 
+                   bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 
+                   w-[1100px] max-h-[90vh] overflow-auto`}
       >
         {/* Close Button */}
         <button
