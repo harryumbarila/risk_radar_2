@@ -818,6 +818,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         isOpen={isPopupActive}
         onClose={() => setIsPopupActive(false)}
         title={activePopup == PopupType.Email ? 'Send Email' : ''}
+        placement={activePopup == PopupType.CardHistory ? 'top' : 'center'}
       >
         {activePopup == PopupType.CardHistory ? (
           <div className="h-full">
