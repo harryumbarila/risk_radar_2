@@ -7,7 +7,7 @@ export type RiskRadarFilterState = {
   categories?: string[];
 
   status: number;
-  assignedToUser?: number;
+  assignedToUser?: number | undefined;
   merchantId?: string | null;
   dbaNameOrSIC?: string | null;
 
