@@ -35,12 +35,12 @@ type AppsIconProps = {
 
 export const AppsIcon: FC<AppsIconProps> = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { hostname } = window.location;
 
-  const internalDashboards = ['localhost', 'staging'].includes(
-    window.location.hostname
-  )
-    ? dashboardsStaging
-    : dashboardsProduction;
+  const internalDashboards =
+    hostname === 'localhost' || hostname?.includes('staging')
+      ? dashboardsStaging
+      : dashboardsProduction;
 
   // Toggle dropdown visibility
   const toggleDropdown = (): void => {

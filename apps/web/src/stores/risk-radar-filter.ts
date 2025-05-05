@@ -7,7 +7,7 @@ import { getCurrentLocalDate } from '@/shared/utils/date-utils';
 
 type RiskRadarFilterStore = {
   filters: RiskRadarFilterState;
-  setFilters: (filters: RiskRadarFilterState) => void;
+  setFilters: (filters: Partial<RiskRadarFilterState>) => void;
   resetFilters: () => void;
 };
 
@@ -30,8 +30,10 @@ export const useRiskRadarFilterStore = create<RiskRadarFilterStore>()(
   persist(
     immer((set) => ({
       filters: defaultRiskRadarFilters,
-      setFilters(newFilters): void {
-        set({ filters: newFilters });
+      setFilters(newFilters: Partial<RiskRadarFilterState>): void {
+        set((state) => {
+          Object.assign(state.filters, newFilters);
+        });
       },
       resetFilters(): void {
         set({ filters: defaultRiskRadarFilters });

@@ -41,8 +41,10 @@ export const RiskRadarFilters: FC<{
   });
 
   const handleSubmit = methods.handleSubmit((data) => {
-    const modifiedData = { ...data };
-    onSubmit?.(modifiedData);
+    onSubmit?.({
+      ...data,
+      page: 1,
+    });
   });
 
   return (
