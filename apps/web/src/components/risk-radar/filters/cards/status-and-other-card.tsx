@@ -26,7 +26,9 @@ export const StatusAndOtherCard: FC<Props> = ({ statuses, users }) => {
         <div className="space-y-3">
           <StatusSelect control={control} options={statuses} />
           {/* TODO: Use a status enum */}
-          {String(status) === '4' && <UserSelect options={users} />}
+          {String(status) === '4' && (
+            <UserSelect {...register('assignedToUser')} options={users} />
+          )}
         </div>
 
         <div className="relative mb-5">

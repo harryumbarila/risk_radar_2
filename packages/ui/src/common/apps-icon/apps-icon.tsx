@@ -1,15 +1,15 @@
 import type { FC } from 'react';
 import { useState } from 'react';
 
-// const dashboards = [
-//   { id: 1, name: "Dashboard Kili", url: "https://dashboard.jobox.ai" },
-//   { id: 2, name: "Dashboard Taluspay", url: "https://dashboard.taluspay.com" },
-//   {
-//     id: 3,
-//     name: "Dashboard Legacy RiskRadar",
-//     url: "https://dashboard.taluspay.com",
-//   },
-// ];
+const dashboardsProduction = [
+  { id: 1, name: 'Dashboard Kili', url: 'https://dashboard.jobox.ai' },
+  { id: 2, name: 'Dashboard Taluspay', url: 'https://dashboard.taluspay.com' },
+  {
+    id: 3,
+    name: 'Dashboard Risk Radar',
+    url: 'https://dashboard.taluspay.com',
+  },
+];
 
 const dashboardsStaging = [
   {
@@ -24,7 +24,7 @@ const dashboardsStaging = [
   },
   {
     id: 3,
-    name: 'Dashboard Legacy RiskRadar',
+    name: 'Dashboard Risk Radar',
     url: 'https://dashboard.taluspay-staging.com',
   },
 ];
@@ -33,11 +33,14 @@ type AppsIconProps = {
   dashboardEnv: string;
 };
 
-export const AppsIcon: FC<AppsIconProps> = ({ dashboardEnv }) => {
+export const AppsIcon: FC<AppsIconProps> = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { hostname } = window.location;
 
   const internalDashboards =
-    dashboardEnv === 'staging' ? dashboardsStaging : dashboardsStaging;
+    hostname === 'localhost' || hostname?.includes('staging')
+      ? dashboardsStaging
+      : dashboardsProduction;
 
   // Toggle dropdown visibility
   const toggleDropdown = (): void => {

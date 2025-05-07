@@ -80,10 +80,6 @@ export class IrisProxyService {
 
       const { assignedUsers } = lead;
 
-      if (!(assignedUsers?.length > 0)) {
-        throw new Error('Lead does not have any assigned users');
-      }
-
       // Define priority order for each category
       const solutionConsultantPriority = [
         'Int - ISC',

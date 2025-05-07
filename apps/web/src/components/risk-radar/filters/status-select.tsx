@@ -2,9 +2,10 @@ import classNames from 'classnames';
 import type { InputHTMLAttributes } from 'react';
 import { forwardRef } from 'react';
 import type { Control } from 'react-hook-form';
-import { Controller } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 
 import type { RiskRadarFilterState } from '@/shared/response';
+import { useRiskRadarFilterStore } from '@/web/src/stores/risk-radar-filter';
 
 type Props = Omit<InputHTMLAttributes<HTMLSelectElement>, 'name'> & {
   options: { value: number; label: string }[];
@@ -14,6 +15,9 @@ type Props = Omit<InputHTMLAttributes<HTMLSelectElement>, 'name'> & {
 
 export const StatusSelect = forwardRef<HTMLSelectElement, Props>(
   ({ options, control, ...props }, ref) => {
+    const { setValue } = useFormContext<RiskRadarFilterState>();
+    const { setFilters } = useRiskRadarFilterStore();
+
     return (
       <div className="flex flex-col gap-3 h-full">
         <label
@@ -38,6 +42,11 @@ export const StatusSelect = forwardRef<HTMLSelectElement, Props>(
                   }
                 )}
                 ref={ref}
+                onChange={(e) => {
+                  setValue('assignedToUser', undefined);
+                  field.onChange(e);
+                  setFilters({ assignedToUser: undefined });
+                }}
               >
                 {options.map((status) => (
                   <option key={status.value} value={status.value}>
