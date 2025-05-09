@@ -4,6 +4,8 @@
   "version": "0.0.1",
   "author": "",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.804.0",
+    "@aws-sdk/s3-request-presigner": "^3.804.0",
     "@denali/connector-db": "*",
     "@denali/crescent-view-db": "*",
     "@denali/data-warehouse-db": "*",
@@ -31,6 +33,7 @@
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
     "nestjs-pino": "^4.4.0",
+    "pdf-lib": "^1.17.1",
     "pino": "^9.6.0",
     "pino-http": "^10.4.0",
     "pino-pretty": "^11.2.1",

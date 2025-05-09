@@ -84,3 +84,11 @@ export const formatDateWithoutTime = (value: unknown): string => {
   if (!parsedDate || !isValid(parsedDate)) return DEFAULT_BLANK_VALUE;
   return formatInTimeZone(parsedDate, DEFAULT_TIME_ZONE, 'MM/dd/yyyy');
 };
+
+export const formatFileSize = (bytes: number): string => {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / k ** i).toFixed(2))} ${sizes[i]}`;
+};

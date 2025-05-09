@@ -24,6 +24,8 @@ import { IrisProxyModule } from './module/iris-proxy/iris-proxy.module';
 import { LegacyDashboardProxyModule } from './module/legacy-dashboard-proxy/legacy-dashboard-proxy.module';
 import { RiskRadarModule } from './module/risk-radar/risk-radar.module';
 import { rootConfig } from './shared/config/root.config';
+import { AWSModule } from './shared/aws/aws.module';
+import { PartnerBanksModule } from './module/partner-banks/partner-banks.module';
 
 // Load dotenv only in development mode (DBs)
 // eslint-disable-next-line no-restricted-properties
@@ -49,6 +51,8 @@ if (process.env.NODE_ENV !== 'production') {
     IrisProxyModule,
     ExampleMultiDbModule,
     RiskRadarModule,
+    AWSModule,
+    PartnerBanksModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,0 +1,38 @@
+import { Controller, Get, Query } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { PartnerBanksService } from './partner-banks.service';
+import { ListInvoiceInputDto } from './dto/get-invoce.dto';
+
+@ApiTags('risk-radar')
+@Controller('v1/partner-banks')
+export class PartnerBanksController {
+  public constructor(
+    private readonly partnerBanksService: PartnerBanksService
+  ) {}
+
+  @ApiResponse({
+    status: 200,
+    description: 'The invoices from aws',
+  })
+  @ApiOperation({
+    operationId: 'partner-banks-invoices',
+    summary: 'Retrieve invoices from s3',
+  })
+  @Get('invoices')
+  async getInvoices(@Query() query: ListInvoiceInputDto) {
+    return this.partnerBanksService.getInvoices(query);
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'The invoices from aws',
+  })
+  @ApiOperation({
+    operationId: 'partner-banks-invoice-url',
+    summary: 'Retrieve invoice url from s3',
+  })
+  @Get('download-url')
+  async getDownloadUrl(@Query('key') key: string) {
+    return this.partnerBanksService.getDownloadUrl(key);
+  }
+}
