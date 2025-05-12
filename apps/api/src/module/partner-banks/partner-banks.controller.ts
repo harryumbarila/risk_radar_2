@@ -21,7 +21,18 @@ export class PartnerBanksController {
   })
   @Get('invoices')
   public async getInvoices(@Query() query: ListInvoiceInputDto) {
-    return this.partnerBanksService.getInvoices(query);
+    try {
+      return await this.partnerBanksService.getInvoices(query);
+    } catch (error) {
+      if (error instanceof Error) {
+        return {
+          status: 'error',
+          message: 'Error retrieving invoices',
+          error: error.message,
+        };
+      }
+      throw error;
+    }
   }
 
   @ApiResponse({
