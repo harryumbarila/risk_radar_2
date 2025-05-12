@@ -3,6 +3,7 @@ import 'dotenv/config';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
 import { LoggerModule } from 'nestjs-pino';
 
 import { GlobalModule } from '@/api/module/global/global.module';
@@ -22,8 +23,11 @@ import { AppController } from './app.controller';
 import { ExampleMultiDbModule } from './module/example-multi-db/example-multi-db.module';
 import { IrisProxyModule } from './module/iris-proxy/iris-proxy.module';
 import { LegacyDashboardProxyModule } from './module/legacy-dashboard-proxy/legacy-dashboard-proxy.module';
+import { PartnerBanksModule } from './module/partner-banks/partner-banks.module';
 import { RiskRadarModule } from './module/risk-radar/risk-radar.module';
+import { AWSModule } from './shared/aws/aws.module';
 import { rootConfig } from './shared/config/root.config';
+import { EmailModule } from './shared/email/email.module';
 
 // Load dotenv only in development mode (DBs)
 // eslint-disable-next-line no-restricted-properties
@@ -34,6 +38,7 @@ if (process.env.NODE_ENV !== 'production') {
 @Module({
   imports: [
     ConfigModule.forRoot(rootConfig),
+    ScheduleModule.forRoot(),
     DataWarehouseDbTypeOrmModule,
     ConnectorDbTypeOrmModule,
     CrescentViewDbTypeOrmModule,
@@ -49,6 +54,9 @@ if (process.env.NODE_ENV !== 'production') {
     IrisProxyModule,
     ExampleMultiDbModule,
     RiskRadarModule,
+    AWSModule,
+    EmailModule,
+    PartnerBanksModule,
   ],
   controllers: [AppController],
   providers: [

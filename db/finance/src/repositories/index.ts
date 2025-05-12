@@ -4,6 +4,7 @@ export * from './dft-256-batch.repository';
 export * from './dft-256-transaction.repository';
 export * from './dft-256-transaction-from-legacy-system.repository';
 export * from './merchant-exception-detail.repository';
+export * from './partner-bank-monthly-billing.repository';
 export * from './pos-entry-modes-adf.repository';
 export * from './risk-radar-assign-exceptions.repository';
 export * from './risk-radar-batch.repository';
