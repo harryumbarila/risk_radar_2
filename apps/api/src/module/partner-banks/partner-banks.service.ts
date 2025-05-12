@@ -1,4 +1,8 @@
+/* eslint-disable */
+
 import { Injectable } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
+
 import { RuntimeException } from '@nestjs/core/errors/exceptions';
 
 import { InjectPinoLogger } from 'nestjs-pino';
@@ -23,33 +27,42 @@ import {
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { MSPMerchantMonthlyBillingRepository } from '@/finance-db/repositories';
+import { EmailService } from '@/api/shared/email/email.service';
+import { EmailTemplateMessage } from '@/api/shared/email/email-template-message';
 
 @Injectable()
 export class PartnerBanksService {
-  bucketName =
-    process.env.AWS_S3_BUCKET_NAME ||
-    'talus-msp-merchants-monthly-invoice-staging';
+  private readonly bucketName = 'talus-msp-merchants-monthly-invoice-staging'; // FIXME: Test bucket
   public constructor(
     private readonly s3Service: S3Service,
     private readonly bufferUtils: BufferUtilsService,
     private readonly mspMerchantMonthlyBillingRepository: MSPMerchantMonthlyBillingRepository,
-
+    private readonly emailService: EmailService,
     @InjectDataSource('iris') private readonly irisDataSource: DataSource,
     @InjectPinoLogger(PartnerBanksService.name) private readonly logger: Logger
   ) {}
 
-  async getInvoices(input: ListInvoiceInputDto): Promise<InvoiceResponseDto> {
+  @Cron(CronExpression.EVERY_10_SECONDS, { name: 'schedulerTest' })
+  public async schedulerSendInvoice() {
+    this.logger.info('Scheduler schedulerSendInvoice started');
+
+    await this.fillInvoiceTemplate();
+  }
+
+  public async getInvoices(
+    input: ListInvoiceInputDto
+  ): Promise<InvoiceResponseDto> {
     return this.s3Service.listObjects({
       ...input,
       bucketName: this.bucketName,
     });
   }
 
-  async getDownloadUrl(key: string) {
+  public async getDownloadUrl(key: string) {
     return this.s3Service.getFileSignedUrl(this.bucketName, key);
   }
 
-  async getUnInvoicedMSPMerchants(): Promise<
+  public async getUnInvoicedMSPMerchants(): Promise<
     MSPMerchantBillingRecord[] | undefined
   > {
     const currentDate = new Date();
@@ -87,17 +100,27 @@ export class PartnerBanksService {
         await this.irisDataSource.query<MSPMerchantBillingRecord[]>(query);
       return result;
     } catch (error) {
-      this.logger.error(
-        `Failed to fetch un invoiced MSP merchants: ${error.message}`
-      );
-      throw new Error(
-        `Failed to fetch un invoiced MSP merchants: ${error.message}`
-      );
+      if (error instanceof Error) {
+        this.logger.error(
+          `Failed to fetch un invoiced MSP merchants: ${error.message}`
+        );
+        throw new Error(
+          `Failed to fetch un invoiced MSP merchants: ${error.message}`
+        );
+      }
+      throw error;
     }
   }
 
-  async fillInvoiceTemplate() {
+  public async fillInvoiceTemplate() {
     try {
+      const currentDate = new Date();
+      const formattedDate = `${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getDate().toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
+      const currentYear = currentDate.getFullYear();
+      const currentMonth = (currentDate.getMonth() + 1)
+        .toString()
+        .padStart(2, '0');
+      const currentYYYYMM = `${currentYear}${currentMonth}`;
       const file = await this.s3Service.getFile(
         this.bucketName,
         'invoice-template.pdf'
@@ -116,122 +139,146 @@ export class PartnerBanksService {
         this.logger.info('No un-invoiced partners found');
         return;
       }
-      for (const partner of partners) {
-        const invoiceTemplate = await PDFDocument.load(templateBuffer);
-        // Get the first page of the document
-        const font = await invoiceTemplate.embedFont(StandardFonts.TimesRoman);
+      while (partners.length > 0) {
+        await Promise.all(
+          partners.splice(0, 10).map(async (partner) => {
+            const invoiceTemplate = await PDFDocument.load(templateBuffer);
+            // Get the first page of the document
+            const font = await invoiceTemplate.embedFont(
+              StandardFonts.TimesRoman
+            );
 
-        const defaultOptions = {
-          font,
-          size: 11,
-          color: rgb(0, 0, 0),
-        };
-        const pages = invoiceTemplate.getPages();
-        const firstPage = pages[0];
-        const { width, height } = firstPage.getSize();
+            const defaultOptions: PDFPageDrawTextOptions = {
+              font,
+              size: 11,
+              color: rgb(0, 0, 0),
+            };
+            const pages = invoiceTemplate.getPages();
+            const firstPage = pages[0];
+            const { width, height } = firstPage.getSize();
 
-        const {
-          pk,
-          InvoiceNumber,
-          LegalName,
-          sOwner,
-          LegalAddress,
-          LegalCity,
-          LegalState,
-          LegalZIP,
-          dMMFSalesVolume,
-          dMMFRate,
-          dMMFBilledAmt,
-        } = partner;
-        // Draw the text on the page
-        const options: PDFPageDrawTextOptions = {
-          ...defaultOptions,
-        };
-        const fields: Record<
-          string,
-          PDFPageDrawTextOptions & { label: string }
-        > = {
-          date: {
-            label: '02/17/2025',
-            x: width - 214,
-            y: height - 108,
-          },
-          invoice: {
-            label: InvoiceNumber,
-            x: width - 134,
-            y: height - 108,
-          },
-          name: {
-            label: LegalName,
-            x: 80,
-            y: height - 190,
-          },
-          legalName: {
-            label: sOwner,
-            x: 80,
-            y: height - 204,
-          },
-          address: {
-            label: LegalAddress,
-            x: 80,
-            y: height - 218,
-          },
-          city: {
-            label: `${LegalCity}, ${LegalState} ${LegalZIP}`,
-            x: 80,
-            y: height - 232,
-          },
-          salesAmount: {
-            label: `${Intl.NumberFormat('en-US', {
-              style: 'currency',
-              currency: 'USD',
-            }).format(dMMFSalesVolume)} X ${dMMFRate.toFixed(2)}%)`,
-            x: 172,
-            y: height - 410,
-          },
-          rate: {
-            label: `${dMMFBilledAmt.toFixed(2)}`,
-            x: 446,
-            y: height - 396,
-          },
-          amount: {
-            label: `${dMMFBilledAmt.toFixed(2)}`,
-            x: 532,
-            y: height - 396,
-          },
-          total: {
-            label: `${dMMFBilledAmt.toFixed(2)}`,
-            x: 532,
-            y: height - 606,
-          },
-          paymentsOrCredit: {
-            label: `-${dMMFBilledAmt.toFixed(2)}`,
-            x: 528,
-            y: height - 638,
-          },
-        };
+            const {
+              pk,
+              InvoiceNumber,
+              LegalName,
+              sOwner,
+              LegalAddress,
+              LegalCity,
+              LegalState,
+              LegalZIP,
+              dMMFSalesVolume,
+              dMMFRate,
+              dMMFBilledAmt,
+              IrisMId,
+            } = partner;
 
-        Object.entries(fields).forEach(([_, value]) => {
-          const { label, ...options } = value;
-          firstPage.drawText(label, {
-            ...defaultOptions,
-            ...options,
-          });
-        });
-        const filledPdf = await invoiceTemplate.save();
-        const pdf = Buffer.from(filledPdf);
+            const fields: Record<
+              string,
+              PDFPageDrawTextOptions & { label: string }
+            > = {
+              date: {
+                label: formattedDate,
+                x: width - 214,
+                y: height - 108,
+              },
+              invoice: {
+                label: InvoiceNumber,
+                x: width - 134,
+                y: height - 108,
+              },
+              name: {
+                label: LegalName,
+                x: 80,
+                y: height - 190,
+              },
+              legalName: {
+                label: sOwner,
+                x: 80,
+                y: height - 204,
+              },
+              address: {
+                label: LegalAddress,
+                x: 80,
+                y: height - 218,
+              },
+              city: {
+                label: `${LegalCity}, ${LegalState} ${LegalZIP}`,
+                x: 80,
+                y: height - 232,
+              },
+              salesAmount: {
+                label: `${Intl.NumberFormat('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                }).format(dMMFSalesVolume)} X ${dMMFRate.toFixed(2)}%)`,
+                x: 172,
+                y: height - 410,
+              },
+              rate: {
+                label: `${dMMFBilledAmt.toFixed(2)}`,
+                x: 446,
+                y: height - 396,
+              },
+              amount: {
+                label: `${dMMFBilledAmt.toFixed(2)}`,
+                x: 532,
+                y: height - 396,
+              },
+              total: {
+                label: `${dMMFBilledAmt.toFixed(2)}`,
+                x: 532,
+                y: height - 606,
+              },
+              paymentsOrCredit: {
+                label: `-${dMMFBilledAmt.toFixed(2)}`,
+                x: 528,
+                y: height - 638,
+              },
+            };
 
-        // Save the modified PDF document
-        const fileName = `invoices/${InvoiceNumber}.pdf`;
-        await this.s3Service.uploadFile(
-          this.bucketName,
-          pdf,
-          fileName,
-          'application/pdf'
+            Object.values(fields).forEach((value) => {
+              const { label, ...options } = value;
+              firstPage.drawText(label, {
+                ...defaultOptions,
+                ...options,
+              });
+            });
+            const filledPdf = await invoiceTemplate.save();
+            const pdf = Buffer.from(filledPdf);
+
+            // Save the modified PDF document
+            const fileName = `invoices/${currentYYYYMM}/${IrisMId}_${InvoiceNumber}.pdf`;
+            await this.s3Service.uploadFile(
+              this.bucketName,
+              pdf,
+              fileName,
+              'application/pdf'
+            );
+            await this.mspMerchantMonthlyBillingRepository.update(pk, {
+              dtInvoiced: () => 'GETDATE()',
+            });
+            const emailTemplate = new EmailTemplateMessage(
+              ['crhistian@solvedex.com'], //FIXME: Test email
+              'Talus Partner Invoice',
+              'partner-invoice',
+              {
+                invoiceNumber: InvoiceNumber,
+              },
+              [
+                {
+                  fileName: `${IrisMId}_${InvoiceNumber}.pdf`,
+                  content: pdf.toString('base64'),
+                  encoding: 'base64',
+                },
+              ]
+            );
+
+            await this.emailService.send(emailTemplate).catch((error) => {
+              this.logger.error('Error sending email', error);
+            });
+            /* eslint-disable no-await-in-loop */
+          })
         );
-        await this.mspMerchantMonthlyBillingRepository.update(pk, {
-          dtInvoiced: () => 'GETDATE()',
-        });
       }
     } catch (error) {
       this.logger.error('Error filling invoice template', error);

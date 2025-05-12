@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AWSModule } from '@/api/shared/aws/aws.module';
-import { PartnerBanksService } from './partner-banks.service';
-import { PartnerBanksController } from './partner-banks.controller';
-import { BufferUtilsService } from '@/api/shared/buffer/buffer-utils.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { AWSModule } from '@/api/shared/aws/aws.module';
+import { BufferUtilsService } from '@/api/shared/buffer/buffer-utils.service';
+import { EmailModule } from '@/api/shared/email/email.module';
+import { MSPMerchantMonthlyBilling } from '@/finance-db/entities';
+import { MSPMerchantMonthlyBillingRepository } from '@/finance-db/repositories';
 import {
   LeadEntity,
   LeadsBusinessInformationEntity,
@@ -16,9 +17,8 @@ import {
   SourceEntity,
 } from '@/iris-db/entities';
 
-import { MSPMerchantMonthlyBillingRepository } from '@/finance-db/repositories';
-
-import { MSPMerchantMonthlyBilling } from '@/finance-db/entities';
+import { PartnerBanksController } from './partner-banks.controller';
+import { PartnerBanksService } from './partner-banks.service';
 
 @Module({
   imports: [
@@ -37,6 +37,7 @@ import { MSPMerchantMonthlyBilling } from '@/finance-db/entities';
       'iris'
     ),
     AWSModule,
+    EmailModule,
   ],
   providers: [
     PartnerBanksService,

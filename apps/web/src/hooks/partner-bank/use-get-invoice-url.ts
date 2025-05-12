@@ -8,7 +8,6 @@ export type InvoiceUrlFilterState = {
 };
 
 export type UsePartnerInvoiceUrlReturnType = {
-  data: InvoiceUrlResponseDto | null;
   isLoading: boolean;
   error: Error | null;
   fetchData: (
@@ -59,6 +58,7 @@ export const usePartnerInvoiceUrl = (): UsePartnerInvoiceUrlReturnType => {
       } finally {
         setIsLoading(false);
       }
+      return undefined;
     },
     [makeRequest]
   );

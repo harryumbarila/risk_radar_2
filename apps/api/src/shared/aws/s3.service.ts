@@ -1,26 +1,29 @@
-import { Injectable, Inject } from '@nestjs/common';
-
-import {
-  S3Client,
-  PutObjectCommand,
-  GetObjectCommand,
-  ListObjectsV2CommandOutput,
-  ListObjectsV2Command,
+import type {
   ListObjectsV2CommandInput,
+  ListObjectsV2CommandOutput,
 } from '@aws-sdk/client-s3';
-import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
+import {
+  GetObjectCommand,
+  ListObjectsV2Command,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { S3PaginationInput } from './dto/s3.dto';
-import { InvoiceResponseDto } from '@/shared/response';
+import { Inject, Injectable } from '@nestjs/common';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
+
+import type { InvoiceResponseDto } from '@/shared/response';
+
+import type { S3PaginationInput } from './dto/s3.dto';
 
 @Injectable()
 export class S3Service {
-  constructor(
+  public constructor(
     @Inject('S3_CLIENT') private readonly s3Client: S3Client,
     @InjectPinoLogger(S3Service.name) private readonly logger: PinoLogger
   ) {}
 
-  async uploadFile(
+  public async uploadFile(
     bucketName: string,
     file: Buffer | string,
     fileName: string,
@@ -44,12 +47,12 @@ export class S3Service {
     };
   }
 
-  async getFile(bucketName: string, key: string) {
+  public async getFile(bucketName: string, key: string) {
     const command = new GetObjectCommand({ Bucket: bucketName, Key: key });
     return this.s3Client.send(command);
   }
 
-  async getFileSignedUrl(
+  public async getFileSignedUrl(
     bucketName: string,
     key: string,
     expiresInSeconds = 3600
@@ -71,8 +74,10 @@ export class S3Service {
     }
   }
 
-  async listObjects(input: S3PaginationInput): Promise<InvoiceResponseDto> {
-    const { bucketName, maxKeys = 5, prefix = '', continuationToken } = input;
+  public async listObjects(
+    input: S3PaginationInput
+  ): Promise<InvoiceResponseDto> {
+    const { bucketName, maxKeys = 50, prefix = '', continuationToken } = input;
     const params: ListObjectsV2CommandInput = {
       Bucket: bucketName,
       Prefix: prefix,
@@ -89,7 +94,7 @@ export class S3Service {
       const result = {
         objects: data.Contents || [],
         folders: (data.CommonPrefixes || []).map(
-          (prefix) => prefix.Prefix || ''
+          (cPrefix) => cPrefix.Prefix || ''
         ),
         nextContinuationToken: data.NextContinuationToken,
         isTruncated: data.IsTruncated || false,
