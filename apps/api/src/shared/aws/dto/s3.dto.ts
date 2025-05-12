@@ -1,26 +1,36 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import {
+  Allow,
+  IsArray,
+  IsDefined,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+  ValidateNested,
+} from 'class-validator';
 
 export class S3PaginationInput {
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'The prefix/folder path to list',
     required: false,
     example: 'documents/',
   })
   @IsOptional()
   @IsString()
-  prefix?: string;
+  public prefix?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Continuation token for pagination',
     required: false,
     example: '1ueD5LqJZ7l5F6w3XpLmBk3qHJGZ1F2vTEXAMPLE=',
   })
   @IsOptional()
   @IsString()
-  continuationToken?: string;
+  public continuationToken?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Maximum number of keys to return per page (max: 1000)',
     required: false,
     default: 100,
@@ -29,53 +39,79 @@ export class S3PaginationInput {
   @IsOptional()
   @IsNumber()
   @Min(1)
-  maxKeys?: number = 100;
+  public maxKeys?: number = 100;
 
-  bucketName: string;
+  @Allow()
+  public bucketName: string;
 }
 
 export class S3ObjectDto {
   @ApiProperty({ example: 'documents/report.pdf' })
-  Key: string;
+  @IsDefined()
+  @IsString()
+  public Key: string;
 
-  @ApiProperty({ example: '2023-01-01T00:00:00.000Z' })
-  LastModified: Date;
+  @ApiProperty({
+    example: '2023-01-01T00:00:00.000Z',
+  })
+  @IsDefined()
+  @Type(() => Date)
+  public LastModified: Date;
 
   @ApiProperty({ example: '"d41d8cd98f00b204e9800998ecf8427e"' })
-  ETag: string;
+  @IsDefined()
+  @IsString()
+  public ETag: string;
 
   @ApiProperty({ example: 1024 })
-  Size: number;
+  @IsDefined()
+  @IsNumber()
+  public Size: number;
 
   @ApiProperty({ example: 'STANDARD' })
-  StorageClass: string;
+  @IsDefined()
+  @IsString()
+  public StorageClass: string;
 }
 
 export class S3PaginatedResponseDto {
-  @ApiProperty({ type: [S3ObjectDto] })
-  objects: S3ObjectDto[];
+  @ApiProperty({ type: S3ObjectDto, isArray: true })
+  @IsDefined()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => S3ObjectDto)
+  public objects: S3ObjectDto[];
 
   @ApiProperty({
-    type: [String],
+    type: 'string',
+    isArray: true,
     example: ['documents/images/', 'documents/archives/'],
   })
-  folders: string[];
+  @IsDefined()
+  @IsArray()
+  @IsString({ each: true })
+  public folders: string[];
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     required: false,
     example: '1ueD5LqJZ7l5F6w3XpLmBk3qHJGZ1F2vTEXAMPLE=',
   })
-  nextContinuationToken?: string;
+  @IsOptional()
+  @IsString()
+  public nextContinuationToken?: string;
 
   @ApiProperty({
     description: 'Whether there are more results to fetch',
     example: true,
   })
-  isTruncated: boolean;
+  @IsDefined()
+  public isTruncated: boolean;
 
   @ApiProperty({
     description: 'Current prefix being listed',
     example: 'documents/',
   })
-  currentPrefix: string;
+  @IsDefined()
+  @IsString()
+  public currentPrefix: string;
 }
