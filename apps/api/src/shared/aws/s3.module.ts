@@ -10,8 +10,8 @@ import { ConfigService } from '@nestjs/config';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const prodConfig: S3ClientConfig = {
-          region: configService.get('AWS_REGION'),
-          endpoint: configService.get('AWS_ENDPOINT'),
+          region: configService.get('AWS_REGION') || 'us-west-2',
+          // endpoint: configService.get('AWS_ENDPOINT'),
           credentials: {
             accessKeyId: configService.get('AWS_ACCESS_KEY_ID'),
             secretAccessKey: configService.get('AWS_SECRET_ACCESS_KEY'),
@@ -19,8 +19,8 @@ import { ConfigService } from '@nestjs/config';
         };
 
         const devConfig: S3ClientConfig = {
-          region: configService.get('AWS_REGION'),
-          endpoint: configService.get('AWS_ENDPOINT'),
+          region: configService.get('AWS_REGION') || 'us-west-2',
+          // endpoint: configService.get('AWS_ENDPOINT'),
           credentials: {
             accessKeyId: configService.get('AWS_ACCESS_KEY_ID'),
             secretAccessKey: configService.get('AWS_SECRET_ACCESS_KEY'),
