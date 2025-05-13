@@ -1,14 +1,16 @@
 /* eslint-disable */
-
-import { Injectable } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
-
 import { RuntimeException } from '@nestjs/core/errors/exceptions';
+import { Injectable } from '@nestjs/common';
 
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { ConfigService } from '@nestjs/config';
+import { InjectDataSource } from '@nestjs/typeorm';
 import { InjectPinoLogger } from 'nestjs-pino';
 
-import { Logger } from 'pino';
 import { Readable } from 'node:stream';
+
+import { DataSource } from 'typeorm';
+import { Logger } from 'pino';
 import {
   PDFDocument,
   PDFPageDrawTextOptions,
@@ -17,30 +19,32 @@ import {
 } from 'pdf-lib';
 
 import { S3Service } from '@/api/shared/aws/s3.service';
+import { EmailService } from '@/api/shared/email/email.service';
 import { BufferUtilsService } from '@/api/shared/buffer/buffer-utils.service';
 
-import { ListInvoiceInputDto } from './dto/get-invoce.dto';
 import {
   InvoiceResponseDto,
   MSPMerchantBillingRecord,
 } from '@/shared/response';
-import { DataSource } from 'typeorm';
-import { InjectDataSource } from '@nestjs/typeorm';
+
 import { MSPMerchantMonthlyBillingRepository } from '@/finance-db/repositories';
-import { EmailService } from '@/api/shared/email/email.service';
 import { EmailTemplateMessage } from '@/api/shared/email/email-template-message';
+import { ListInvoiceInputDto } from './dto/get-invoce.dto';
 
 @Injectable()
 export class PartnerBanksService {
-  private readonly bucketName = 'talus-msp-merchants-monthly-invoice-staging'; // FIXME: Test bucket
+  private bucketName = ''; // FIXME: Test bucket
   public constructor(
     private readonly s3Service: S3Service,
     private readonly bufferUtils: BufferUtilsService,
     private readonly mspMerchantMonthlyBillingRepository: MSPMerchantMonthlyBillingRepository,
     private readonly emailService: EmailService,
     @InjectDataSource('iris') private readonly irisDataSource: DataSource,
+    private readonly configService: ConfigService,
     @InjectPinoLogger(PartnerBanksService.name) private readonly logger: Logger
-  ) {}
+  ) {
+    this.bucketName = this.configService.get('AWS_PARTNER_BANK_INVOICE_BUCKET');
+  }
 
   @Cron(CronExpression.EVERY_10_SECONDS, { name: 'schedulerTest' })
   public async schedulerSendInvoice() {
