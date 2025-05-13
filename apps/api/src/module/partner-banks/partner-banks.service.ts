@@ -46,10 +46,9 @@ export class PartnerBanksService {
     this.bucketName = this.configService.get('AWS_PARTNER_BANK_INVOICE_BUCKET');
   }
 
-  @Cron(CronExpression.EVERY_10_SECONDS, { name: 'schedulerTest' })
+  @Cron(CronExpression.EVERY_10_SECONDS, { name: 'schedulerSendInvoice' })
   public async schedulerSendInvoice() {
     this.logger.info('Scheduler schedulerSendInvoice started');
-
     await this.fillInvoiceTemplate();
   }
 
@@ -270,15 +269,22 @@ export class PartnerBanksService {
               },
               [
                 {
-                  fileName: `${IrisMId}_${InvoiceNumber}.pdf`,
-                  content: pdf.toString('base64'),
-                  encoding: 'base64',
+                  FileName: `${IrisMId}_${InvoiceNumber}.pdf`,
+                  RawContent: pdf,
+                  ContentType: 'application/pdf',
+                  ContentDisposition: 'ATTACHMENT',
+                  ContentTransferEncoding: 'BASE64',
+                  ContentDescription: `${IrisMId}_${InvoiceNumber}.pdf`,
                 },
               ]
             );
 
             await this.emailService.send(emailTemplate).catch((error) => {
-              this.logger.error('Error sending email', error);
+              this.logger.error('Error sending email');
+              if (error instanceof Error) {
+                this.logger.error(error);
+              }
+              this.logger.error(error);
             });
             /* eslint-disable no-await-in-loop */
           })

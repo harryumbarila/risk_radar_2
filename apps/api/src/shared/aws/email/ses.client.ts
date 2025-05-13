@@ -1,8 +1,8 @@
 import type {
   SendEmailCommandOutput,
-  SESClientConfig,
-} from '@aws-sdk/client-ses';
-import { SendEmailCommand, SESClient } from '@aws-sdk/client-ses';
+  SESv2ClientConfig,
+} from '@aws-sdk/client-sesv2';
+import { SendEmailCommand, SESv2Client } from '@aws-sdk/client-sesv2';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -32,24 +32,27 @@ export class AwsSesClient implements EmailClientInterface {
       fromAddress: string
     ) => {
       return new SendEmailCommand({
+        FromEmailAddress: fromAddress,
         Destination: {
           ToAddresses: toAddress,
         },
-        Message: {
-          /* required */
-          Body: {
+        Content: {
+          Simple: {
             /* required */
-            Html: {
-              Charset: 'UTF-8',
-              Data: email.body,
+            Body: {
+              /* required */
+              Html: {
+                Charset: 'UTF-8',
+                Data: email.body,
+              },
             },
-          },
-          Subject: {
-            Charset: 'UTF-8',
-            Data: email.subject,
+            Subject: {
+              Charset: 'UTF-8',
+              Data: email.subject,
+            },
+            Attachments: email.attachments,
           },
         },
-        Source: fromAddress,
         ReplyToAddresses: [
           this.configService.get('AWS_SES_SENDER_EMAIL_ADDRESS'),
         ],
@@ -62,17 +65,17 @@ export class AwsSesClient implements EmailClientInterface {
         this.configService.get('AWS_SES_SENDER_EMAIL_ADDRESS')
       );
 
-      const prodConfig: SESClientConfig = {
+      const prodConfig: SESv2ClientConfig = {
         region: this.configService.get('AWS_REGION') || 'us-west-2',
       };
 
-      const devConfig: SESClientConfig = {
+      const devConfig: SESv2ClientConfig = {
         region: this.configService.get('AWS_REGION') || 'us-west-2',
         // endpoint: this.configService.get('AWS_ENDPOINT'),
       };
 
       try {
-        const sesClient = new SESClient(
+        const sesClient = new SESv2Client(
           this.configService.get('NODE_ENV') === 'development'
             ? devConfig
             : prodConfig
@@ -91,6 +94,6 @@ export class AwsSesClient implements EmailClientInterface {
 
     return 'MessageId' in response
       ? { status: 'sent' }
-      : { status: 'failed_to_send', error: response.message };
+      : { status: 'failed_to_send' };
   }
 }

@@ -1,5 +1,6 @@
 import { OmitType, PartialType } from '@nestjs/swagger';
 
+import type { Attachment } from '@/api/shared/aws/email/email-message';
 import { EmailMessage } from '@/api/shared/aws/email/email-message';
 
 type TemplateType = 'partner-invoice';
@@ -14,7 +15,7 @@ export class EmailTemplateMessage extends PartialType(
     subject: string,
     template: TemplateType,
     context: { [key: string]: unknown },
-    attachments?: unknown
+    attachments?: Attachment[]
   ) {
     super();
 
