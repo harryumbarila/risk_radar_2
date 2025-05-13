@@ -1,6 +1,7 @@
 import { OmitType, PartialType } from '@nestjs/swagger';
 
-import { Attachment, EmailMessage } from '@/api/shared/aws/email/email-message';
+import type { Attachment } from '@/api/shared/aws/email/email-message';
+import { EmailMessage } from '@/api/shared/aws/email/email-message';
 
 type TemplateType = 'partner-invoice';
 

@@ -12,7 +12,7 @@ export class EmailMessage {
 /**
  * Represents an email attachment with all relevant metadata
  */
-export interface Attachment {
+export type Attachment = {
   /**
    * The raw binary content of the attachment
    * @example new Uint8Array() or Buffer.from("") or new TextEncoder().encode("")
@@ -53,4 +53,4 @@ export interface Attachment {
    * @example "application/pdf", "image/png"
    */
   ContentType?: string;
-}
+};
