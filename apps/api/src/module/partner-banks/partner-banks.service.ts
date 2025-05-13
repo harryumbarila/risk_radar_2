@@ -49,6 +49,7 @@ export class PartnerBanksService {
   @Cron(CronExpression.EVERY_10_SECONDS, { name: 'schedulerSendInvoice' })
   public async schedulerSendInvoice() {
     this.logger.info('Scheduler schedulerSendInvoice started');
+
     await this.fillInvoiceTemplate();
   }
 
@@ -78,6 +79,9 @@ export class PartnerBanksService {
       SELECT 
         b.pk,
         l.IrisMId,
+        lbi.DBAName,
+        lbi.ContactName,
+	      lbi.ContactEmailAddress,
         'MSP' + '-' + CONVERT(VARCHAR(25), b.pk) AS InvoiceNumber,
         lbi.LegalName,
         lo.FirstName + ' ' + lo.LastName AS sOwner,
@@ -162,6 +166,9 @@ export class PartnerBanksService {
 
             const {
               pk,
+              DBAName,
+              // ContactEmailAddress,
+              ContactName,
               InvoiceNumber,
               LegalName,
               sOwner,
@@ -262,10 +269,10 @@ export class PartnerBanksService {
             });
             const emailTemplate = new EmailTemplateMessage(
               ['crhistian@solvedex.com'], //FIXME: Test email
-              'Talus Partner Invoice',
+              `${DBAName} Invoice From Talus`,
               'partner-invoice',
               {
-                invoiceNumber: InvoiceNumber,
+                contactName: ContactName,
               },
               [
                 {
