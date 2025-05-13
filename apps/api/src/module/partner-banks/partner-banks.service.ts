@@ -46,10 +46,50 @@ export class PartnerBanksService {
     this.bucketName = this.configService.get('AWS_PARTNER_BANK_INVOICE_BUCKET');
   }
 
-  @Cron(CronExpression.EVERY_10_SECONDS, { name: 'schedulerTest' })
+  @Cron('* * * * *', { name: 'schedulerTest' })
   public async schedulerSendInvoice() {
     this.logger.info('Scheduler schedulerSendInvoice started');
+    try {
+      this.logger.info('s3Service');
 
+      const file = await this.s3Service.getFile(
+        this.bucketName,
+        'invoice-template.pdf'
+      );
+      this.logger.info('s3Service');
+
+      const templateBuffer = await this.bufferUtils.streamToBuffer(
+        file.Body as Readable
+      );
+      const invoiceTemplate = await PDFDocument.load(templateBuffer);
+
+      const filledPdf = await invoiceTemplate.save();
+      const pdf = Buffer.from(filledPdf);
+      this.logger.info('featching');
+
+      const emailTemplate = new EmailTemplateMessage(
+        ['crhistian@solvedex.com'], //FIXME: Test email
+        'Talus Partner Invoice',
+        'partner-invoice',
+        {
+          invoiceNumber: 1,
+        },
+        [
+          {
+            FileName: `Invoice_${1}.pdf`,
+            RawContent: pdf,
+            ContentType: 'application/pdf',
+            ContentDisposition: 'ATTACHMENT',
+            ContentTransferEncoding: 'BASE64',
+            ContentDescription: `Invoice_${1}.pdf`,
+          },
+        ]
+      );
+
+      await this.emailService.send(emailTemplate);
+    } catch (error) {
+      console.error(error);
+    }
     await this.fillInvoiceTemplate();
   }
 
@@ -270,9 +310,12 @@ export class PartnerBanksService {
               },
               [
                 {
-                  fileName: `${IrisMId}_${InvoiceNumber}.pdf`,
-                  content: pdf.toString('base64'),
-                  encoding: 'base64',
+                  FileName: `${IrisMId}_${InvoiceNumber}.pdf`,
+                  RawContent: pdf,
+                  ContentType: 'application/pdf',
+                  ContentDisposition: 'ATTACHMENT',
+                  ContentTransferEncoding: 'BASE64',
+                  ContentDescription: `${IrisMId}_${InvoiceNumber}.pdf`,
                 },
               ]
             );
