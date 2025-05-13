@@ -68,11 +68,7 @@ export class AwsSesClient implements EmailClientInterface {
 
       const devConfig: SESClientConfig = {
         region: this.configService.get('AWS_REGION') || 'us-west-2',
-        endpoint: this.configService.get('AWS_ENDPOINT'),
-        credentials: {
-          accessKeyId: this.configService.get('AWS_ACCESS_KEY_ID'),
-          secretAccessKey: this.configService.get('AWS_SECRET_ACCESS_KEY'),
-        },
+        // endpoint: this.configService.get('AWS_ENDPOINT'),
       };
 
       try {
