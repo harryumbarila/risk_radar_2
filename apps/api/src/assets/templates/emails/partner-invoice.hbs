@@ -1,9 +1,11 @@
 <html lang='en'>
+
   <head>
     <meta charset='utf-8' />
     <meta name='viewport' content='width=device-width, initial-scale=1.0' />
     <title>Partner Invoice</title>
   </head>
+
   <body
     style='margin: 0; padding: 0; background-color: #C2E3EA; font-family: Arial, sans-serif;'
   >
@@ -27,40 +29,57 @@
             border='0'
             style='background-color: #ffffff; border-radius: 4px; overflow: hidden; width: 100%; max-width: 600px;'
           >
-            <!-- Header -->
-            <tr>
-              <td
-                align='center'
-                style='padding: 20px; background-color: #ffffff;'
-              >
-                <img
-                  src='https://storage.googleapis.com/iac-2-storage/c/aeb05708a4ab469b923f255dzcv3lrty/p/28f30d28069944b087d79e7b6axiib0h/logo/brand_color.png?v=454226'
-                  alt='Talus Pay Logo'
-                  width='120'
-                  style='display: block; margin-bottom: 10px; border: 0; outline: none; text-decoration: none; max-width: 100%;'
-                />
-              </td>
-            </tr>
             <!-- Content -->
             <tr>
               <td style='padding: 30px; font-size: 16px; color: #333333;'>
-                <h1
-                  style='font-size: 24px; margin: 0 0 20px; color: #333333;'
-                >Template Invoice</h1>
+                <p>Dear {{contactName}},</p>
 
-                <p style='margin: 0; line-height: 1.5em;'>Best regards,<br />The
-                  Talus Pay Team</p>
+                <p>Your invoice is attached. The payment has been automatically
+                  deducted from your account.</p>
+
+                <p>Thank you for your business &mdash; we appreciate it very
+                  much.</p>
+
+                <div class='signature'>
+                  <p>Sincerely,</p>
+                  <p>Talus</p>
+                </div>
               </td>
             </tr>
             <!-- Divider -->
             <tr>
               <td style='padding: 0 30px;'>
-                <hr style='border: none; border-top: 1px solid #CCCCCC;' />
+                <a
+                  href='https://www.taluspay.com'
+                  style='color: #0066cc; text-decoration: none;'
+                >www.taluspay.com</a><br />
+                12712 Park Central Drive, Dallas, TX 75251<br />
+                24/7 Support:
+                <a
+                  href='tel:18007874105'
+                  style='color: #0066cc; text-decoration: none;'
+                >1-800-787-4105</a><br />
+                <a
+                  href='mailto:support@taluspay.com'
+                  style='color: #0066cc; text-decoration: none;'
+                >support@taluspay.com</a>
               </td>
             </tr>
             <!-- Footer spacing -->
             <tr>
-              <td style='height: 50px;'></td>
+              <tr>
+                <td
+                  align='left'
+                  style='padding: 20px; background-color: #ffffff;'
+                >
+                  <img
+                    src='https://storage.googleapis.com/iac-2-storage/c/aeb05708a4ab469b923f255dzcv3lrty/p/28f30d28069944b087d79e7b6axiib0h/logo/brand_color.png?v=454226'
+                    alt='Talus Pay Logo'
+                    width='120'
+                    style='display: block; margin-bottom: 10px; border: 0; outline: none; text-decoration: none; max-width: 100%;'
+                  />
+                </td>
+              </tr>
             </tr>
           </table>
           <!-- End Main container -->
@@ -68,4 +87,5 @@
       </tr>
     </table>
   </body>
+
 </html>

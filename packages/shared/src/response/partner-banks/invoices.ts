@@ -31,6 +31,15 @@ export interface MSPMerchantBillingRecord {
   /** Unique merchant identifier in Iris system */
   IrisMId: string;
 
+  /** Merchant name in Iris system */
+  DBAName: string;
+
+  /** Merchant Contact name in Iris system */
+  ContactName: string;
+
+  /** Merchant Contact email in Iris system */
+  ContactEmailAddress: string;
+
   /** Generated invoice number in format MSP-{number} */
   InvoiceNumber: string;
 
