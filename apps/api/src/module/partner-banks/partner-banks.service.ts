@@ -158,7 +158,7 @@ export class PartnerBanksService {
             const defaultOptions: PDFPageDrawTextOptions = {
               font,
               size: 11,
-              color: rgb(20, 20, 20),
+              color: rgb(0, 0, 0),
             };
             const pages = invoiceTemplate.getPages();
             const firstPage = pages[0];
