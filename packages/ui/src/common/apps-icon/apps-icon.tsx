@@ -7,7 +7,7 @@ const dashboardsProduction = [
   {
     id: 3,
     name: 'Dashboard Risk Radar',
-    url: 'https://dashboard.taluspay.com',
+    url: 'https://dashboard.taluspay.com/risk-radar',
   },
 ];
 
@@ -25,7 +25,7 @@ const dashboardsStaging = [
   {
     id: 3,
     name: 'Dashboard Risk Radar',
-    url: 'https://dashboard.taluspay-staging.com',
+    url: 'https://dashboard.taluspay-staging.com/risk-radar',
   },
 ];
 

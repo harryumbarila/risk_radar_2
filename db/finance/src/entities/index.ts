@@ -7,6 +7,7 @@ export * from './dft-256-batch';
 export * from './dft-256-transaction';
 export * from './dft-256-transaction-from-legacy-system.entity';
 export * from './fsp-risk-radar-exception-points.entity';
+export * from './partner-bank-monthly-billing.entity';
 export * from './pos-entry-modes-adf.entity';
 export * from './risk-radar-batch.entity';
 export * from './risk-radar-cycle-time-monitor.entity';
