@@ -43,23 +43,17 @@ export interface MSPMerchantBillingRecord {
   /** Generated invoice number in format MSP-{number} */
   InvoiceNumber: string;
 
-  /** Legal business name of the merchant */
-  LegalName: string;
-
-  /** Full name of the business owner */
-  sOwner: string;
-
   /** Legal business address */
-  LegalAddress: string;
+  DBAAddress: string;
 
   /** City for legal address */
-  LegalCity: string;
+  DBACity: string;
 
   /** State for legal address (2-letter code) */
-  LegalState: string;
+  DBAState: string;
 
   /** ZIP code for legal address */
-  LegalZIP: string;
+  DBAZIP: string;
 
   /** Monthly sales volume amount */
   dMMFSalesVolume: number;

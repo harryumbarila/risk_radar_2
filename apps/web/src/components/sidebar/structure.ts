@@ -1,4 +1,4 @@
-import { ChartColumnStacked, Link2, Radar } from 'lucide-react';
+import { ChartColumnStacked, Link2, Radar, UserPen } from 'lucide-react';
 
 import type { ResourceKey } from '@/types/permissions';
 
@@ -34,6 +34,13 @@ const sidebarStructure: SidebarItem[] = [
         name: 'ATTRIBUTION_LINK',
         link: '/attribution-url',
         icon: Link2,
+      },
+      {
+        id: 'msp-merchant-invoice',
+        title: 'MSP Merchant Invoice',
+        name: 'RISK_RADAR', // FIXME: Add permission
+        link: '/partner-bank',
+        icon: UserPen,
       },
     ],
   },
