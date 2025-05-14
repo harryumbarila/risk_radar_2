@@ -1,12 +1,13 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { Public } from '@/api/shared/auth/decorator/public.decorator';
+import { InternalApiKeyGuard } from '@/api/shared/guard/internal-api-key.guard';
 
 import { ListInvoiceInputDto } from './dto/get-invoce.dto';
 import { PartnerBanksService } from './partner-banks.service';
 
-@ApiTags('risk-radar')
+@ApiTags('partner-banks')
 @Controller('v1/partner-banks')
 export class PartnerBanksController {
   public constructor(
@@ -45,11 +46,12 @@ export class PartnerBanksController {
   })
   @ApiOperation({
     operationId: 'partner-banks-invoice-url',
-    summary: 'Retrieve invoice url from s3',
+    summary: 'Execute msp mernchant invoice generation',
   })
-  @Get('test')
+  @Post('execute')
   @Public()
-  public async fillInvoiceTest() {
-    return this.partnerBanksService.fillInvoiceTemplateTest();
+  @UseGuards(InternalApiKeyGuard)
+  public async sendInvoices() {
+    return this.partnerBanksService.fillInvoiceTemplate();
   }
 }
