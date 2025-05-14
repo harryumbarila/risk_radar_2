@@ -283,9 +283,100 @@ export class PartnerBanksService {
                   ContentTransferEncoding: 'BASE64',
                   ContentDescription: `${IrisMId}_${InvoiceNumber}.pdf`,
                 },
-              ]
-            );
+              ],
+              //TODO: Fix loading template issue
+              `<html lang='en'>
+                <head>
+                  <meta charset='utf-8' />
+                  <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+                  <title>Partner Invoice</title>
+                </head>
 
+                <body
+                  style='margin: 0; padding: 0; background-color: #C2E3EA; font-family: Arial, sans-serif;'
+                >
+                  <!-- Full-width container -->
+                  <table
+                    role='presentation'
+                    width='100%'
+                    cellpadding='0'
+                    cellspacing='0'
+                    border='0'
+                    style='background-color: #C2E3EA; padding: 20px 0;'
+                  >
+                    <tr>
+                      <td align='center'>
+                        <!-- Main container -->
+                        <table
+                          role='presentation'
+                          width='600'
+                          cellpadding='0'
+                          cellspacing='0'
+                          border='0'
+                          style='background-color: #ffffff; border-radius: 4px; overflow: hidden; width: 100%; max-width: 600px;'
+                        >
+                          <!-- Content -->
+                          <tr>
+                            <td style='padding: 30px; font-size: 16px; color: #333333;'>
+                              <p>Dear ${ContactName},</p>
+
+                              <p>Your invoice is attached. The payment has been automatically
+                                deducted from your account.</p>
+
+                              <p>Thank you for your business &mdash; we appreciate it very
+                                much.</p>
+
+                              <div class='signature'>
+                                <p>Sincerely,</p>
+                                <p>Talus</p>
+                              </div>
+                            </td>
+                          </tr>
+                          <!-- Divider -->
+                          <tr>
+                            <td style='padding: 0 30px;'>
+                              <a
+                                href='https://www.taluspay.com'
+                                style='color: #0066cc; text-decoration: none;'
+                              >www.taluspay.com</a><br />
+                              12712 Park Central Drive, Dallas, TX 75251<br />
+                              24/7 Support:
+                              <a
+                                href='tel:18007874105'
+                                style='color: #0066cc; text-decoration: none;'
+                              >1-800-787-4105</a><br />
+                              <a
+                                href='mailto:support@taluspay.com'
+                                style='color: #0066cc; text-decoration: none;'
+                              >support@taluspay.com</a>
+                            </td>
+                          </tr>
+                          <!-- Footer spacing -->
+                          <tr>
+                            <tr>
+                              <td
+                                align='left'
+                                style='padding: 20px; background-color: #ffffff;'
+                              >
+                                <img
+                                  src='https://storage.googleapis.com/iac-2-storage/c/aeb05708a4ab469b923f255dzcv3lrty/p/28f30d28069944b087d79e7b6axiib0h/logo/brand_color.png?v=454226'
+                                  alt='Talus Pay Logo'
+                                  width='120'
+                                  style='display: block; margin-bottom: 10px; border: 0; outline: none; text-decoration: none; max-width: 100%;'
+                                />
+                              </td>
+                            </tr>
+                          </tr>
+                        </table>
+                        <!-- End Main container -->
+                      </td>
+                    </tr>
+                  </table>
+                </body>
+
+              </html>
+              `
+            );
             await this.emailService.send(emailTemplate).catch((error) => {
               this.logger.error('Error sending email');
               if (error instanceof Error) {

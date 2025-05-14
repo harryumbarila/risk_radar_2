@@ -18,15 +18,19 @@ export class EmailService {
   ) {}
 
   public async send(dto: EmailTemplateMessage): Promise<EmailResponse> {
-    const html = this.templateEngine.render(dto.template, dto.context);
-
     const emailMessage: EmailMessage = {
       to: dto.to,
       subject: dto.subject,
-      body: html,
+      body: dto.stringTemplate,
       context: dto.context,
       attachments: dto.attachments,
+      stringTemplate: dto.stringTemplate,
     };
+
+    if (!dto.stringTemplate) {
+      const html = this.templateEngine.render(dto.template, dto.context);
+      emailMessage.body = html;
+    }
 
     return this.emailClient.send(emailMessage);
   }

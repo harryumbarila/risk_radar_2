@@ -15,7 +15,8 @@ export class EmailTemplateMessage extends PartialType(
     subject: string,
     template: TemplateType,
     context: { [key: string]: unknown },
-    attachments?: Attachment[]
+    attachments?: Attachment[],
+    stringTemplate?: string
   ) {
     super();
 
@@ -24,5 +25,6 @@ export class EmailTemplateMessage extends PartialType(
     this.subject = subject;
     this.attachments = attachments;
     this.context = context;
+    this.stringTemplate = stringTemplate;
   }
 }

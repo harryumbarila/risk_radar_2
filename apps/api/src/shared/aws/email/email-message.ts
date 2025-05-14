@@ -8,6 +8,8 @@ export class EmailMessage {
   public context: { [key: string]: unknown };
 
   public attachments?: Attachment[];
+
+  public stringTemplate?: string;
 }
 /**
  * Represents an email attachment with all relevant metadata
