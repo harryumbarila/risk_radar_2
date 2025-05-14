@@ -48,8 +48,8 @@ export class PartnerBanksController {
     operationId: 'partner-banks-invoice-url',
     summary: 'Execute msp mernchant invoice generation',
   })
-  @Post('execute')
   @Public()
+  @Post('execute')
   @UseGuards(InternalApiKeyGuard)
   public async sendInvoices() {
     return this.partnerBanksService.fillInvoiceTemplate();
