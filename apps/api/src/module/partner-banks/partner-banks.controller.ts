@@ -1,6 +1,8 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+import { Public } from '@/api/shared/auth/decorator/public.decorator';
+
 import { ListInvoiceInputDto } from './dto/get-invoce.dto';
 import { PartnerBanksService } from './partner-banks.service';
 
@@ -35,5 +37,19 @@ export class PartnerBanksController {
   @Get('download-url')
   public async getDownloadUrl(@Query('key') key: string) {
     return this.partnerBanksService.getDownloadUrl(key);
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'The invoices from aws',
+  })
+  @ApiOperation({
+    operationId: 'partner-banks-invoice-url',
+    summary: 'Retrieve invoice url from s3',
+  })
+  @Get('test')
+  @Public()
+  public async fillInvoiceTest() {
+    return this.partnerBanksService.fillInvoiceTemplateTest();
   }
 }
