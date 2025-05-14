@@ -31,7 +31,7 @@ export class VersionResolver {
     }
 
     return {
-      version: '1.0.0',
+      version: '1.0.1',
       branch: 'master',
       commit: 'latest',
       created_at: '',
