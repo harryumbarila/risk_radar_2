@@ -23,8 +23,11 @@ export class MSPMerchantMonthlyBilling {
   @Column({ name: 'dtACHBilled', type: 'datetime', nullable: true })
   public dtACHBilled: Date | null;
 
-  @Column({ name: 'dtInvoiced', type: 'datetime', nullable: true })
-  public dtInvoiced: Date | null;
+  @Column({ name: 'dtInvoiceGenerated', type: 'datetime', nullable: true })
+  public dtInvoiceGenerated: Date | null;
+
+  @Column({ name: 'dtInvoiceEmailed', type: 'datetime', nullable: true })
+  public dtInvoiceEmailed: Date | null;
 
   @Column({ name: 'dtCreated', type: 'datetime', default: () => 'GETDATE()' })
   public dtCreated: Date;

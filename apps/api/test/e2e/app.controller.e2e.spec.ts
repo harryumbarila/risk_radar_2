@@ -32,7 +32,7 @@ describe('AppController (e2e)', () => {
         .get('/')
         .expect(200)
         .expect((res) => {
-          expect(res.body).toHaveProperty('version', '1.0.0');
+          expect(res.body).toHaveProperty('version', '1.0.1');
           expect(res.body).toHaveProperty('branch', 'master');
           expect(res.body).toHaveProperty('commit', 'latest');
           expect(res.body).toHaveProperty('created_at');

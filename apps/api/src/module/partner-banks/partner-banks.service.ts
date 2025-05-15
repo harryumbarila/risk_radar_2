@@ -2,7 +2,6 @@
 import { RuntimeException } from '@nestjs/core/errors/exceptions';
 import { Injectable } from '@nestjs/common';
 
-import { Cron, CronExpression } from '@nestjs/schedule';
 import { ConfigService } from '@nestjs/config';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { InjectPinoLogger } from 'nestjs-pino';
@@ -46,7 +45,10 @@ export class PartnerBanksService {
     this.bucketName = this.configService.get('AWS_PARTNER_BANK_INVOICE_BUCKET');
   }
 
-  @Cron(CronExpression.EVERY_10_SECONDS, { name: 'schedulerSendInvoice' })
+  // @Cron(CronExpression.EVERY_10_SECONDS, {
+  //   name: 'schedulerSendInvoice',
+  //   waitForCompletion: true,
+  // })
   public async schedulerSendInvoice() {
     this.logger.info('Scheduler schedulerSendInvoice started');
 
@@ -70,25 +72,26 @@ export class PartnerBanksService {
     MSPMerchantBillingRecord[] | undefined
   > {
     const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = (currentDate.getMonth() + 1)
+    currentDate.setMonth(currentDate.getMonth() - 1);
+
+    const previousYear = currentDate.getFullYear();
+    const previousMonth = (currentDate.getMonth() + 1)
       .toString()
       .padStart(2, '0');
-    const currentYYYYMM = `${currentYear}${currentMonth}`;
+
+    const previousYYYYMM = `${previousYear}${previousMonth}`;
     const query = `
       SELECT 
         b.pk,
         l.IrisMId,
-        lbi.DBAName,
         lbi.ContactName,
-	      lbi.ContactEmailAddress,
+        lbi.ContactEmailAddress,
         'MSP' + '-' + CONVERT(VARCHAR(25), b.pk) AS InvoiceNumber,
-        lbi.LegalName,
-        lo.FirstName + ' ' + lo.LastName AS sOwner,
-        lbi.LegalAddress,
-        lbi.LegalCity,
-        lbi.LegalState,
-        lbi.LegalZIP,
+        lbi.DBAName,
+        lbi.DBAAddress,
+        lbi.DBACity,
+        lbi.DBAState,
+        lbi.DBAZIP,
         b.dMMFSalesVolume,
         b.dMMFRate,
         b.dMMFBilledAmt
@@ -98,8 +101,9 @@ export class PartnerBanksService {
         JOIN LeadsBusinessInformation lbi ON lbi.LeadId = l.Id
         JOIN LeadsOwner lo ON lo.LeadId = l.id
       WHERE
-        b.sYYYYMM = '${currentYYYYMM}' AND
-        b.dtInvoiced IS NULL
+        b.sYYYYMM = '${previousYYYYMM}' AND
+        b.dtACHBilled is not NULL AND
+        b.dtInvoiceGenerated is NULL
     `;
 
     try {
@@ -139,12 +143,12 @@ export class PartnerBanksService {
         throw new RuntimeException(`Template buffer not loaded for lead `);
       }
 
-      // Get the width and height of the first page
-
       const partners = await this.getUnInvoicedMSPMerchants();
       if (!partners || partners.length === 0) {
         this.logger.info('No un-invoiced partners found');
-        return;
+        return {
+          status: 'success',
+        };
       }
       while (partners.length > 0) {
         await Promise.all(
@@ -162,20 +166,19 @@ export class PartnerBanksService {
             };
             const pages = invoiceTemplate.getPages();
             const firstPage = pages[0];
+
             const { width, height } = firstPage.getSize();
 
             const {
               pk,
               DBAName,
-              // ContactEmailAddress,
+              ContactEmailAddress,
               ContactName,
               InvoiceNumber,
-              LegalName,
-              sOwner,
-              LegalAddress,
-              LegalCity,
-              LegalState,
-              LegalZIP,
+              DBAAddress,
+              DBACity,
+              DBAState,
+              DBAZIP,
               dMMFSalesVolume,
               dMMFRate,
               dMMFBilledAmt,
@@ -197,22 +200,22 @@ export class PartnerBanksService {
                 y: height - 108,
               },
               name: {
-                label: LegalName,
+                label: DBAName,
                 x: 80,
                 y: height - 190,
               },
               legalName: {
-                label: sOwner,
+                label: ContactName,
                 x: 80,
                 y: height - 204,
               },
               address: {
-                label: LegalAddress,
+                label: DBAAddress,
                 x: 80,
                 y: height - 218,
               },
               city: {
-                label: `${LegalCity}, ${LegalState} ${LegalZIP}`,
+                label: `${DBACity}, ${DBAState} ${DBAZIP}`,
                 x: 80,
                 y: height - 232,
               },
@@ -265,40 +268,50 @@ export class PartnerBanksService {
               'application/pdf'
             );
             await this.mspMerchantMonthlyBillingRepository.update(pk, {
-              dtInvoiced: () => 'GETDATE()',
+              dtInvoiceGenerated: () => 'GETDATE()',
             });
-            const emailTemplate = new EmailTemplateMessage(
-              ['crhistian@solvedex.com'], //FIXME: Test email
-              `${DBAName} Invoice From Talus`,
-              'partner-invoice',
-              {
-                contactName: ContactName,
-              },
-              [
-                {
-                  FileName: `${IrisMId}_${InvoiceNumber}.pdf`,
-                  RawContent: pdf,
-                  ContentType: 'application/pdf',
-                  ContentDisposition: 'ATTACHMENT',
-                  ContentTransferEncoding: 'BASE64',
-                  ContentDescription: `${IrisMId}_${InvoiceNumber}.pdf`,
-                },
-              ]
-            );
 
-            await this.emailService.send(emailTemplate).catch((error) => {
-              this.logger.error('Error sending email');
-              if (error instanceof Error) {
+            if (ContactEmailAddress) {
+              const emailTemplate = new EmailTemplateMessage(
+                [ContactEmailAddress], //FIXME: Test email
+                `${DBAName} Invoice From Talus`,
+                'partner-invoice',
+                {
+                  contactName: ContactName,
+                },
+                [
+                  {
+                    FileName: `${IrisMId}_${InvoiceNumber}.pdf`,
+                    RawContent: pdf,
+                    ContentType: 'application/pdf',
+                    ContentDisposition: 'ATTACHMENT',
+                    ContentTransferEncoding: 'BASE64',
+                    ContentDescription: `${IrisMId}_${InvoiceNumber}.pdf`,
+                  },
+                ]
+              );
+              try {
+                await this.emailService.send(emailTemplate);
+                await this.mspMerchantMonthlyBillingRepository.update(pk, {
+                  dtInvoiceEmailed: () => 'GETDATE()',
+                });
+              } catch (error) {
+                if (error instanceof Error) {
+                  this.logger.error(`Error sending email: ${error.message}`);
+                }
                 this.logger.error(error);
               }
-              this.logger.error(error);
-            });
-            /* eslint-disable no-await-in-loop */
+            }
           })
         );
       }
+
+      return {
+        status: 'success',
+      };
     } catch (error) {
-      this.logger.error('Error filling invoice template', error);
+      this.logger.error('Error filling invoice template');
+      this.logger.error(error);
       throw new RuntimeException(`Error filling invoice template`);
     }
   }
