@@ -150,6 +150,16 @@ export class PartnerBanksService {
           status: 'success',
         };
       }
+
+      const previousDate = new Date();
+
+      previousDate.setMonth(previousDate.getMonth() - 1);
+
+      const formatted = `(${previousDate.toLocaleDateString('en-US', {
+        month: 'short',
+        year: 'numeric',
+      })})`;
+
       while (partners.length > 0) {
         await Promise.all(
           partners.splice(0, 10).map(async (partner) => {
@@ -195,9 +205,10 @@ export class PartnerBanksService {
                 y: height - 108,
               },
               invoice: {
-                label: InvoiceNumber,
-                x: width - 134,
+                label: `${InvoiceNumber} ${formatted}`,
+                x: width - 145,
                 y: height - 108,
+                size: 9,
               },
               name: {
                 label: DBAName,
