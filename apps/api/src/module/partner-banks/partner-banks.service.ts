@@ -72,11 +72,14 @@ export class PartnerBanksService {
     MSPMerchantBillingRecord[] | undefined
   > {
     const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = (currentDate.getMonth() + 1)
+    currentDate.setMonth(currentDate.getMonth() - 1);
+
+    const previousYear = currentDate.getFullYear();
+    const previousMonth = (currentDate.getMonth() + 1)
       .toString()
       .padStart(2, '0');
-    const currentYYYYMM = `${currentYear}${currentMonth}`;
+
+    const previousYYYYMM = `${previousYear}${previousMonth}`;
     const query = `
       SELECT 
         b.pk,
@@ -98,7 +101,7 @@ export class PartnerBanksService {
         JOIN LeadsBusinessInformation lbi ON lbi.LeadId = l.Id
         JOIN LeadsOwner lo ON lo.LeadId = l.id
       WHERE
-        b.sYYYYMM = '${currentYYYYMM}' AND
+        b.sYYYYMM = '${previousYYYYMM}' AND
         b.dtACHBilled is not NULL AND
         b.dtInvoiceGenerated is NULL
     `;
