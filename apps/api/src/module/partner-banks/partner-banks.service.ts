@@ -97,7 +97,7 @@ export class PartnerBanksService {
         b.dMMFBilledAmt
       FROM
         finance..tblMSPMerchantsMonthlyBilling b
-        JOIN leads l ON l.IrisMId = b.sMId
+        JOIN leads l ON l.IrisMId = b.sMId AND l.IsArchived = 0
         JOIN LeadsBusinessInformation lbi ON lbi.LeadId = l.Id
         JOIN LeadsOwner lo ON lo.LeadId = l.id
       WHERE
@@ -125,13 +125,6 @@ export class PartnerBanksService {
 
   public async fillInvoiceTemplate() {
     try {
-      const currentDate = new Date();
-      const formattedDate = `${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getDate().toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
-      const currentYear = currentDate.getFullYear();
-      const currentMonth = (currentDate.getMonth() + 1)
-        .toString()
-        .padStart(2, '0');
-      const currentYYYYMM = `${currentYear}${currentMonth}`;
       const file = await this.s3Service.getFile(
         this.bucketName,
         'invoice-template.pdf'
@@ -159,6 +152,13 @@ export class PartnerBanksService {
         month: 'short',
         year: 'numeric',
       })})`;
+
+      const formattedDate = `${(previousDate.getMonth() + 1).toString().padStart(2, '0')}/${previousDate.getDate().toString().padStart(2, '0')}/${previousDate.getFullYear()}`;
+      const year = previousDate.getFullYear();
+      const previousMonth = (previousDate.getMonth() + 1)
+        .toString()
+        .padStart(2, '0');
+      const previousYYYYMM = `${year}${previousMonth}`;
 
       while (partners.length > 0) {
         await Promise.all(
@@ -271,7 +271,7 @@ export class PartnerBanksService {
             const pdf = Buffer.from(filledPdf);
 
             // Save the modified PDF document
-            const fileName = `invoices/${currentYYYYMM}/${IrisMId}_${InvoiceNumber}.pdf`;
+            const fileName = `invoices/${previousYYYYMM}/${IrisMId}_${InvoiceNumber}.pdf`;
             await this.s3Service.uploadFile(
               this.bucketName,
               pdf,
