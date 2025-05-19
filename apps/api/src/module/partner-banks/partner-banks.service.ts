@@ -97,7 +97,7 @@ export class PartnerBanksService {
         b.dMMFBilledAmt
       FROM
         finance..tblMSPMerchantsMonthlyBilling b
-        JOIN leads l ON l.IrisMId = b.sMId
+        JOIN leads l ON l.IrisMId = b.sMId AND l.IsArchived = 0
         JOIN LeadsBusinessInformation lbi ON lbi.LeadId = l.Id
         JOIN LeadsOwner lo ON lo.LeadId = l.id
       WHERE
