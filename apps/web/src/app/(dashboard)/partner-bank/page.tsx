@@ -19,7 +19,6 @@ import { useFilteredPartnerInvoice } from '@/web/src/hooks/partner-bank/use-get-
 const PartnerBankPage: React.FC = () => {
   const { data, isLoading, error, fetchData, filters } =
     useFilteredPartnerInvoice();
-
   const { fetchData: fetchInvoiceUrl } = usePartnerInvoiceUrl();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,6 +29,16 @@ const PartnerBankPage: React.FC = () => {
     fetchData(filters);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  React.useEffect(() => {
+    if (data?.nextContinuationToken && !pageTokens[currentPage + 1]) {
+      setPageTokens((prev) => ({
+        ...prev,
+        [currentPage + 1]: data.nextContinuationToken,
+      }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data?.nextContinuationToken, currentPage]);
 
   const normalizePrefixForApi = (prefix?: string): undefined | string => {
     return prefix === '' || prefix === '/' ? undefined : prefix;
@@ -87,6 +96,10 @@ const PartnerBankPage: React.FC = () => {
   };
 
   const goToPage = (page: number): void => {
+    if (page === currentPage || (page > 1 && !pageTokens[page])) {
+      return;
+    }
+
     fetchData({
       ...filters,
       prefix: normalizePrefixForApi(data.currentPrefix),
