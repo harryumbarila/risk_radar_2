@@ -262,7 +262,7 @@ export class PartnerBanksService {
 
             Object.values(fields).forEach((value) => {
               const { label, ...options } = value;
-              firstPage.drawText(label, {
+              firstPage.drawText(label || '', {
                 ...defaultOptions,
                 ...options,
               });
