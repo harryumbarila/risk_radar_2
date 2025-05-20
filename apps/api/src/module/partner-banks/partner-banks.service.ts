@@ -146,6 +146,8 @@ export class PartnerBanksService {
 
       const previousDate = new Date();
 
+      const formattedDate = `${(previousDate.getMonth() + 1).toString().padStart(2, '0')}/${previousDate.getDate().toString().padStart(2, '0')}/${previousDate.getFullYear()}`;
+
       previousDate.setMonth(previousDate.getMonth() - 1);
 
       const formatted = `(${previousDate.toLocaleDateString('en-US', {
@@ -153,7 +155,6 @@ export class PartnerBanksService {
         year: 'numeric',
       })})`;
 
-      const formattedDate = `${(previousDate.getMonth() + 1).toString().padStart(2, '0')}/${previousDate.getDate().toString().padStart(2, '0')}/${previousDate.getFullYear()}`;
       const year = previousDate.getFullYear();
       const previousMonth = (previousDate.getMonth() + 1)
         .toString()

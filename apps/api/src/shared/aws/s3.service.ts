@@ -77,7 +77,7 @@ export class S3Service {
   public async listObjects(
     input: S3PaginationInput
   ): Promise<InvoiceResponseDto> {
-    const { bucketName, maxKeys = 50, prefix = '', continuationToken } = input;
+    const { bucketName, maxKeys = 100, prefix = '', continuationToken } = input;
     const params: ListObjectsV2CommandInput = {
       Bucket: bucketName,
       Prefix: prefix,
