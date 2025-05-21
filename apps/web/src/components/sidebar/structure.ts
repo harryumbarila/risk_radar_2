@@ -1,4 +1,10 @@
-import { ChartColumnStacked, Link2, Radar, UserPen } from 'lucide-react';
+import {
+  ChartCandlestick,
+  ChartColumnStacked,
+  Link2,
+  Radar,
+  UserPen,
+} from 'lucide-react';
 
 import type { ResourceKey } from '@/types/permissions';
 
@@ -41,6 +47,13 @@ const sidebarStructure: SidebarItem[] = [
         name: 'RISK_RADAR', // FIXME: Add permission
         link: '/partner-bank',
         icon: UserPen,
+      },
+      {
+        id: 'tsys-fiu',
+        title: 'TSYS FIU',
+        name: 'RISK_RADAR', // FIXME: Add permission
+        link: '/tsys-fiu',
+        icon: ChartCandlestick,
       },
     ],
   },
