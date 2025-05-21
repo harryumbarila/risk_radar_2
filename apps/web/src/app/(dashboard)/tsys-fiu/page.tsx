@@ -16,7 +16,7 @@ import {
 import { usePartnerInvoiceUrl } from '@/web/src/hooks/partner-bank/use-get-invoice-url';
 import { useFilteredPartnerInvoice } from '@/web/src/hooks/partner-bank/use-get-invoices';
 
-const PartnerBankPage: React.FC = () => {
+const TyssFiuPage: React.FC = () => {
   const { data, isLoading, error, fetchData } = useFilteredPartnerInvoice();
   const { fetchData: fetchInvoiceUrl } = usePartnerInvoiceUrl();
 
@@ -26,7 +26,7 @@ const PartnerBankPage: React.FC = () => {
   }>({ 1: undefined });
   React.useEffect(() => {
     fetchData({
-      prefix: 'invoices/',
+      prefix: 'paya/',
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -49,7 +49,12 @@ const PartnerBankPage: React.FC = () => {
     return async (): Promise<void> => {
       const req = await fetchInvoiceUrl({ key });
       if (!req) return;
-      window.open(req.url, '_blank');
+      const link = document.createElement('a');
+      link.href = req.url;
+      link.download = ''; // Optional: specify a filename like 'invoice.pdf'
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     };
   };
 
@@ -269,4 +274,4 @@ const PartnerBankPage: React.FC = () => {
     </div>
   );
 };
-export default PartnerBankPage;
+export default TyssFiuPage;
