@@ -10,6 +10,10 @@ export const PERMISSIONS = {
     READ: 'talus:read:attribution-link-generator',
     WRITE: 'talus:write:attribution-link-generator',
   },
+  MSP_INVOICE: {
+    READ: 'talus:read:invoice',
+    WRITE: 'talus:write:invoice',
+  },
 };
 
 // Create a type for available resources from PERMISSIONS
