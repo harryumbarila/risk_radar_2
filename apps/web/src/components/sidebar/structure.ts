@@ -44,7 +44,7 @@ const sidebarStructure: SidebarItem[] = [
       {
         id: 'msp-merchant-invoice',
         title: 'MSP Merchant Invoice',
-        name: 'RISK_RADAR', // FIXME: Add permission
+        name: 'MSP_INVOICE',
         link: '/partner-bank',
         icon: UserPen,
       },
