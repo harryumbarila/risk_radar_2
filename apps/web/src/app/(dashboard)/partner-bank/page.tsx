@@ -142,6 +142,7 @@ const PartnerBankPage: React.FC = () => {
 
         <div className="flex max-w-[300px] gap-2">
           <input
+            value={currentSearchTerm || ''}
             type="text"
             placeholder="Search"
             className="w-full rounded border-[1.5px] border-stroke bg-transparent px-2 py-1 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
