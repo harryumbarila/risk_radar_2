@@ -14,6 +14,11 @@ export const PERMISSIONS = {
     READ: 'talus:read:invoice',
     WRITE: 'talus:write:invoice',
   },
+  TSYS_FIU: {
+    // FIXME: Create new permission
+    READ: 'talus:read:invoice',
+    WRITE: 'talus:write:invoice',
+  },
 };
 
 // Create a type for available resources from PERMISSIONS

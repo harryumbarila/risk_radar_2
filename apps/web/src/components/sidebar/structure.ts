@@ -51,7 +51,7 @@ const sidebarStructure: SidebarItem[] = [
       {
         id: 'tsys-fiu',
         title: 'TSYS FIU',
-        name: 'RISK_RADAR', // FIXME: Add permission
+        name: 'TSYS_FIU',
         link: '/tsys-fiu',
         icon: ChartCandlestick,
       },

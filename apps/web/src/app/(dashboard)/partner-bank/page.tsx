@@ -6,6 +6,7 @@ import {
   File,
   Folder,
   RefreshCw,
+  Search,
 } from 'lucide-react';
 import React, { useState } from 'react';
 
@@ -62,6 +63,14 @@ const PartnerBankPage: React.FC = () => {
   };
 
   if (error || !data) {
+    if (!data && isLoading) {
+      return (
+        <div className="flex justify-center items-center h-64">
+          <RefreshCw className="animate-spin text-blue-500 text-2xl" />
+        </div>
+      );
+    }
+
     return (
       <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded">
         Error loading data
@@ -140,30 +149,40 @@ const PartnerBankPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex max-w-[300px] gap-2">
-          <input
-            value={currentSearchTerm || ''}
-            type="text"
-            placeholder="Search"
-            className="w-full rounded border-[1.5px] border-stroke bg-transparent px-2 py-1 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-            onChange={(e) => {
-              const { value } = e.target;
-              if (value.length > 3) {
-                fetchData({
-                  prefix: normalizePrefixForApi(data.currentPrefix),
-                  searchTerm: value,
-                  continuationToken: undefined,
-                });
-              }
-              setCurrentSearchTerm(value);
-            }}
-          />
+        <div className="flex max-w-[400px] gap-2">
+          {data.objects.length > 0 ? (
+            <>
+              <input
+                value={currentSearchTerm || ''}
+                type="text"
+                placeholder="Search"
+                className="w-full rounded border-[1.5px] border-stroke bg-transparent px-2 py-1 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                onChange={(e) => setCurrentSearchTerm(e.target.value)}
+              />
+              <button
+                type="button"
+                disabled={
+                  !!(currentSearchTerm && currentSearchTerm?.length < 1)
+                }
+                onClick={() => {
+                  fetchData({
+                    prefix: normalizePrefixForApi(data.currentPrefix),
+                    searchTerm: currentSearchTerm,
+                    continuationToken: undefined,
+                  });
+                }}
+                className={`ounded ${currentSearchTerm && currentSearchTerm?.length < 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}`}
+              >
+                <Search className="size-5" />
+              </button>
+            </>
+          ) : null}
           <button
             type="button"
             onClick={refresh}
-            className="p-2 rounded hover:bg-gray-100"
+            className="rounded hover:bg-gray-100"
           >
-            <RefreshCw />
+            <RefreshCw className="size-5" />
           </button>
         </div>
 
