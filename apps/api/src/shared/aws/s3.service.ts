@@ -77,13 +77,20 @@ export class S3Service {
   public async listObjects(
     input: S3PaginationInput
   ): Promise<InvoiceResponseDto> {
-    const { bucketName, maxKeys = 100, prefix = '', continuationToken } = input;
+    const {
+      bucketName,
+      maxKeys = 100,
+      prefix = '',
+      continuationToken,
+      searchTerm,
+    } = input;
     const params: ListObjectsV2CommandInput = {
       Bucket: bucketName,
       Prefix: prefix,
       ContinuationToken: continuationToken,
       Delimiter: '/', // This ensures we get proper folder structure
-      MaxKeys: maxKeys,
+      MaxKeys: searchTerm ? 1000 : maxKeys,
+      StartAfter: searchTerm ? prefix + searchTerm.toLowerCase() : undefined,
     };
 
     try {
@@ -91,14 +98,23 @@ export class S3Service {
         new ListObjectsV2Command(params)
       );
 
+      let objects = data.Contents || [];
+      if (searchTerm) {
+        const searchLower = searchTerm.toLowerCase();
+        objects = objects.filter(
+          (obj) => obj.Key && obj.Key.toLowerCase().includes(searchLower)
+        );
+      }
+
       const result = {
-        objects: data.Contents || [],
+        objects,
         folders: (data.CommonPrefixes || []).map(
           (cPrefix) => cPrefix.Prefix || ''
         ),
         nextContinuationToken: data.NextContinuationToken,
         isTruncated: data.IsTruncated || false,
         currentPrefix: prefix || '',
+        searchTerm: searchTerm || undefined,
       } as InvoiceResponseDto;
 
       return result;

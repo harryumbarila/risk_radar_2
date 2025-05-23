@@ -16,6 +16,8 @@ import {
 import { usePartnerInvoiceUrl } from '@/web/src/hooks/partner-bank/use-get-invoice-url';
 import { useFilteredPartnerInvoice } from '@/web/src/hooks/partner-bank/use-get-invoices';
 
+const PATH_PREFIX = 'paya/';
+
 const TyssFiuPage: React.FC = () => {
   const { data, isLoading, error, fetchData } = useFilteredPartnerInvoice();
   const { fetchData: fetchInvoiceUrl } = usePartnerInvoiceUrl();
@@ -26,7 +28,7 @@ const TyssFiuPage: React.FC = () => {
   }>({ 1: undefined });
   React.useEffect(() => {
     fetchData({
-      prefix: 'paya/',
+      prefix: PATH_PREFIX,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -85,8 +87,9 @@ const TyssFiuPage: React.FC = () => {
 
   const navigateUp = (): void => {
     const currentPath = data.currentPrefix;
-    if (!currentPath || currentPath === '/') return;
-
+    if (!currentPath || currentPath === '/' || currentPath === PATH_PREFIX) {
+      return;
+    }
     const parts = currentPath.split('/').filter(Boolean);
     const parentPath =
       parts.length > 1 ? `${parts.slice(0, -1).join('/')}/` : '';
@@ -129,7 +132,7 @@ const TyssFiuPage: React.FC = () => {
             type="button"
             onClick={navigateUp}
             // disabled={!data.currentPrefix}
-            className={`p-2 rounded ${data.currentPrefix ? 'hover:bg-gray-100' : 'opacity-50 cursor-not-allowed'}`}
+            className={`p-2 rounded ${data.currentPrefix && !(data.currentPrefix === PATH_PREFIX) ? 'hover:bg-gray-100' : 'opacity-50 cursor-not-allowed'}`}
           >
             <ChevronLeft />
           </button>

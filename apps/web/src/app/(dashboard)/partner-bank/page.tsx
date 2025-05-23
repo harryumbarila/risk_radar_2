@@ -16,17 +16,25 @@ import {
 import { usePartnerInvoiceUrl } from '@/web/src/hooks/partner-bank/use-get-invoice-url';
 import { useFilteredPartnerInvoice } from '@/web/src/hooks/partner-bank/use-get-invoices';
 
+const PATH_PREFIX = 'invoices/';
+// TODO: Create a shared component for this table
+
 const PartnerBankPage: React.FC = () => {
   const { data, isLoading, error, fetchData } = useFilteredPartnerInvoice();
   const { fetchData: fetchInvoiceUrl } = usePartnerInvoiceUrl();
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [currentSearchTerm, setCurrentSearchTerm] = useState<
+    string | undefined
+  >(undefined);
   const [pageTokens, setPageTokens] = useState<{
     [key: number]: string | undefined;
   }>({ 1: undefined });
+
   React.useEffect(() => {
     fetchData({
-      prefix: 'invoices/',
+      prefix: PATH_PREFIX,
+      searchTerm: currentSearchTerm,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -53,14 +61,6 @@ const PartnerBankPage: React.FC = () => {
     };
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <RefreshCw className="animate-spin text-blue-500 text-2xl" />
-      </div>
-    );
-  }
-
   if (error || !data) {
     return (
       <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded">
@@ -73,6 +73,7 @@ const PartnerBankPage: React.FC = () => {
     fetchData({
       prefix: normalizePrefixForApi(folderPath),
       continuationToken: undefined,
+      searchTerm: currentSearchTerm,
     });
     setCurrentPage(1);
     setPageTokens({ 1: undefined });
@@ -80,7 +81,9 @@ const PartnerBankPage: React.FC = () => {
 
   const navigateUp = (): void => {
     const currentPath = data.currentPrefix;
-    if (!currentPath || currentPath === '/') return;
+    if (!currentPath || currentPath === '/' || currentPath === PATH_PREFIX) {
+      return;
+    }
 
     const parts = currentPath.split('/').filter(Boolean);
     const parentPath =
@@ -89,6 +92,7 @@ const PartnerBankPage: React.FC = () => {
     fetchData({
       prefix: normalizePrefixForApi(parentPath),
       continuationToken: undefined,
+      searchTerm: currentSearchTerm,
     });
     setCurrentPage(1);
     setPageTokens({ 1: undefined });
@@ -102,7 +106,9 @@ const PartnerBankPage: React.FC = () => {
     fetchData({
       prefix: normalizePrefixForApi(data.currentPrefix),
       continuationToken: pageTokens[page],
+      searchTerm: currentSearchTerm,
     });
+
     setCurrentPage(page);
   };
 
@@ -110,8 +116,10 @@ const PartnerBankPage: React.FC = () => {
     fetchData({
       prefix: normalizePrefixForApi(data.currentPrefix),
       continuationToken: undefined,
+      searchTerm: undefined,
     });
     setCurrentPage(1);
+    setCurrentSearchTerm(undefined);
     setPageTokens({ 1: undefined });
   };
 
@@ -123,14 +131,32 @@ const PartnerBankPage: React.FC = () => {
           <button
             type="button"
             onClick={navigateUp}
-            // disabled={!data.currentPrefix}
-            className={`p-2 rounded ${data.currentPrefix ? 'hover:bg-gray-100' : 'opacity-50 cursor-not-allowed'}`}
+            className={`p-2 rounded ${data.currentPrefix && !(data.currentPrefix === PATH_PREFIX) ? 'hover:bg-gray-100' : 'opacity-50 cursor-not-allowed'}`}
           >
             <ChevronLeft />
           </button>
           <div className="text-sm text-gray-600">
             {data.currentPrefix || 'Root'}
           </div>
+        </div>
+
+        <div className="flex max-w-[300px] gap-2">
+          <input
+            type="text"
+            placeholder="Search"
+            className="w-full rounded border-[1.5px] border-stroke bg-transparent px-2 py-1 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+            onChange={(e) => {
+              const { value } = e.target;
+              if (value.length > 3) {
+                fetchData({
+                  prefix: normalizePrefixForApi(data.currentPrefix),
+                  searchTerm: value,
+                  continuationToken: undefined,
+                });
+              }
+              setCurrentSearchTerm(value);
+            }}
+          />
           <button
             type="button"
             onClick={refresh}
@@ -169,102 +195,114 @@ const PartnerBankPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Name
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Last Modified
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Size
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Type
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {/* Folders first */}
-            {data.folders.map((folder) => {
-              const folderName = folder
-                .replace(data.currentPrefix || '', '')
-                .replace(/\/$/, '');
-              return (
-                <tr
-                  key={folder}
-                  className="hover:bg-blue-50 cursor-pointer"
-                  onClick={() => navigateToFolder(folder)}
-                >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <Folder className="flex-shrink-0 h-5 w-5 text-blue-500" />
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-blue-600">
-                          {folderName}
-                        </div>
-                        <div className="text-sm text-gray-500">{folder}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    -
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    -
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    Folder
-                  </td>
-                </tr>
-              );
-            })}
-
-            {/* Files */}
-            {data.objects.map((file) => {
-              const fileName = file.Key.split('/').pop() || file.Key;
-              return (
-                <tr
-                  key={file.Key}
-                  className="hover:bg-gray-50 cursor-pointer"
-                  onClick={handleDownload(file.Key)}
-                >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <File className="flex-shrink-0 h-5 w-5 text-gray-400" />
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {fileName}
-                        </div>
-                        <div className="text-sm text-gray-500">{file.Key}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatDate(file.LastModified)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatFileSize(file.Size)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {file.StorageClass}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Empty state */}
-      {data.objects.length === 0 && data.folders.length === 0 && (
-        <div className="p-8 text-center text-gray-500">
-          This folder is empty
+      {isLoading ? (
+        <div className="flex justify-center items-center h-64">
+          <RefreshCw className="animate-spin text-blue-500 text-2xl" />
         </div>
+      ) : (
+        <>
+          {/* Table */}
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Last Modified
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Size
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Type
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {/* Folders first */}
+                {data.folders.map((folder) => {
+                  const folderName = folder
+                    .replace(data.currentPrefix || '', '')
+                    .replace(/\/$/, '');
+                  return (
+                    <tr
+                      key={folder}
+                      className="hover:bg-blue-50 cursor-pointer"
+                      onClick={() => navigateToFolder(folder)}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <Folder className="flex-shrink-0 h-5 w-5 text-blue-500" />
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-blue-600">
+                              {folderName}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {folder}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        -
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        -
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        Folder
+                      </td>
+                    </tr>
+                  );
+                })}
+
+                {/* Files */}
+                {data.objects.map((file) => {
+                  const fileName = file.Key.split('/').pop() || file.Key;
+                  return (
+                    <tr
+                      key={file.Key}
+                      className="hover:bg-gray-50 cursor-pointer"
+                      onClick={handleDownload(file.Key)}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <File className="flex-shrink-0 h-5 w-5 text-gray-400" />
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">
+                              {fileName}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {file.Key}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {formatDate(file.LastModified)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {formatFileSize(file.Size)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {file.StorageClass}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Empty state */}
+          {data.objects.length === 0 && data.folders.length === 0 && (
+            <div className="p-8 text-center text-gray-500">
+              This folder is empty
+            </div>
+          )}
+        </>
       )}
     </div>
   );
