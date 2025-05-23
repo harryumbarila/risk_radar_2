@@ -65,7 +65,8 @@ export const Sidebar: FC<SidebarProps> = () => {
     index: number,
     recursive: number = 0
   ): JSX.Element => {
-    const classesActive = activeName === item.link ? 'active' : '';
+    const isMatch = activeName === item.link || activeName === item.name;
+    const classesActive = isMatch ? 'active' : '';
 
     return (
       <li key={index}>
@@ -93,13 +94,11 @@ export const Sidebar: FC<SidebarProps> = () => {
               'pl-11': recursive === 1,
               'pl-16': recursive > 1,
               'bg-graydark dark:bg-meta-4':
-                activeName === item.link ||
-                activeName.split('.')[0] === item.link,
+                isMatch || activeName.split('.')[0] === item.link,
               'text-slate-400':
-                activeName !== item.link &&
-                activeName.split('.')[0] !== item.link,
+                !isMatch && activeName.split('.')[0] !== item.link,
               'text-slate-200':
-                activeName !== item.link &&
+                !isMatch &&
                 activeName.split('.')[0] !== item.link &&
                 isExpandOnHover,
             },
