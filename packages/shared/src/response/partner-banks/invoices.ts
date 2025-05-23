@@ -4,6 +4,7 @@ export interface InvoiceResponseDto {
   nextContinuationToken: string;
   isTruncated: boolean;
   currentPrefix: string;
+  searchTerm?: string; // Add this
 }
 
 export interface File {
