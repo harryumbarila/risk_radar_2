@@ -5,9 +5,8 @@ import type { InvoiceResponseDto } from '@/shared/response';
 
 export type InvoicePaginationFilterState = {
   prefix?: string;
-
   continuationToken?: string;
-
+  searchTerm?: string;
   maxKeys?: number;
 };
 

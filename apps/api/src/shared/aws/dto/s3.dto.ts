@@ -41,6 +41,16 @@ export class S3PaginationInput {
   @Min(1)
   public maxKeys?: number = 100;
 
+  @ApiPropertyOptional({
+    description: 'Search term',
+    required: false,
+    default: 100,
+    example: 100,
+  })
+  @IsOptional()
+  @IsString()
+  public searchTerm?: string;
+
   @Allow()
   public bucketName: string;
 }
