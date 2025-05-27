@@ -1,3 +1,4 @@
+/* eslint-disable */
 import type {
   ListObjectsV2CommandInput,
   ListObjectsV2CommandOutput,
@@ -7,6 +8,7 @@ import {
   ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
+  _Object,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Inject, Injectable } from '@nestjs/common';
@@ -118,6 +120,81 @@ export class S3Service {
       } as InvoiceResponseDto;
 
       return result;
+    } catch (error) {
+      this.logger.error('Error listing S3 objects:', error);
+      throw error;
+    }
+  }
+
+  public async listObjectsWithSearch(
+    input: S3PaginationInput
+  ): Promise<InvoiceResponseDto> {
+    const {
+      bucketName,
+      maxKeys = 100,
+      prefix = '',
+      continuationToken,
+      searchTerm,
+    } = input;
+
+    const paramsBase: ListObjectsV2CommandInput = {
+      Bucket: bucketName,
+      Prefix: prefix,
+      Delimiter: '/', // Keeps folder structure
+    };
+
+    try {
+      if (!searchTerm) {
+        const params = {
+          ...paramsBase,
+          MaxKeys: maxKeys,
+          ContinuationToken: continuationToken,
+        };
+
+        const data: ListObjectsV2CommandOutput = await this.s3Client.send(
+          new ListObjectsV2Command(params)
+        );
+
+        return {
+          objects: data.Contents || [],
+          folders: (data.CommonPrefixes || []).map((c) => c.Prefix || ''),
+          nextContinuationToken: data.NextContinuationToken,
+          isTruncated: data.IsTruncated || false,
+          currentPrefix: prefix,
+          searchTerm: undefined,
+        } as InvoiceResponseDto;
+      } else {
+        let allObjects: _Object[] = [];
+        let nextToken: string | undefined = continuationToken;
+
+        do {
+          const data: ListObjectsV2CommandOutput = await this.s3Client.send(
+            new ListObjectsV2Command({
+              ...paramsBase,
+              Delimiter: undefined, // Disable folder grouping for full object traversal
+              ContinuationToken: nextToken,
+              MaxKeys: 1000,
+            })
+          );
+
+          allObjects.push(...(data.Contents || []));
+          nextToken = data.IsTruncated ? data.NextContinuationToken : undefined;
+        } while (nextToken);
+
+        const searchLower = searchTerm.toLowerCase();
+        const filteredObjects = allObjects.filter(
+          (obj) => obj.Key && obj.Key.toLowerCase().includes(searchLower)
+        );
+
+        return {
+          objects: filteredObjects,
+          folders: [], // Folder data not collected in full search
+          nextContinuationToken: undefined,
+          isTruncated: false,
+          currentPrefix: prefix,
+          searchTerm,
+        } as InvoiceResponseDto;
+      }
     } catch (error) {
       this.logger.error('Error listing S3 objects:', error);
       throw error;

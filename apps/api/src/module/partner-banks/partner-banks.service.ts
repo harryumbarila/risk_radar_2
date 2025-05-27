@@ -58,7 +58,7 @@ export class PartnerBanksService {
   public async getInvoices(
     input: ListInvoiceInputDto
   ): Promise<InvoiceResponseDto> {
-    return this.s3Service.listObjects({
+    return this.s3Service.listObjectsWithSearch({
       ...input,
       bucketName: this.bucketName,
     });
@@ -150,11 +150,6 @@ export class PartnerBanksService {
 
       previousDate.setMonth(previousDate.getMonth() - 1);
 
-      const formatted = `(${previousDate.toLocaleDateString('en-US', {
-        month: 'short',
-        year: 'numeric',
-      })})`;
-
       const year = previousDate.getFullYear();
       const previousMonth = (previousDate.getMonth() + 1)
         .toString()
@@ -183,7 +178,7 @@ export class PartnerBanksService {
             const {
               pk,
               DBAName,
-              ContactEmailAddress,
+              // ContactEmailAddress,
               ContactName,
               InvoiceNumber,
               DBAAddress,
@@ -206,10 +201,9 @@ export class PartnerBanksService {
                 y: height - 108,
               },
               invoice: {
-                label: `${InvoiceNumber} ${formatted}`,
-                x: width - 145,
+                label: `${InvoiceNumber}`,
+                x: width - 134,
                 y: height - 108,
-                size: 9,
               },
               name: {
                 label: DBAName,
@@ -283,37 +277,37 @@ export class PartnerBanksService {
               dtInvoiceGenerated: () => 'GETDATE()',
             });
 
-            if (ContactEmailAddress) {
-              const emailTemplate = new EmailTemplateMessage(
-                [ContactEmailAddress], //FIXME: Test email
-                `${DBAName} Invoice From Talus`,
-                'partner-invoice',
-                {
-                  contactName: ContactName,
-                },
-                [
-                  {
-                    FileName: `${IrisMId}_${InvoiceNumber}.pdf`,
-                    RawContent: pdf,
-                    ContentType: 'application/pdf',
-                    ContentDisposition: 'ATTACHMENT',
-                    ContentTransferEncoding: 'BASE64',
-                    ContentDescription: `${IrisMId}_${InvoiceNumber}.pdf`,
-                  },
-                ]
-              );
-              try {
-                await this.emailService.send(emailTemplate);
-                await this.mspMerchantMonthlyBillingRepository.update(pk, {
-                  dtInvoiceEmailed: () => 'GETDATE()',
-                });
-              } catch (error) {
-                if (error instanceof Error) {
-                  this.logger.error(`Error sending email: ${error.message}`);
-                }
-                this.logger.error(error);
-              }
-            }
+            // if (ContactEmailAddress) {
+            //   const emailTemplate = new EmailTemplateMessage(
+            //     [ContactEmailAddress], //FIXME: Test email
+            //     `${DBAName} Invoice From Talus`,
+            //     'partner-invoice',
+            //     {
+            //       contactName: ContactName,
+            //     },
+            //     [
+            //       {
+            //         FileName: `${IrisMId}_${InvoiceNumber}.pdf`,
+            //         RawContent: pdf,
+            //         ContentType: 'application/pdf',
+            //         ContentDisposition: 'ATTACHMENT',
+            //         ContentTransferEncoding: 'BASE64',
+            //         ContentDescription: `${IrisMId}_${InvoiceNumber}.pdf`,
+            //       },
+            //     ]
+            //   );
+            //   try {
+            //     await this.emailService.send(emailTemplate);
+            //     await this.mspMerchantMonthlyBillingRepository.update(pk, {
+            //       dtInvoiceEmailed: () => 'GETDATE()',
+            //     });
+            //   } catch (error) {
+            //     if (error instanceof Error) {
+            //       this.logger.error(`Error sending email: ${error.message}`);
+            //     }
+            //     this.logger.error(error);
+            //   }
+            // }
           })
         );
       }
