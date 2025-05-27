@@ -178,7 +178,7 @@ export class PartnerBanksService {
             const {
               pk,
               DBAName,
-              // ContactEmailAddress,
+              ContactEmailAddress,
               ContactName,
               InvoiceNumber,
               DBAAddress,
@@ -277,37 +277,37 @@ export class PartnerBanksService {
               dtInvoiceGenerated: () => 'GETDATE()',
             });
 
-            // if (ContactEmailAddress) {
-            //   const emailTemplate = new EmailTemplateMessage(
-            //     [ContactEmailAddress], //FIXME: Test email
-            //     `${DBAName} Invoice From Talus`,
-            //     'partner-invoice',
-            //     {
-            //       contactName: ContactName,
-            //     },
-            //     [
-            //       {
-            //         FileName: `${IrisMId}_${InvoiceNumber}.pdf`,
-            //         RawContent: pdf,
-            //         ContentType: 'application/pdf',
-            //         ContentDisposition: 'ATTACHMENT',
-            //         ContentTransferEncoding: 'BASE64',
-            //         ContentDescription: `${IrisMId}_${InvoiceNumber}.pdf`,
-            //       },
-            //     ]
-            //   );
-            //   try {
-            //     await this.emailService.send(emailTemplate);
-            //     await this.mspMerchantMonthlyBillingRepository.update(pk, {
-            //       dtInvoiceEmailed: () => 'GETDATE()',
-            //     });
-            //   } catch (error) {
-            //     if (error instanceof Error) {
-            //       this.logger.error(`Error sending email: ${error.message}`);
-            //     }
-            //     this.logger.error(error);
-            //   }
-            // }
+            if (ContactEmailAddress) {
+              const emailTemplate = new EmailTemplateMessage(
+                [ContactEmailAddress], //FIXME: Test email
+                `${DBAName} Invoice From Talus`,
+                'partner-invoice',
+                {
+                  contactName: ContactName,
+                },
+                [
+                  {
+                    FileName: `${IrisMId}_${InvoiceNumber}.pdf`,
+                    RawContent: pdf,
+                    ContentType: 'application/pdf',
+                    ContentDisposition: 'ATTACHMENT',
+                    ContentTransferEncoding: 'BASE64',
+                    ContentDescription: `${IrisMId}_${InvoiceNumber}.pdf`,
+                  },
+                ]
+              );
+              try {
+                await this.emailService.send(emailTemplate);
+                await this.mspMerchantMonthlyBillingRepository.update(pk, {
+                  dtInvoiceEmailed: () => 'GETDATE()',
+                });
+              } catch (error) {
+                if (error instanceof Error) {
+                  this.logger.error(`Error sending email: ${error.message}`);
+                }
+                this.logger.error(error);
+              }
+            }
           })
         );
       }
