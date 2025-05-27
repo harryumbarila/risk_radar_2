@@ -149,8 +149,15 @@ const PartnerBankPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex max-w-[400px] gap-2">
-          {data.objects.length > 0 ? (
+        <div className="flex max-w-[450px] gap-5">
+          <button
+            type="button"
+            onClick={refresh}
+            className="rounded hover:bg-gray-100"
+          >
+            <RefreshCw className="size-5" />
+          </button>
+          {data.objects.length > 0 || currentSearchTerm ? (
             <>
               <input
                 value={currentSearchTerm || ''}
@@ -177,13 +184,6 @@ const PartnerBankPage: React.FC = () => {
               </button>
             </>
           ) : null}
-          <button
-            type="button"
-            onClick={refresh}
-            className="rounded hover:bg-gray-100"
-          >
-            <RefreshCw className="size-5" />
-          </button>
         </div>
 
         {/* Pagination controls */}
