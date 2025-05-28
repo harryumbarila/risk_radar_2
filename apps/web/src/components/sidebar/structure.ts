@@ -11,7 +11,7 @@ import type { ResourceKey } from '@/types/permissions';
 export type SidebarItem = {
   id: string;
   title: string;
-  name: ResourceKey;
+  name: ResourceKey | 'ANY';
   parent?: boolean;
   icon: typeof Link2;
   link: string;
@@ -22,7 +22,7 @@ const sidebarStructure: SidebarItem[] = [
   {
     id: 'dashboard',
     title: 'Dashboard',
-    name: 'ATTRIBUTION_LINK',
+    name: 'ANY',
     parent: true,
     icon: ChartColumnStacked,
     link: '/',
