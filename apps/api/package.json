@@ -16,6 +16,7 @@
     "@denali/ez-enroll-pcc-db": "*",
     "@denali/finance-db": "*",
     "@denali/iris-db": "*",
+    "@denali/paya-db": "*",
     "@denali/shared": "*",
     "@denali/snap-pcc-db": "*",
     "@fastify/compress": "^6.0.0",

@@ -2899,11 +2899,6 @@
   resolved "https://registry.npmjs.org/@nestjs/mapped-types/-/mapped-types-2.0.5.tgz"
   integrity sha512-bSJv4pd6EY99NX9CjBIyn4TVDoSit82DUZlL4I3bqNfy5Gt+gXTa86i3I/i0iIV9P4hntcGM5GyO+FhZAhxtyg==
 
-"@nestjs/passport@^11.0.5":
-  version "11.0.5"
-  resolved "https://registry.yarnpkg.com/@nestjs/passport/-/passport-11.0.5.tgz#dd3e506c2fb7ddc80fd1321c01cc1a0ca6d6b609"
-  integrity sha512-ulQX6mbjlws92PIM15Naes4F4p2JoxGnIJuUsdXQPT+Oo2sqQmENEZXM7eYuimocfHnKlcfZOuyzbA33LwUlOQ==
-
 "@nestjs/platform-fastify@^10.0.0":
   version "10.4.15"
   resolved "https://registry.npmjs.org/@nestjs/platform-fastify/-/platform-fastify-10.4.15.tgz"
@@ -14101,28 +14096,6 @@ pascal-case@^3.1.2:
     no-case "^3.0.4"
     tslib "^2.0.3"
 
-passport-headerapikey@^1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/passport-headerapikey/-/passport-headerapikey-1.2.2.tgz#b71960523999c9864151b8535c919e3ff5ba75ce"
-  integrity sha512-4BvVJRrWsNJPrd3UoZfcnnl4zvUWYKEtfYkoDsaOKBsrWHYmzTApCjs7qUbncOLexE9ul0IRiYBFfBG0y9IVQA==
-  dependencies:
-    lodash "^4.17.15"
-    passport-strategy "^1.0.0"
-
-passport-strategy@1.x.x, passport-strategy@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/passport-strategy/-/passport-strategy-1.0.0.tgz#b5539aa8fc225a3d1ad179476ddf236b440f52e4"
-  integrity sha512-CB97UUvDKJde2V0KDWWB3lyf6PC3FaZP7YxZ2G8OAtn9p4HI9j9JLP9qjOGZFvyl8uwNT8qM+hGnz/n16NI7oA==
-
-passport@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/passport/-/passport-0.7.0.tgz#3688415a59a48cf8068417a8a8092d4492ca3a05"
-  integrity sha512-cPLl+qZpSc+ireUvt+IzqbED1cHHkDoVYMo30jbJIdOOjQ1MQYZBPiNvmi8UM6lJuOpTPXJGZQk0DtC4y61MYQ==
-  dependencies:
-    passport-strategy "1.x.x"
-    pause "0.0.1"
-    utils-merge "^1.0.1"
-
 path-case@^2.1.0:
   version "2.1.1"
   resolved "https://registry.npmjs.org/path-case/-/path-case-2.1.1.tgz"
@@ -14197,11 +14170,6 @@ pathval@^1.1.1:
   version "1.1.1"
   resolved "https://registry.npmjs.org/pathval/-/pathval-1.1.1.tgz"
   integrity sha512-Dp6zGqpTdETdR63lehJYPeIOqpiNBNtc7BpWSLrOje7UaIsE5aY92r/AunQA7rsXvet3lrJ3JnZX29UPTKXyKQ==
-
-pause@0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/pause/-/pause-0.0.1.tgz#1d408b3fdb76923b9543d96fb4c9dfd535d9cb5d"
-  integrity sha512-KG8UEiEVkR3wGEb4m5yZkVCzigAD+cVEJck2CzYZO37ZGJfctvVptVO192MwrtPhzONn6go8ylnOdMhKqi4nfg==
 
 pdf-lib@^1.17.1:
   version "1.17.1"
@@ -17221,10 +17189,10 @@ typeorm-fixtures-cli@^4.1.0:
     typescript-collections "^1.3.3"
     yargs "^17.5.1"
 
-typeorm-naming-strategy@^2.0.12:
-  version "2.0.12"
-  resolved "https://registry.npmjs.org/typeorm-naming-strategy/-/typeorm-naming-strategy-2.0.12.tgz"
-  integrity sha512-yot9CTGhxXRW14KhTPcuK6P9CyI/ezR75pCbCVQGqefSbpR7lrhKuwPNlks7BSw8gSmjnu67BJuQkEDopINQIw==
+typeorm-naming-strategy@^2.0.13:
+  version "2.0.13"
+  resolved "https://registry.yarnpkg.com/typeorm-naming-strategy/-/typeorm-naming-strategy-2.0.13.tgz#0da84cbf017e5efa2b233100e4a7427fdea07bed"
+  integrity sha512-lSdPhks9BuYZ5lAWFcn1SOZPPGax8WJb6ENaCxE0KFmw7t2+aGu/anJQjzfwP6MPY60T+U/gGxzk3If5n+ZYWQ==
 
 typeorm@^0.3.21:
   version "0.3.21"
@@ -17586,11 +17554,6 @@ util-deprecate@^1.0.1, util-deprecate@^1.0.2, util-deprecate@~1.0.1:
   version "1.0.2"
   resolved "https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.2.tgz"
   integrity sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==
-
-utils-merge@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
-  integrity sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==
 
 uuid@^10.0.0:
   version "10.0.0"
