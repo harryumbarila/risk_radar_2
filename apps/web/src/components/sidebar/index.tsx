@@ -157,12 +157,17 @@ export const Sidebar: FC<SidebarProps> = () => {
 
   const newStructure: SidebarItem[] = sidebarStructure.flatMap(
     (item): SidebarItem[] => {
-      const result = forResource(item.name).canRead;
-      if (!result) {
-        return []; // skip this item
+      if (item.name !== 'ANY') {
+        const result = forResource(item.name).canRead;
+        if (!result) {
+          return []; // skip this item
+        }
       }
 
       const newChild = item.child?.filter((child) => {
+        if (child.name === 'ANY') {
+          return true;
+        }
         return forResource(child.name).canRead;
       });
 
