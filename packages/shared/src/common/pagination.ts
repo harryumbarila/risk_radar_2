@@ -5,3 +5,8 @@ export type PaginationResponse<T> = {
   page: number;
   pageCount: number;
 };
+
+export type PaginationInput = {
+  page?: number;
+  limit?: number;
+};

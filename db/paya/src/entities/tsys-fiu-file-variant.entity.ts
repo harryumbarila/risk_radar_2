@@ -1,17 +1,21 @@
 /* eslint-disable import/no-cycle */
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, Unique } from 'typeorm';
 
 import { TsysFiuFileVariantType } from '../enums';
 import { BaseEntity } from '../models';
 import { TsysFiuFile } from './tsys-fiu-file.entity';
 
 @Entity()
+@Unique(['fileId', 'variantType'])
 export class TsysFiuFileVariant extends BaseEntity {
   @ManyToOne(() => TsysFiuFile, (file) => file.variants, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'file_id' })
   public file: TsysFiuFile;
+
+  @Column({ name: 'file_id' })
+  public fileId: string;
 
   @Column({
     type: 'enum',

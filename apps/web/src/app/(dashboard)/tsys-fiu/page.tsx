@@ -1,55 +1,55 @@
 'use client';
 
-import {
-  ChevronLeft,
-  ChevronRight,
-  File,
-  Folder,
-  RefreshCw,
-} from 'lucide-react';
-import React, { useState } from 'react';
+import classNames from 'classnames';
+import { RefreshCw } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 
-import {
-  formatDate,
-  formatFileSize,
-} from '@/web/src/components/risk-radar/risk-radar-table/table/formatters';
-import { usePartnerInvoiceUrl } from '@/web/src/hooks/partner-bank/use-get-invoice-url';
-import { useFilteredPartnerInvoice } from '@/web/src/hooks/partner-bank/use-get-invoices';
+import { useListTsysFiuFile } from '@/web/src/hooks/paya/list-tsys-fiu';
+import { useTsysFiuFileUrl } from '@/web/src/hooks/paya/use-get-tsys-fiu-url';
 
-const PATH_PREFIX = 'paya/';
+const variantColors: Record<string, string> = {
+  SUBMITTED: 'bg-green-100 border-green-300 text-green-800',
+  TSYS_RESPONSE: 'bg-blue-100 border-blue-300 text-blue-800',
+};
 
-const TyssFiuPage: React.FC = () => {
-  const { data, isLoading, error, fetchData } = useFilteredPartnerInvoice();
-  const { fetchData: fetchInvoiceUrl } = usePartnerInvoiceUrl();
+const TsysFiuPage: React.FC = () => {
+  const {
+    data: value,
+    fetchData: fetchTsysFiuFile,
+    isLoading,
+    error,
+  } = useListTsysFiuFile();
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageTokens, setPageTokens] = useState<{
-    [key: number]: string | undefined;
-  }>({ 1: undefined });
-  React.useEffect(() => {
-    fetchData({
-      prefix: PATH_PREFIX,
-    });
+  const { fetchData: fetchTsysFiuFileUrl } = useTsysFiuFileUrl();
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
+  useEffect(() => {
+    fetchTsysFiuFile({ page, limit });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  React.useEffect(() => {
-    if (data?.nextContinuationToken && !pageTokens[currentPage + 1]) {
-      setPageTokens((prev) => ({
-        ...prev,
-        [currentPage + 1]: data.nextContinuationToken,
-      }));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data?.nextContinuationToken, currentPage]);
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <RefreshCw className="animate-spin text-blue-500 text-2xl" />
+      </div>
+    );
+  }
 
-  const normalizePrefixForApi = (prefix?: string): undefined | string => {
-    return prefix === '' || prefix === '/' ? undefined : prefix;
-  };
+  if (error || !value?.data) {
+    return (
+      <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded">
+        Error loading data
+      </div>
+    );
+  }
 
-  const handleDownload = (key: string) => {
+  const handleDownload = (id: string) => {
     return async (): Promise<void> => {
-      const req = await fetchInvoiceUrl({ key });
+      const req = await fetchTsysFiuFileUrl({ id });
       if (!req) return;
       const link = document.createElement('a');
       link.href = req.url;
@@ -60,221 +60,107 @@ const TyssFiuPage: React.FC = () => {
     };
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <RefreshCw className="animate-spin text-blue-500 text-2xl" />
-      </div>
-    );
-  }
+  const filteredData = value.data.filter((file) =>
+    file.fileName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-  if (error || !data) {
-    return (
-      <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded">
-        Error loading data
-      </div>
-    );
-  }
-
-  const navigateToFolder = (folderPath: string): void => {
-    fetchData({
-      prefix: normalizePrefixForApi(folderPath),
-      continuationToken: undefined,
-    });
-    setCurrentPage(1);
-    setPageTokens({ 1: undefined });
-  };
-
-  const navigateUp = (): void => {
-    const currentPath = data.currentPrefix;
-    if (!currentPath || currentPath === '/' || currentPath === PATH_PREFIX) {
-      return;
-    }
-    const parts = currentPath.split('/').filter(Boolean);
-    const parentPath =
-      parts.length > 1 ? `${parts.slice(0, -1).join('/')}/` : '';
-
-    fetchData({
-      prefix: normalizePrefixForApi(parentPath),
-      continuationToken: undefined,
-    });
-    setCurrentPage(1);
-    setPageTokens({ 1: undefined });
-  };
-
-  const goToPage = (page: number): void => {
-    if (page === currentPage || (page > 1 && !pageTokens[page])) {
-      return;
-    }
-
-    fetchData({
-      prefix: normalizePrefixForApi(data.currentPrefix),
-      continuationToken: pageTokens[page],
-    });
-    setCurrentPage(page);
-  };
-
-  const refresh = (): void => {
-    fetchData({
-      prefix: normalizePrefixForApi(data.currentPrefix),
-      continuationToken: undefined,
-    });
-    setCurrentPage(1);
-    setPageTokens({ 1: undefined });
-  };
+  const pageCount = Math.ceil(filteredData.length / limit);
+  const paginatedData = filteredData.slice((page - 1) * limit, page * limit);
 
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
-      {/* Breadcrumbs and controls */}
-      <div className="p-4 border-b flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <button
-            type="button"
-            onClick={navigateUp}
-            // disabled={!data.currentPrefix}
-            className={`p-2 rounded ${data.currentPrefix && !(data.currentPrefix === PATH_PREFIX) ? 'hover:bg-gray-100' : 'opacity-50 cursor-not-allowed'}`}
-          >
-            <ChevronLeft />
-          </button>
-          <div className="text-sm text-gray-600">
-            {data.currentPrefix || 'Root'}
+      <div className="p-4">
+        <h1 className="text-2xl font-bold mb-4">Files</h1>
+
+        <input
+          type="text"
+          placeholder="Search by file name..."
+          className="w-full p-2 mb-4 border border-gray-300 rounded-lg"
+          value={searchQuery}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            setPage(1);
+          }}
+        />
+
+        <div className="space-y-4">
+          {paginatedData.map((file) => (
+            <div key={file.id} className="bg-white rounded-2xl shadow p-4">
+              <div className="mb-2">
+                <h2 className="text-lg font-semibold text-gray-800">
+                  {file.fileName}
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Created at: {new Date(file.createdAt).toLocaleString()}
+                </p>
+              </div>
+              <div className="mt-4">
+                <h3 className="text-sm font-medium text-gray-700">Status:</h3>
+                <div className="mt-2 space-y-2">
+                  {file.variants.map((variant) => (
+                    <div
+                      key={variant.id}
+                      className={`border rounded-xl p-3 ${
+                        variantColors[variant.variantType] ||
+                        'bg-gray-100 border-gray-300 text-gray-800'
+                      }`}
+                    >
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="text-sm font-semibold text-gray-800">
+                            Type: {variant.variantType}
+                          </p>
+                          <p className="text-xs text-gray-600">
+                            Path: {variant.s3DirectoryPath}
+                          </p>
+                        </div>
+                        <div className="text-right text-xs text-gray-500">
+                          <p>{new Date(variant.createdAt).toLocaleString()}</p>
+                          <button
+                            type="button"
+                            disabled={!!variant.downloaderIp}
+                            className={classNames(
+                              'flex w-full justify-center rounded p-1 font-medium text-gray bg-primary hover:bg-opacity-90',
+                              {
+                                'bg-gray-400 cursor-not-allowed opacity-50 pointer-events-none':
+                                  !!variant.downloaderIp,
+                              }
+                            )}
+                            onClick={handleDownload(variant.id)}
+                          >
+                            Download
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {pageCount > 1 && (
+          <div className="flex justify-center mt-6 space-x-2">
+            {Array.from({ length: pageCount }, (_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setPage(i + 1)}
+                className={`px-3 py-1 rounded-lg ${
+                  page === i + 1
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-700'
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
           </div>
-          <button
-            type="button"
-            onClick={refresh}
-            className="p-2 rounded hover:bg-gray-100"
-          >
-            <RefreshCw />
-          </button>
-        </div>
-
-        {/* Pagination controls */}
-        <div className="flex items-center space-x-2">
-          <button
-            type="button"
-            onClick={() => goToPage(currentPage - 1)}
-            disabled={currentPage === 1}
-            className={`p-2 rounded ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}`}
-          >
-            <ChevronLeft />
-          </button>
-          <span className="text-sm">Page {currentPage}</span>
-          <button
-            type="button"
-            onClick={() => {
-              const nextPage = currentPage + 1;
-              setPageTokens((prev) => ({
-                ...prev,
-                [nextPage]: data.nextContinuationToken,
-              }));
-              goToPage(nextPage);
-            }}
-            disabled={!data?.isTruncated}
-            className={`p-2 rounded ${!data.isTruncated ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}`}
-          >
-            <ChevronRight />
-          </button>
-        </div>
+        )}
       </div>
-
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Name
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Last Modified
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Size
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Type
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {/* Folders first */}
-            {data.folders.map((folder) => {
-              const folderName = folder
-                .replace(data.currentPrefix || '', '')
-                .replace(/\/$/, '');
-              return (
-                <tr
-                  key={folder}
-                  className="hover:bg-blue-50 cursor-pointer"
-                  onClick={() => navigateToFolder(folder)}
-                >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <Folder className="flex-shrink-0 h-5 w-5 text-blue-500" />
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-blue-600">
-                          {folderName}
-                        </div>
-                        <div className="text-sm text-gray-500">{folder}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    -
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    -
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    Folder
-                  </td>
-                </tr>
-              );
-            })}
-
-            {/* Files */}
-            {data.objects.map((file) => {
-              const fileName = file.Key.split('/').pop() || file.Key;
-              return (
-                <tr
-                  key={file.Key}
-                  className="hover:bg-gray-50 cursor-pointer"
-                  onClick={handleDownload(file.Key)}
-                >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <File className="flex-shrink-0 h-5 w-5 text-gray-400" />
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {fileName}
-                        </div>
-                        <div className="text-sm text-gray-500">{file.Key}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatDate(file.LastModified)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatFileSize(file.Size)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {file.StorageClass}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Empty state */}
-      {data.objects.length === 0 && data.folders.length === 0 && (
-        <div className="p-8 text-center text-gray-500">
-          This folder is empty
-        </div>
-      )}
     </div>
   );
 };
-export default TyssFiuPage;
+
+export default TsysFiuPage;
