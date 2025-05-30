@@ -1,3 +1,4 @@
+import { FastifyMulterModule } from '@nest-lab/fastify-multer';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -14,6 +15,7 @@ import { PayaService } from './services/tsys-fiu/tsys-fiu.service';
 @Module({
   imports: [
     AWSModule,
+    FastifyMulterModule,
     TypeOrmModule.forFeature([TsysFiuFileVariant, TsysFiuFile], 'paya'),
   ],
   controllers: [PayaController],

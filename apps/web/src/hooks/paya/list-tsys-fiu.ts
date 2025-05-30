@@ -12,7 +12,9 @@ export type UseFilteredTsysFiuReturnType = {
   data: TsysFiuFileResponse | null;
   isLoading: boolean;
   error: Error | null;
-  fetchData: (filtersToApply: TsysFiuFilePaginationFilterState) => void;
+  fetchData: (
+    filtersToApply: TsysFiuFilePaginationFilterState
+  ) => Promise<void>;
 };
 
 export const useListTsysFiuFile = (): UseFilteredTsysFiuReturnType => {

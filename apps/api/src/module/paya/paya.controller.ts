@@ -1,8 +1,24 @@
-import { Controller, Get, Ip, Query } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { File, FileInterceptor } from '@nest-lab/fastify-multer';
+import {
+  Body,
+  Controller,
+  Get,
+  Ip,
+  Patch,
+  Query,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import {
+  ApiConsumes,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { Public } from '@/api/shared/auth/decorator/public.decorator';
 
+import { TsysFiuFileUploadDto } from './services/tsys-fiu/dto/file-upload.dto';
 import {
   ListTsysPaginationInput,
   ListTsysPaginationOutput,
@@ -40,7 +56,23 @@ export class PayaController {
     summary: 'Retrieve tsys fiu files variant url from s3',
   })
   @Get('download-url')
-  public async getDownloadUrl(@Query('key') key: string, @Ip() ip: string) {
-    return this.payaService.getDownloadUrl(key, ip);
+  public async getDownloadUrl(@Query('id') id: string, @Ip() ip: string) {
+    return this.payaService.getDownloadUrl(id, ip);
+  }
+
+  @Patch('file')
+  @ApiResponse({
+    status: 200,
+    description: 'Uploads a single file',
+  })
+  @ApiOperation({ summary: 'Uploads a single file' })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file'))
+  public async uploadFile(
+    @UploadedFile() file: File,
+    @Body() body: TsysFiuFileUploadDto,
+    @Ip() ip: string
+  ) {
+    return this.payaService.uploadFile({ ...body, file, ip });
   }
 }

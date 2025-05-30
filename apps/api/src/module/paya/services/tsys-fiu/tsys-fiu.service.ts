@@ -1,12 +1,16 @@
+import { createHash } from 'node:crypto';
+
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import type { FileUploadDto } from '@/api/shared/aws/dto/s3.dto';
 import { S3Service } from '@/api/shared/aws/s3.service';
 import {
   TsysFiuFileRepository,
   TsysFiuFileVariantRepository,
 } from '@/paya-db/repositories';
 
+import type { TsysFiuFileUploadDto } from './dto/file-upload.dto';
 import type {
   ListTsysPaginationInput,
   ListTsysPaginationOutput,
@@ -70,10 +74,11 @@ export class PayaService {
 
       await this.tsysFiuFileVariantRepository.update(
         {
-          id,
+          id: item.id,
         },
         {
           downloaderIp: ip,
+          downloadedAt: new Date(),
         }
       );
       return await this.s3Service.getFileSignedUrl(
@@ -83,6 +88,53 @@ export class PayaService {
     } catch (error) {
       throw new HttpException(
         `Failed ${error}`,
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  public async uploadFile(
+    body: TsysFiuFileUploadDto & Partial<FileUploadDto> & { ip: string }
+  ) {
+    try {
+      const { fileId, file, modifiedAt, ip, variant } = body;
+      const item = await this.tsysFiuFileVariantRepository.findOneBy({
+        fileId,
+        variantType: variant,
+      });
+
+      if (item) {
+        throw new Error('File already SUBMITTED');
+      }
+      const csvContent = file.buffer.toString('utf-8');
+
+      const csvHash = createHash('sha256').update(csvContent).digest('hex');
+
+      const currentDate = new Date();
+      const currentDateMMDDYYYY = `${String(currentDate.getMonth() + 1).padStart(2, '0')}${String(currentDate.getDate()).padStart(2, '0')}${currentDate.getFullYear()}`;
+
+      const s3DirectoryPath = `paya/tsys-fiu/${currentDateMMDDYYYY}/${variant.toLocaleLowerCase()}/${file.originalname}`;
+
+      await this.tsysFiuFileVariantRepository.save(
+        this.tsysFiuFileVariantRepository.create({
+          fileId,
+          variantType: variant,
+          contentsHash: csvHash,
+          s3DirectoryPath,
+          modifiedAt: new Date(Number(modifiedAt)),
+          uploaderIp: ip,
+          updatedAt: new Date(),
+        })
+      );
+
+      return await this.s3Service.uploadFile(
+        this.bucketName,
+        file.buffer,
+        s3DirectoryPath
+      );
+    } catch (error) {
+      throw new HttpException(
+        `Failed file upload ${error}`,
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
