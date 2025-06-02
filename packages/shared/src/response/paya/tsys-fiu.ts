@@ -16,10 +16,12 @@ export type TsysFiuFileVariant = {
   variantType: string;
   s3DirectoryPath: string;
   contentsHash: string;
-  uploaderIp: null;
-  downloadedAt: null;
-  downloaderIp: null;
-  modifiedAt: null;
+  uploaderIp?: string;
+  downloadedAt?: string;
+  downloaderIp?: string;
+  modifiedAt?: string;
+  uploaderUserName?: string;
+  downloaderUserName?: string;
 };
 
 export type TsysFiuFileResponse = PaginationResponse<TsysFiuFile>;

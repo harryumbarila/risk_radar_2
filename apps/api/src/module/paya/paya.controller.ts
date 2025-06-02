@@ -19,6 +19,7 @@ import {
 import { Public } from '@/api/shared/auth/decorator/public.decorator';
 
 import { TsysFiuFileUploadDto } from './services/tsys-fiu/dto/file-upload.dto';
+import { GetTsysFiuFileDownloadDto } from './services/tsys-fiu/dto/get-download.dto';
 import {
   ListTsysPaginationInput,
   ListTsysPaginationOutput,
@@ -56,8 +57,11 @@ export class PayaController {
     summary: 'Retrieve tsys fiu files variant url from s3',
   })
   @Get('download-url')
-  public async getDownloadUrl(@Query('id') id: string, @Ip() ip: string) {
-    return this.payaService.getDownloadUrl(id, ip);
+  public async getDownloadUrl(
+    @Query() input: GetTsysFiuFileDownloadDto,
+    @Ip() ip: string
+  ) {
+    return this.payaService.getDownloadUrl(input, ip);
   }
 
   @Patch('file')

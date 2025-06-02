@@ -1,5 +1,6 @@
 'use client';
 
+import { useAuth } from '@frontegg/nextjs';
 import classNames from 'classnames';
 import { RefreshCw, UploadCloud } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
@@ -14,6 +15,10 @@ const variantColors: Record<string, string> = {
   TSYS_RESPONSE: 'bg-blue-100 border-blue-300 text-blue-800',
 };
 
+function capitalizeFirstLetter(val: string): string {
+  return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+}
+
 const TsysFiuPage: React.FC = () => {
   const {
     data: value,
@@ -21,6 +26,8 @@ const TsysFiuPage: React.FC = () => {
     isLoading,
     error,
   } = useListTsysFiuFile();
+
+  const { user } = useAuth();
 
   const { fetchData: fetchTsysFiuFileUrl } = useTsysFiuFileUrl();
   const { uploadFile, isLoading: isLoadingUpload } = useUploadTsysFiuFile();
@@ -72,6 +79,7 @@ const TsysFiuPage: React.FC = () => {
     formData.append('fileId', fileId);
     formData.append('modifiedAt', String(file.lastModified));
     formData.append('variant', variant);
+    formData.append('userName', user?.name || '');
 
     try {
       await uploadFile(formData);
@@ -95,7 +103,7 @@ const TsysFiuPage: React.FC = () => {
     });
 
     if (result.isConfirmed) {
-      const req = await fetchTsysFiuFileUrl({ id });
+      const req = await fetchTsysFiuFileUrl({ id, userName: user?.name || '' });
 
       if (!req) return;
       const link = document.createElement('a');
@@ -153,7 +161,10 @@ const TsysFiuPage: React.FC = () => {
                         onClick={() => handleUploadClick(file.id)}
                         className="flex items-center px-3 py-1 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg"
                       >
-                        <UploadCloud className="w-4 h-4 mr-1" /> Upload
+                        <UploadCloud className="w-4 h-4 mr-1" />
+                        {`Upload ${capitalizeFirstLetter(
+                          uploadVariant.toLocaleLowerCase()
+                        )}`}
                       </button>
                       <input
                         type="file"
@@ -188,6 +199,17 @@ const TsysFiuPage: React.FC = () => {
                             <p className="text-xs text-gray-600">
                               Path: {variant.s3DirectoryPath}
                             </p>
+
+                            {variant.downloaderUserName ? (
+                              <p className="text-xs text-gray-600">
+                                Downloader By: {variant.downloaderUserName}
+                              </p>
+                            ) : null}
+                            {variant.uploaderUserName ? (
+                              <p className="text-xs text-gray-600">
+                                Uploader By: {variant.uploaderUserName}
+                              </p>
+                            ) : null}
                           </div>
                           <div className="text-right text-xs text-gray-500">
                             <p>

@@ -21,6 +21,13 @@ export class TsysFiuFileUploadDto {
 
   @ApiProperty({
     type: 'string',
+    description: 'The user name to submitted',
+  })
+  @IsString()
+  public userName: string;
+
+  @ApiProperty({
+    type: 'string',
     description: 'The date modified file to submitted',
   })
   @IsString()

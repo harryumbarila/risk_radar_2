@@ -11,6 +11,7 @@ import {
 } from '@/paya-db/repositories';
 
 import type { TsysFiuFileUploadDto } from './dto/file-upload.dto';
+import type { GetTsysFiuFileDownloadDto } from './dto/get-download.dto';
 import type {
   ListTsysPaginationInput,
   ListTsysPaginationOutput,
@@ -62,8 +63,9 @@ export class PayaService {
     }
   }
 
-  public async getDownloadUrl(id: string, ip: string) {
+  public async getDownloadUrl(input: GetTsysFiuFileDownloadDto, ip: string) {
     try {
+      const { id, userName } = input;
       const item = await this.tsysFiuFileVariantRepository.findOneBy({
         id,
       });
@@ -79,6 +81,7 @@ export class PayaService {
         {
           downloaderIp: ip,
           downloadedAt: new Date(),
+          downloaderUserName: userName,
         }
       );
       return await this.s3Service.getFileSignedUrl(
@@ -97,7 +100,7 @@ export class PayaService {
     body: TsysFiuFileUploadDto & Partial<FileUploadDto> & { ip: string }
   ) {
     try {
-      const { fileId, file, modifiedAt, ip, variant } = body;
+      const { fileId, file, modifiedAt, ip, variant, userName } = body;
       const item = await this.tsysFiuFileVariantRepository.findOneBy({
         fileId,
         variantType: variant,
@@ -124,6 +127,7 @@ export class PayaService {
           modifiedAt: new Date(Number(modifiedAt)),
           uploaderIp: ip,
           updatedAt: new Date(),
+          uploaderUserName: userName,
         })
       );
 

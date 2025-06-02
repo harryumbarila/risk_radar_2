@@ -17,6 +17,12 @@ export class TsysFiuFileVariant extends BaseEntity {
   @Column({ name: 'file_id' })
   public fileId: string;
 
+  @Column({ nullable: true })
+  public downloaderUserName?: string;
+
+  @Column({ nullable: true })
+  public uploaderUserName?: string;
+
   @Column({
     type: 'enum',
     enum: TsysFiuFileVariantType,
@@ -31,14 +37,14 @@ export class TsysFiuFileVariant extends BaseEntity {
   public contentsHash: string;
 
   @Column({ type: 'inet', nullable: true })
-  public uploaderIp: string;
+  public uploaderIp?: string;
 
   @Column({ type: 'timestamptz', nullable: true })
-  public downloadedAt: Date;
+  public downloadedAt?: Date;
 
   @Column({ type: 'inet', nullable: true })
-  public downloaderIp: string;
+  public downloaderIp?: string;
 
   @Column({ type: 'timestamptz', nullable: true })
-  public modifiedAt: Date;
+  public modifiedAt?: Date;
 }
