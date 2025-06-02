@@ -1,3 +1,4 @@
+import { File } from '@nest-lab/fastify-multer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
@@ -5,6 +6,7 @@ import {
   IsArray,
   IsDefined,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
   Min,
@@ -124,4 +126,18 @@ export class S3PaginatedResponseDto {
   @IsDefined()
   @IsString()
   public currentPrefix: string;
+}
+
+export class FileUploadDto {
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    description: 'The file to upload',
+  })
+  @IsObject()
+  public file: File;
+
+  @ApiProperty({ description: 'The unique key for the file' })
+  @IsString()
+  public key: string;
 }
