@@ -32,4 +32,11 @@ export class TsysFiuFileUploadDto {
   })
   @IsString()
   public modifiedAt: string;
+
+  @ApiProperty({
+    type: 'string',
+    description: 'The user IP address',
+  })
+  @IsString()
+  public ip: string;
 }

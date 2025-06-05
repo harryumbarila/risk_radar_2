@@ -6,6 +6,7 @@ import type { InvoiceUrlResponseDto } from '@/shared/response';
 export type TsysFiuFileUrlFilterState = {
   id: string;
   userName: string;
+  ip?: string;
 };
 
 export type UseTsysFiuFileUrlReturnType = {

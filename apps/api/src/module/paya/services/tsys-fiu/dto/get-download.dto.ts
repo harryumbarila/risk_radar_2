@@ -15,4 +15,11 @@ export class GetTsysFiuFileDownloadDto {
   })
   @IsString()
   public userName: string;
+
+  @ApiProperty({
+    type: 'string',
+    description: 'The user IP address',
+  })
+  @IsString()
+  public ip: string;
 }
