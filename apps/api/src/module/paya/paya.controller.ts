@@ -3,7 +3,6 @@ import {
   Body,
   Controller,
   Get,
-  Ip,
   Patch,
   Query,
   UploadedFile,
@@ -57,11 +56,8 @@ export class PayaController {
     summary: 'Retrieve tsys fiu files variant url from s3',
   })
   @Get('download-url')
-  public async getDownloadUrl(
-    @Query() input: GetTsysFiuFileDownloadDto,
-    @Ip() ip: string
-  ) {
-    return this.payaService.getDownloadUrl(input, ip);
+  public async getDownloadUrl(@Query() input: GetTsysFiuFileDownloadDto) {
+    return this.payaService.getDownloadUrl(input);
   }
 
   @Patch('file')
@@ -74,9 +70,8 @@ export class PayaController {
   @UseInterceptors(FileInterceptor('file'))
   public async uploadFile(
     @UploadedFile() file: File,
-    @Body() body: TsysFiuFileUploadDto,
-    @Ip() ip: string
+    @Body() body: TsysFiuFileUploadDto
   ) {
-    return this.payaService.uploadFile({ ...body, file, ip });
+    return this.payaService.uploadFile({ ...body, file });
   }
 }
