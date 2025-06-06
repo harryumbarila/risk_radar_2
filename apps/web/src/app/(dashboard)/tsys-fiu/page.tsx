@@ -50,7 +50,7 @@ const TsysFiuPage: React.FC = () => {
     try {
       const res = await fetch('https://api.ipify.org/?format=json');
       if (!res.ok) {
-        throw new Error('Failded to fetch IP Address');
+        throw new Error('Failed to fetch IP Address');
       }
 
       const output = (await res.json()) as { ip: string };
@@ -89,6 +89,16 @@ const TsysFiuPage: React.FC = () => {
   ): Promise<void> => {
     const file = event.target.files?.[0];
     if (!file) return;
+
+    if (file.size > 5 * 1000 * 1024) {
+      await Swal.fire({
+        title: 'File too large',
+        text: 'Please upload a file smaller than 5MB.',
+        icon: 'error',
+        confirmButtonColor: '#3C50E0',
+      });
+      return;
+    }
 
     const currentIp = await getCurrentIp();
     const formData = new FormData();

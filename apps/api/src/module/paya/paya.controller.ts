@@ -67,7 +67,13 @@ export class PayaController {
   })
   @ApiOperation({ summary: 'Uploads a single file' })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: {
+        fileSize: 5 * 1024 * 1024, // 5 MB limit
+      },
+    })
+  )
   public async uploadFile(
     @UploadedFile() file: File,
     @Body() body: TsysFiuFileUploadDto
