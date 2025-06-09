@@ -3,7 +3,6 @@ import {
   Body,
   Controller,
   Get,
-  Ip,
   Patch,
   Query,
   UploadedFile,
@@ -91,11 +90,8 @@ export class PayaController {
     summary: 'Retrieve tsys fiu files variant url from s3',
   })
   @Get('download-url')
-  public async getDownloadUrl(
-    @Query() input: GetTsysFiuFileDownloadDto,
-    @Ip() ip: string
-  ) {
-    return this.payaService.getDownloadUrl(input, ip);
+  public async getDownloadUrl(@Query() input: GetTsysFiuFileDownloadDto) {
+    return this.payaService.getDownloadUrl(input);
   }
 
   @ApiResponse({
@@ -121,13 +117,18 @@ export class PayaController {
   })
   @ApiOperation({ summary: 'Uploads a single file' })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: {
+        fileSize: 5 * 1024 * 1024, // 5 MB limit
+      },
+    })
+  )
   public async uploadFile(
     @UploadedFile() file: File,
-    @Body() body: TsysFiuFileUploadDto,
-    @Ip() ip: string
+    @Body() body: TsysFiuFileUploadDto
   ) {
-    return this.payaService.uploadFile({ ...body, file, ip });
+    return this.payaService.uploadFile({ ...body, file });
   }
 
   @Patch('commission-file')

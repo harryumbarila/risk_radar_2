@@ -36,6 +36,9 @@ export class TsysFiuFileVariant extends BaseEntity {
   @Column()
   public contentsHash: string;
 
+  @Column({ type: 'bool', default: true })
+  public validHash: boolean;
+
   @Column({ type: 'inet', nullable: true })
   public uploaderIp?: string;
 

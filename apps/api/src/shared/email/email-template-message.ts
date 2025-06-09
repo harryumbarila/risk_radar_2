@@ -3,7 +3,7 @@ import { OmitType, PartialType } from '@nestjs/swagger';
 import type { Attachment } from '@/api/shared/aws/email/email-message';
 import { EmailMessage } from '@/api/shared/aws/email/email-message';
 
-type TemplateType = 'partner-invoice';
+type TemplateType = 'partner-invoice' | 'tsys-fiu-changed-file';
 
 export class EmailTemplateMessage extends PartialType(
   OmitType(EmailMessage, ['body'] as const)

@@ -2,9 +2,14 @@ import { createHash } from 'node:crypto';
 
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InjectPinoLogger } from 'nestjs-pino';
+import { Logger } from 'pino';
 
 import type { FileUploadDto } from '@/api/shared/aws/dto/s3.dto';
 import { S3Service } from '@/api/shared/aws/s3.service';
+import { EmailService } from '@/api/shared/email/email.service';
+import { EmailTemplateMessage } from '@/api/shared/email/email-template-message';
+import { TsysFiuFileVariantType } from '@/paya-db/enums';
 import {
   TsysFiuFileRepository,
   TsysFiuFileVariantRepository,
@@ -23,9 +28,11 @@ export class PayaService {
 
   public constructor(
     private readonly s3Service: S3Service,
+    private readonly emailService: EmailService,
     private readonly tsysFiuFileRepository: TsysFiuFileRepository,
     private readonly tsysFiuFileVariantRepository: TsysFiuFileVariantRepository,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    @InjectPinoLogger(PayaService.name) private readonly logger: Logger
   ) {
     this.bucketName = this.configService.get('AWS_PARTNER_BANK_INVOICE_BUCKET');
   }
@@ -63,9 +70,9 @@ export class PayaService {
     }
   }
 
-  public async getDownloadUrl(input: GetTsysFiuFileDownloadDto, ip: string) {
+  public async getDownloadUrl(input: GetTsysFiuFileDownloadDto) {
     try {
-      const { id, userName } = input;
+      const { id, userName, ip } = input;
       const item = await this.tsysFiuFileVariantRepository.findOneBy({
         id,
       });
@@ -109,9 +116,54 @@ export class PayaService {
       if (item) {
         throw new Error('File already SUBMITTED');
       }
+
+      const previousFileVariant =
+        variant === TsysFiuFileVariantType.SUBMITTED
+          ? TsysFiuFileVariantType.PROVIDED
+          : TsysFiuFileVariantType.SUBMITTED;
+
+      const previousFile = await this.tsysFiuFileVariantRepository.findOneBy({
+        fileId,
+        variantType: previousFileVariant,
+      });
+
       const csvContent = file.buffer.toString('utf-8');
 
-      const csvHash = createHash('sha256').update(csvContent).digest('hex');
+      const parsedCsv =
+        previousFileVariant === TsysFiuFileVariantType.SUBMITTED
+          ? csvContent
+              .split('\n')
+              .map((line) => {
+                const columns = line.split(','); // Split line into columns
+                columns.pop(); // Remove last column
+                return columns.join(','); // Join back into line
+              })
+              .join('\n')
+          : csvContent;
+
+      const csvHash = createHash('sha256').update(parsedCsv).digest('hex');
+      let validHash = true;
+      if (previousFile) {
+        if (previousFile.contentsHash !== csvHash) {
+          validHash = false;
+          const description =
+            previousFileVariant === TsysFiuFileVariantType.PROVIDED
+              ? 'Alert! Uploaded TSYS FIU Paya file is different from file that was provided. Finance/Accounting department will be notified via e-mail shortly.'
+              : 'Alert! Uploaded TSYS FIU response Paya file is different from file that was submitted to TSYS. Finance/Accounting department will be notified via e-mail shortly.';
+          const emailTemplate = new EmailTemplateMessage(
+            ['crhistian@solvedex.com'], // FIXME: Test email
+            `Alert! Uploaded TSYS FIU Paya ${file.originalname}`,
+            'tsys-fiu-changed-file',
+            {
+              description,
+            }
+          );
+          await this.emailService.send(emailTemplate).catch((error) => {
+            this.logger.error('Failed to send email');
+            this.logger.error(error);
+          });
+        }
+      }
 
       const currentDate = new Date();
       const currentDateMMDDYYYY = `${String(currentDate.getMonth() + 1).padStart(2, '0')}${String(currentDate.getDate()).padStart(2, '0')}${currentDate.getFullYear()}`;
@@ -123,6 +175,7 @@ export class PayaService {
           fileId,
           variantType: variant,
           contentsHash: csvHash,
+          validHash,
           s3DirectoryPath,
           modifiedAt: new Date(Number(modifiedAt)),
           uploaderIp: ip,

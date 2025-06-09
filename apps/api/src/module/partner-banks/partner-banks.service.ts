@@ -279,7 +279,7 @@ export class PartnerBanksService {
 
             if (ContactEmailAddress) {
               const emailTemplate = new EmailTemplateMessage(
-                [ContactEmailAddress], //FIXME: Test email
+                [ContactEmailAddress],
                 `${DBAName} Invoice From Talus`,
                 'partner-invoice',
                 {

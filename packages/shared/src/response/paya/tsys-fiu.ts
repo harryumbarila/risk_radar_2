@@ -16,6 +16,7 @@ export type TsysFiuFileVariant = {
   variantType: string;
   s3DirectoryPath: string;
   contentsHash: string;
+  validHash: boolean;
   uploaderIp?: string;
   downloadedAt?: string;
   downloaderIp?: string;

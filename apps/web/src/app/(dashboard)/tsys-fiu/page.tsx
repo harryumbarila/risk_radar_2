@@ -13,6 +13,7 @@ import { useTsysFiuFileUrl } from '@/web/src/hooks/paya/use-get-tsys-fiu-url';
 const variantColors: Record<string, string> = {
   SUBMITTED: 'bg-green-100 border-green-300 text-green-800',
   TSYS_RESPONSE: 'bg-blue-100 border-blue-300 text-blue-800',
+  INVALID: 'bg-red-100 border-red-300 text-red-800',
 };
 
 function capitalizeFirstLetter(val: string): string {
@@ -29,7 +30,8 @@ const TsysFiuPage: React.FC = () => {
 
   const { user } = useAuth();
 
-  const { fetchData: fetchTsysFiuFileUrl } = useTsysFiuFileUrl();
+  const { fetchData: fetchTsysFiuFileUrl, isLoading: isDownloading } =
+    useTsysFiuFileUrl();
   const { uploadFile, isLoading: isLoadingUpload } = useUploadTsysFiuFile();
 
   const fileInputRefs = React.useRef<Record<string, HTMLInputElement | null>>(
@@ -43,6 +45,20 @@ const TsysFiuPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const limit = 10;
+
+  const getCurrentIp = async (): Promise<string> => {
+    try {
+      const res = await fetch('https://api.ipify.org/?format=json');
+      if (!res.ok) {
+        throw new Error('Failed to fetch IP Address');
+      }
+
+      const output = (await res.json()) as { ip: string };
+      return output.ip;
+    } catch (err) {
+      return '';
+    }
+  };
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -74,12 +90,24 @@ const TsysFiuPage: React.FC = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    if (file.size > 5 * 1000 * 1024) {
+      await Swal.fire({
+        title: 'File too large',
+        text: 'Please upload a file smaller than 5MB.',
+        icon: 'error',
+        confirmButtonColor: '#3C50E0',
+      });
+      return;
+    }
+
+    const currentIp = await getCurrentIp();
     const formData = new FormData();
     formData.append('file', file);
     formData.append('fileId', fileId);
     formData.append('modifiedAt', String(file.lastModified));
     formData.append('variant', variant);
     formData.append('userName', user?.name || '');
+    formData.append('ip', currentIp);
 
     try {
       await uploadFile(formData);
@@ -103,7 +131,13 @@ const TsysFiuPage: React.FC = () => {
     });
 
     if (result.isConfirmed) {
-      const req = await fetchTsysFiuFileUrl({ id, userName: user?.name || '' });
+      const currentIp = await getCurrentIp();
+
+      const req = await fetchTsysFiuFileUrl({
+        id,
+        userName: user?.name || '',
+        ip: currentIp,
+      });
 
       if (!req) return;
       const link = document.createElement('a');
@@ -163,7 +197,7 @@ const TsysFiuPage: React.FC = () => {
                       >
                         <UploadCloud className="w-4 h-4 mr-1" />
                         {`Upload ${capitalizeFirstLetter(
-                          uploadVariant.toLocaleLowerCase()
+                          uploadVariant.toLocaleLowerCase().split('_').join(' ')
                         )}`}
                       </button>
                       <input
@@ -187,12 +221,20 @@ const TsysFiuPage: React.FC = () => {
                       <div
                         key={variant.id}
                         className={`border rounded-xl p-3 ${
-                          variantColors[variant.variantType] ||
-                          'bg-gray-100 border-gray-300 text-gray-800'
+                          !variant.validHash
+                            ? variantColors.INVALID
+                            : variantColors[variant.variantType] ||
+                              'bg-gray-100 border-gray-300 text-gray-800'
                         }`}
                       >
                         <div className="flex justify-between items-center">
                           <div>
+                            {!variant.validHash && (
+                              <p className="text-sm font-semibold text-red-800">
+                                Invalid content
+                              </p>
+                            )}
+
                             <p className="text-sm font-semibold text-gray-800">
                               Type: {variant.variantType}
                             </p>
@@ -202,12 +244,12 @@ const TsysFiuPage: React.FC = () => {
 
                             {variant.downloaderUserName ? (
                               <p className="text-xs text-gray-600">
-                                Downloader By: {variant.downloaderUserName}
+                                Downloaded: {variant.downloaderUserName}
                               </p>
                             ) : null}
                             {variant.uploaderUserName ? (
                               <p className="text-xs text-gray-600">
-                                Uploader By: {variant.uploaderUserName}
+                                Uploaded: {variant.uploaderUserName}
                               </p>
                             ) : null}
                           </div>
@@ -215,7 +257,9 @@ const TsysFiuPage: React.FC = () => {
                             <p>
                               {new Date(variant.createdAt).toLocaleString()}
                             </p>
-                            {!variant.downloaderIp ? (
+                            {!variant.downloaderIp &&
+                            !isDownloading &&
+                            !isLoading ? (
                               <button
                                 type="button"
                                 disabled={!!variant.downloaderIp}
