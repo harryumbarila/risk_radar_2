@@ -231,7 +231,8 @@ const TsysFiuPage: React.FC = () => {
                           <div>
                             {!variant.validHash && (
                               <p className="text-sm font-semibold text-red-800">
-                                Invalid content
+                                Submitted file is not the same as uploaded
+                                provided file
                               </p>
                             )}
 
