@@ -90,7 +90,7 @@ const TsysFiuPage: React.FC = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1000 * 1024) {
+    if (file.size > 5 * 1024 * 1024) {
       await Swal.fire({
         title: 'File too large',
         text: 'Please upload a file smaller than 5MB.',
@@ -231,7 +231,8 @@ const TsysFiuPage: React.FC = () => {
                           <div>
                             {!variant.validHash && (
                               <p className="text-sm font-semibold text-red-800">
-                                Invalid content
+                                Submitted file is not the same as uploaded
+                                provided file
                               </p>
                             )}
 
