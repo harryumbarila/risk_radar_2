@@ -26,7 +26,6 @@ export default function useBaseApi(): {
       headers: {
         ...options?.headers,
         Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
       },
     };
 

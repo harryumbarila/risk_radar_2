@@ -14,7 +14,7 @@
     "typeorm": "^0.3.21",
     "typeorm-extension": "^3.7.0",
     "typeorm-fixtures-cli": "^4.1.0",
-    "typeorm-naming-strategy": "^2.0.12",
+    "typeorm-naming-strategy": "^2.0.13",
     "zod": "^3.24.2"
   },
   "devDependencies": {

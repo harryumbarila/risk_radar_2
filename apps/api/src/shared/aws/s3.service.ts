@@ -25,30 +25,6 @@ export class S3Service {
     @InjectPinoLogger(S3Service.name) private readonly logger: PinoLogger
   ) {}
 
-  public async uploadFile(
-    bucketName: string,
-    file: Buffer | string,
-    fileName: string,
-    contentType?: string
-  ) {
-    const fileKey = fileName;
-    const command = new PutObjectCommand({
-      Bucket: bucketName,
-      Key: fileName,
-      Body: file,
-      ContentType: contentType,
-    });
-
-    await this.s3Client.send(command);
-
-    this.logger.info(`File uploaded to S3: ${fileKey}`);
-
-    return {
-      key: fileKey,
-      url: `https://${bucketName}.s3.amazonaws.com/${fileKey}`,
-    };
-  }
-
   public async getFile(bucketName: string, key: string) {
     const command = new GetObjectCommand({ Bucket: bucketName, Key: key });
     return this.s3Client.send(command);
@@ -199,5 +175,30 @@ export class S3Service {
       this.logger.error('Error listing S3 objects:', error);
       throw error;
     }
+  }
+
+  public async uploadFile(
+    bucketName: string,
+    file: Buffer | string,
+    fileName: string,
+    contentType?: string
+  ) {
+    const fileKey = fileName;
+
+    await this.s3Client.send(
+      new PutObjectCommand({
+        Bucket: bucketName,
+        Key: fileName,
+        Body: file,
+        ContentType: contentType,
+      })
+    );
+
+    this.logger.info(`File uploaded to S3: ${fileKey}`);
+
+    return {
+      key: fileKey,
+      url: `https://${bucketName}.s3.amazonaws.com/${fileKey}`,
+    };
   }
 }

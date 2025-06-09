@@ -23,7 +23,8 @@
       "@/ez-enroll-db/*": ["../../db/ez-enroll/src/*"],
       "@/ez-enroll-pcc-db/*": ["../../db/ez-enroll-pcc/src/*"],
       "@/dsm-db/*": ["../../db/dsm/src/*"],
-      "@/snap-pcc-db/*": ["../../db/snap-pcc/src/*"]
+      "@/snap-pcc-db/*": ["../../db/snap-pcc/src/*"],
+      "@/paya-db/*": ["../../db/paya/src/*"]
     },
     "incremental": true,
     "skipLibCheck": true,
