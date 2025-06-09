@@ -15,9 +15,8 @@ export const PERMISSIONS = {
     WRITE: 'talus:write:invoice',
   },
   TSYS_FIU: {
-    // FIXME: Create new permission
-    READ: 'talus:read:invoice',
-    WRITE: 'talus:write:invoice',
+    READ: 'talus:read:TSYS-FIU',
+    WRITE: 'talus:read:TSYS-FIU',
   },
   COMMISSION: {
     // Using the same permissions as TSYS_FIU for now
