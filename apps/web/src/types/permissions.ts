@@ -19,6 +19,11 @@ export const PERMISSIONS = {
     READ: 'talus:read:invoice',
     WRITE: 'talus:write:invoice',
   },
+  COMMISSION: {
+    // Using the same permissions as TSYS_FIU for now
+    READ: 'talus:read:invoice',
+    WRITE: 'talus:write:invoice',
+  },
 };
 
 // Create a type for available resources from PERMISSIONS

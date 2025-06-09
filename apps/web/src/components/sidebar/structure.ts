@@ -4,6 +4,7 @@ import {
   Link2,
   Radar,
   UserPen,
+  Receipt,
 } from 'lucide-react';
 
 import type { ResourceKey } from '@/types/permissions';
@@ -54,6 +55,13 @@ const sidebarStructure: SidebarItem[] = [
         name: 'TSYS_FIU',
         link: '/tsys-fiu',
         icon: ChartCandlestick,
+      },
+      {
+        id: 'commission',
+        title: 'Commission',
+        name: 'COMMISSION',
+        link: '/commission',
+        icon: Receipt,
       },
     ],
   },

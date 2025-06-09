@@ -18,6 +18,10 @@ import {
 
 import { Public } from '@/api/shared/auth/decorator/public.decorator';
 
+import { CommissionService } from './services/commission/commission.service';
+import { CommissionFileUploadDto } from './services/commission/dto/file-upload.dto';
+import { GetCommissionFileDownloadDto } from './services/commission/dto/get-download.dto';
+import { ListCommissionPaginationInput, ListCommissionPaginationOutput } from './services/commission/dto/list-commission.dto';
 import { TsysFiuFileUploadDto } from './services/tsys-fiu/dto/file-upload.dto';
 import { GetTsysFiuFileDownloadDto } from './services/tsys-fiu/dto/get-download.dto';
 import {
@@ -29,7 +33,10 @@ import { PayaService } from './services/tsys-fiu/tsys-fiu.service';
 @ApiTags('paya')
 @Controller('v1/paya')
 export class PayaController {
-  public constructor(private readonly payaService: PayaService) {}
+  public constructor(
+    private readonly payaService: PayaService,
+    private readonly commissionService: CommissionService
+  ) {}
 
   @ApiResponse({
     status: 200,
@@ -50,6 +57,33 @@ export class PayaController {
 
   @ApiResponse({
     status: 200,
+    type: ListCommissionPaginationOutput,
+    description: 'The commission files and variants',
+  })
+  @ApiOperation({
+    operationId: 'commission',
+    summary: 'Retrieve commission files and variants',
+  })
+  @Get('commission')
+  @Public()
+  public async listCommissionFiles(
+    @Query() query: ListCommissionPaginationInput
+  ): Promise<ListCommissionPaginationOutput> {
+    console.log('PayaController.listCommissionFiles - START', { query });
+    console.log('Commission service available:', !!this.commissionService);
+    
+    try {
+      const result = await this.commissionService.listFiles(query);
+      console.log('PayaController.listCommissionFiles - SUCCESS');
+      return result;
+    } catch (error) {
+      console.error('PayaController.listCommissionFiles - ERROR:', error);
+      throw error;
+    }
+  }
+
+  @ApiResponse({
+    status: 200,
     description: 'The invoices from aws',
   })
   @ApiOperation({
@@ -62,6 +96,22 @@ export class PayaController {
     @Ip() ip: string
   ) {
     return this.payaService.getDownloadUrl(input, ip);
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'The commission file url from aws',
+  })
+  @ApiOperation({
+    operationId: 'commission-url',
+    summary: 'Retrieve commission files variant url from s3',
+  })
+  @Get('commission-download-url')
+  public async getCommissionDownloadUrl(
+    @Query() input: GetCommissionFileDownloadDto,
+    @Ip() ip: string
+  ) {
+    return this.commissionService.getDownloadUrl(input, ip);
   }
 
   @Patch('file')
@@ -78,5 +128,21 @@ export class PayaController {
     @Ip() ip: string
   ) {
     return this.payaService.uploadFile({ ...body, file, ip });
+  }
+
+  @Patch('commission-file')
+  @ApiResponse({
+    status: 200,
+    description: 'Uploads a single commission file',
+  })
+  @ApiOperation({ summary: 'Uploads a single commission file' })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file'))
+  public async uploadCommissionFile(
+    @UploadedFile() file: File,
+    @Body() body: CommissionFileUploadDto,
+    @Ip() ip: string
+  ) {
+    return this.commissionService.uploadFile({ ...body, file, ip });
   }
 }
