@@ -2,9 +2,13 @@ import { createHash } from 'node:crypto';
 
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InjectPinoLogger } from 'nestjs-pino';
+import { Logger } from 'pino';
 
 import type { FileUploadDto } from '@/api/shared/aws/dto/s3.dto';
 import { S3Service } from '@/api/shared/aws/s3.service';
+import { EmailService } from '@/api/shared/email/email.service';
+import { EmailTemplateMessage } from '@/api/shared/email/email-template-message';
 import { PayaMonthlyResidualMetadataRepository } from '@/paya-db/repositories';
 
 import type { CommissionFileUploadDto } from './dto/file-upload.dto';
@@ -21,12 +25,15 @@ export class CommissionService {
 
   public constructor(
     private readonly s3Service: S3Service,
+    private readonly emailService: EmailService,
     private readonly payaMonthlyResidualMetadataRepository: PayaMonthlyResidualMetadataRepository,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    @InjectPinoLogger(CommissionService.name) private readonly logger: Logger
   ) {
     console.log('🚀 CommissionService - CONSTRUCTOR START');
     console.log('📦 Services injected:', {
       s3Service: !!this.s3Service,
+      emailService: !!this.emailService,
       payaMonthlyResidualMetadataRepository: !!this.payaMonthlyResidualMetadataRepository,
       configService: !!this.configService
     });
@@ -141,9 +148,33 @@ export class CommissionService {
       if (item) {
         throw new Error('File already uploaded for this month');
       }
+
+      // Check for existing file to compare hashes
+      const existingFile = await this.payaMonthlyResidualMetadataRepository.findOne({
+        where: { fileId },
+        order: { createdAt: 'DESC' }
+      });
       
       const fileContent = file.buffer;
       const contentHash = createHash('sha256').update(fileContent).digest('hex');
+
+      let validHash = true;
+      if (existingFile && existingFile.contentHash !== contentHash) {
+        validHash = false;
+        const description = 'Alert! Uploaded Commission file has different content from previously uploaded file. Finance/Accounting department will be notified via e-mail shortly.';
+        const emailTemplate = new EmailTemplateMessage(
+          ['crhistian@solvedex.com'], // FIXME: Test email
+          `Alert! Uploaded Commission ${file.originalname}`,
+          'tsys-fiu-changed-file',
+          {
+            description,
+          }
+        );
+        await this.emailService.send(emailTemplate).catch((error) => {
+          this.logger.error('Failed to send email');
+          this.logger.error(error);
+        });
+      }
 
       const fileMonthDate = new Date(fileMonth);
       const year = fileMonthDate.getFullYear();

@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsString, IsNumber, IsOptional, IsDateString } from 'class-validator';
 
 export class CommissionFileUploadDto {
@@ -6,6 +7,7 @@ export class CommissionFileUploadDto {
     type: 'number',
     description: 'The numeric file ID',
   })
+  @Transform(({ value }) => parseInt(value, 10))
   @IsNumber()
   public fileId: number;
 

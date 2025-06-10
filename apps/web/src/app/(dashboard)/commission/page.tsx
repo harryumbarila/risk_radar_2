@@ -155,6 +155,29 @@ const CommissionPage: React.FC = () => {
                       Created: {new Date(file.createdAt).toLocaleString()}
                     </p>
                   </div>
+                  {canUpload && !isLoadingUpload ? (
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => handleUploadClick(file.id)}
+                        className="flex items-center px-3 py-1 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg"
+                      >
+                        <UploadCloud className="w-4 h-4 mr-1" />
+                        Upload File
+                      </button>
+                      <input
+                        type="file"
+                        accept=".xls,.xlsx,.csv"
+                        className="hidden"
+                        ref={(el) => {
+                          fileInputRefs.current[file.id] = el;
+                        }}
+                        onChange={(e) =>
+                          handleFileChange(e, String(file.fileId), file.fileMonth.toString())
+                        }
+                      />
+                    </div>
+                  ) : null}
                 </div>
                 <div className="mt-4">
                   <h3 className="text-sm font-medium text-gray-700">File Details:</h3>
@@ -166,7 +189,7 @@ const CommissionPage: React.FC = () => {
                             Commission File
                           </p>
                           <p className="text-xs text-gray-600">
-                            S3 Path: {file.s3DirectoryPath || file.originalS3Key}
+                            Filename: {file.s3DirectoryPath || file.originalS3Key}
                           </p>
                           {file.recordCount && (
                             <p className="text-xs text-gray-600">
