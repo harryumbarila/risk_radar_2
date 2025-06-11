@@ -29,24 +29,25 @@ export type CommissionFile = {
   id: string;
   createdAt: Date;
   updatedAt: Date;
-  fileId: number;
-  fileMonth: Date;
-  originalS3Key: string;
-  summaryExcelS3Key?: string;
-  contentHash: string;
-  fileSizeBytes: number;
-  recordCount: number;
-  revenueTotal: number;
-  expenseTotal: number;
-  downloaderUserName?: string;
-  uploaderUserName?: string;
-  variantType?: string;
-  s3DirectoryPath?: string;
-  contentsHash?: string;
+  fileName: string;
+  variants: CommissionFileVariant[];
+};
+
+export type CommissionFileVariant = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  fileId: string;
+  variantType: string;
+  s3DirectoryPath: string;
+  contentsHash: string;
+  validHash: boolean;
   uploaderIp?: string;
-  downloadedAt?: Date;
+  downloadedAt?: string;
   downloaderIp?: string;
-  modifiedAt?: Date;
+  modifiedAt?: string;
+  uploaderUserName?: string;
+  downloaderUserName?: string;
 };
 
 export type TsysFiuFileResponse = PaginationResponse<TsysFiuFile>;

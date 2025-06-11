@@ -21,7 +21,10 @@ import { Public } from '@/api/shared/auth/decorator/public.decorator';
 import { CommissionService } from './services/commission/commission.service';
 import { CommissionFileUploadDto } from './services/commission/dto/file-upload.dto';
 import { GetCommissionFileDownloadDto } from './services/commission/dto/get-download.dto';
-import { ListCommissionPaginationInput, ListCommissionPaginationOutput } from './services/commission/dto/list-commission.dto';
+import {
+  ListCommissionPaginationInput,
+  ListCommissionPaginationOutput,
+} from './services/commission/dto/list-commission.dto';
 import { TsysFiuFileUploadDto } from './services/tsys-fiu/dto/file-upload.dto';
 import { GetTsysFiuFileDownloadDto } from './services/tsys-fiu/dto/get-download.dto';
 import {
@@ -61,25 +64,15 @@ export class PayaController {
     description: 'The commission files and variants',
   })
   @ApiOperation({
-    operationId: 'commission',
+    operationId: 'residual',
     summary: 'Retrieve commission files and variants',
   })
-  @Get('commission')
+  @Get('residual')
   @Public()
   public async listCommissionFiles(
     @Query() query: ListCommissionPaginationInput
   ): Promise<ListCommissionPaginationOutput> {
-    console.log('PayaController.listCommissionFiles - START', { query });
-    console.log('Commission service available:', !!this.commissionService);
-    
-    try {
-      const result = await this.commissionService.listFiles(query);
-      console.log('PayaController.listCommissionFiles - SUCCESS');
-      return result;
-    } catch (error) {
-      console.error('PayaController.listCommissionFiles - ERROR:', error);
-      throw error;
-    }
+    return this.commissionService.listFiles(query);
   }
 
   @ApiResponse({
@@ -100,15 +93,14 @@ export class PayaController {
     description: 'The commission file url from aws',
   })
   @ApiOperation({
-    operationId: 'commission-url',
+    operationId: 'residual-url',
     summary: 'Retrieve commission files variant url from s3',
   })
-  @Get('commission-download-url')
+  @Get('residual-download-url')
   public async getCommissionDownloadUrl(
-    @Query() input: GetCommissionFileDownloadDto,
-    @Ip() ip: string
+    @Query() input: GetCommissionFileDownloadDto
   ) {
-    return this.commissionService.getDownloadUrl(input, ip);
+    return this.commissionService.getDownloadUrl(input);
   }
 
   @Patch('file')
@@ -132,7 +124,7 @@ export class PayaController {
     return this.payaService.uploadFile({ ...body, file });
   }
 
-  @Patch('commission-file')
+  @Patch('residual-file')
   @ApiResponse({
     status: 200,
     description: 'Uploads a single commission file',

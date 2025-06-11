@@ -21,10 +21,13 @@ export const useUploadCommissionFile = (): UseUploadCommissionReturnType => {
     async (body: FormData): Promise<void> => {
       setIsLoading(true);
       try {
-        const result = await makeRequest<CommissionFileResponse>('/v1/paya/commission-file', {
-          body,
-          method: 'PATCH',
-        });
+        const result = await makeRequest<CommissionFileResponse>(
+          '/v1/paya/residual-file',
+          {
+            body,
+            method: 'PATCH',
+          }
+        );
 
         setData(result);
         setError(null);
@@ -38,4 +41,4 @@ export const useUploadCommissionFile = (): UseUploadCommissionReturnType => {
   );
 
   return { data, isLoading, error, uploadFile };
-}; 
+};

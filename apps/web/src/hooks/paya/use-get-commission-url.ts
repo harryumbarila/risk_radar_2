@@ -6,6 +6,7 @@ import type { InvoiceUrlResponseDto } from '@/shared/response';
 export type CommissionFileUrlFilterState = {
   id: string;
   userName: string;
+  ip: string;
 };
 
 export type UseCommissionFileUrlReturnType = {
@@ -22,7 +23,9 @@ export const useCommissionFileUrl = (): UseCommissionFileUrlReturnType => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const createQuery = (filtersToApply: CommissionFileUrlFilterState): string => {
+  const createQuery = (
+    filtersToApply: CommissionFileUrlFilterState
+  ): string => {
     const urlQueryParams = new URLSearchParams();
 
     Object.entries(filtersToApply).forEach(([key, value]) => {
@@ -49,7 +52,7 @@ export const useCommissionFileUrl = (): UseCommissionFileUrlReturnType => {
         const queryParams = createQuery(filtersToApply);
 
         const result = await makeRequest<InvoiceUrlResponseDto>(
-          `/v1/paya/commission-download-url?${queryParams}`
+          `/v1/paya/residual-download-url?${queryParams}`
         );
 
         setError(null);
@@ -65,4 +68,4 @@ export const useCommissionFileUrl = (): UseCommissionFileUrlReturnType => {
   );
 
   return { isLoading, error, fetchData };
-}; 
+};

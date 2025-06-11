@@ -18,10 +18,10 @@ export const PERMISSIONS = {
     READ: 'talus:read:TSYS-FIU',
     WRITE: 'talus:read:TSYS-FIU',
   },
-  COMMISSION: {
+  RESIDUAL: {
     // Using the same permissions as TSYS_FIU for now
-    READ: 'talus:read:invoice',
-    WRITE: 'talus:write:invoice',
+    READ: 'talus:write:residual',
+    WRITE: 'talus:read:residual',
   },
 };
 

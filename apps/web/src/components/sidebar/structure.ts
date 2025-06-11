@@ -3,8 +3,8 @@ import {
   ChartColumnStacked,
   Link2,
   Radar,
-  UserPen,
   Receipt,
+  UserPen,
 } from 'lucide-react';
 
 import type { ResourceKey } from '@/types/permissions';
@@ -57,10 +57,10 @@ const sidebarStructure: SidebarItem[] = [
         icon: ChartCandlestick,
       },
       {
-        id: 'commission',
-        title: 'Commission',
-        name: 'COMMISSION',
-        link: '/commission',
+        id: 'residual',
+        title: 'Residual',
+        name: 'RESIDUAL',
+        link: '/residual',
         icon: Receipt,
       },
     ],

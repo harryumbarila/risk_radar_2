@@ -45,13 +45,15 @@ export const useListCommissionFile = (): UseFilteredCommissionReturnType => {
   };
 
   const fetchData = useCallback(
-    async (filtersToApply: CommissionFilePaginationFilterState): Promise<void> => {
+    async (
+      filtersToApply: CommissionFilePaginationFilterState
+    ): Promise<void> => {
       setIsLoading(true);
       try {
         const queryParams = createQuery(filtersToApply);
 
         const result = await makeRequest<CommissionFileResponse>(
-          `/v1/paya/commission?${queryParams}`
+          `/v1/paya/residual?${queryParams}`
         );
 
         setData(result);
@@ -66,4 +68,4 @@ export const useListCommissionFile = (): UseFilteredCommissionReturnType => {
   );
 
   return { data, isLoading, error, fetchData };
-}; 
+};

@@ -1,28 +1,27 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import { IsString, IsNumber, IsOptional, IsDateString } from 'class-validator';
+import { IsEnum, IsString } from 'class-validator';
+
+import { CommissionFileVariantType } from '@/paya-db/enums';
 
 export class CommissionFileUploadDto {
   @ApiProperty({
-    type: 'number',
-    description: 'The numeric file ID',
+    type: 'string',
+    format: 'binary',
+    description: 'The file to upload',
   })
-  @Transform(({ value }) => parseInt(value, 10))
-  @IsNumber()
-  public fileId: number;
+  @IsString()
+  public fileId: string;
+
+  @ApiProperty({
+    enum: CommissionFileVariantType,
+    enumName: 'CommissionFileVariantType',
+  })
+  @IsEnum(CommissionFileVariantType)
+  public variant: CommissionFileVariantType;
 
   @ApiProperty({
     type: 'string',
-    format: 'date',
-    description: 'The month this file represents (YYYY-MM-DD format)',
-    example: '2025-05-01',
-  })
-  @IsDateString()
-  public fileMonth: string;
-
-  @ApiProperty({
-    type: 'string',
-    description: 'The user name of the uploader',
+    description: 'The user name to submitted',
   })
   @IsString()
   public userName: string;
@@ -33,4 +32,11 @@ export class CommissionFileUploadDto {
   })
   @IsString()
   public modifiedAt: string;
-} 
+
+  @ApiProperty({
+    type: 'string',
+    description: 'The user IP address',
+  })
+  @IsString()
+  public ip: string;
+}

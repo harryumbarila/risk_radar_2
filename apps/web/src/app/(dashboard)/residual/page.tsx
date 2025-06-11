@@ -6,13 +6,15 @@ import { RefreshCw, UploadCloud } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 
-import { useListCommissionFile } from '@/hooks/paya/list-commission';
 import { useUploadCommissionFile } from '@/hooks/paya/commission-file-upload-file';
+import { useListCommissionFile } from '@/hooks/paya/list-commission';
 import { useCommissionFileUrl } from '@/hooks/paya/use-get-commission-url';
 
 const variantColors: Record<string, string> = {
   SUBMITTED: 'bg-green-100 border-green-300 text-green-800',
-  TSYS_RESPONSE: 'bg-blue-100 border-blue-300 text-blue-800',
+  PROVIDED: 'bg-blue-100 border-blue-300 text-blue-800',
+  PROCESSED: 'bg-purple-100 border-purple-300 text-purple-800',
+  INVALID: 'bg-red-100 border-red-300 text-red-800',
 };
 
 function capitalizeFirstLetter(val: string): string {
@@ -29,7 +31,8 @@ const CommissionPage: React.FC = () => {
 
   const { user } = useAuth();
 
-  const { fetchData: fetchCommissionFileUrl } = useCommissionFileUrl();
+  const { fetchData: fetchCommissionFileUrl, isLoading: isDownloading } =
+    useCommissionFileUrl();
   const { uploadFile, isLoading: isLoadingUpload } = useUploadCommissionFile();
 
   const fileInputRefs = React.useRef<Record<string, HTMLInputElement | null>>(
@@ -43,6 +46,20 @@ const CommissionPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const limit = 10;
+
+  const getCurrentIp = async (): Promise<string> => {
+    try {
+      const res = await fetch('https://api.ipify.org/?format=json');
+      if (!res.ok) {
+        throw new Error('Failed to fetch IP Address');
+      }
+
+      const output = (await res.json()) as { ip: string };
+      return output.ip;
+    } catch (err) {
+      return '';
+    }
+  };
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -69,17 +86,29 @@ const CommissionPage: React.FC = () => {
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
     fileId: string,
-    fileMonth: string
+    variant: string
   ): Promise<void> => {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    if (file.size > 5 * 1024 * 1024) {
+      await Swal.fire({
+        title: 'File too large',
+        text: 'Please upload a file smaller than 5MB.',
+        icon: 'error',
+        confirmButtonColor: '#3C50E0',
+      });
+      return;
+    }
+
+    const currentIp = await getCurrentIp();
     const formData = new FormData();
     formData.append('file', file);
     formData.append('fileId', fileId);
-    formData.append('fileMonth', fileMonth);
     formData.append('modifiedAt', String(file.lastModified));
+    formData.append('variant', variant);
     formData.append('userName', user?.name || '');
+    formData.append('ip', currentIp);
 
     try {
       await uploadFile(formData);
@@ -103,12 +132,18 @@ const CommissionPage: React.FC = () => {
     });
 
     if (result.isConfirmed) {
-      const req = await fetchCommissionFileUrl({ id, userName: user?.name || '' });
+      const currentIp = await getCurrentIp();
+
+      const req = await fetchCommissionFileUrl({
+        id,
+        userName: user?.name || '',
+        ip: currentIp,
+      });
 
       if (!req) return;
       const link = document.createElement('a');
       link.href = req.url;
-      link.download = ''; // Optional: specify a filename like 'invoice.pdf'
+      link.download = ''; // Optional: specify a filename
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -122,7 +157,7 @@ const CommissionPage: React.FC = () => {
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <div className="p-4">
-        <h1 className="text-2xl font-bold mb-4">Commission Files</h1>
+        <h1 className="text-2xl font-bold mb-4">Residual Files</h1>
 
         <input
           type="text"
@@ -137,101 +172,114 @@ const CommissionPage: React.FC = () => {
 
         <div className="space-y-4">
           {value.data.map((file) => {
-            // Commission files don't have variants - they are single records
-            const canUpload = !file.uploaderUserName; // Can upload if no uploader yet
-            const canDownload = !file.downloaderIp; // Can download if not downloaded yet
+            const uploadSubmission = file.variants.length === 1;
+
+            const uploadVariant =
+              file.variants.length === 1 ? 'SUBMITTED' : 'PROCESSED';
 
             return (
               <div key={file.id} className="bg-white rounded-2xl shadow p-4">
                 <div className="mb-2 flex justify-between items-center">
                   <div>
                     <h2 className="text-lg font-semibold text-gray-800">
-                      File ID: {file.fileId}
+                      {file.fileName}
                     </h2>
                     <p className="text-sm text-gray-500">
-                      Month: {new Date(file.fileMonth).toLocaleDateString()}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Created: {new Date(file.createdAt).toLocaleString()}
+                      Created at: {new Date(file.createdAt).toLocaleString()}
                     </p>
                   </div>
-                  {canUpload && !isLoadingUpload ? (
-                    <div>
+                  {uploadSubmission && !isLoadingUpload ? (
+                    <>
                       <button
                         type="button"
                         onClick={() => handleUploadClick(file.id)}
                         className="flex items-center px-3 py-1 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg"
                       >
                         <UploadCloud className="w-4 h-4 mr-1" />
-                        Upload File
+                        {`Upload ${capitalizeFirstLetter(
+                          uploadVariant.toLocaleLowerCase().split('_').join(' ')
+                        )}`}
                       </button>
                       <input
                         type="file"
-                        accept=".xls,.xlsx,.csv"
+                        accept=".csv,.xlsx,.xls"
                         className="hidden"
                         ref={(el) => {
                           fileInputRefs.current[file.id] = el;
                         }}
                         onChange={(e) =>
-                          handleFileChange(e, String(file.fileId), file.fileMonth.toString())
+                          handleFileChange(e, file.id, uploadVariant)
                         }
                       />
-                    </div>
+                    </>
                   ) : null}
                 </div>
                 <div className="mt-4">
-                  <h3 className="text-sm font-medium text-gray-700">File Details:</h3>
-                  <div className="mt-2">
-                    <div className="border rounded-xl p-3 bg-blue-100 border-blue-300 text-blue-800">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <p className="text-sm font-semibold text-gray-800">
-                            Commission File
-                          </p>
-                          <p className="text-xs text-gray-600">
-                            Filename: {file.s3DirectoryPath || file.originalS3Key}
-                          </p>
-                          {file.recordCount && (
-                            <p className="text-xs text-gray-600">
-                              Records: {file.recordCount}
+                  <h3 className="text-sm font-medium text-gray-700">Status:</h3>
+                  <div className="mt-2 space-y-2">
+                    {file.variants.map((variant) => (
+                      <div
+                        key={variant.id}
+                        className={`border rounded-xl p-3 ${
+                          !variant.validHash
+                            ? variantColors.INVALID
+                            : variantColors[variant.variantType] ||
+                              'bg-gray-100 border-gray-300 text-gray-800'
+                        }`}
+                      >
+                        <div className="flex justify-between items-center">
+                          <div>
+                            {!variant.validHash && (
+                              <p className="text-sm font-semibold text-red-800">
+                                Submitted file is not the same as uploaded
+                                provided file
+                              </p>
+                            )}
+
+                            <p className="text-sm font-semibold text-gray-800">
+                              Type: {variant.variantType}
                             </p>
-                          )}
-                          {file.revenueTotal && (
                             <p className="text-xs text-gray-600">
-                              Revenue: ${file.revenueTotal}
+                              Path: {variant.s3DirectoryPath}
                             </p>
-                          )}
-                          {file.downloaderUserName && (
-                            <p className="text-xs text-gray-600">
-                              Downloaded by: {file.downloaderUserName}
+
+                            {variant.downloaderUserName ? (
+                              <p className="text-xs text-gray-600">
+                                Downloaded: {variant.downloaderUserName}
+                              </p>
+                            ) : null}
+                            {variant.uploaderUserName ? (
+                              <p className="text-xs text-gray-600">
+                                Uploaded: {variant.uploaderUserName}
+                              </p>
+                            ) : null}
+                          </div>
+                          <div className="text-right text-xs text-gray-500">
+                            <p>
+                              {new Date(variant.createdAt).toLocaleString()}
                             </p>
-                          )}
-                          {file.uploaderUserName && (
-                            <p className="text-xs text-gray-600">
-                              Uploaded by: {file.uploaderUserName}
-                            </p>
-                          )}
-                        </div>
-                        <div className="text-right text-xs text-gray-500">
-                          <p>
-                            {new Date(file.createdAt).toLocaleString()}
-                          </p>
-                          {canDownload ? (
-                            <button
-                              type="button"
-                              className="flex w-full justify-center rounded p-1 font-medium text-gray bg-primary hover:bg-opacity-90"
-                              onClick={() => handleDownload(file.id)}
-                            >
-                              Download
-                            </button>
-                          ) : (
-                            <span className="text-xs text-red-500">
-                              Already Downloaded
-                            </span>
-                          )}
+                            {!variant.downloaderIp &&
+                            !isDownloading &&
+                            !isLoading ? (
+                              <button
+                                type="button"
+                                disabled={!!variant.downloaderIp}
+                                className={classNames(
+                                  'flex w-full justify-center rounded p-1 font-medium text-gray bg-primary hover:bg-opacity-90',
+                                  {
+                                    'bg-gray-400 cursor-not-allowed opacity-50 pointer-events-none':
+                                      !!variant.downloaderIp,
+                                  }
+                                )}
+                                onClick={() => handleDownload(variant.id)}
+                              >
+                                Download
+                              </button>
+                            ) : null}
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -262,4 +310,4 @@ const CommissionPage: React.FC = () => {
   );
 };
 
-export default CommissionPage; 
+export default CommissionPage;
