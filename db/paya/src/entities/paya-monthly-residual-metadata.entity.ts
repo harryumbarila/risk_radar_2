@@ -58,4 +58,4 @@ export class PayaMonthlyResidualMetadata extends BaseEntity {
 
   @Column({ name: 'modified_at', type: 'timestamptz', nullable: true })
   public modifiedAt?: Date;
-} 
+}

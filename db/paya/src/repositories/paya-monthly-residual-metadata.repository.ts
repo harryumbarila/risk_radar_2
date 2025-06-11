@@ -9,4 +9,4 @@ export class PayaMonthlyResidualMetadataRepository extends Repository<PayaMonthl
   public constructor(@InjectDataSource('paya') dataSource: DataSource) {
     super(PayaMonthlyResidualMetadata, dataSource.createEntityManager());
   }
-} 
+}
