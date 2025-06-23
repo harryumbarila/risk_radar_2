@@ -439,6 +439,7 @@ export class RiskRadarSaveService {
         } else if (clickedStatus === 'mgrq') {
           this.logger.log(`Step 10b: Processing manager queue status`);
           exceptionJeff.exceptionStatusId = 3;
+          exceptionJeff.userReviewed = null;
 
           await this.notesRepository.createManagerQueuedNotes(
             merchantId,
