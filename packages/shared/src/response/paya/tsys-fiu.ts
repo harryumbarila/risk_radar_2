@@ -25,4 +25,30 @@ export type TsysFiuFileVariant = {
   downloaderUserName?: string;
 };
 
+export type CommissionFile = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  fileName: string;
+  variants: CommissionFileVariant[];
+};
+
+export type CommissionFileVariant = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  fileId: string;
+  variantType: string;
+  s3DirectoryPath: string;
+  contentsHash: string;
+  validHash: boolean;
+  uploaderIp?: string;
+  downloadedAt?: string;
+  downloaderIp?: string;
+  modifiedAt?: string;
+  uploaderUserName?: string;
+  downloaderUserName?: string;
+};
+
 export type TsysFiuFileResponse = PaginationResponse<TsysFiuFile>;
+export type CommissionFileResponse = PaginationResponse<CommissionFile>;

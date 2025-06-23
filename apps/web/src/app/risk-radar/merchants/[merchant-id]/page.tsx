@@ -603,6 +603,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const handleManagersQueueTrigger = async (): Promise<void> => {
     const newStatus =
       merchantStateData.clickedStatus === 'mgrq' ? 'none' : 'mgrq';
+
     setMerchantStateData((prev) => ({
       ...prev,
       clickedStatus: newStatus,
@@ -612,6 +613,10 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       ...prev,
       clickedStatus: true,
     }));
+
+    if (newStatus === 'mgrq') {
+      setReviewStatus('none');
+    }
 
     if (user?.name) {
       await saveChangedFields({ clickedStatus: newStatus });
@@ -1118,7 +1123,8 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     : 'Review'}
               </button>
 
-              {riskException?.fkRiskExceptionStatus === 1 && (
+              {(riskException?.fkRiskExceptionStatus === 1 ||
+                riskException?.fkRiskExceptionStatus === 2) && (
                 <button
                   className={`inline-flex items-center justify-center rounded-lg border px-4 py-1 text-white transition-colors
                 ${

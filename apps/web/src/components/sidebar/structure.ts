@@ -3,6 +3,7 @@ import {
   ChartColumnStacked,
   Link2,
   Radar,
+  Receipt,
   UserPen,
 } from 'lucide-react';
 
@@ -54,6 +55,13 @@ const sidebarStructure: SidebarItem[] = [
         name: 'TSYS_FIU',
         link: '/tsys-fiu',
         icon: ChartCandlestick,
+      },
+      {
+        id: 'residual',
+        title: 'Residual',
+        name: 'RESIDUAL',
+        link: '/residual',
+        icon: Receipt,
       },
     ],
   },
