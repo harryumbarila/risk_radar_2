@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectPinoLogger } from 'nestjs-pino';
 import { Logger } from 'pino';
 
@@ -14,6 +14,9 @@ type ExceptionWithMid = Pick<RiskRadarExceptionsJeffEntity, 'id' | 'mid'>;
  */
 @Injectable()
 export class AssignExceptionsService {
+  // Add a static map to track in-progress assignments at the class level
+  private static inProgressAssignments: Map<string, string> = new Map();
+
   public constructor(
     @InjectPinoLogger(AssignExceptionsService.name)
     private readonly logger: Logger,
@@ -61,15 +64,90 @@ export class AssignExceptionsService {
         return { success: false };
       }
 
+      // Check if any exceptions are already assigned (status 4)
+      const existingExceptions = await this.assignExceptionsRepository
+        .createQueryBuilder('exception')
+        .select([
+          'exception.id',
+          'exception.exceptionStatusId',
+          'exception.assignedUserId',
+        ])
+        .whereInIds(exceptionIdArray)
+        .getMany();
+
+      const alreadyAssignedExceptions = existingExceptions.filter(
+        (exception) => exception.exceptionStatusId === 4
+      );
+
+      if (alreadyAssignedExceptions.length > 0) {
+        const assignedExceptionIds = alreadyAssignedExceptions
+          .map((e) => e.id)
+          .join(', ');
+        this.logger.warn(
+          `Assignment rejected: Exceptions ${assignedExceptionIds} are already assigned (status 4)`
+        );
+        throw new BadRequestException(
+          `The following exceptions are already assigned to users: ${assignedExceptionIds}. Please refresh the page and try again.`
+        );
+      }
+
       // Get the NT user ID of the assigned user
       const assignedUser = await this.userService.getUserById(assignToUserId);
       const assignedUserName = assignedUser?.ntUserId || '';
 
-      // Use the repository to handle the database operations
-      await this.assignExceptionsRepository.assignExceptions(
-        exceptionIdArray,
-        assignToUserId
+      // Check for concurrent assignments on the same exceptions
+      const assignmentKeys = exceptionIdArray.map(
+        (exceptionId) => `assignment-${exceptionId}`
       );
+
+      const conflictingExceptions = exceptionIdArray
+        .map((exceptionId, index) => {
+          const assignmentKey = assignmentKeys[index];
+          if (
+            AssignExceptionsService.inProgressAssignments.has(assignmentKey)
+          ) {
+            const currentAssigner =
+              AssignExceptionsService.inProgressAssignments.get(assignmentKey);
+            return `${exceptionId} (being assigned by ${currentAssigner})`;
+          }
+          return null;
+        })
+        .filter((item): item is string => item !== null);
+
+      if (conflictingExceptions.length > 0) {
+        this.logger.warn(
+          `Assignment conflicts detected for exceptions: ${conflictingExceptions.join(', ')}. 
+          Rejecting concurrent assignment attempt by ${createdBy}.`
+        );
+        throw new BadRequestException(
+          `The following exceptions are currently being assigned by another user: ${conflictingExceptions.join(', ')}. Please try again later.`
+        );
+      }
+
+      try {
+        // Set locks for all exceptions being assigned
+        assignmentKeys.forEach((key) => {
+          AssignExceptionsService.inProgressAssignments.set(key, createdBy);
+        });
+
+        this.logger.debug(
+          `Assignment locks acquired for exceptions ${exceptionIdArray.join(', ')} by ${createdBy}`
+        );
+
+        // Use the repository to handle the database operations
+        await this.assignExceptionsRepository.assignExceptions(
+          exceptionIdArray,
+          assignToUserId
+        );
+      } finally {
+        // Always release the locks, even if an error occurs
+        assignmentKeys.forEach((key) => {
+          AssignExceptionsService.inProgressAssignments.delete(key);
+        });
+        this.logger.debug(
+          `Assignment locks released for exceptions ${exceptionIdArray.join(', ')}`
+        );
+      }
 
       // Get MIDs for the assigned exceptions
       const exceptions =
