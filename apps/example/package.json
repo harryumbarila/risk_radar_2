@@ -27,7 +27,7 @@
     "@tailwindcss/postcss": "^4",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.5.0",
-    "@testing-library/react": "^16.0.1",
+    "@testing-library/react": "^16.3.0",
     "@types/dropzone": "^5.7.9",
     "@types/jest": "^29.5.2",
     "@types/node": "^20.11.24",
