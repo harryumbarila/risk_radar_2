@@ -3,7 +3,7 @@
   "description": "TypeORM Iris database integration",
   "version": "0.0.0",
   "dependencies": {
-    "@nestjs/common": "^10.0.0",
+    "@nestjs/common": "^10.4.16",
     "@nestjs/typeorm": "^11.0.0",
     "@t3-oss/env-core": "^0.6.1",
     "mssql": "^11.0.1",
