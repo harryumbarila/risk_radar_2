@@ -73,7 +73,7 @@
     "jest-transform-css": "^6.0.2",
     "postcss": "^8",
     "prettier": "^3.2.5",
-    "prettier-plugin-tailwindcss": "^0.5.11",
+    "prettier-plugin-tailwindcss": "^0.6.13",
     "tailwindcss": "^3.4.1",
     "ts-jest": "^29.2.4",
     "typescript": "^5.3.3"
