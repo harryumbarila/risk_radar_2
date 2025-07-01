@@ -1,0 +1,75 @@
+@startuml
+allowmixing
+left to right direction
+
+' Denali Internal Architecture Diagram (Business-Oriented, Improved Layout)
+
+package "Denali Platform" {
+  ' Business Domains (top row)
+  package "Risk Management" as RM {
+    class "Risk Radar Controller" as RiskRadarController
+    class "Risk Radar Service" as RiskRadarService
+    class "Exception Orchestration" as ExceptionOrchestrator
+    class "Merchant Exception Workflow" as MerchantExceptionWorkflow
+    class "Risk Data Aggregation" as RiskDataAggregator
+    class "Risk Repositories" as RiskRepositories
+    RiskRadarController --> RiskRadarService
+    RiskRadarService --> ExceptionOrchestrator
+    ExceptionOrchestrator --> MerchantExceptionWorkflow
+    MerchantExceptionWorkflow --> RiskDataAggregator
+    RiskDataAggregator --> RiskRepositories
+  }
+
+  package "Banking Integration" as BI {
+    class "Partner Banks Controller" as PartnerBanksController
+    class "Partner Banks Service" as PartnerBanksService
+    class "Banking Data Aggregation" as BankingDataAggregator
+    class "Banking Repositories" as BankingRepositories
+    PartnerBanksController --> PartnerBanksService
+    PartnerBanksService --> BankingDataAggregator
+    BankingDataAggregator --> BankingRepositories
+  }
+
+  package "Payment Integration" as PI {
+    class "Paya Controller" as PayaController
+    class "Paya Service" as PayaService
+    class "Payment Repositories" as PaymentRepositories
+    PayaController --> PayaService
+    PayaService --> PaymentRepositories
+  }
+
+  package "Legacy Integration" as LI {
+    class "Legacy Dashboard Controller" as LegacyDashboardController
+    class "Legacy Dashboard Client" as LegacyDashboardClient
+    class "Legacy Data Repositories" as LegacyRepositories
+    LegacyDashboardController --> LegacyDashboardClient
+    LegacyDashboardClient --> LegacyRepositories
+  }
+
+  ' Shared Services & Utilities (bottom row)
+  package "Shared Services & Utilities" as SSU {
+    class "AWS S3 Service" as AWSS3Service
+    class "Email Service" as EmailService
+    class "Buffer Utilities" as BufferUtils
+    class "Authentication & Guards" as AuthGuards
+    class "Config Management" as ConfigService
+    class "Logger" as Logger
+    class "DTOs & Validation" as DTOs
+  }
+
+  ' Cross-domain dependencies (vertical arrows for clarity)
+  RiskRadarService -down-> AWSS3Service : uses
+  RiskRadarService -down-> EmailService : uses
+  RiskRadarService -down-> AuthGuards : uses
+  RiskRadarService -down-> DTOs : uses
+  PartnerBanksService -down-> AWSS3Service : uses
+  PartnerBanksService -down-> EmailService : uses
+  PartnerBanksService -down-> BufferUtils : uses
+  PartnerBanksService -down-> AuthGuards : uses
+  PartnerBanksService -down-> DTOs : uses
+  PayaService -down-> AuthGuards : uses
+  PayaService -down-> DTOs : uses
+  LegacyDashboardClient -down-> DTOs : uses
+}
+
+@enduml 

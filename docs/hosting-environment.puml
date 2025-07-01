@@ -1,0 +1,43 @@
+@startuml
+allowmixing
+
+' Denali Hosting/External Environment Diagram
+
+cloud "Cloud/Datacenter" {
+  rectangle "Denali API Service" as API
+  database "Finance DB" as DB_Finance
+  database "Iris DB" as DB_Iris
+  database "Paya DB" as DB_Paya
+  database "DSM DB" as DB_DSM
+  database "EZ Enroll DB" as DB_EZEnroll
+  database "EZ Enroll PCC DB" as DB_EZEnrollPCC
+  database "Crescent View DB" as DB_Crescent
+  database "Snap PCC DB" as DB_SnapPCC
+  database "Connector DB" as DB_Connector
+  database "Data Warehouse" as DB_DW
+}
+
+cloud "External Services" {
+  rectangle "Banking Partners API" as Ext_BankAPI
+  rectangle "Payment Gateway (Paya)" as Ext_Paya
+  rectangle "Legacy Dashboard" as Ext_Legacy
+  rectangle "Iris External System" as Ext_Iris
+}
+
+API --> DB_Finance
+API --> DB_Iris
+API --> DB_Paya
+API --> DB_DSM
+API --> DB_EZEnroll
+API --> DB_EZEnrollPCC
+API --> DB_Crescent
+API --> DB_SnapPCC
+API --> DB_Connector
+API --> DB_DW
+
+API --> Ext_BankAPI : "Partner Banks"
+API --> Ext_Paya : "Payment Processing"
+API --> Ext_Legacy : "Legacy Dashboard Proxy"
+API --> Ext_Iris : "Iris Proxy"
+
+@enduml 

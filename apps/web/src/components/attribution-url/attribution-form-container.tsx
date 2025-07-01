@@ -235,7 +235,7 @@ export const AttributionFormContainer: React.FC<
             className="mb-2.5 block text-black dark:text-white"
             htmlFor="existingLeadId"
           >
-            Lead ID / IRIS URL
+            Lead ID
             <span className="text-meta-1">*</span>
           </label>
           <input
@@ -243,7 +243,7 @@ export const AttributionFormContainer: React.FC<
             {...register('existingLeadId', {
               required: 'Lead ID is required',
             })}
-            placeholder="Enter lead ID or IRIS URL"
+            placeholder="Enter lead ID"
             className={`w-full rounded border ${
               errors.existingLeadId ? 'border-danger' : 'border-stroke'
             } bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary`}
