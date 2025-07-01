@@ -74,6 +74,13 @@ export class IrisProxyService {
     try {
       const lead = payload?.data?.lead || payload?.data?.leads?.[0];
 
+      this.logger.log(
+        JSON.stringify({
+          msg: 'lead-assigned-webhook',
+          lead,
+        })
+      );
+
       if (!lead.id) {
         throw new Error('Lead ID is required');
       }
@@ -123,12 +130,15 @@ export class IrisProxyService {
         referralPartnerUser = await this.getLeadSource(lead.id);
       }
 
-      this.logger.log({
-        solutionConsultantUser,
-        referralPartnerUser,
-        resellerUser,
-        isvUser,
-      });
+      this.logger.log(
+        JSON.stringify({
+          msg: 'lead-assigned-webhook',
+          solutionConsultantUser,
+          referralPartnerUser,
+          resellerUser,
+          isvUser,
+        })
+      );
 
       // Prod Stag
       // 8046	8438	Solution Consultant
@@ -150,6 +160,30 @@ export class IrisProxyService {
               reseller: '8048',
               isv: '8049',
             };
+
+      this.logger.log(
+        JSON.stringify({
+          msg: 'lead-assigned-webhook',
+          fields: [
+            {
+              id: codeMap.consultant,
+              value: solutionConsultantUser?.name || '',
+            },
+            {
+              id: codeMap.partner,
+              value: referralPartnerUser?.name || '',
+            },
+            {
+              id: codeMap.reseller,
+              value: resellerUser?.name || '',
+            },
+            {
+              id: codeMap.isv,
+              value: isvUser?.name || '',
+            },
+          ],
+        })
+      );
 
       await this.client.patch(`/api/v1/leads/${lead.id}`, {
         fields: [
