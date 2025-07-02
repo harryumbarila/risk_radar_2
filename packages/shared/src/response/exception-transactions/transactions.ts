@@ -17,6 +17,7 @@ export type TransactionResult = {
 
 export type FSPTransaction = {
   exceptionId: string;
+  type: string;
   TransactionDate: Date;
   Amount: number;
   sPaymentMethodDesc: string;
