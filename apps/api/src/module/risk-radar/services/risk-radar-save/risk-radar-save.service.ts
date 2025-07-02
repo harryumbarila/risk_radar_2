@@ -437,8 +437,10 @@ export class RiskRadarSaveService {
             this.logger.debug(`Lock released for exception ${exceptionId}`);
           }
         } else if (clickedStatus === 'mgrq') {
-          this.logger.log(`Step 10b: Processing manager queue status for exception ${exceptionId}`);
-          
+          this.logger.log(
+            `Step 10b: Processing manager queue status for exception ${exceptionId}`
+          );
+
           // Check if exception is already in manager queue (status 3)
           if (exceptionJeff.exceptionStatusId === 3) {
             this.logger.warn(
@@ -448,11 +450,12 @@ export class RiskRadarSaveService {
               `This exception is already in the manager queue.`
             );
           }
-          
+
           // Check if someone is currently reviewing this exception
           const reviewKey = `exception-${exceptionId}`;
           if (RiskRadarSaveService.inProgressReviews.has(reviewKey)) {
-            const currentReviewer = RiskRadarSaveService.inProgressReviews.get(reviewKey);
+            const currentReviewer =
+              RiskRadarSaveService.inProgressReviews.get(reviewKey);
             this.logger.warn(
               `Exception ${exceptionId} is currently being reviewed by ${currentReviewer}. 
               Rejecting managers queue attempt by ${createdBy}.`
@@ -465,7 +468,8 @@ export class RiskRadarSaveService {
           // Add concurrent protection for managers queue operations
           const managerQueueKey = `manager-queue-${exceptionId}`;
           if (RiskRadarSaveService.inProgressReviews.has(managerQueueKey)) {
-            const currentProcessor = RiskRadarSaveService.inProgressReviews.get(managerQueueKey);
+            const currentProcessor =
+              RiskRadarSaveService.inProgressReviews.get(managerQueueKey);
             this.logger.warn(
               `Exception ${exceptionId} is currently being processed for manager queue by ${currentProcessor}. 
               Rejecting concurrent attempt by ${createdBy}.`
@@ -477,35 +481,53 @@ export class RiskRadarSaveService {
 
           try {
             // Set lock for manager queue operation
-            this.logger.log(`Step 10b.1: Acquiring manager queue lock for exception ${exceptionId}`);
-            RiskRadarSaveService.inProgressReviews.set(managerQueueKey, createdBy);
-            this.logger.log(`Step 10b.1 Complete: Manager queue lock acquired by ${createdBy}`);
+            this.logger.log(
+              `Step 10b.1: Acquiring manager queue lock for exception ${exceptionId}`
+            );
+            RiskRadarSaveService.inProgressReviews.set(
+              managerQueueKey,
+              createdBy
+            );
+            this.logger.log(
+              `Step 10b.1 Complete: Manager queue lock acquired by ${createdBy}`
+            );
 
-            this.logger.log(`Step 10b.2: Updating exception status to manager queue (3) and clearing reviewer`);
+            this.logger.log(
+              `Step 10b.2: Updating exception status to manager queue (3) and clearing reviewer`
+            );
             exceptionJeff.exceptionStatusId = 3;
             exceptionJeff.userReviewed = null; // Clear reviewer when moving to managers queue
-            this.logger.log(`Step 10b.2 Complete: Exception status updated successfully`);
+            this.logger.log(
+              `Step 10b.2 Complete: Exception status updated successfully`
+            );
 
             this.logger.log(`Step 10b.3: Creating manager queue notes`);
             await this.notesRepository.createManagerQueuedNotes(
               merchantId,
               createdBy
             );
-            this.logger.log(`Step 10b.3 Complete: Manager queue notes created successfully`);
+            this.logger.log(
+              `Step 10b.3 Complete: Manager queue notes created successfully`
+            );
           } finally {
             // Always release the lock
-            this.logger.log(`Step 10b.4: Releasing manager queue lock for exception ${exceptionId}`);
+            this.logger.log(
+              `Step 10b.4: Releasing manager queue lock for exception ${exceptionId}`
+            );
             RiskRadarSaveService.inProgressReviews.delete(managerQueueKey);
             this.logger.log(`Step 10b.4 Complete: Manager queue lock released`);
           }
         } else if (clickedStatus === '') {
           // Reset status if empty string is provided
-          this.logger.log(`Step 10c: Resetting exception status for exception ${exceptionId}`);
-          
+          this.logger.log(
+            `Step 10c: Resetting exception status for exception ${exceptionId}`
+          );
+
           // Check for concurrent operations on this exception
           const resetKey = `reset-${exceptionId}`;
           if (RiskRadarSaveService.inProgressReviews.has(resetKey)) {
-            const currentProcessor = RiskRadarSaveService.inProgressReviews.get(resetKey);
+            const currentProcessor =
+              RiskRadarSaveService.inProgressReviews.get(resetKey);
             this.logger.warn(
               `Exception ${exceptionId} is currently being reset by ${currentProcessor}. 
               Rejecting concurrent reset attempt by ${createdBy}.`
@@ -517,17 +539,27 @@ export class RiskRadarSaveService {
 
           try {
             // Set lock for reset operation
-            this.logger.log(`Step 10c.1: Acquiring reset lock for exception ${exceptionId}`);
+            this.logger.log(
+              `Step 10c.1: Acquiring reset lock for exception ${exceptionId}`
+            );
             RiskRadarSaveService.inProgressReviews.set(resetKey, createdBy);
-            this.logger.log(`Step 10c.1 Complete: Reset lock acquired by ${createdBy}`);
+            this.logger.log(
+              `Step 10c.1 Complete: Reset lock acquired by ${createdBy}`
+            );
 
-            this.logger.log(`Step 10c.2: Resetting exception status to default (1) and clearing reviewer`);
+            this.logger.log(
+              `Step 10c.2: Resetting exception status to default (1) and clearing reviewer`
+            );
             exceptionJeff.exceptionStatusId = 1; // Reset to default status
             exceptionJeff.userReviewed = null;
-            this.logger.log(`Step 10c.2 Complete: Exception status reset successfully`);
+            this.logger.log(
+              `Step 10c.2 Complete: Exception status reset successfully`
+            );
           } finally {
             // Always release the lock
-            this.logger.log(`Step 10c.3: Releasing reset lock for exception ${exceptionId}`);
+            this.logger.log(
+              `Step 10c.3: Releasing reset lock for exception ${exceptionId}`
+            );
             RiskRadarSaveService.inProgressReviews.delete(resetKey);
             this.logger.log(`Step 10c.3 Complete: Reset lock released`);
           }
