@@ -50,7 +50,8 @@ export class FspExceptionTransactionService {
     const rawTransactions = await this.clxReportingRepository
       .createQueryBuilder('s')
       .select([
-        's.id as exceptionId',
+        's.id AS exceptionId',
+        's.type AS type',
         's.TransactionDateTime AS TransactionDate',
         's.Amount AS Amount ',
         'pm.sPaymentMethodDesc AS sPaymentMethodDesc',
@@ -101,7 +102,7 @@ export class FspExceptionTransactionService {
           acc[key] = {
             id: t.exceptionId,
             transactionDate: t.TransactionDate,
-            transactionAmount: t.Amount,
+            transactionAmount: t.type === 'Return' ? t.Amount * -1 : t.Amount,
             posEntryMode: t.sPaymentMethodDesc,
             avsResponseCode: t.sAVSRespDesc,
             authCode: t.AuthCode,
