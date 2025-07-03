@@ -86,6 +86,7 @@ export class PartnerBanksService {
         l.IrisMId,
         lbi.ContactName,
         lbi.ContactEmailAddress,
+        lml.InvoiceEmails,
         'MSP' + '-' + CONVERT(VARCHAR(25), b.pk) AS InvoiceNumber,
         lbi.DBAName,
         lbi.DBAAddress,
@@ -99,6 +100,7 @@ export class PartnerBanksService {
         finance..tblMSPMerchantsMonthlyBilling b
         JOIN leads l ON l.IrisMId = b.sMId AND l.IsArchived = 0
         JOIN LeadsBusinessInformation lbi ON lbi.LeadId = l.Id
+        JOIN LeadsMerchantLead lml ON lml.LeadId = l.id
         JOIN LeadsOwner lo ON lo.LeadId = l.id
       WHERE
         b.sYYYYMM = '${previousYYYYMM}' AND
@@ -155,7 +157,7 @@ export class PartnerBanksService {
         .toString()
         .padStart(2, '0');
       const previousYYYYMM = `${year}${previousMonth}`;
-
+      console.log({ partners });
       while (partners.length > 0) {
         await Promise.all(
           partners.splice(0, 10).map(async (partner) => {
@@ -179,6 +181,7 @@ export class PartnerBanksService {
               pk,
               DBAName,
               ContactEmailAddress,
+              InvoiceEmails,
               ContactName,
               InvoiceNumber,
               DBAAddress,
@@ -277,9 +280,11 @@ export class PartnerBanksService {
               dtInvoiceGenerated: () => 'GETDATE()',
             });
 
-            if (ContactEmailAddress) {
+            if (InvoiceEmails || ContactEmailAddress) {
               const emailTemplate = new EmailTemplateMessage(
-                [ContactEmailAddress],
+                InvoiceEmails
+                  ? InvoiceEmails.split(',')
+                  : [ContactEmailAddress],
                 `${DBAName} Invoice From Talus`,
                 'partner-invoice',
                 {
