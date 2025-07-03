@@ -1,6 +1,7 @@
 export * from './divert-queue.repository';
 export * from './divert-queue-fsp.repository';
 export * from './lead.repository';
+export * from './lead-partner.repository';
 export * from './leads-business-information.repository';
 export * from './leads-financial-profile.repository';
 export * from './leads-owner.repository';
