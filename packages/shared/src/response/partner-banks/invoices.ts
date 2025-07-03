@@ -41,6 +41,9 @@ export interface MSPMerchantBillingRecord {
   /** Merchant Contact email in Iris system */
   ContactEmailAddress: string;
 
+  /** PR Tool Boarding emails in Iris system */
+  InvoiceEmails: string;
+
   /** Generated invoice number in format MSP-{number} */
   InvoiceNumber: string;
 
