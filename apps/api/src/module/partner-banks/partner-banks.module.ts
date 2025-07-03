@@ -11,6 +11,7 @@ import {
   LeadsBusinessInformationEntity,
   LeadsFinancialProfileEntity,
   LeadsOwnerEntity,
+  LeadsPartnerEntity,
   LeadsServicesEntity,
   LeadsUnderwritingEntity,
   PartnerAndSalesAgentIdentificationEntity,
@@ -26,6 +27,7 @@ import { PartnerBanksService } from './partner-banks.service';
     TypeOrmModule.forFeature(
       [
         LeadEntity,
+        LeadsPartnerEntity,
         LeadsBusinessInformationEntity,
         LeadsServicesEntity,
         LeadsUnderwritingEntity,

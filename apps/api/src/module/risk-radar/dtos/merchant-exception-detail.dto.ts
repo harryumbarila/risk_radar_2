@@ -396,6 +396,13 @@ export class MerchantBusinessInfoDto {
   public isv: string;
 }
 
+export class PartnerLeadResponseDto {
+  @ApiProperty({
+    description: 'Customer Service Email',
+  })
+  public customerServiceEmail: string;
+}
+
 export class MerchantExceptionDetailResponseDto {
   @ApiProperty({
     description: 'Merchant business information',
@@ -423,4 +430,10 @@ export class MerchantExceptionDetailResponseDto {
     isArray: true,
   })
   public exceptionTypes: ExceptionTypeDto[];
+
+  @ApiProperty({
+    description: 'Partner Lead',
+    type: PartnerLeadResponseDto,
+  })
+  public partnerLead: PartnerLeadResponseDto;
 }
