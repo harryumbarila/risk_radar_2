@@ -2,6 +2,7 @@ export * from './divert-queue.entity';
 export * from './divert-queue-fsp.entity';
 export * from './lead.entity';
 export * from './lead-business-information.entity';
+export * from './lead-partner.entity';
 export * from './leads-financial-profile.entity';
 export * from './leads-owner.entity';
 export * from './leads-services.entity';

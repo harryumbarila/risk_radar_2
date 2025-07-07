@@ -23,6 +23,7 @@ import {
   LeadsBusinessInformationRepository,
   LeadsFinancialProfileRepository,
   LeadsOwnerRepository,
+  LeadsPartnerRepository,
   LeadsServicesRepository,
   LeadsUnderwritingRepository,
   PartnerAndSalesAgentIdentificationRepository,
@@ -33,6 +34,7 @@ import {
 export class MerchantExceptionDetailService {
   public constructor(
     private readonly leadRepository: LeadRepository,
+    private readonly leadsPartnerRepository: LeadsPartnerRepository,
     private readonly leadsBusinessInfoRepository: LeadsBusinessInformationRepository,
     private readonly leadsServicesRepository: LeadsServicesRepository,
     private readonly leadsUnderwritingRepository: LeadsUnderwritingRepository,
@@ -43,6 +45,7 @@ export class MerchantExceptionDetailService {
     private readonly merchantExceptionDetailRepository: MerchantExceptionDetailRepository,
     private readonly riskRadarExceptionsRepository: RiskRadarExceptionsJeffRepository,
     private readonly riskRadarMerchAdjParamRepository: RiskRadarMerchAdjParamRepository,
+    private readonly: RiskRadarMerchAdjParamRepository,
 
     @InjectDataSource('iris')
     private readonly irisDataSource: DataSource,
@@ -89,7 +92,9 @@ export class MerchantExceptionDetailService {
     );
     // Get chargebacks count
     const chargebacks =
-      await this.merchantExceptionDetailRepository.getChargebacksCount(midAsVarchar);
+      await this.merchantExceptionDetailRepository.getChargebacksCount(
+        midAsVarchar
+      );
 
     this.logger.info(
       {
@@ -189,7 +194,10 @@ export class MerchantExceptionDetailService {
 
     this.logger.info({}, 'Activated date: ' + activatedDate);
     // Get lead information using the specialized method
-    const lead = await this.leadRepository.findByMerchantId(midAsVarchar, false);
+    const lead = await this.leadRepository.findByMerchantId(
+      midAsVarchar,
+      false
+    );
 
     if (!lead) {
       throw new Error(`Lead not found for MID: ${midAsVarchar}`);
@@ -201,7 +209,8 @@ export class MerchantExceptionDetailService {
     });
 
     // Get partner and sales agent identification
-    const partnerAndSalesAgent = await this.partnerRepository.findByMerchantId(midAsVarchar);
+    const partnerAndSalesAgent =
+      await this.partnerRepository.findByMerchantId(midAsVarchar);
 
     // Get lead services
     const services = await this.leadsServicesRepository.findOne({
@@ -220,13 +229,22 @@ export class MerchantExceptionDetailService {
       }
     );
 
+    const leadPartner = await this.leadsPartnerRepository.findOne({
+      where: { leadId: lead.id },
+    });
+
+    this.logger.debug({ leadPartner });
+
     // Get source
     const source = await this.sourceRepository.findOne({
       where: { id: lead.sourceId },
     });
 
     // Get merchant adjust parameters using the specialized method
-    const merchAdjParam = await this.riskRadarMerchAdjParamRepository.findByMerchantId(midAsVarchar);
+    const merchAdjParam =
+      await this.riskRadarMerchAdjParamRepository.findByMerchantId(
+        midAsVarchar
+      );
 
     // Get owners
     const owners = await this.leadsOwnerRepository.find({
@@ -270,6 +288,9 @@ export class MerchantExceptionDetailService {
         id: et.id,
         description: et.description || '',
       })),
+      partnerLead: {
+        customerServiceEmail: leadPartner?.customerServiceEmail || '',
+      },
     };
 
     return response;

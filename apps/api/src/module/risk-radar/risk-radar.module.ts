@@ -48,6 +48,7 @@ import {
   LeadsBusinessInformationEntity,
   LeadsFinancialProfileEntity,
   LeadsOwnerEntity,
+  LeadsPartnerEntity,
   LeadsServicesEntity,
   LeadsUnderwritingEntity,
   PartnerAndSalesAgentIdentificationEntity,
@@ -60,6 +61,7 @@ import {
   LeadsBusinessInformationRepository,
   LeadsFinancialProfileRepository,
   LeadsOwnerRepository,
+  LeadsPartnerRepository,
   LeadsServicesRepository,
   LeadsUnderwritingRepository,
   PartnerAndSalesAgentIdentificationRepository,
@@ -104,6 +106,7 @@ import { RiskRadarUserService } from './services/risk-radar-user/risk-radar-user
     TypeOrmModule.forFeature(
       [
         LeadEntity,
+        LeadsPartnerEntity,
         LeadsBusinessInformationEntity,
         LeadsServicesEntity,
         LeadsUnderwritingEntity,
@@ -124,6 +127,7 @@ import { RiskRadarUserService } from './services/risk-radar-user/risk-radar-user
     // Entity repos
     LeadRepository,
     LeadsBusinessInformationRepository,
+    LeadsPartnerRepository,
     LeadsServicesRepository,
     LeadsUnderwritingRepository,
     LeadsFinancialProfileRepository,

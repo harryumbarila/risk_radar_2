@@ -97,6 +97,9 @@ type MerchantContactResponse = {
     id: number;
     description: string;
   }>;
+  partnerLead: {
+    customerServiceEmail?: string;
+  };
 };
 
 type Props = {
@@ -295,7 +298,11 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         isAutoHoldEnabled: data?.businessInfo?.isAutoHoldWhiteLabel || false,
       });
 
-      setEmail(data.businessInfo.contactEmail || '');
+      setEmail(
+        data?.partnerLead?.customerServiceEmail ||
+          data.businessInfo.contactEmail ||
+          ''
+      );
 
       // Update merchantStateData
       setMerchantStateData({
@@ -780,6 +787,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
     sOwnershipType: data?.businessInfo?.ownershipType || '',
     sSIC: data?.businessInfo?.mccCode || '',
     sReseller: data?.businessInfo?.reseller || '',
+    sISV: data?.businessInfo?.isv,
     sMerchantType: data?.businessInfo?.businessType || '',
     bIsTalusPayMerchant: data?.businessInfo?.talusPayAccountIndicator === 'Yes',
     sChannel: data?.businessInfo?.channel || '',
@@ -888,8 +896,16 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     htmlFor="email-recipient"
                   >
                     E-Mail Recipient:
+                    {!merchantProfile?.sISV ? (
+                      <span className="text-red-500 dark:text-red-400 font-bold">
+                        &nbsp;Send to Full Service Partner or Full Service ISV
+                        Only.
+                      </span>
+                    ) : null}
                   </label>
                   <input
+                    id="email-recipient"
+                    name="email-recipient"
                     type="email"
                     className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-black text-sm focus:ring-blue-500 focus:border-blue-500"
                     value={email}
@@ -907,6 +923,8 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     E-Mail Body Content:
                   </label>
                   <textarea
+                    id="email-body"
+                    name="email-body"
                     className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-black text-sm focus:ring-blue-500 focus:border-blue-500"
                     rows={25}
                     value={templateData.body}
@@ -1032,7 +1050,13 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
             <p className="text-black dark:text-white text-[15px]">
               <strong>Talus Pay:</strong>
             </p>
-            {merchantProfile?.bIsTalusPayMerchant ? (
+            <p className="text-red-500 dark:text-red-400 font-bold">
+              {merchantProfile?.bIsTalusPayMerchant ? 'Yes' : null}
+            </p>
+            <p className="text-black dark:text-white text-[15px]">
+              <strong>Full Serve Partner/ISV</strong>
+            </p>
+            {merchantProfile?.sISV ? (
               <p className="text-red-500 dark:text-red-400 font-bold">Yes</p>
             ) : null}
           </div>
