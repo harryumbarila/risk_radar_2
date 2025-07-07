@@ -157,7 +157,7 @@ export class PartnerBanksService {
         .toString()
         .padStart(2, '0');
       const previousYYYYMM = `${year}${previousMonth}`;
-      console.log({ partners });
+
       while (partners.length > 0) {
         await Promise.all(
           partners.splice(0, 10).map(async (partner) => {
