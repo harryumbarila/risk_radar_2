@@ -896,7 +896,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
                     htmlFor="email-recipient"
                   >
                     E-Mail Recipient:
-                    {!merchantProfile?.sISV ? (
+                    {merchantProfile?.sISV ? (
                       <span className="text-red-500 dark:text-red-400 font-bold">
                         &nbsp;Send to Full Service Partner or Full Service ISV
                         Only.
@@ -1054,7 +1054,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
               {merchantProfile?.bIsTalusPayMerchant ? 'Yes' : null}
             </p>
             <p className="text-black dark:text-white text-[15px]">
-              <strong>Full Serve Partner/ISV</strong>
+              <strong>Full Serve Partner/ISV:</strong>
             </p>
             {merchantProfile?.sISV ? (
               <p className="text-red-500 dark:text-red-400 font-bold">Yes</p>
