@@ -164,7 +164,7 @@ export class LeadsMerchantLead {
   })
   public consultationCompleted?: string;
 
-  @Column('varchar', { length: 200, name: 'InvoiceEmails', nullable: true })
+  @Column('varchar', { length: 200, name: 'InvoiceEmail', nullable: true })
   public invoiceEmails?: string;
 
   @Column('varchar', {
@@ -174,7 +174,7 @@ export class LeadsMerchantLead {
   })
   public solutionConsultant?: string;
 
-  @Column('varchar', { length: 100, name: 'ReferralPartner', nullable: true })
+  @Column('varchar', { length: 100, name: 'ReferalPartner', nullable: true })
   public referralPartner?: string;
 
   @Column('varchar', { length: 100, name: 'Reseller', nullable: true })

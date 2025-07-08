@@ -214,6 +214,7 @@ export class MerchantExceptionDetailService {
       where: {
         leadId: lead.id,
       },
+      select: ['isv'],
     });
 
     // Get partner and sales agent identification
