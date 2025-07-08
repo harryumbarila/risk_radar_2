@@ -299,9 +299,11 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       });
 
       setEmail(
-        data?.partnerLead?.customerServiceEmail ||
-          data.businessInfo.contactEmail ||
-          ''
+        data?.businessInfo?.isv
+          ? (data?.partnerLead?.customerServiceEmail ??
+              data.businessInfo?.contactEmail ??
+              '')
+          : (data?.businessInfo?.contactEmail ?? '')
       );
 
       // Update merchantStateData
