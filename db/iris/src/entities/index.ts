@@ -4,6 +4,7 @@ export * from './lead.entity';
 export * from './lead-business-information.entity';
 export * from './lead-partner.entity';
 export * from './leads-financial-profile.entity';
+export * from './leads-merchant-lead.entity';
 export * from './leads-owner.entity';
 export * from './leads-services.entity';
 export * from './leads-underwriting.entity';
