@@ -86,7 +86,7 @@ export class PartnerBanksService {
         l.IrisMId,
         lbi.ContactName,
         lbi.ContactEmailAddress,
-        lml.InvoiceEmails,
+        lml.InvoiceEmail AS InvoiceEmails,
         'MSP' + '-' + CONVERT(VARCHAR(25), b.pk) AS InvoiceNumber,
         lbi.DBAName,
         lbi.DBAAddress,
