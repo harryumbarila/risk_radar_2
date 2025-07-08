@@ -22,6 +22,7 @@ import {
   LeadRepository,
   LeadsBusinessInformationRepository,
   LeadsFinancialProfileRepository,
+  LeadsMerchantLeadRepository,
   LeadsOwnerRepository,
   LeadsPartnerRepository,
   LeadsServicesRepository,
@@ -36,6 +37,7 @@ export class MerchantExceptionDetailService {
     private readonly leadRepository: LeadRepository,
     private readonly leadsPartnerRepository: LeadsPartnerRepository,
     private readonly leadsBusinessInfoRepository: LeadsBusinessInformationRepository,
+    private readonly leadsMerchantLeadRepository: LeadsMerchantLeadRepository,
     private readonly leadsServicesRepository: LeadsServicesRepository,
     private readonly leadsUnderwritingRepository: LeadsUnderwritingRepository,
     private readonly leadsFinancialProfileRepository: LeadsFinancialProfileRepository,
@@ -208,6 +210,12 @@ export class MerchantExceptionDetailService {
       where: { leadId: lead.id },
     });
 
+    const leadsMerchantLead = await this.leadsMerchantLeadRepository.findOne({
+      where: {
+        leadId: lead.id,
+      },
+    });
+
     // Get partner and sales agent identification
     const partnerAndSalesAgent =
       await this.partnerRepository.findByMerchantId(midAsVarchar);
@@ -264,24 +272,26 @@ export class MerchantExceptionDetailService {
     // Get exception types
     const exceptionTypes =
       await this.merchantExceptionDetailRepository.getExceptionTypes();
-
     // Build response
     const response: MerchantExceptionDetailResponseDto = {
-      businessInfo: this.buildBusinessInfo(
-        businessInfo,
-        partnerAndSalesAgent,
-        services,
-        underwriting,
-        financialProfile,
-        source,
-        merchAdjParam,
-        chargebacks,
-        exception,
-        uwNewAccountHoldAllowRiskToEdit,
-        swipedPercentageTransCount,
-        activatedDate,
-        netSettlementBalance
-      ),
+      businessInfo: {
+        ...this.buildBusinessInfo(
+          businessInfo,
+          partnerAndSalesAgent,
+          services,
+          underwriting,
+          financialProfile,
+          source,
+          merchAdjParam,
+          chargebacks,
+          exception,
+          uwNewAccountHoldAllowRiskToEdit,
+          swipedPercentageTransCount,
+          activatedDate,
+          netSettlementBalance
+        ),
+        isv: leadsMerchantLead?.isv || partnerAndSalesAgent?.isv || '',
+      },
       owners: this.buildOwners(owners),
       processingSummaries: this.mapProcessingSummaries(processingSummaries),
       exceptionTypes: exceptionTypes.map((et) => ({
