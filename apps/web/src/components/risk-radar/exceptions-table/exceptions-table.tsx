@@ -51,7 +51,7 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
             className="text-center"
           />
         ),
-        footer: (info) => info.column.id,
+
         enableSorting: true,
         sortingFn: 'datetime',
         meta: {
@@ -75,7 +75,7 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
             )}
           </td>
         ),
-        footer: (info) => info.column.id,
+
         enableSorting: true,
         meta: {
           align: 'right',
@@ -98,7 +98,7 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
             />
           );
         },
-        footer: (info) => info.column.id,
+
         enableSorting: true,
         meta: {
           align: 'right',
@@ -113,7 +113,7 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
             className="text-center"
           />
         ),
-        footer: (info) => info.column.id,
+
         enableSorting: true,
         meta: {
           align: 'center',
@@ -128,7 +128,7 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
             className="text-center"
           />
         ),
-        footer: (info) => info.column.id,
+
         enableSorting: true,
         meta: {
           align: 'center',
@@ -143,7 +143,7 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
             className="text-center"
           />
         ),
-        footer: (info) => info.column.id,
+
         enableSorting: true,
         meta: {
           align: 'center',
@@ -165,7 +165,7 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
             </span>
           </td>
         ),
-        footer: (info) => info.column.id,
+
         enableSorting: true,
         meta: {
           align: 'center',
@@ -180,7 +180,7 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
             className="text-center"
           />
         ),
-        footer: (info) => info.column.id,
+
         enableSorting: true,
         meta: {
           align: 'center',
@@ -212,7 +212,7 @@ export const ExceptionsTable: FC<ExceptionTableProps> = ({
                 ))}
           </td>
         ),
-        footer: (info) => info.column.id,
+
         enableSorting: false,
         meta: {
           align: 'center',

@@ -179,4 +179,17 @@ export class RiskRadarNotesRepository extends Repository<RiskRadarNotesEntity> {
       .addOrderBy('notes.id', 'DESC')
       .getRawMany();
   }
+
+  public async findLatestNoteByMID(mid: string): Promise<string | null> {
+    const result = await this.createQueryBuilder('note')
+      .select('note.sNotes', 'note')
+      .where('note.sMID = :mid', { mid })
+      .andWhere('note.fkRiskRadarNotesType = 5')
+      .andWhere('note.bHidden = 0')
+      .orderBy('note.pkRiskRadarNotes', 'DESC')
+      .limit(1)
+      .getRawOne<{ note: string }>();
+
+    return result?.note ?? null;
+  }
 }

@@ -10,3 +10,4 @@ export * from './leads-services.entity';
 export * from './leads-underwriting.entity';
 export * from './partner-and-sales-agent-identification.entity';
 export * from './source.entity';
+export * from './subscription-queue-request-event-json-source.entity';
