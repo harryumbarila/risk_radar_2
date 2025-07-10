@@ -20,6 +20,12 @@ const enum UserClassId {
   INT_ISC = 66,
 }
 
+type GetUserOptions = {
+  perPage?: number;
+  filterByEmail?: string;
+  filterByUserId?: string;
+};
+
 @Injectable()
 export class IrisClient {
   private readonly logger = new Logger(IrisClient.name);
@@ -75,12 +81,18 @@ export class IrisClient {
     );
   }
 
-  public async getUsers(): Promise<IrisUsersResponseDto> {
+  public async getUsers(
+    options?: GetUserOptions
+  ): Promise<IrisUsersResponseDto> {
     const classIds = [
       UserClassId.INT_SSC,
       UserClassId.INT_SC,
       UserClassId.INT_ISC,
     ];
+
+    const { perPage, filterByEmail } = options ?? {};
+
+    const rowsPerPage = perPage ?? 100;
 
     const combinedResponse: IrisUsersResponseDto = {
       data: [],
@@ -89,7 +101,7 @@ export class IrisClient {
         from: 1,
         last_page: 1,
         path: '',
-        per_page: 100,
+        per_page: rowsPerPage,
         to: 0,
         total: 0,
       },
@@ -104,7 +116,7 @@ export class IrisClient {
         try {
           // eslint-disable-next-line no-await-in-loop
           const response = await this.get<IrisUsersResponseDto>(
-            `/api/v1/users/list?page=${currentPage}&per_page=100&sort_by=name&sort_dir=asc&class=${classId}&active=Yes`,
+            `/api/v1/users/list?page=${currentPage}&per_page=${rowsPerPage}&sort_by=name&sort_dir=asc&class=${classId}&active=Yes`,
             {
               headers: {
                 'Content-Type': 'application/json',
@@ -148,6 +160,12 @@ export class IrisClient {
       const bFirstName = b.full_name.split(' ')[0] || b.full_name;
       return aFirstName.localeCompare(bFirstName);
     });
+
+    if (filterByEmail) {
+      combinedResponse.data = combinedResponse.data.filter(
+        (user) => user.email === filterByEmail
+      );
+    }
 
     return combinedResponse;
   }

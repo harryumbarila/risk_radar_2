@@ -12,6 +12,7 @@ describe('FilteredUsersFactory', () => {
           {
             id: 1,
             full_name: 'John Doe',
+            email: 'john.doe@example.com',
             class: {
               id: 101,
               name: 'Manager',
@@ -98,6 +99,7 @@ describe('FilteredUsersFactory', () => {
           {
             id: 1,
             full_name: 'John Doe',
+            email: 'john.doe@example.com',
             class: {
               id: 101,
               name: 'Manager',
