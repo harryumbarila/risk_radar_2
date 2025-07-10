@@ -1,11 +1,13 @@
-import React from 'react';
-import { useFormContext } from 'react-hook-form';
+import React, { useEffect } from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
 
 import { useUsersData } from '@/hooks/attribution-url/use-users-data';
 import type { IrisBasicInfoResponseDto } from '@/shared/response/iris-proxy';
 import type { FormValues } from '@/types/attribution-url';
 import { GenerationFormMode } from '@/types/attribution-url';
 
+import type { AutoSelectOption } from './auto-select-field';
+import { AutoSelectField } from './auto-select-field';
 import { SubmitButton } from './submit-button';
 
 type AttributionFormContainerProps = {
@@ -32,201 +34,185 @@ export const AttributionFormContainer: React.FC<
     setValue,
     formState: { errors, isDirty },
     trigger,
+    control,
+    clearErrors,
   } = useFormContext<FormValues>();
 
   const { data: usersData, isLoading: usersLoading } = useUsersData();
 
   // State for dropdown options
-  const [channels, setChannels] = React.useState<
-    Array<{ id: number; name: string }>
-  >([]);
-  const [rslOptions, setRslOptions] = React.useState<
-    Array<{ id: number; name: string }>
-  >([]);
+  const [channels, setChannels] = React.useState<AutoSelectOption[]>([]);
+  const [rslOptions, setRslOptions] = React.useState<AutoSelectOption[]>([]);
   const [partnerOptions, setPartnerOptions] = React.useState<
-    Array<{ user_id: number; username: string }>
+    AutoSelectOption[]
   >([]);
 
-  // Handle IRIS user selection
-  const handleIrisUserChange = async (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ): Promise<void> => {
-    const selectedValue = e.target.value;
-    setValue('irisUser', selectedValue);
-
-    // Reset dependent fields
+  // Handle IRIS user selection and dependent fields
+  const handleIrisUserChange = async (value: string): Promise<void> => {
+    setValue('irisUser', value);
     setValue('channel', '');
     setValue('rsl', '');
     setValue('referralPartner', '');
 
-    // Find the selected user and load related options
-    if (selectedValue) {
+    if (value) {
       const selectedUser = usersData?.data?.find(
-        (filteredUser) => filteredUser.value === parseInt(selectedValue, 10)
+        (filteredUser) => filteredUser.value === parseInt(value, 10)
       );
-
       if (selectedUser) {
-        // Set channels
-        const userChannels = selectedUser.channels || [];
+        // Channels
+        const userChannels = (selectedUser.channels ?? []).map((c) => ({
+          value: c.id.toString(),
+          label: c.name,
+        }));
         setChannels(userChannels);
+        if (userChannels.length === 1) {
+          setValue('channel', userChannels[0]?.value ?? '');
+          await trigger('channel');
+        }
 
-        // Set RSL users
-        const rslUsers = selectedUser.rsl || [];
+        // RSL
+        const rslUsers = (selectedUser.rsl ?? []).map((r) => ({
+          value: r.id.toString(),
+          label: r.name,
+        }));
         setRslOptions(rslUsers);
+        if (rslUsers.length === 1) {
+          setValue('rsl', rslUsers[0]?.value ?? '');
+          await trigger('rsl');
+        }
 
-        // Set referral partners
-        const managedUsers = selectedUser.manages || [];
+        // Referral Partners
+        const managedUsers = (selectedUser.manages ?? []).map((p) => ({
+          value: p.user_id.toString(),
+          label: p.username,
+        }));
         setPartnerOptions(managedUsers);
+        if (managedUsers.length === 1) {
+          setValue('referralPartner', managedUsers[0]?.value ?? '');
+          updateSelectedPartnerName(managedUsers[0]?.label ?? '');
+          await trigger('referralPartner');
+        }
+      } else {
+        setChannels([]);
+        setRslOptions([]);
+        setPartnerOptions([]);
       }
+    } else {
+      setChannels([]);
+      setRslOptions([]);
+      setPartnerOptions([]);
     }
-
-    // Trigger validation
     await trigger('irisUser');
   };
 
-  // Handle referral partner selection
-  const handlePartnerChange = async (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ): Promise<void> => {
-    const selectedValue = e.target.value;
-    setValue('referralPartner', selectedValue);
-
-    const selectedPartner = partnerOptions.find(
-      (partner) => partner.user_id.toString() === selectedValue
-    );
-
+  // Handle Referral Partner selection (for updating partner name)
+  const handlePartnerChange = async (value: string): Promise<void> => {
+    setValue('referralPartner', value);
+    const selectedPartner = partnerOptions.find((p) => p.value === value);
     if (selectedPartner) {
-      updateSelectedPartnerName(selectedPartner.username);
+      updateSelectedPartnerName(selectedPartner.label);
     }
-
     await trigger('referralPartner');
   };
 
+  // Prepare options for IRIS User
+  const irisUserOptions: AutoSelectOption[] = Array.isArray(usersData?.data)
+    ? (usersData.data ?? []).map((u) => ({
+        value: u.value.toString(),
+        label: u.label,
+      }))
+    : [];
+
+  // Clear existingLeadId error when not in EXISTING_LEAD mode
+  useEffect(() => {
+    if (generationMode !== GenerationFormMode.EXISTING_LEAD) {
+      clearErrors('existingLeadId');
+    }
+  }, [generationMode, clearErrors]);
+
   return (
     <>
-      {/* IRIS User */}
-      <div className="mb-4.5">
-        <label
-          className="mb-2.5 block text-black dark:text-white"
-          htmlFor="irisUser"
-        >
-          Choose IRIS User
-          <span className="text-meta-1">*</span>
-        </label>
-        <div className="relative z-20 bg-transparent dark:bg-form-input">
-          {usersLoading ? (
-            <div className="flex items-center justify-center py-3">
-              <div className="size-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-            </div>
-          ) : (
-            <select
-              id="irisUser"
-              {...register('irisUser', {
-                required: 'IRIS User is required',
-              })}
-              onChange={handleIrisUserChange}
-              className={`relative z-20 w-full appearance-none rounded border ${
-                errors.irisUser ? 'border-danger' : 'border-stroke'
-              } bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary`}
-            >
-              <option value="">Select IRIS User</option>
-              {usersData?.data?.map((filteredUser) => (
-                <option key={filteredUser.value} value={filteredUser.value}>
-                  {filteredUser.label}
-                </option>
-              ))}
-            </select>
-          )}
-          {errors.irisUser && (
-            <span className="text-sm text-danger">
-              {errors.irisUser.message}
-            </span>
-          )}
-        </div>
-      </div>
+      {/* IRIS User (Controller) */}
+      <Controller
+        name="irisUser"
+        control={control}
+        rules={{ required: 'IRIS User is required' }}
+        render={({ field, fieldState }) => (
+          <AutoSelectField
+            id="irisUser"
+            label="IRIS User"
+            options={irisUserOptions}
+            required
+            error={fieldState.error?.message}
+            value={field.value || ''}
+            onChange={async (v) => {
+              field.onChange(v);
+              await handleIrisUserChange(v);
+            }}
+            loading={usersLoading}
+            disabled={usersLoading || irisUserOptions.length <= 1}
+          />
+        )}
+      />
 
-      {/* Channel */}
-      <div className="mb-4.5">
-        <label
-          className="mb-2.5 block text-black dark:text-white"
-          htmlFor="channel"
-        >
-          Channel
-          <span className="text-meta-1">*</span>
-        </label>
-        <div className="relative z-20 bg-transparent dark:bg-form-input">
-          <select
+      {/* Channel (Controller) */}
+      <Controller
+        name="channel"
+        control={control}
+        rules={{ required: 'Channel is required' }}
+        render={({ field, fieldState }) => (
+          <AutoSelectField
             id="channel"
-            {...register('channel', {
-              required: 'Channel is required',
-            })}
-            className={`relative z-20 w-full appearance-none rounded border ${
-              errors.channel ? 'border-danger' : 'border-stroke'
-            } bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary`}
-          >
-            <option value="">Select Channel</option>
-            {channels.map((group) => (
-              <option key={group.id} value={group.id}>
-                {group.name}
-              </option>
-            ))}
-          </select>
-          {errors.channel && (
-            <span className="text-sm text-danger">
-              {errors.channel.message}
-            </span>
-          )}
-        </div>
-      </div>
+            label="Channel"
+            options={channels ?? []}
+            required
+            error={fieldState.error?.message}
+            value={field.value || ''}
+            onChange={(v) => field.onChange(v)}
+            loading={usersLoading}
+            disabled={usersLoading || (channels?.length ?? 0) <= 1}
+          />
+        )}
+      />
 
-      {/* RSL */}
-      <div className="mb-4.5">
-        <label
-          className="mb-2.5 block text-black dark:text-white"
-          htmlFor="rsl"
-        >
-          RSL
-        </label>
-        <div className="relative z-20 bg-transparent dark:bg-form-input">
-          <select
+      {/* RSL (Controller, optional) */}
+      <Controller
+        name="rsl"
+        control={control}
+        render={({ field, fieldState }) => (
+          <AutoSelectField
             id="rsl"
-            {...register('rsl')}
-            className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-          >
-            <option value="">Select RSL</option>
-            {rslOptions.map((rslUser) => (
-              <option key={rslUser.id} value={rslUser.id}>
-                {rslUser.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+            label="RSL"
+            options={rslOptions ?? []}
+            error={fieldState.error?.message}
+            value={field.value || ''}
+            onChange={(v) => field.onChange(v)}
+            loading={usersLoading}
+            disabled={usersLoading || (rslOptions?.length ?? 0) <= 1}
+          />
+        )}
+      />
 
-      {/* Referral Partner */}
-      <div className="mb-4.5">
-        <label
-          className="mb-2.5 block text-black dark:text-white"
-          htmlFor="referralPartner"
-        >
-          Referral Partner
-        </label>
-        <div className="relative z-20 bg-transparent dark:bg-form-input">
-          <select
+      {/* Referral Partner (Controller, optional) */}
+      <Controller
+        name="referralPartner"
+        control={control}
+        render={({ field, fieldState }) => (
+          <AutoSelectField
             id="referralPartner"
-            {...register('referralPartner')}
-            onChange={handlePartnerChange}
-            className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-          >
-            <option value="">Select Referral Partner</option>
-            {partnerOptions.map((partner) => (
-              <option key={partner.user_id} value={partner.user_id}>
-                {partner.username}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+            label="Referral Partner"
+            options={partnerOptions ?? []}
+            error={fieldState.error?.message}
+            value={field.value || ''}
+            onChange={async (v) => {
+              field.onChange(v);
+              await handlePartnerChange(v);
+            }}
+            loading={usersLoading}
+            disabled={usersLoading || (partnerOptions?.length ?? 0) <= 1}
+          />
+        )}
+      />
 
       {/* Lead ID field */}
       {generationMode === GenerationFormMode.EXISTING_LEAD && (

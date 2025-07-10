@@ -16,6 +16,7 @@ interface Meta {
 interface UserData {
   id: number;
   full_name: string;
+  email: string;
   class: UserClass;
   groups: UserGroup[];
   reports_to: UserReport[];

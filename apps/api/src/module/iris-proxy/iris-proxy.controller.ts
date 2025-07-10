@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import type { IUser } from '@frontegg/client/dist/src/clients/identity/types';
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -38,8 +39,15 @@ export class IrisProxyController {
   })
   @ApiOperation({ operationId: 'users', summary: 'Get filtered users' })
   @Get('users')
-  public async users(): Promise<IrisFilteredUsersResponseDto> {
-    const data = await this.client.getUsers();
+  public async users(
+    @Req() req: { userEntity: IUser }
+  ): Promise<IrisFilteredUsersResponseDto> {
+    const { email } = req.userEntity || {};
+
+    const data = await this.client.getUsers({
+      filterByEmail: email,
+    });
+
     const environment =
       this.configService.get('IRIS_ENV') === 'staging'
         ? 'staging'
