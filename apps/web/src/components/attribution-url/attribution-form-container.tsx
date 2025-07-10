@@ -30,9 +30,13 @@ export const AttributionFormContainer: React.FC<
   const {
     register,
     setValue,
+    watch,
     formState: { errors, isDirty },
     trigger,
   } = useFormContext<FormValues>();
+
+  // Watch form values to ensure proper updates
+  const watchedValues = watch();
 
   const { data: usersData, isLoading: usersLoading } = useUsersData();
 
@@ -70,13 +74,32 @@ export const AttributionFormContainer: React.FC<
         const userChannels = selectedUser.channels || [];
         setChannels(userChannels);
 
+        // Auto-select channel if only one option is available
+        if (userChannels.length === 1 && userChannels[0]) {
+          setValue('channel', userChannels[0].id.toString());
+          await trigger('channel');
+        }
+
         // Set RSL users
         const rslUsers = selectedUser.rsl || [];
         setRslOptions(rslUsers);
 
+        // Auto-select RSL if only one option is available
+        if (rslUsers.length === 1 && rslUsers[0]) {
+          setValue('rsl', rslUsers[0].id.toString());
+          await trigger('rsl');
+        }
+
         // Set referral partners
         const managedUsers = selectedUser.manages || [];
         setPartnerOptions(managedUsers);
+
+        // Auto-select referral partner if only one option is available
+        if (managedUsers.length === 1 && managedUsers[0]) {
+          setValue('referralPartner', managedUsers[0].user_id.toString());
+          updateSelectedPartnerName(managedUsers[0].username);
+          await trigger('referralPartner');
+        }
       }
     }
 
@@ -160,9 +183,13 @@ export const AttributionFormContainer: React.FC<
             {...register('channel', {
               required: 'Channel is required',
             })}
+            value={watchedValues.channel || ''}
+            disabled={channels.length === 1}
             className={`relative z-20 w-full appearance-none rounded border ${
               errors.channel ? 'border-danger' : 'border-stroke'
-            } bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary`}
+            } bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary ${
+              channels.length === 1 ? 'cursor-not-allowed opacity-60' : ''
+            }`}
           >
             <option value="">Select Channel</option>
             {channels.map((group) => (
@@ -191,7 +218,11 @@ export const AttributionFormContainer: React.FC<
           <select
             id="rsl"
             {...register('rsl')}
-            className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+            value={watchedValues.rsl || ''}
+            disabled={rslOptions.length === 1}
+            className={`relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary ${
+              rslOptions.length === 1 ? 'cursor-not-allowed opacity-60' : ''
+            }`}
           >
             <option value="">Select RSL</option>
             {rslOptions.map((rslUser) => (
@@ -215,8 +246,12 @@ export const AttributionFormContainer: React.FC<
           <select
             id="referralPartner"
             {...register('referralPartner')}
+            value={watchedValues.referralPartner || ''}
             onChange={handlePartnerChange}
-            className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+            disabled={partnerOptions.length === 1}
+            className={`relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary ${
+              partnerOptions.length === 1 ? 'cursor-not-allowed opacity-60' : ''
+            }`}
           >
             <option value="">Select Referral Partner</option>
             {partnerOptions.map((partner) => (
