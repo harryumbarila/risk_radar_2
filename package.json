@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@commitlint/cli": "^17.4.4",
-    "@commitlint/config-conventional": "^17.4.4",
+    "@commitlint/config-conventional": "^19.8.1",
     "@denali/eslint-config": "*",
     "@denali/shared": "*",
     "@denali/typescript-config": "*",
