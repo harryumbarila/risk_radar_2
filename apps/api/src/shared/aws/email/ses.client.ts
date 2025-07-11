@@ -35,6 +35,7 @@ export class AwsSesClient implements EmailClientInterface {
         FromEmailAddress: fromAddress,
         Destination: {
           ToAddresses: toAddress,
+          CcAddresses: email.cc,
         },
         Content: {
           Simple: {
