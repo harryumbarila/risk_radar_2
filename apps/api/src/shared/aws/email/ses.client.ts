@@ -54,7 +54,9 @@ export class AwsSesClient implements EmailClientInterface {
           },
         },
         ReplyToAddresses: [
-          this.configService.get('AWS_SES_SENDER_EMAIL_ADDRESS'),
+          email.sender ||
+            this.configService.get('AWS_SES_SENDER_EMAIL_ADDRESS'),
+          ...(email.cc || []),
         ],
       });
     };
@@ -62,7 +64,7 @@ export class AwsSesClient implements EmailClientInterface {
     const run = async () => {
       const sendEmailCommand = createSendEmailCommand(
         email.to,
-        this.configService.get('AWS_SES_SENDER_EMAIL_ADDRESS')
+        email.sender || this.configService.get('AWS_SES_SENDER_EMAIL_ADDRESS')
       );
 
       const prodConfig: SESv2ClientConfig = {

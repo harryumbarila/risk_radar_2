@@ -6,6 +6,7 @@ export type SendExceptionMemoEmailDto = {
   emailTemplateId: number;
   emailRecipient: string;
   user: string;
+  email: string;
 };
 
 type UseSendExceptionMemoEmailReturnType = {
