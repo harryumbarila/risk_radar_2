@@ -106,7 +106,7 @@ export class PartnerBanksService {
         b.sYYYYMM = '${previousYYYYMM}' AND
         b.dtACHBilled is not NULL AND
         b.dtInvoiceGenerated is NULL
-    `;
+         `;
 
     try {
       const result =
@@ -283,7 +283,7 @@ export class PartnerBanksService {
             if (InvoiceEmails || ContactEmailAddress) {
               const emailTemplate = new EmailTemplateMessage(
                 InvoiceEmails
-                  ? InvoiceEmails.split(',')
+                  ? InvoiceEmails.split(';').map((email) => email.trim())
                   : [ContactEmailAddress],
                 `${DBAName} Invoice From Talus`,
                 'partner-invoice',

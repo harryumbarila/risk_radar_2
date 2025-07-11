@@ -1,6 +1,10 @@
 export class EmailMessage {
   public to: string[];
 
+  public cc?: string[];
+
+  public sender?: string;
+
   public subject: string;
 
   public body: string;

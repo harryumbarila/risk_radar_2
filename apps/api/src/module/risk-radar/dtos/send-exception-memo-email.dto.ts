@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class SendExceptionMemoEmailDto {
   @IsNotEmpty()
@@ -20,4 +20,8 @@ export class SendExceptionMemoEmailDto {
   @IsNotEmpty()
   @IsString()
   public user: string;
+
+  @IsNotEmpty()
+  @IsEmail()
+  public email: string;
 }
