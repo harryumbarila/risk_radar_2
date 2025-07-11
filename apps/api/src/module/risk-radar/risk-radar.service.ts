@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectDataSource } from '@nestjs/typeorm';
 import { InjectPinoLogger } from 'nestjs-pino';
 import { Logger } from 'pino';
-import { DataSource } from 'typeorm';
 
+import { EmailService } from '@/api/shared/email/email.service';
+import { EmailTemplateMessage } from '@/api/shared/email/email-template-message';
 import { RiskRadarEmailTemplateRepository } from '@/finance-db/repositories/risk-radar-email-template.repository';
 import { RiskRadarNotesRepository } from '@/finance-db/repositories/risk-radar-notes.repository';
 import { RiskRadarUserRepository } from '@/finance-db/repositories/risk-radar-user.repository';
@@ -11,6 +11,19 @@ import { LeadRepository } from '@/iris-db/repositories';
 import { LeadsBusinessInformationRepository } from '@/iris-db/repositories/leads-business-information.repository';
 
 import type { SendExceptionMemoEmailDto } from './dtos/send-exception-memo-email.dto';
+
+function convertToHtmlEmailBody(text: string) {
+  const escapedText = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  const paragraphs = escapedText
+    .split(/\n{2,}/)
+    .map((p) => `<p>${p.replace(/\n/g, '<br>')}</p>`);
+
+  return paragraphs.join('\n');
+}
 
 @Injectable()
 export class RiskRadarService {
@@ -20,14 +33,15 @@ export class RiskRadarService {
     private readonly leadsBusinessInfoRepository: LeadsBusinessInformationRepository,
     private readonly leadsRepository: LeadRepository,
     private readonly riskRadarNotesRepository: RiskRadarNotesRepository,
-    @InjectDataSource('finance') private readonly financeDataSource: DataSource,
+    private readonly emailService: EmailService,
     @InjectPinoLogger(RiskRadarService.name) private readonly logger: Logger
   ) {}
 
   public async sendExceptionMemoEmail(
     params: SendExceptionMemoEmailDto
   ): Promise<string> {
-    const { mid, emailBody, emailTemplateId, emailRecipient, user } = params;
+    const { mid, emailBody, emailTemplateId, emailRecipient, user, email } =
+      params;
     const midAsVarchar = String(mid);
 
     // Find data
@@ -76,17 +90,17 @@ export class RiskRadarService {
     }
 
     try {
-      // Send email using sp_send_dbmail
-      await this.financeDataSource.query(
-        `EXEC msdb.dbo.sp_send_dbmail
-          @profile_name = 'RISK',
-          @recipients = @0,
-          @copy_recipients = @1,
-          @reply_to = @1,
-          @subject = @2,
-          @body = @3`,
-        [emailRecipient, replyTo, subject, emailBody]
+      const emailTemplate = new EmailTemplateMessage(
+        [emailRecipient],
+        subject,
+        'risk-radar-memo',
+        {
+          description: convertToHtmlEmailBody(emailBody),
+        }
       );
+      emailTemplate.cc = [email];
+      emailTemplate.sender = 'taluspay_donotreply_rr@taluspay.com';
+      await this.emailService.send(emailTemplate);
 
       // Record the action in notes - using explicit cast for MID
       await this.riskRadarNotesRepository.insert({

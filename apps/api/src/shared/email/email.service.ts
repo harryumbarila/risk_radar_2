@@ -20,6 +20,8 @@ export class EmailService {
   public async send(dto: EmailTemplateMessage): Promise<EmailResponse> {
     const emailMessage: EmailMessage = {
       to: dto.to,
+      cc: dto.cc,
+      sender: dto.sender,
       subject: dto.subject,
       body: dto.stringTemplate,
       context: dto.context,
