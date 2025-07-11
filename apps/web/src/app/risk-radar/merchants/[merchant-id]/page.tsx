@@ -145,8 +145,7 @@ type ChangedFields = {
   isAutoHoldEnabled?: boolean;
 };
 
-// eslint-disable-next-line @next/next/no-async-client-component, @typescript-eslint/require-await
-const RiskRadarMerchantPage: FC<Props> = async ({ params }) => {
+const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
   const { 'merchant-id': merchantId } = React.use(params);
   const router = useRouter();
 
