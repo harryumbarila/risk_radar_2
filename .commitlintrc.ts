@@ -8,7 +8,7 @@ const config: UserConfig = {
   rules: {
     'body-leading-blank': [2, 'always'],
     'footer-leading-blank': [2, 'always'],
-    'scope-enum': [2, 'always', ['api', 'web', 'ui', 'shared', 'db', 'ci']],
+    'scope-enum': [2, 'always', ['api', 'web', 'ui', 'shared', 'db', 'ci', 'deps', 'deps-dev']],
   },
 };
 

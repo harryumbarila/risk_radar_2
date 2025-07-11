@@ -4,20 +4,20 @@
   "dependencies": {
     "@denali/shared": "*",
     "@denali/ui": "*",
-    "@frontegg/nextjs": "^9.2.1",
+    "@frontegg/nextjs": "^9.2.8",
     "apexcharts": "^3.45.2",
     "dropzone": "^6.0.0-beta.2",
     "flatpickr": "^4.6.13",
-    "jsvectormap": "^1.6.0",
+    "jsvectormap": "^1.7.0",
     "next": "15.3.5",
-    "nouislider": "^15.7.1",
+    "nouislider": "^15.8.1",
     "react": "19.1.0",
     "react-apexcharts": "^1.4.1",
     "react-dom": "19.1.0",
     "react-table": "^7.8.0",
-    "react-toastify": "^11.0.3",
-    "swiper": "^11.0.5",
-    "swr": "^2.3.3"
+    "react-toastify": "^11.0.5",
+    "swiper": "^11.2.10",
+    "swr": "^2.3.4"
   },
   "devDependencies": {
     "@denali/eslint-config": "*",
@@ -62,7 +62,7 @@
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.6.13",
     "tailwindcss": "^3.4.1",
-    "ts-jest": "^29.2.4",
+    "ts-jest": "^29.4.0",
     "typescript": "^5.3.3"
   },
   "private": true,

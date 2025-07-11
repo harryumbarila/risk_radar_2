@@ -70,10 +70,10 @@ export class MerchantWithSameTaxIdService {
       `;
 
       // Cast the result to the defined interface, using parameterized query
-      const queryResults = (await this.leadRepository.query(query, [
-        taxId,
-        merchantId,
-      ])) as MerchantIdResult[];
+      const queryResults = await this.leadRepository.query<MerchantIdResult[]>(
+        query,
+        [taxId, merchantId]
+      );
 
       // Extract merchant IDs from the result
       const merchantIds = queryResults.map((result) => result.irisMId);

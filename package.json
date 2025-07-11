@@ -46,9 +46,8 @@
     "jscodeshift": "^17.3.0",
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
-    "rimraf": "^5.0.5",
-    "syncpack": "^12.3.0",
-    "tspath": "^2.6.8",
+    "rimraf": "^6.0.1",
+    "syncpack": "^13.0.4",
     "turbo": "latest"
   },
   "engines": {
