@@ -1,15 +1,16 @@
-const withNextra = require('nextra')({
-  theme: 'nextra-theme-docs',
-  themeConfig: './theme.config.js',
+/* eslint-disable import/no-default-export */
+import nextra from 'nextra';
+
+const withNextra = nextra({
   latex: true,
-  flexsearch: {
-    codeblock: false,
+  search: {
+    codeblocks: false,
   },
 });
 
 const repoName = process.env.REPO_NAME || '';
 
-module.exports = withNextra({
+export default withNextra({
   reactStrictMode: true,
   output: 'export', // Ensures static export
   distDir: 'out',

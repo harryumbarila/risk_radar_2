@@ -7,7 +7,7 @@
     "ts-jest": "^29.2.4"
   },
   "peerDependencies": {
-    "next": "^14.2.30"
+    "next": "15.3.5"
   },
   "private": true
 }
