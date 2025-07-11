@@ -11,7 +11,7 @@ import classNames from 'classnames';
 import { format } from 'date-fns';
 import { notFound, useRouter, useSearchParams } from 'next/navigation';
 import type { FC } from 'react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
 
@@ -104,10 +104,10 @@ type MerchantContactResponse = {
 };
 
 type Props = {
-  params: {
+  params: Promise<{
     'merchant-id': string;
     'exception-id': string;
-  };
+  }>;
 };
 
 type NewNoteRequest = {
@@ -146,7 +146,7 @@ type ChangedFields = {
 };
 
 const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
-  const { 'merchant-id': merchantId } = params;
+  const { 'merchant-id': merchantId } = React.use(params);
   const router = useRouter();
 
   const searchParams = useSearchParams();
