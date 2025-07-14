@@ -19,9 +19,12 @@ export const PERMISSIONS = {
     WRITE: 'talus:read:TSYS-FIU',
   },
   RESIDUAL: {
-    // Using the same permissions as TSYS_FIU for now
     READ: 'talus:write:residual',
     WRITE: 'talus:read:residual',
+  },
+  NET_SETTLEMENT: {
+    READ: 'talus:write:net-settlement',
+    WRITE: 'talus:read:net-settlement',
   },
 };
 
