@@ -17,7 +17,7 @@ export class NetSettlementTransRepository extends Repository<NetSettlementTrans>
   public async getNetSettlementTransactionsSummary(
     mid: string
   ): Promise<NetSettlementTransactionRow[]> {
-    const result = (await this.query(
+    const result = await this.query<NetSettlementTransactionRow[]>(
       `
       SELECT 
         t.pkTrans,
@@ -85,7 +85,7 @@ export class NetSettlementTransRepository extends Repository<NetSettlementTrans>
       ORDER BY t.dtTrans, t.dtCreated
       `,
       [mid]
-    )) as NetSettlementTransactionRow[];
+    );
 
     return result;
   }
