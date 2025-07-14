@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { AWSModule } from '@/api/shared/aws/aws.module';
+import { EmailModule } from '@/api/shared/email/email.module';
 import { IrisModule } from '@/api/shared/module/iris/iris.module';
 import {
   ClxReportingRepository,
@@ -123,6 +125,8 @@ import { RiskRadarUserService } from './services/risk-radar-user/risk-radar-user
     TypeOrmModule.forFeature([], 'connector'),
     TypeOrmModule.forFeature([], 'crescent-view'),
     IrisModule,
+    AWSModule,
+    EmailModule,
   ],
   controllers: [RiskRadarController],
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

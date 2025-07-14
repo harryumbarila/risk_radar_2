@@ -4,10 +4,10 @@
   "devDependencies": {
     "jest": "^29.5.0",
     "jest-transform-stub": "^2.0.0",
-    "ts-jest": "^29.2.4"
+    "ts-jest": "^29.4.0"
   },
   "peerDependencies": {
-    "next": "^14.2.30"
+    "next": "15.3.5"
   },
   "private": true
 }

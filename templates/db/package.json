@@ -11,7 +11,7 @@
     "mssql": "^11.0.1",
     "pg": "^8.14.1",
     "ts-jest": "^29.2.4",
-    "typeorm": "^0.3.21",
+    "typeorm": "^0.3.25",
     "typeorm-extension": "^3.7.0",
     "typeorm-fixtures-cli": "^4.1.0",
     "typeorm-naming-strategy": "^2.0.13",

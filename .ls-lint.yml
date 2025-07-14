@@ -34,3 +34,5 @@ ignore:
   # Frontegg specific (as they need to follow a different convention)
   - 'apps/web/src/app/[...frontegg-router]'
   - 'apps/web/src/pages/api/frontegg/[...frontegg-middleware].ts'
+
+  - 'apps/docs/src/app/[[...mdxPath]]'

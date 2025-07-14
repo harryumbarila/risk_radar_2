@@ -5,16 +5,20 @@
     "baseUrl": "."
   },
   "include": [
-    "next-env.d.ts",
-    "src",
-    "tests",
+    ".next/types/**/*.ts",
     "jest.config.ts",
-    "tailwind.config.js",
+    "next-env.d.ts",
+    "next.config.ts",
+    "mdx-components.tsx",
     "sentry.client.config.ts",
     "sentry.edge.config.ts",
     "sentry.server.config.ts",
-    ".next/types/**/*.ts",
-    "src/theme.config.js"
+    "src",
+    "src/theme.config.js",
+    "tailwind.config.js",
+    "tests",
+    "out/types/**/*.ts",
+    "mdx-components.tsx"
   ],
   "plugins": [
     {
