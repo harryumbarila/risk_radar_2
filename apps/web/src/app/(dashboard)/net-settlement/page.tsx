@@ -2,12 +2,19 @@
 
 'use client';
 
-import { Breadcrumb, DataTable, DynamicCell, Loader } from '@denali/ui';
+import {
+  Breadcrumb,
+  DataTable,
+  Dropdown,
+  DynamicCell,
+  Loader,
+} from '@denali/ui';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
+import classNames from 'classnames';
 import { Search } from 'lucide-react';
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 
 import type { NetSettlementTransactionRow } from '@/shared/response';
 import {
@@ -20,16 +27,18 @@ import { useNetSettlementSummary } from '@/web/src/hooks/net-settlement/net-sett
 const columnHelper = createColumnHelper<NetSettlementTransactionRow>();
 
 const NetSettlementPage: React.FC = () => {
+  const { data, fetchData, isLoading } = useNetSettlementSummary();
+
   const methods = useForm<NetSettlementSummaryFilterState>({
     defaultValues: {
       mid: '',
+      label: '',
+      divertReason: data?.header?.divertReason || '',
     },
     mode: 'onChange',
   });
 
   const { mid } = methods.watch();
-
-  const { data, fetchData, isLoading } = useNetSettlementSummary();
 
   const columns = React.useMemo<
     ColumnDef<NetSettlementTransactionRow>[]
@@ -246,6 +255,16 @@ const NetSettlementPage: React.FC = () => {
     ] as ColumnDef<NetSettlementTransactionRow>[];
   }, []);
 
+  React.useEffect(() => {
+    if (data) {
+      methods.reset({
+        mid: data.header.sMID16Exist,
+        label: '',
+        divertReason: data.header.divertReason || '',
+      });
+    }
+  }, [data, methods]);
+
   if (isLoading) {
     return (
       <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -263,45 +282,51 @@ const NetSettlementPage: React.FC = () => {
           <div
             className={`"flex flex-wrap items-center gap-4 ${data ? 'border-b pb-4' : undefined}`}
           >
-            <div className="flex items-center gap-4">
-              <div>
-                <label
-                  htmlFor="mid"
-                  className="block text-sm font-medium text-black dark:text-white"
-                >
-                  Net Settlement - MID Search
-                </label>
-                <input
-                  type="text"
-                  placeholder="MID"
-                  {...methods.register('mid')}
-                  className="w-full rounded border-[1.5px] border-stroke bg-transparent px-2 py-1 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                />
-              </div>
+            <FormProvider {...methods}>
+              <div className="flex items-center gap-4">
+                <div>
+                  <label
+                    htmlFor="mid"
+                    className="block text-sm font-medium text-black dark:text-white"
+                  >
+                    Net Settlement - MID Search
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="MID"
+                    {...methods.register('mid')}
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent px-2 py-1 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  />
+                </div>
 
-              <div>
-                <label
-                  htmlFor="mids"
-                  className="block text-sm font-medium text-black dark:text-white"
-                >
-                  Label
-                </label>
-                <select className="px-3 py-1.5 border rounded-md w-40">
-                  <option value="">-- Select --</option>
-                </select>
-              </div>
+                <div>
+                  {data ? (
+                    <Dropdown
+                      label="Labels"
+                      name="label"
+                      options={[
+                        { value: '', label: '--Select--' },
+                        ...data.labels.map((label) => ({
+                          value: String(label.id),
+                          label: label.name,
+                        })),
+                      ]}
+                    />
+                  ) : null}
+                </div>
 
-              <div className="flex items-center pt-6">
-                <button
-                  type="button"
-                  onClick={methods.handleSubmit(fetchData)}
-                  disabled={!mid}
-                  className={`rounded ${!mid ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}`}
-                >
-                  <Search className="size-5" />
-                </button>
+                <div className="flex items-center pt-6">
+                  <button
+                    type="button"
+                    onClick={methods.handleSubmit(fetchData)}
+                    disabled={!mid}
+                    className={`rounded ${!mid ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}`}
+                  >
+                    <Search className="size-5" />
+                  </button>
+                </div>
               </div>
-            </div>
+            </FormProvider>
           </div>
 
           {data ? (
@@ -332,7 +357,7 @@ const NetSettlementPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex flex-wrap items-end justify-between gap-4">
                 <div className="flex-1">
                   <label
                     htmlFor="reason"
@@ -341,18 +366,20 @@ const NetSettlementPage: React.FC = () => {
                     Divert Reason
                   </label>
                   <input
-                    name="reason"
                     type="text"
                     className="w-full border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter reason"
-                    defaultValue={data?.header.divertReason || ''}
+                    {...methods.register('divertReason')}
                   />
                 </div>
                 <button
                   type="button"
-                  className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
+                  className={classNames(' text-white px-4 py-2 rounded-md ', {
+                    'bg-red-600 hover:bg-red-700': data?.header.divertReason,
+                    'bg-blue-600 hover:bg-blue-700': !data?.header.divertReason,
+                  })}
                 >
-                  Remove
+                  {data?.header.divertReason ? 'Remove' : 'Add'}
                 </button>
               </div>
 

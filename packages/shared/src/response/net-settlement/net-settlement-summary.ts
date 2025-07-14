@@ -12,6 +12,11 @@ export interface NetSettlementSummaryHeader {
   uwNewAccountHoldAllowRiskToEdit: boolean;
 }
 
+export interface NetSettlementLabelType {
+  id: number;
+  name: string;
+}
+
 export interface NetSettlementTransactionRow extends BaseModel {
   pkTrans: number;
   fkTransParent?: string;
@@ -31,4 +36,6 @@ export interface NetSettlementSummary {
   header: NetSettlementSummaryHeader;
   transactions: NetSettlementTransactionRow[];
   matchingMIDs: string[];
+
+  labels: NetSettlementLabelType[];
 }

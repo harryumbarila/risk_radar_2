@@ -5,6 +5,8 @@ import type { NetSettlementSummary } from '@/shared/response';
 
 export type NetSettlementSummaryFilterState = {
   mid: string;
+  label?: string;
+  divertReason?: string;
 };
 
 export type UseNetSettlementSummaryReturnType = {

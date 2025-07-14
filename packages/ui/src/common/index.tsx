@@ -61,6 +61,7 @@ export * from './data-stats/data-stats-two';
 export * from './data-tables';
 export * from './download-list';
 export * from './dropdowns';
+export * from './dropdowns/dropdown';
 export * from './dropdowns/dropdown-default';
 export * from './dropdowns/dropdown-five';
 export * from './dropdowns/dropdown-four';
