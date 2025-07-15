@@ -37,13 +37,13 @@ export const WriteOff: React.FC<WriteOffProps> = (props) => {
 
   const netSettlementActions = [
     { id: 1, name: 'Release', value: 'release' },
-    { id: 2, name: 'Withdraw' },
-    { id: 3, name: 'Check received' },
-    { id: 4, name: 'Non risk write off' },
-    { id: 5, name: 'Risk write off' },
-    { id: 6, name: 'Check payment' },
-    { id: 7, name: 'Transfer from check divert' },
-    { id: 8, name: 'Transfer to another MID' },
+    { id: 2, name: 'Withdraw', value: 'withdraw' },
+    { id: 3, name: 'Check received', value: 'received' },
+    { id: 4, name: 'Non risk write off', value: 'write off' },
+    { id: 5, name: 'Risk write off', value: 'write off' },
+    { id: 6, name: 'Check payment', value: 'transfer' },
+    { id: 7, name: 'Transfer from check divert', value: 'transfer' },
+    { id: 8, name: 'Transfer to another MID', value: 'transfer' },
   ];
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

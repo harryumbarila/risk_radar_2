@@ -320,7 +320,7 @@ export class NetSettlementsService {
           if (lastRecord?.isDiverted) {
             await this.divertQueueRepository.insert({
               merchantId: Number(mid),
-              isDiverted: true,
+              isDiverted: false,
               divertFlagNotes: 'Manual remove from divert via NetSettlement',
               createDate: () => 'GETDATE()',
               createdBy: user,
@@ -344,7 +344,7 @@ export class NetSettlementsService {
           if (lastRecord?.isDiverted) {
             await this.divertQueueFSPRepository.insert({
               merchantId: Number(mid),
-              isDiverted: true,
+              isDiverted: false,
               divertFlagNotes: 'Manual remove from divert via NetSettlement',
               createDate: () => 'GETDATE()',
               createdBy: user,
