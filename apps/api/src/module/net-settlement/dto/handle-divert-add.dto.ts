@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class HandleDiverAddDto {
   @ApiProperty({
@@ -8,7 +8,6 @@ export class HandleDiverAddDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Length(12, 20, { message: 'MID must be between 12 and 20 characters' })
   public mid: string;
 
   @ApiProperty({

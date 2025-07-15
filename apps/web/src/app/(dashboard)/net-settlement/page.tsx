@@ -17,6 +17,7 @@ import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import type { NetSettlementTransactionRow } from '@/shared/response';
+import { WriteOff } from '@/web/src/components/net-settlement/write-off';
 import {
   formatCurrency,
   formatDate,
@@ -27,7 +28,8 @@ import { useNetSettlementSummary } from '@/web/src/hooks/net-settlement/net-sett
 const columnHelper = createColumnHelper<NetSettlementTransactionRow>();
 
 const NetSettlementPage: React.FC = () => {
-  const { data, fetchData, isLoading } = useNetSettlementSummary();
+  const { data, fetchData, addNotes, removeNotes, handleAction, isLoading } =
+    useNetSettlementSummary();
 
   const methods = useForm<NetSettlementSummaryFilterState>({
     defaultValues: {
@@ -63,7 +65,7 @@ const NetSettlementPage: React.FC = () => {
         header: () => 'Trans Date',
         cell: (info) => (
           <DynamicCell
-            type="date"
+            type="text"
             value={formatDate(info.getValue(), 'MM/dd/yyyy')}
             className="text-center"
           />
@@ -357,31 +359,44 @@ const NetSettlementPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-end justify-between gap-4">
-                <div className="flex-1">
-                  <label
-                    htmlFor="reason"
-                    className="block text-sm font-medium text-black mb-1"
-                  >
-                    Divert Reason
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter reason"
-                    {...methods.register('divertReason')}
-                  />
+              {methods.formState.isSubmitting ? (
+                <div className="pb-[25px] bg-white rounded-lg shadow overflow-hidden">
+                  <Loader fullScreen={false} />
                 </div>
-                <button
-                  type="button"
-                  className={classNames(' text-white px-4 py-2 rounded-md ', {
-                    'bg-red-600 hover:bg-red-700': data?.header.divertReason,
-                    'bg-blue-600 hover:bg-blue-700': !data?.header.divertReason,
-                  })}
-                >
-                  {data?.header.divertReason ? 'Remove' : 'Add'}
-                </button>
-              </div>
+              ) : (
+                <div className="flex flex-wrap items-end justify-between gap-4">
+                  <div className="flex-1">
+                    <label
+                      htmlFor="reason"
+                      className="block text-sm font-medium text-black mb-1"
+                    >
+                      Divert Reason
+                    </label>
+                    <input
+                      readOnly={!!data?.header.divertReason}
+                      type="text"
+                      className="w-full border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter reason"
+                      {...methods.register('divertReason', { required: false })}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    className={classNames(' text-white px-4 py-2 rounded-md ', {
+                      'bg-red-600 hover:bg-red-700': data?.header.divertReason,
+                      'bg-blue-600 hover:bg-blue-700':
+                        !data?.header.divertReason,
+                    })}
+                    onClick={
+                      data?.header.divertReason
+                        ? methods.handleSubmit(removeNotes)
+                        : methods.handleSubmit(addNotes)
+                    }
+                  >
+                    {data?.header.divertReason ? 'Remove' : 'Add'}
+                  </button>
+                </div>
+              )}
 
               <DataTable
                 tableContainerClassName="max-h-[300px]"
@@ -402,27 +417,7 @@ const NetSettlementPage: React.FC = () => {
                 isLoading={isLoading}
               />
               {/* Footer Inputs */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <input
-                  type="text"
-                  placeholder="Amount"
-                  className="border px-3 py-2 rounded-md"
-                />
-                <input
-                  type="text"
-                  placeholder="Notes"
-                  className="border px-3 py-2 rounded-md"
-                />
-                <select className="px-3 py-1.5 border rounded-md">
-                  <option value="">Action</option>
-                </select>
-                <button
-                  type="button"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-                >
-                  Save
-                </button>
-              </div>
+              <WriteOff mid={methods.watch().mid} handleAction={handleAction} />
             </>
           ) : null}
         </div>

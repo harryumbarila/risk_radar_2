@@ -1,16 +1,21 @@
 import clsx from 'clsx';
 import type { InputHTMLAttributes } from 'react';
 import { forwardRef } from 'react';
+import type { FieldValues, RegisterOptions } from 'react-hook-form';
 import { Controller, useFormContext } from 'react-hook-form';
 
 type Props<T = string> = InputHTMLAttributes<HTMLSelectElement> & {
   label?: string;
   name: string;
   options: { value: T; label: string }[];
+  rules?: Omit<
+    RegisterOptions<FieldValues, string>,
+    'disabled' | 'valueAsNumber' | 'valueAsDate' | 'setValueAs'
+  >;
 };
 
 export const Dropdown = forwardRef<HTMLSelectElement, Props>(
-  ({ label, name, options, ...props }, ref) => {
+  ({ label, name, options, rules, ...props }, ref) => {
     const { control } = useFormContext();
     return (
       <div className="flex flex-col h-full">
@@ -26,7 +31,7 @@ export const Dropdown = forwardRef<HTMLSelectElement, Props>(
         <Controller
           control={control}
           name={name}
-          rules={{ required: 'Status is required' }}
+          rules={rules}
           render={({ field, fieldState }) => (
             <div>
               <select

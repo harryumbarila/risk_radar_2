@@ -39,3 +39,15 @@ export interface NetSettlementSummary {
 
   labels: NetSettlementLabelType[];
 }
+
+export interface NetSettlementBaseDto {
+  mid: string;
+  type: string;
+  amount: number;
+  note: string;
+  user: string;
+  checkType?: 'payed' | 'returned';
+  writeOffType: 'risk' | 'regular';
+  midXFixer: string;
+  futureBalanceAmt: number;
+}

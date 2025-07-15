@@ -9,6 +9,7 @@ import {
 import {
   NetSettlementLabelTypeRepository,
   NetSettlementTransRepository,
+  NetSettlementTransWorkSheetRepository,
 } from '@/crescent-view-db/repositories';
 import { RiskRadarMerchAdjParamEntity } from '@/finance-db/entities';
 import {
@@ -25,6 +26,8 @@ import {
 import {
   DivertQueueFSPRepository,
   DivertQueueRepository,
+  LeadRepository,
+  MerchantMemoUploadRepository,
   SubscriptionQueueRequestEventJsonSourceRepository,
 } from '@/iris-db/repositories';
 
@@ -60,6 +63,10 @@ import { NetSettlementsService } from './net-settlement.service';
     DivertQueueRepository,
     DivertQueueFSPRepository,
     RiskRadarMerchAdjParamRepository,
+
+    NetSettlementTransWorkSheetRepository,
+    LeadRepository,
+    MerchantMemoUploadRepository,
   ],
   controllers: [NetSettlementsController],
 })
