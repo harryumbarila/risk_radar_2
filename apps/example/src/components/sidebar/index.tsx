@@ -342,7 +342,7 @@ export const Sidebar: FC<SidebarProps> = ({
             <Image
               width={176}
               height={32}
-              src="https://apply.taluspay.com/assets/company-logo.svg"
+              src="/images/talus-only-logo.png"
               alt="Logo"
               priority
             />

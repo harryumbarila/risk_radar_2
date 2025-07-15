@@ -27,6 +27,6 @@ export const config = {
     // - static files (images, favicon)
     // - auth-related routes
     // And exclude specific API routes that should be public
-    '/((?!api/version|_next|favicon.ico).*)',
+    '/((?!api/version|_next|favicon.ico|images/talus-only-logo.png).*)',
   ],
 };
