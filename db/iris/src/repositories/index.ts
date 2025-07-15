@@ -10,3 +10,4 @@ export * from './leads-services.repository';
 export * from './leads-underwriting.repository';
 export * from './partner-and-sales-agent-identification.repository';
 export * from './source.repository';
+export * from './subscription-queue-request-event-json-source.repository';

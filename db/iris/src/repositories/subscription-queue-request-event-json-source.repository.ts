@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
-import { IsNull, Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import { SubscriptionQueueRequestEventJsonSourceEntity } from '../entities/subscription-queue-request-event-json-source.entity';
 
@@ -20,16 +20,12 @@ export class SubscriptionQueueRequestEventJsonSourceRepository extends Repositor
   public async checkUwNewAccountHoldAllowRiskToEdit(
     irisMid: string
   ): Promise<boolean> {
-    const result = await this.findOne({
-      where: {
-        irisMId: irisMid,
-        uwNewAccountHoldOnDivertCapturedInTalusDBDate: Not(IsNull()),
-        uwNewAccountHoldOffDivertCapturedInTalusDBDate: IsNull(),
-      },
-    });
-
-    // If record exists matching criteria, risk is NOT allowed to edit (return false)
-    // If no matching record, risk IS allowed to edit (return true)
+    const result = await this.createQueryBuilder()
+      .select(['pk'])
+      .where('IrisMId = :irisMid', { irisMid })
+      .andWhere('dtUW_NewAccountHold_OnDivertCapturedInTalusDB IS NOT NULL')
+      .andWhere('dtUW_NewAccountHold_OffDivertCapturedInTalusDB IS NULL')
+      .getOne();
     return !result;
   }
 }

@@ -7,8 +7,8 @@ export type DataTableProps<BaseModel> = {
   data: PaginationResponse<BaseModel>; // Row Data
   columns: ColumnDef<BaseModel>[]; // Columns definitions
   onSelectRow?: (arg: BaseModel) => void; // On row selection
-  onSetPagination: (arg: PaginationState) => void; // Pagination
-  initialItemsPerPage: number;
+  onSetPagination?: (arg: PaginationState) => void; // Pagination
+  initialItemsPerPage?: number;
   enablePagination?: boolean;
   fontSize?: 'small' | 'medium' | 'large';
   tableClassName?: string;

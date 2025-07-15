@@ -5,6 +5,7 @@ import {
   Radar,
   Receipt,
   UserPen,
+  Workflow,
 } from 'lucide-react';
 
 import type { ResourceKey } from '@/types/permissions';
@@ -62,6 +63,13 @@ const sidebarStructure: SidebarItem[] = [
         name: 'RESIDUAL',
         link: '/residual',
         icon: Receipt,
+      },
+      {
+        id: 'net-settlement',
+        title: 'Net Settlement',
+        name: 'NET_SETTLEMENT',
+        link: '/net-settlement',
+        icon: Workflow,
       },
     ],
   },

@@ -38,8 +38,8 @@ type ActionsCell<T> = BaseCell & {
   type: 'actions';
   row: Row<T>;
   className?: string;
-  onEdit: (data: T) => Promise<void> | void;
-  onDelete: (data: T) => Promise<void> | void;
+  onEdit?: (data: T) => Promise<void> | void;
+  onDelete?: (data: T) => Promise<void> | void;
   iconOnly?: boolean;
 };
 

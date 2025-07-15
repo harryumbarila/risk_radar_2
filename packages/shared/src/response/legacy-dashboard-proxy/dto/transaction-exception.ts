@@ -1,4 +1,4 @@
-import type { BaseModel } from '@/shared/common/base';
+import type { BaseModel } from '@denali/shared/src/common';
 
 export interface TransactionExceptionResponseDto extends BaseModel {
   transactionDate: string;
