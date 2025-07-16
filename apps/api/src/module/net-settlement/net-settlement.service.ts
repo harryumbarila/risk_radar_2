@@ -26,10 +26,7 @@ import type {
   NetSettlementSummaryHeader,
 } from '@/shared/response';
 
-import type {
-  NetSettlementBaseDto,
-  NetSettlementBaseOutput,
-} from './dto/handle-action.dto';
+import type { NetSettlementBaseDto } from './dto/handle-action.dto';
 import type { HandleDiverAddDto } from './dto/handle-divert-add.dto';
 import type { HandleDiverRemovedDto } from './dto/handle-divert-removed.dto copy';
 
@@ -132,10 +129,6 @@ export class NetSettlementsService {
        ORDER BY l.IrisMId`,
         [header.sTIN, mid]
       );
-
-      if (matchingMIDs.length > 0) {
-        matchingMIDs.unshift({ sMID: 'Match Found' });
-      }
 
       const transactions =
         await this.netSettlementTransRepository.getNetSettlementTransactionsSummary(
@@ -375,7 +368,7 @@ export class NetSettlementsService {
 
   public async releaseFunds(
     payload: NetSettlementBaseDto
-  ): Promise<NetSettlementBaseOutput> {
+  ): Promise<NetSettlementSummary> {
     try {
       const { mid, amount, note, user } = payload;
       const now = new Date();
@@ -383,7 +376,7 @@ export class NetSettlementsService {
       const midRight6 = mid.slice(-6);
 
       if (!amount || amount <= 0) {
-        return { success: false, message: 'Nothing to release' };
+        return await this.getNetSettlementSummaryByMID(mid);
       }
 
       const trans = await this.netSettlementTransRepository.save(
@@ -401,7 +394,7 @@ export class NetSettlementsService {
       );
 
       const transId = trans?.id;
-      if (!transId) return { success: false, message: 'No transaction id' };
+      if (!transId) return await this.getNetSettlementSummaryByMID(mid);
 
       await this.netSettlementTransRepository.update(
         { id: transId },
@@ -444,9 +437,7 @@ export class NetSettlementsService {
           })
         );
       }
-      return {
-        success: true,
-      };
+      return await this.getNetSettlementSummaryByMID(mid);
     } catch (error) {
       this.logger.error(`Error releaseFunds for MID: ${payload.mid}`);
       this.logger.error(error);
@@ -456,147 +447,164 @@ export class NetSettlementsService {
 
   // withdraw
   public async withDraw(
-    mid: string,
-    amount: number,
-    user: string,
-    withdrawNotes: string
-  ): Promise<void> {
-    const now = new Date();
+    payload: NetSettlementBaseDto
+  ): Promise<NetSettlementSummary> {
+    try {
+      const { mid, user, amount, note } = payload;
+      const now = new Date();
 
-    const trans = await this.netSettlementTransRepository.save(
-      this.netSettlementTransRepository.create({
-        sourceId: 4,
-        categoryId: 8,
-        typeId: 1,
-        transactionDate: now,
-        bankNumber: mid.substring(0, 4),
-        mid6: mid.substring(mid.length - 6),
-        mid,
-        dba: null,
-        amount,
-        createdBy: user,
-      })
-    );
+      const trans = await this.netSettlementTransRepository.save(
+        this.netSettlementTransRepository.create({
+          sourceId: 4,
+          categoryId: 8,
+          typeId: 1,
+          transactionDate: now,
+          bankNumber: mid.substring(0, 4),
+          mid6: mid.substring(mid.length - 6),
+          mid,
+          dba: null,
+          amount,
+          createdBy: user,
+        })
+      );
 
-    await this.netSettlementTransRepository.update(
-      { id: trans.id },
-      { groupId: trans.id }
-    );
+      await this.netSettlementTransRepository.update(
+        { id: trans.id },
+        { groupId: trans.id }
+      );
 
-    await this.netSettlementTransWorkSheetRepository.save(
-      this.netSettlementTransWorkSheetRepository.create({
-        transactionId: trans.id,
-        transactionCategoryId: trans.categoryId,
-        transactionTypeId: trans.typeId,
-        transactionDate: trans.transactionDate,
-        amount: trans.amount,
-        notes: withdrawNotes,
-        isMain: true,
-        createdBy: user,
-        createdDate: now,
-      })
-    );
+      await this.netSettlementTransWorkSheetRepository.save(
+        this.netSettlementTransWorkSheetRepository.create({
+          transactionId: trans.id,
+          transactionCategoryId: trans.categoryId,
+          transactionTypeId: trans.typeId,
+          transactionDate: trans.transactionDate,
+          amount: trans.amount,
+          notes: note,
+          isMain: true,
+          createdBy: user,
+          createdDate: now,
+        })
+      );
+      return await this.getNetSettlementSummaryByMID(mid);
+    } catch (error) {
+      this.logger.error(`Error withDraw for MID: ${payload.mid}`);
+      this.logger.error(error);
+      throw new RuntimeException(`Error withDraw for MID: ${payload.mid}`);
+    }
   }
 
   // apply
   public async applyCheckToNetSettlement(
-    mid: string,
-    amount: number,
-    note: string,
-    checkType: 'payed' | 'received',
-    user: string
-  ): Promise<void> {
-    const now = new Date();
+    payload: NetSettlementBaseDto
+  ): Promise<NetSettlementSummary> {
+    try {
+      const { mid, amount, note, checkType, user } = payload;
+      const now = new Date();
 
-    const transTypeId = checkType === 'payed' ? 2 : 1;
+      const transTypeId = checkType === 'payed' ? 2 : 1;
 
-    const trans = await this.netSettlementTransRepository.save(
-      this.netSettlementTransRepository.create({
-        sourceId: 6,
-        categoryId: 10,
-        typeId: transTypeId,
-        transactionDate: now,
-        bankNumber: mid.substring(0, 4),
-        mid6: mid.substring(mid.length - 6),
-        mid,
-        dba: null,
-        amount,
-        createdBy: user,
-      })
-    );
+      const trans = await this.netSettlementTransRepository.save(
+        this.netSettlementTransRepository.create({
+          sourceId: 6,
+          categoryId: 10,
+          typeId: transTypeId,
+          transactionDate: now,
+          bankNumber: mid.substring(0, 4),
+          mid6: mid.substring(mid.length - 6),
+          mid,
+          dba: null,
+          amount,
+          createdBy: user,
+        })
+      );
 
-    await this.netSettlementTransRepository.update(
-      { id: trans.id },
-      { groupId: trans.id }
-    );
+      await this.netSettlementTransRepository.update(
+        { id: trans.id },
+        { groupId: trans.id }
+      );
 
-    await this.netSettlementTransWorkSheetRepository.save(
-      this.netSettlementTransWorkSheetRepository.create({
-        transactionId: trans.id,
-        transactionCategoryId: trans.categoryId,
-        transactionTypeId: trans.typeId,
-        transactionDate: trans.transactionDate,
-        amount: trans.amount,
-        notes: note,
-        isMain: true,
-        createdBy: user,
-        createdDate: now,
-      })
-    );
+      await this.netSettlementTransWorkSheetRepository.save(
+        this.netSettlementTransWorkSheetRepository.create({
+          transactionId: trans.id,
+          transactionCategoryId: trans.categoryId,
+          transactionTypeId: trans.typeId,
+          transactionDate: trans.transactionDate,
+          amount: trans.amount,
+          notes: note,
+          isMain: true,
+          createdBy: user,
+          createdDate: now,
+        })
+      );
+      return await this.getNetSettlementSummaryByMID(mid);
+    } catch (error) {
+      this.logger.error(
+        `Error applyCheckToNetSettlement for MID: ${payload.mid}`
+      );
+      this.logger.error(error);
+      throw new RuntimeException(
+        `Error applyCheckToNetSettlement for MID: ${payload.mid}`
+      );
+    }
   }
 
   // write off
   public async writeOffNetSettlement(
-    mid: string,
-    writeOffAmt: number,
-    writeOffNotes: string,
-    writeOffType: 'risk' | 'other',
-    user: string
-  ) {
-    const now = new Date();
+    payload: NetSettlementBaseDto
+  ): Promise<NetSettlementSummary> {
+    try {
+      const { mid, amount, note, writeOffType, user } = payload;
 
-    const [{ maxEligibleWriteOff = 0 }] =
-      await this.netSettlementTransRepository.getEligibleWriteOffSum(mid);
+      const now = new Date();
 
-    if (Math.abs(writeOffAmt) <= 0 || Math.abs(maxEligibleWriteOff) <= 0) {
-      return { success: false, message: 'Nothing to WriteOff' };
+      const [{ maxEligibleWriteOff = 0 }] =
+        await this.netSettlementTransRepository.getEligibleWriteOffSum(mid);
+
+      if (Math.abs(amount) <= 0 || Math.abs(maxEligibleWriteOff) <= 0) {
+        return await this.getNetSettlementSummaryByMID(mid);
+      }
+
+      const trans = await this.netSettlementTransRepository.save(
+        this.netSettlementTransRepository.create({
+          sourceId: 7,
+          categoryId: writeOffType === 'risk' ? 11 : 9,
+          typeId: maxEligibleWriteOff < 0 ? 1 : 2,
+          bankNumber: mid.substring(0, 4),
+          mid6: mid.substring(mid.length - 6),
+          mid,
+          dba: null,
+          transactionDate: now,
+          amount: Math.abs(amount),
+          createdBy: user,
+        })
+      );
+
+      await this.netSettlementTransRepository.update(
+        { id: trans.id },
+        { groupId: trans.id }
+      );
+
+      await this.netSettlementTransWorkSheetRepository.save(
+        this.netSettlementTransWorkSheetRepository.create({
+          transactionId: trans.id,
+          transactionCategoryId: trans.categoryId,
+          transactionTypeId: trans.typeId,
+          transactionDate: trans.transactionDate,
+          amount: trans.amount,
+          notes: note,
+          isMain: true,
+          createdBy: user,
+          createdDate: now,
+        })
+      );
+
+      return await this.getNetSettlementSummaryByMID(mid);
+    } catch (error) {
+      this.logger.error(`Error withDraw for MID: ${payload.mid}`);
+      this.logger.error(error);
+      throw new RuntimeException(`Error withDraw for MID: ${payload.mid}`);
     }
-
-    const trans = await this.netSettlementTransRepository.save(
-      this.netSettlementTransRepository.create({
-        sourceId: 7,
-        categoryId: writeOffType === 'risk' ? 11 : 9,
-        typeId: maxEligibleWriteOff < 0 ? 1 : 2,
-        bankNumber: mid.substring(0, 4),
-        mid6: mid.substring(mid.length - 6),
-        mid,
-        dba: null,
-        transactionDate: now,
-        amount: Math.abs(writeOffAmt),
-        createdBy: user,
-      })
-    );
-
-    await this.netSettlementTransRepository.update(
-      { id: trans.id },
-      { groupId: trans.id }
-    );
-
-    await this.netSettlementTransWorkSheetRepository.save(
-      this.netSettlementTransWorkSheetRepository.create({
-        transactionId: trans.id,
-        transactionCategoryId: trans.categoryId,
-        transactionTypeId: trans.typeId,
-        transactionDate: trans.transactionDate,
-        amount: trans.amount,
-        notes: writeOffNotes,
-        isMain: true,
-        createdBy: user,
-        createdDate: now,
-      })
-    );
-
-    return { success: true };
   }
 
   // transfer

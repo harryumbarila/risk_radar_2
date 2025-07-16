@@ -88,6 +88,7 @@ export * from './images/images-two';
 export * from './inbox';
 export * from './inbox/inbox-list';
 export * from './inbox/inbox-menu-list';
+export * from './input';
 export * from './invoice/invoice-one';
 export * from './invoice/invoice-two';
 export * from './leads-report';

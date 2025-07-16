@@ -1,7 +1,6 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import type { NetSettlementBaseOutput } from './dto/handle-action.dto';
 import { NetSettlementBaseDto } from './dto/handle-action.dto';
 import { HandleDiverAddDto } from './dto/handle-divert-add.dto';
 import { HandleDiverRemovedDto } from './dto/handle-divert-removed.dto copy';
@@ -62,14 +61,36 @@ export class NetSettlementsController {
     summary: 'Add a divert note given a MID',
   })
   @Post('summary/action')
-  public async handleAction(
-    @Body() payload: NetSettlementBaseDto
-  ): Promise<NetSettlementBaseOutput> {
-    if (payload.type === 'release') {
-      return this.netSettlementsService.releaseFunds(payload);
+  public async handleAction(@Body() payload: NetSettlementBaseDto) {
+    switch (payload.type) {
+      case '1': // release
+        return this.netSettlementsService.releaseFunds(payload);
+      case '2': // withdraw
+        return this.netSettlementsService.withDraw(payload);
+      case '3': // apply
+        return this.netSettlementsService.applyCheckToNetSettlement({
+          ...payload,
+          checkType: 'received',
+        });
+      case '4': // write off
+        return this.netSettlementsService.applyCheckToNetSettlement({
+          ...payload,
+          writeOffType: 'regular',
+        });
+      case '5': // write off
+        return this.netSettlementsService.applyCheckToNetSettlement({
+          ...payload,
+          writeOffType: 'risk',
+        });
+      case '6': // apply
+        return this.netSettlementsService.applyCheckToNetSettlement({
+          ...payload,
+          checkType: 'payed',
+        });
+      default:
+        return {
+          success: false,
+        };
     }
-    return {
-      success: false,
-    };
   }
 }
