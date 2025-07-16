@@ -609,127 +609,135 @@ export class NetSettlementsService {
 
   // transfer
   public async applyCheckDivertTransfer(
-    mid: string,
-    amount: number,
-    notes: string,
-    user: string
-  ): Promise<number> {
-    const now = new Date();
+    payload: NetSettlementBaseDto
+  ): Promise<NetSettlementSummary> {
+    try {
+      const { mid, amount, note, user } = payload;
+      const now = new Date();
 
-    const trans = await this.netSettlementTransRepository.save(
-      this.netSettlementTransRepository.create({
-        sourceId: 8, // Check Divert Transfer Source
-        categoryId: 12, // Check Divert Category
-        typeId: 1, // Assuming 'withdrawal'
-        bankNumber: mid.substring(0, 4),
-        mid6: mid.substring(mid.length - 6),
-        mid,
-        transactionDate: now,
-        amount,
-        createdBy: user,
-      })
-    );
+      const trans = await this.netSettlementTransRepository.save(
+        this.netSettlementTransRepository.create({
+          sourceId: 8,
+          categoryId: 12,
+          typeId: 1,
+          bankNumber: mid.substring(0, 4),
+          mid6: mid.substring(mid.length - 6),
+          mid,
+          transactionDate: now,
+          amount,
+          createdBy: user,
+        })
+      );
 
-    trans.groupId = trans.id;
-    await this.netSettlementTransRepository.save(trans);
+      trans.groupId = trans.id;
+      await this.netSettlementTransRepository.save(trans);
 
-    await this.netSettlementTransWorkSheetRepository.save(
-      this.netSettlementTransWorkSheetRepository.create({
+      await this.netSettlementTransWorkSheetRepository.save(
+        this.netSettlementTransWorkSheetRepository.create({
+          transactionId: trans.id,
+          transactionCategoryId: trans.categoryId,
+          transactionTypeId: trans.typeId,
+          transactionDate: trans.transactionDate,
+          amount: trans.amount,
+          notes: `Transferred from Check Divert ${note ?? ''}`,
+          isMain: true,
+          createdBy: user,
+          createdDate: now,
+        })
+      );
+
+      return await this.getNetSettlementSummaryByMID(mid);
+    } catch (error) {
+      this.logger.error(`Error withDraw for MID: ${payload.mid}`);
+      this.logger.error(error);
+      throw new RuntimeException(`Error withDraw for MID: ${payload.mid}`);
+    }
+  }
+
+  // transfer to another MID
+  public async applyTransferToAnotherMID(
+    payload: NetSettlementBaseDto
+  ): Promise<NetSettlementSummary> {
+    const { mid, midXFixer, amount, futureBalanceAmt, note, user } = payload;
+    try {
+      if (!midXFixer?.trim()) {
+        return await this.getNetSettlementSummaryByMID(mid);
+      }
+
+      const now = new Date();
+
+      // Determine transaction types
+      const typeTo = futureBalanceAmt > 0 ? 2 : 1; // Deposit if futureBalance > 0
+      const typeFrom = futureBalanceAmt > 0 ? 1 : 2; // Withdraw if futureBalance > 0
+
+      // Entry #1 — FROM sMID (withdraw or deposit)
+      const trans = await this.netSettlementTransRepository.save(
+        this.netSettlementTransRepository.create({
+          sourceId: 8,
+          categoryId: 13,
+          typeId: typeTo,
+          bankNumber: mid.substring(0, 4),
+          mid6: mid.slice(-6),
+          mid,
+          transactionDate: now,
+          amount,
+          createdBy: user,
+        })
+      );
+
+      trans.groupId = trans.id;
+      await this.netSettlementTransRepository.save(trans);
+
+      const workSheetFrom = this.netSettlementTransWorkSheetRepository.create({
         transactionId: trans.id,
         transactionCategoryId: trans.categoryId,
         transactionTypeId: trans.typeId,
         transactionDate: trans.transactionDate,
         amount: trans.amount,
-        notes: `Transferred from Check Divert ${notes ?? ''}`,
+        notes: `Transferred to MID ${midXFixer} ${note ?? ''}`,
         isMain: true,
         createdBy: user,
         createdDate: now,
-      })
-    );
+      });
 
-    return trans.id;
-  }
+      await this.netSettlementTransWorkSheetRepository.save(workSheetFrom);
 
-  public async applyTransferToAnotherMID(
-    mid: string,
-    midXfer: string,
-    amount: number,
-    futureBalanceAmt: number,
-    notes: string,
-    user: string
-  ): Promise<void> {
-    if (!midXfer?.trim()) {
-      return;
+      // Entry #2 — TO sMIDXFER (opposite type)
+      const transTo = await this.netSettlementTransRepository.save(
+        this.netSettlementTransRepository.create({
+          sourceId: 8,
+          categoryId: 13,
+          typeId: typeFrom,
+          bankNumber: midXFixer.substring(0, 4),
+          mid6: midXFixer.slice(-6),
+          mid: midXFixer,
+          transactionDate: now,
+          amount,
+          createdBy: user,
+        })
+      );
+
+      transTo.groupId = transTo.id;
+      await this.netSettlementTransRepository.save(transTo);
+
+      const workSheetTo = this.netSettlementTransWorkSheetRepository.create({
+        transactionId: transTo.id,
+        transactionCategoryId: transTo.categoryId,
+        transactionTypeId: transTo.typeId,
+        transactionDate: transTo.transactionDate,
+        amount: transTo.amount,
+        notes: `Transferred from MID ${mid} ${note ?? ''}`,
+        isMain: true,
+        createdBy: user,
+        createdDate: now,
+      });
+
+      await this.netSettlementTransWorkSheetRepository.save(workSheetTo);
+      return await this.getNetSettlementSummaryByMID(mid);
+    } catch (error) {
+      this.logger.error(`Error withDraw for MID: ${payload.mid}`);
+      this.logger.error(error);
+      throw new RuntimeException(`Error withDraw for MID: ${payload.mid}`);
     }
-
-    const now = new Date();
-
-    // Determine transaction types
-    const typeTo = futureBalanceAmt > 0 ? 2 : 1; // Deposit if futureBalance > 0
-    const typeFrom = futureBalanceAmt > 0 ? 1 : 2; // Withdraw if futureBalance > 0
-
-    // Entry #1 — FROM sMID (withdraw or deposit)
-    const trans = await this.netSettlementTransRepository.save(
-      this.netSettlementTransRepository.create({
-        sourceId: 8,
-        categoryId: 13,
-        typeId: typeTo,
-        bankNumber: mid.substring(0, 4),
-        mid6: mid.slice(-6),
-        mid,
-        transactionDate: now,
-        amount,
-        createdBy: user,
-      })
-    );
-
-    trans.groupId = trans.id;
-    await this.netSettlementTransRepository.save(trans);
-
-    const workSheetFrom = this.netSettlementTransWorkSheetRepository.create({
-      transactionId: trans.id,
-      transactionCategoryId: trans.categoryId,
-      transactionTypeId: trans.typeId,
-      transactionDate: trans.transactionDate,
-      amount: trans.amount,
-      notes: `Transferred to MID ${midXfer} ${notes ?? ''}`,
-      isMain: true,
-      createdBy: user,
-      createdDate: now,
-    });
-
-    await this.netSettlementTransWorkSheetRepository.save(workSheetFrom);
-
-    // Entry #2 — TO sMIDXFER (opposite type)
-    const transTo = await this.netSettlementTransRepository.save(
-      this.netSettlementTransRepository.create({
-        sourceId: 8,
-        categoryId: 13,
-        typeId: typeFrom,
-        bankNumber: midXfer.substring(0, 4),
-        mid6: midXfer.slice(-6),
-        mid: midXfer,
-        transactionDate: now,
-        amount,
-        createdBy: user,
-      })
-    );
-
-    transTo.groupId = transTo.id;
-    await this.netSettlementTransRepository.save(transTo);
-
-    const workSheetTo = this.netSettlementTransWorkSheetRepository.create({
-      transactionId: transTo.id,
-      transactionCategoryId: transTo.categoryId,
-      transactionTypeId: transTo.typeId,
-      transactionDate: transTo.transactionDate,
-      amount: transTo.amount,
-      notes: `Transferred from MID ${mid} ${notes ?? ''}`,
-      isMain: true,
-      createdBy: user,
-      createdDate: now,
-    });
-
-    await this.netSettlementTransWorkSheetRepository.save(workSheetTo);
   }
 }

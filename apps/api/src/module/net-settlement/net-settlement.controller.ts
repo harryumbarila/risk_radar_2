@@ -87,6 +87,10 @@ export class NetSettlementsController {
           ...payload,
           checkType: 'payed',
         });
+      case '7': // transfer
+        return this.netSettlementsService.applyCheckDivertTransfer(payload);
+      case '8': // transfer to another MID
+        return this.netSettlementsService.applyTransferToAnotherMID(payload);
       default:
         return {
           success: false,

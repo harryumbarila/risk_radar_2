@@ -217,14 +217,15 @@ const NetSettlementPage: React.FC = () => {
       columnHelper.display({
         id: 'actions',
         header: () => 'Actions',
-        cell: (props) => (
-          <DynamicCell
-            type="actions"
-            row={props.row}
-            iconOnly
-            onDelete={() => {}}
-          />
-        ),
+        cell: (props) =>
+          props.row.original.sCreatedBy && (
+            <DynamicCell
+              type="actions"
+              row={props.row}
+              iconOnly
+              onDelete={() => {}}
+            />
+          ),
         meta: {
           align: 'center',
         },
