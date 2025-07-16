@@ -15,11 +15,13 @@ type WriteOffProps = {
     totalPending: number;
     totalWriteOff: number;
   };
+  mids?: string[];
   handleAction: (payload: Partial<NetSettlementBaseDto>) => Promise<void>;
 };
 
 const schema = z.object({
   mid: z.string(),
+  midXFixer: z.string(),
   amount: z.coerce.number().min(1, 'Amount must be at least 1'),
   note: z.string().min(5, 'Note must be at least 5 characters'),
   type: z.string(),
@@ -33,7 +35,7 @@ const schema = z.object({
 type HandleActionType = z.infer<typeof schema>;
 
 export const WriteOff: React.FC<WriteOffProps> = (props) => {
-  const { mid, totalAmounts, handleAction } = props;
+  const { mid, totalAmounts, mids, handleAction } = props;
   const methods = useForm({
     mode: 'all',
     resolver: zodResolver(schema),
@@ -42,6 +44,7 @@ export const WriteOff: React.FC<WriteOffProps> = (props) => {
       amount: 0,
       note: '',
       type: '',
+      midXFixer: '',
       totalBalance: totalAmounts.totalBalance,
     },
   });
@@ -49,8 +52,11 @@ export const WriteOff: React.FC<WriteOffProps> = (props) => {
   const {
     register,
     reset,
+    watch,
     formState: { isValid, isSubmitting },
   } = methods;
+
+  const { type } = watch();
 
   const onSubmit = async (data: HandleActionType): Promise<void> => {
     await handleAction(data);
@@ -74,37 +80,75 @@ export const WriteOff: React.FC<WriteOffProps> = (props) => {
     { id: 8, name: 'Transfer to another MID', value: 'transfer' },
   ];
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <FormProvider {...methods}>
-        <InputField
-          name="amount"
-          type="number"
-          placeholder="Amount"
-          isRequired
-        />
-        <InputField name="note" type="text" placeholder="Notes" isRequired />
-        <select className="px-3 py-1.5 border rounded-md" {...register('type')}>
-          <option value="">-- Please choose an action --</option>
-          {netSettlementActions.map((action) => (
-            <option key={action.id} value={action.id}>
-              {action.name}
-            </option>
-          ))}
-        </select>
-        <button
-          type="button"
-          disabled={!isValid || isSubmitting}
-          className={classNames(
-            ' text-white px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700',
-            {
-              'opacity-50 cursor-not-allowed': !isValid || isSubmitting,
-            }
-          )}
-          onClick={methods.handleSubmit(onSubmit)}
-        >
-          Save
-        </button>
-      </FormProvider>
-    </div>
+    <section className="flex justify-center">
+      <div className="flex flex-col justify-between gap-4 max-w-[800px]">
+        <FormProvider {...methods}>
+          <div className="flex gap-4">
+            <div className="w-full">
+              <p className="text-sm font-medium text-black">Action</p>
+              <select
+                className="px-3 py-1.5 border rounded-md w-full"
+                {...register('type')}
+              >
+                <option value="">-- Please choose an action --</option>
+                {netSettlementActions.map((action) => (
+                  <option key={action.id} value={action.id}>
+                    {action.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {type === '8' ? (
+              <div className="w-full">
+                <p className="text-sm font-medium text-black">MID</p>
+                <select
+                  className="px-3 py-1.5 border rounded-md w-full"
+                  {...register('midXFixer')}
+                >
+                  <option value="">Select</option>
+                  {mids?.map((match) => (
+                    <option key={match} value={match}>
+                      {match}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : null}
+          </div>
+
+          <div className="flex flex-col gap-4 w-[500px]">
+            <InputField
+              label="Amount"
+              name="amount"
+              type="number"
+              placeholder="Amount"
+              isRequired
+            />
+            <InputField
+              label="Notes"
+              name="note"
+              type="text"
+              placeholder="Notes"
+              isRequired
+            />
+          </div>
+
+          <button
+            type="button"
+            disabled={!isValid || isSubmitting}
+            className={classNames(
+              ' text-white px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700',
+              {
+                'opacity-50 cursor-not-allowed': !isValid || isSubmitting,
+              }
+            )}
+            onClick={methods.handleSubmit(onSubmit)}
+          >
+            Save
+          </button>
+        </FormProvider>
+      </div>
+    </section>
   );
 };

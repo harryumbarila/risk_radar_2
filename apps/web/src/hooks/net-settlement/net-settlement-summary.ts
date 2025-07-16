@@ -12,6 +12,10 @@ export type NetSettlementSummaryFilterState = {
   label?: string;
   divertReason?: string;
 };
+export type NetSettlementSummaryRemoveTransaction = {
+  mid: string;
+  transactionId: number;
+};
 
 export type UseNetSettlementSummaryReturnType = {
   data: NetSettlementSummary | null;
@@ -23,6 +27,9 @@ export type UseNetSettlementSummaryReturnType = {
     filtersToApply: NetSettlementSummaryFilterState
   ) => Promise<void>;
   handleAction: (payload: Partial<NetSettlementBaseDto>) => Promise<void>;
+  removeTransaction: (
+    payload: NetSettlementSummaryRemoveTransaction
+  ) => Promise<void>;
 };
 
 export const useNetSettlementSummary =
@@ -133,6 +140,33 @@ export const useNetSettlementSummary =
       },
       [makeRequest, user?.name]
     );
+    const removeTransaction = useCallback(
+      async (payload: NetSettlementSummaryRemoveTransaction): Promise<void> => {
+        try {
+          setIsLoading(true);
+          const result = await makeRequest<NetSettlementSummary>(
+            '/v1/net-settlement/summary/transaction/remove',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                ...payload,
+                user: user?.name,
+              }),
+            }
+          );
+
+          setData(result);
+        } catch (err) {
+          setError(err as Error);
+        } finally {
+          setIsLoading(false);
+        }
+      },
+      [makeRequest, user?.name]
+    );
 
     return {
       data,
@@ -142,5 +176,6 @@ export const useNetSettlementSummary =
       removeNotes,
       addNotes,
       handleAction,
+      removeTransaction,
     };
   };

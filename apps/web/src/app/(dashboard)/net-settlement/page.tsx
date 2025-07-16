@@ -13,8 +13,9 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import classNames from 'classnames';
 import { Search } from 'lucide-react';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import Swal from 'sweetalert2';
 
 import type { NetSettlementTransactionRow } from '@/shared/response';
 import { WriteOff } from '@/web/src/components/net-settlement/write-off';
@@ -22,25 +23,62 @@ import {
   formatCurrency,
   formatDate,
 } from '@/web/src/components/risk-radar/risk-radar-table/table/formatters';
-import type { NetSettlementSummaryFilterState } from '@/web/src/hooks/net-settlement/net-settlement-summary';
+import type {
+  NetSettlementSummaryFilterState,
+  NetSettlementSummaryRemoveTransaction,
+} from '@/web/src/hooks/net-settlement/net-settlement-summary';
 import { useNetSettlementSummary } from '@/web/src/hooks/net-settlement/net-settlement-summary';
 
 const columnHelper = createColumnHelper<NetSettlementTransactionRow>();
 
 const NetSettlementPage: React.FC = () => {
-  const { data, fetchData, addNotes, removeNotes, handleAction, isLoading } =
-    useNetSettlementSummary();
+  const {
+    data,
+    fetchData,
+    addNotes,
+    removeNotes,
+    handleAction,
+    removeTransaction,
+    isLoading,
+  } = useNetSettlementSummary();
 
   const methods = useForm<NetSettlementSummaryFilterState>({
     defaultValues: {
       mid: '',
-      label: '',
+      label: data?.header.netSettlementLabelTypeId || '',
       divertReason: data?.header?.divertReason || '',
     },
     mode: 'onChange',
   });
 
   const { mid } = methods.watch();
+
+  const onDeleteTransaction = useCallback(
+    async (payload: NetSettlementSummaryRemoveTransaction): Promise<void> => {
+      try {
+        const result = await Swal.fire({
+          title: 'Are you sure?',
+          text: "You won't be able to undo!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3C50E0',
+          cancelButtonColor: '#FB5454',
+          confirmButtonText: 'Yes, do it!',
+        });
+
+        if (result.isConfirmed) {
+          await removeTransaction(payload);
+        }
+      } catch (error) {
+        await Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Something went wrong!',
+        });
+      }
+    },
+    [removeTransaction]
+  );
 
   const columns = React.useMemo<
     ColumnDef<NetSettlementTransactionRow>[]
@@ -223,7 +261,12 @@ const NetSettlementPage: React.FC = () => {
               type="actions"
               row={props.row}
               iconOnly
-              onDelete={() => {}}
+              onDelete={() =>
+                onDeleteTransaction({
+                  mid,
+                  transactionId: props.row.original.pkTrans,
+                })
+              }
             />
           ),
         meta: {
@@ -231,13 +274,13 @@ const NetSettlementPage: React.FC = () => {
         },
       }),
     ] as ColumnDef<NetSettlementTransactionRow>[];
-  }, []);
+  }, [mid, onDeleteTransaction]);
 
   React.useEffect(() => {
     if (data) {
       methods.reset({
         mid: data.header.sMID16Exist,
-        label: '',
+        label: data.header.netSettlementLabelTypeId || '',
         divertReason: data.header.divertReason || '',
       });
     }
@@ -291,7 +334,7 @@ const NetSettlementPage: React.FC = () => {
       <Breadcrumb pageName="Net Settlement" />
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="p-3 bg-white shadow-lg rounded-xl space-y-3">
+        <div className="p-6 bg-white shadow-lg rounded-xl space-y-3">
           <div
             className={`"flex flex-wrap items-center gap-4 ${data ? 'border-b pb-4' : undefined}`}
           >
@@ -467,6 +510,7 @@ const NetSettlementPage: React.FC = () => {
                 mid={methods.watch().mid}
                 handleAction={handleAction}
                 totalAmounts={totalAmounts}
+                mids={data?.matchingMIDs}
               />
             </>
           ) : null}

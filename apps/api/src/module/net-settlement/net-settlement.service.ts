@@ -1,8 +1,10 @@
+/* eslint-disable */
 import { Injectable } from '@nestjs/common';
 import { RuntimeException } from '@nestjs/core/errors/exceptions';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { InjectPinoLogger, Logger } from 'nestjs-pino';
 import { DataSource } from 'typeorm';
+import { differenceInHours } from 'date-fns';
 
 import {
   NetSettlementLabelTypeRepository,
@@ -29,6 +31,7 @@ import type {
 import type { NetSettlementBaseDto } from './dto/handle-action.dto';
 import type { HandleDiverAddDto } from './dto/handle-divert-add.dto';
 import type { HandleDiverRemovedDto } from './dto/handle-divert-removed.dto copy';
+import { HandleDeleteTransactionDto } from './dto/handle-delete-transaction.dto';
 
 @Injectable()
 export class NetSettlementsService {
@@ -733,6 +736,122 @@ export class NetSettlementsService {
       });
 
       await this.netSettlementTransWorkSheetRepository.save(workSheetTo);
+      return await this.getNetSettlementSummaryByMID(mid);
+    } catch (error) {
+      this.logger.error(`Error withDraw for MID: ${payload.mid}`);
+      this.logger.error(error);
+      throw new RuntimeException(`Error withDraw for MID: ${payload.mid}`);
+    }
+  }
+
+  public async deleteTransaction(
+    payload: HandleDeleteTransactionDto
+  ): Promise<NetSettlementSummary> {
+    const { mid, transactionId, user } = payload;
+    try {
+      const now = new Date();
+      const formattedTime = now.toTimeString().split(' ')[0].replace(/:/g, '');
+
+      const worksheets = await this.netSettlementTransWorkSheetRepository
+        .createQueryBuilder('ws')
+        .where('ws.transactionCategoryId IN (:...categories)', {
+          categories: [9, 10, 11, 12, 13],
+        })
+        .andWhere('ws.transactionId = :transactionId', { transactionId })
+        .andWhere('ws.isMain = :isMain', { isMain: true })
+        .getMany();
+
+      const matchingCount = worksheets.filter((ws) => {
+        const hoursSinceCreation = Math.abs(
+          differenceInHours(now, ws.createdDate)
+        );
+        return hoursSinceCreation < 3 && formattedTime < '150000';
+      }).length;
+
+      if (matchingCount === 1) {
+        await this.netSettlementTransRepository.update(transactionId, {
+          hidden: true,
+          hiddenAt: now,
+          hiddenBy: user,
+        });
+
+        await this.netSettlementTransWorkSheetRepository.update(
+          { transactionId },
+          {
+            isHidden: true,
+            hiddenDate: now,
+            hiddenBy: user,
+          }
+        );
+      }
+
+      // Fetch transaction
+      const trans = await this.netSettlementTransRepository.findOne({
+        where: { id: transactionId },
+      });
+
+      if (!trans || trans.hidden)
+        return await this.getNetSettlementSummaryByMID(mid);
+
+      const within10Hours = (date?: Date) =>
+        date ? Math.abs(differenceInHours(now, date)) < 10 : false;
+
+      const canSoftDelete =
+        (trans.sourceReferenceKey === null &&
+          trans.categoryId === 8 &&
+          trans.sourceId === 4) ||
+        (trans.categoryId === 10 &&
+          trans.sourceId === 6 &&
+          within10Hours(trans.transactionDate)) ||
+        ([12, 13].includes(trans.categoryId) &&
+          trans.sourceId === 8 &&
+          within10Hours(trans.transactionDate));
+
+      if (canSoftDelete) {
+        await this.netSettlementTransRepository.update(transactionId, {
+          hidden: true,
+          hiddenAt: now,
+          hiddenBy: user,
+        });
+
+        const workSheetsToUpdate =
+          await this.netSettlementTransWorkSheetRepository.find({
+            where: {
+              transactionId: transactionId,
+              isHidden: false,
+            },
+          });
+        // eslint-disable-next-line no-await-in-loop
+        for (const ws of workSheetsToUpdate) {
+          const wsWithin10Hours = within10Hours(ws.transactionDate);
+          const shouldHide =
+            (trans.sourceReferenceKey === null &&
+              trans.categoryId === 8 &&
+              trans.sourceId === 4 &&
+              ws.transactionCategoryId === 8 &&
+              !ws.achDetail1Id) ||
+            (trans.categoryId === 10 &&
+              trans.sourceId === 6 &&
+              ws.transactionCategoryId === 10 &&
+              wsWithin10Hours) ||
+            (trans.categoryId === 12 &&
+              trans.sourceId === 8 &&
+              ws.transactionCategoryId === 12 &&
+              wsWithin10Hours) ||
+            (trans.categoryId === 13 &&
+              trans.sourceId === 8 &&
+              ws.transactionCategoryId === 13 &&
+              wsWithin10Hours);
+
+          if (shouldHide) {
+            await this.netSettlementTransWorkSheetRepository.update(ws.id, {
+              isHidden: true,
+              hiddenDate: now,
+              hiddenBy: user,
+            });
+          }
+        }
+      }
       return await this.getNetSettlementSummaryByMID(mid);
     } catch (error) {
       this.logger.error(`Error withDraw for MID: ${payload.mid}`);

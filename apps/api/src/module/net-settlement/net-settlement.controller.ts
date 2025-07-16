@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { NetSettlementBaseDto } from './dto/handle-action.dto';
+import { HandleDeleteTransactionDto } from './dto/handle-delete-transaction.dto';
 import { HandleDiverAddDto } from './dto/handle-divert-add.dto';
 import { HandleDiverRemovedDto } from './dto/handle-divert-removed.dto copy';
 import { NetSettlementsService } from './net-settlement.service';
@@ -50,6 +51,21 @@ export class NetSettlementsController {
   @Post('summary/remove')
   public async handleDivertRemove(@Body() payload: HandleDiverRemovedDto) {
     return this.netSettlementsService.handleDivertRemove(payload);
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'Deleted a transaction given a MID',
+  })
+  @ApiOperation({
+    operationId: 'net-settlement-summary',
+    summary: 'Delete a transaction given a MID',
+  })
+  @Post('summary/transaction/remove')
+  public async handleRemoveTransaction(
+    @Body() payload: HandleDeleteTransactionDto
+  ) {
+    return this.netSettlementsService.deleteTransaction(payload);
   }
 
   @ApiResponse({
