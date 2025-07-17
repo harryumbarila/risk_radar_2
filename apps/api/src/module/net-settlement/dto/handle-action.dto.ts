@@ -28,7 +28,7 @@ export class NetSettlementBaseDto {
 
   @Allow()
   @IsOptional()
-  public checkType?: 'payed' | 'returned';
+  public checkType?: 'payed' | 'received';
 
   @Allow()
   public writeOffType: 'risk' | 'regular';
