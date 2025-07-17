@@ -8,6 +8,7 @@ import { differenceInHours } from 'date-fns';
 
 import {
   NetSettlementLabelTypeRepository,
+  NetSettlementMidLabelRepository,
   NetSettlementTransRepository,
   NetSettlementTransWorkSheetRepository,
 } from '@/crescent-view-db/repositories';
@@ -32,6 +33,7 @@ import type { NetSettlementBaseDto } from './dto/handle-action.dto';
 import type { HandleDiverAddDto } from './dto/handle-divert-add.dto';
 import type { HandleDiverRemovedDto } from './dto/handle-divert-removed.dto copy';
 import { HandleDeleteTransactionDto } from './dto/handle-delete-transaction.dto';
+import { NetSettlementMidLabelUpdateDto } from './dto/handle-add-label.dto';
 
 @Injectable()
 export class NetSettlementsService {
@@ -50,7 +52,8 @@ export class NetSettlementsService {
     private readonly riskRadarMerchAdjParamRepository: RiskRadarMerchAdjParamRepository,
     private readonly netSettlementTransWorkSheetRepository: NetSettlementTransWorkSheetRepository,
     private readonly leadRepository: LeadRepository,
-    private readonly merchantMemoUploadRepository: MerchantMemoUploadRepository
+    private readonly merchantMemoUploadRepository: MerchantMemoUploadRepository,
+    private readonly netSettlementMidLabelRepository: NetSettlementMidLabelRepository
   ) {}
 
   public async getNetSettlementSummaryByMID(
@@ -88,12 +91,11 @@ export class NetSettlementsService {
 
       const header = headerResult[0] || {};
 
-      const labelType = await manager.query<
-        { fkNetSettlementLabelType?: string }[]
-      >(
-        `SELECT fkNetSettlementLabelType FROM tblNetSettlementMIDLabel WHERE sMID = @0`,
-        [mid]
-      );
+      const labelType = (
+        await this.netSettlementMidLabelRepository.findOneBy({
+          merchantId: mid,
+        })
+      )?.labelTypeId;
 
       const divertFlag1 =
         await this.tSYSDivertFlagUpdateRepository.findValidByMid(mid);
@@ -157,8 +159,7 @@ export class NetSettlementsService {
           sTIN: header.sTIN,
           divertFlag: hasDivert,
           divertReason,
-          netSettlementLabelTypeId:
-            labelType[0]?.fkNetSettlementLabelType || null,
+          netSettlementLabelTypeId: labelType || null,
           uwNewAccountHoldAllowRiskToEdit,
         },
         transactions,
@@ -868,6 +869,44 @@ export class NetSettlementsService {
       this.logger.error(error);
       throw new RuntimeException(
         `Error deleteTransaction for MID: ${payload.mid}`
+      );
+    }
+  }
+
+  public async updateMIDLabel(
+    payload: NetSettlementMidLabelUpdateDto
+  ): Promise<NetSettlementSummary> {
+    const { mid, netSettlementLabelTypeId, user } = payload;
+    try {
+      const existingLabel =
+        await this.netSettlementMidLabelRepository.findOneBy({
+          merchantId: mid,
+        });
+
+      if (existingLabel) {
+        await this.netSettlementMidLabelRepository.update(
+          { merchantId: mid },
+          {
+            labelTypeId: netSettlementLabelTypeId,
+            lastUpdatedBy: user,
+            updatedAt: () => 'GETDATE()',
+          }
+        );
+      } else {
+        await this.netSettlementMidLabelRepository.insert({
+          merchantId: mid,
+          labelTypeId: netSettlementLabelTypeId,
+          createdBy: user,
+          updatedAt: () => 'GETDATE()',
+        });
+      }
+
+      return await this.getNetSettlementSummaryByMID(mid);
+    } catch (error) {
+      this.logger.error(`Error updateMIDLabel for MID: ${payload.mid}`);
+      this.logger.error(error);
+      throw new RuntimeException(
+        `Error updateMIDLabel for MID: ${payload.mid}`
       );
     }
   }

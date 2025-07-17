@@ -9,7 +9,7 @@ import type {
 
 export type NetSettlementSummaryFilterState = {
   mid: string;
-  label?: string;
+  netSettlementLabelTypeId?: number;
   divertReason?: string;
 };
 export type NetSettlementSummaryRemoveTransaction = {
@@ -30,6 +30,7 @@ export type UseNetSettlementSummaryReturnType = {
   removeTransaction: (
     payload: NetSettlementSummaryRemoveTransaction
   ) => Promise<void>;
+  changeLabel: (payload: NetSettlementSummaryFilterState) => Promise<void>;
 };
 
 export const useNetSettlementSummary =
@@ -167,6 +168,36 @@ export const useNetSettlementSummary =
       },
       [makeRequest, user?.name]
     );
+    const changeLabel = useCallback(
+      async (payload: NetSettlementSummaryFilterState): Promise<void> => {
+        try {
+          setIsLoading(true);
+          const result = await makeRequest<NetSettlementSummary>(
+            '/v1/net-settlement/summary/label/add',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                ...payload,
+                netSettlementLabelTypeId: Number(
+                  payload.netSettlementLabelTypeId
+                ),
+                user: user?.name,
+              }),
+            }
+          );
+
+          setData(result);
+        } catch (err) {
+          setError(err as Error);
+        } finally {
+          setIsLoading(false);
+        }
+      },
+      [makeRequest, user?.name]
+    );
 
     return {
       data,
@@ -177,5 +208,6 @@ export const useNetSettlementSummary =
       addNotes,
       handleAction,
       removeTransaction,
+      changeLabel,
     };
   };

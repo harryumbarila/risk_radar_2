@@ -8,7 +8,7 @@ export interface NetSettlementSummaryHeader {
   sTIN: string;
   divertFlag: boolean;
   divertReason: string;
-  netSettlementLabelTypeId: string;
+  netSettlementLabelTypeId: number;
   uwNewAccountHoldAllowRiskToEdit: boolean;
 }
 

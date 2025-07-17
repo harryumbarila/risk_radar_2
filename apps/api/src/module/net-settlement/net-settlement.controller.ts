@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { NetSettlementBaseDto } from './dto/handle-action.dto';
+import { NetSettlementMidLabelUpdateDto } from './dto/handle-add-label.dto';
 import { HandleDeleteTransactionDto } from './dto/handle-delete-transaction.dto';
 import { HandleDiverAddDto } from './dto/handle-divert-add.dto';
 import { HandleDiverRemovedDto } from './dto/handle-divert-removed.dto copy';
@@ -66,6 +67,19 @@ export class NetSettlementsController {
     @Body() payload: HandleDeleteTransactionDto
   ) {
     return this.netSettlementsService.deleteTransaction(payload);
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'Deleted a transaction given a MID',
+  })
+  @ApiOperation({
+    operationId: 'net-settlement-summary',
+    summary: 'Delete a transaction given a MID',
+  })
+  @Post('summary/label/add')
+  public async updateLabel(@Body() payload: NetSettlementMidLabelUpdateDto) {
+    return this.netSettlementsService.updateMIDLabel(payload);
   }
 
   @ApiResponse({

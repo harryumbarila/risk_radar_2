@@ -159,6 +159,7 @@ export * from './tasks/kanban-tasks';
 export * from './tasks/list-tasks';
 export * from './teams/team-one';
 export * from './teams/team-two';
+export * from './text';
 export * from './todo/to-do-list';
 export * from './tool-tips/tooltips-one';
 export * from './tool-tips/tooltips-two';

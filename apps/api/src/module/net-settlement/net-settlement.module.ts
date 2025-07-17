@@ -8,6 +8,7 @@ import {
 } from '@/crescent-view-db/entities';
 import {
   NetSettlementLabelTypeRepository,
+  NetSettlementMidLabelRepository,
   NetSettlementTransRepository,
   NetSettlementTransWorkSheetRepository,
 } from '@/crescent-view-db/repositories';
@@ -67,6 +68,7 @@ import { NetSettlementsService } from './net-settlement.service';
     NetSettlementTransWorkSheetRepository,
     LeadRepository,
     MerchantMemoUploadRepository,
+    NetSettlementMidLabelRepository,
   ],
   controllers: [NetSettlementsController],
 })

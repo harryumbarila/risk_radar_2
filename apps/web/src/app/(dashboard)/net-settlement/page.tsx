@@ -8,6 +8,7 @@ import {
   Dropdown,
   DynamicCell,
   Loader,
+  MaskedText,
 } from '@denali/ui';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
@@ -39,13 +40,14 @@ const NetSettlementPage: React.FC = () => {
     removeNotes,
     handleAction,
     removeTransaction,
+    changeLabel,
     isLoading,
   } = useNetSettlementSummary();
 
   const methods = useForm<NetSettlementSummaryFilterState>({
     defaultValues: {
       mid: '',
-      label: data?.header.netSettlementLabelTypeId || '',
+      netSettlementLabelTypeId: data?.header.netSettlementLabelTypeId || 0,
       divertReason: data?.header?.divertReason || '',
     },
     mode: 'onChange',
@@ -159,7 +161,7 @@ const NetSettlementPage: React.FC = () => {
         },
       }),
       columnHelper.group({
-        header: 'Amounts',
+        header: '-',
         columns: [
           columnHelper.accessor('dPendingAmt', {
             header: () => 'Pending Amt',
@@ -256,7 +258,7 @@ const NetSettlementPage: React.FC = () => {
         id: 'actions',
         header: () => 'Actions',
         cell: (props) =>
-          props.row.original.sCreatedBy && (
+          props.row.original.sCreatedBy ? (
             <DynamicCell
               type="actions"
               row={props.row}
@@ -268,6 +270,8 @@ const NetSettlementPage: React.FC = () => {
                 })
               }
             />
+          ) : (
+            <DynamicCell type="text" value="-" className="text-center" />
           ),
         meta: {
           align: 'center',
@@ -280,7 +284,7 @@ const NetSettlementPage: React.FC = () => {
     if (data) {
       methods.reset({
         mid: data.header.sMID16Exist,
-        label: data.header.netSettlementLabelTypeId || '',
+        netSettlementLabelTypeId: data.header.netSettlementLabelTypeId || 0,
         divertReason: data.header.divertReason || '',
       });
     }
@@ -339,47 +343,86 @@ const NetSettlementPage: React.FC = () => {
             className={`"flex flex-wrap items-center gap-4 ${data ? 'border-b pb-4' : undefined}`}
           >
             <FormProvider {...methods}>
-              <div className="flex items-center gap-4">
-                <div>
-                  <label
-                    htmlFor="mid"
-                    className="block text-sm font-medium text-black dark:text-white"
-                  >
-                    Net Settlement - MID Search
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="MID"
-                    {...methods.register('mid')}
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent px-2 py-1 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                  />
+              <div className="flex justify-between items-center gap-4">
+                <div className="flex gap-2">
+                  <div>
+                    <label
+                      htmlFor="mid"
+                      className="block text-sm font-medium text-black dark:text-white"
+                    >
+                      Net Settlement - MID Search
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="MID"
+                      {...methods.register('mid')}
+                      className="w-full rounded border-[1.5px] border-stroke bg-transparent px-2 py-1 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                    />
+                  </div>
+                  <div className="flex items-center pt-6">
+                    <button
+                      type="button"
+                      onClick={methods.handleSubmit(fetchData)}
+                      disabled={!mid}
+                      className={`rounded ${!mid ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}`}
+                    >
+                      <Search className="size-5" />
+                    </button>
+                  </div>
                 </div>
 
                 <div>
-                  {data ? (
-                    <Dropdown
-                      label="Labels"
-                      name="label"
-                      options={[
-                        { value: '', label: '--Select--' },
-                        ...data.labels.map((label) => ({
-                          value: String(label.id),
-                          label: label.name,
-                        })),
-                      ]}
-                    />
+                  {data?.matchingMIDs && data?.matchingMIDs?.length > 0 ? (
+                    <div>
+                      <p className="text-sm font-medium text-black">
+                        Match Found
+                      </p>
+                      <select
+                        className="px-3 py-1.5 border rounded-md"
+                        onChange={(e) =>
+                          fetchData({
+                            mid: e.target.value,
+                          })
+                        }
+                      >
+                        <option value={data?.header.sMID16Exist}>
+                          {data?.header.sMID16Exist}
+                        </option>
+                        {data?.matchingMIDs.map((match) => (
+                          <option key={match} value={match}>
+                            {match}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   ) : null}
                 </div>
-
-                <div className="flex items-center pt-6">
-                  <button
-                    type="button"
-                    onClick={methods.handleSubmit(fetchData)}
-                    disabled={!mid}
-                    className={`rounded ${!mid ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}`}
-                  >
-                    <Search className="size-5" />
-                  </button>
+                <div>
+                  {data ? (
+                    <div className="flex gap-4">
+                      <Dropdown
+                        label="Labels"
+                        name="netSettlementLabelTypeId"
+                        options={[
+                          { value: '', label: '--Select--' },
+                          ...data.labels.map((label) => ({
+                            value: String(label.id),
+                            label: label.name,
+                          })),
+                        ]}
+                      />
+                      <div className="items-center pt-6">
+                        <button
+                          type="button"
+                          onClick={methods.handleSubmit(changeLabel)}
+                          disabled={!mid}
+                          className={`rounded ${!mid ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}`}
+                        >
+                          <Search className="size-5" />
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
               </div>
             </FormProvider>
@@ -389,45 +432,27 @@ const NetSettlementPage: React.FC = () => {
             <>
               {/* Header */}
               <div className="flex flex-wrap items-center justify-between gap-2">
-                {data?.matchingMIDs.length > 0 ? (
-                  <div>
-                    <p className="text-sm font-medium text-black">
-                      Match Found
-                    </p>
-                    <select
-                      className="px-3 py-1.5 border rounded-md"
-                      onChange={(e) =>
-                        fetchData({
-                          mid: e.target.value,
-                        })
-                      }
-                    >
-                      <option value={data?.header.sMID16Exist}>
-                        {data?.header.sMID16Exist}
-                      </option>
-                      {data?.matchingMIDs.map((match) => (
-                        <option key={match} value={match}>
-                          {match}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                ) : null}
                 <div>
                   <p className="text-sm font-medium text-black">DBA</p>
                   <p className="text-lg font-semibold">{data?.header.sDBA}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-black">Routing #</p>
-                  <p className="text-lg font-semibold">
-                    {data?.header.sMerchantBankRoutingNumber}
-                  </p>
+                  {data?.header.sMerchantBankRoutingNumber ? (
+                    <MaskedText
+                      className="text-lg font-semibold"
+                      text={data?.header.sMerchantBankRoutingNumber}
+                    />
+                  ) : null}
                 </div>
                 <div>
                   <p className="text-sm font-medium text-black">Account #</p>
-                  <p className="text-lg font-semibold">
-                    {data?.header.sMerchantBankAccountNumber}
-                  </p>
+                  {data?.header.sMerchantBankAccountNumber ? (
+                    <MaskedText
+                      className="text-lg font-semibold"
+                      text={data?.header.sMerchantBankAccountNumber}
+                    />
+                  ) : null}
                 </div>
               </div>
 
