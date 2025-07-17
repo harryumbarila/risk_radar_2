@@ -438,9 +438,6 @@ const NetSettlementPage: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-black">Routing #</p>
-                  <p className="text-lg font-semibold">
-                    {data?.header.sMerchantBankRoutingNumber}
-                  </p>
                   {data?.header.sMerchantBankRoutingNumber ? (
                     <MaskedText
                       className="text-lg font-semibold"
