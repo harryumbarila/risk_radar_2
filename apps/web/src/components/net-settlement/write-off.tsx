@@ -1,3 +1,4 @@
+import { InputField } from '@denali/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import classNames from 'classnames';
 import React from 'react';
@@ -5,7 +6,6 @@ import { FormProvider, useForm } from 'react-hook-form';
 import z from 'zod';
 
 import type { NetSettlementBaseDto } from '@/shared/response';
-import { InputField } from '@/ui/common';
 
 type WriteOffProps = {
   mid: string;
@@ -19,23 +19,25 @@ type WriteOffProps = {
   handleAction: (payload: Partial<NetSettlementBaseDto>) => Promise<void>;
 };
 
-const schema = z.object({
-  mid: z.string(),
-  midXFixer: z.string(),
-  amount: z.coerce.number().min(1, 'Amount must be at least 1'),
-  note: z.string().min(5, 'Note must be at least 5 characters'),
-  type: z.string(),
-  totalBalance: z.number(),
-});
-// .refine((data) => data.amount <= Math.abs(data.totalBalance), {
-//   message: 'Amount cannot be greater than the net balance',
-//   path: ['amount'],
-// });
+const schema = z
+  .object({
+    mid: z.string(),
+    midXFixer: z.string(),
+    amount: z.coerce.number().min(1, 'Amount must be at least 1'),
+    note: z.string().min(5, 'Note must be at least 5 characters'),
+    type: z.string(),
+    totalBalance: z.number(),
+  })
+  .refine((data) => data.amount <= Math.abs(data.totalBalance), {
+    message: 'Amount cannot be greater than the net balance',
+    path: ['amount'],
+  });
 
 type HandleActionType = z.infer<typeof schema>;
 
 export const WriteOff: React.FC<WriteOffProps> = (props) => {
   const { mid, totalAmounts, mids, handleAction } = props;
+
   const methods = useForm({
     mode: 'all',
     resolver: zodResolver(schema),
@@ -80,60 +82,57 @@ export const WriteOff: React.FC<WriteOffProps> = (props) => {
     { id: 8, name: 'Transfer to another MID', value: 'transfer' },
   ];
   return (
-    <section className="flex justify-center">
-      <div className="flex flex-col justify-between gap-4 max-w-[800px]">
-        <FormProvider {...methods}>
-          <div className="flex gap-4">
+    <section className="max-w bg-white p-6 rounded-lg shadow-lg flex flex-col gap-5 justify-center">
+      <FormProvider {...methods}>
+        <div className="flex justify-between gap-4 items-center">
+          <div className="w-full">
+            <p className="text-sm font-medium text-black">Action</p>
+            <select
+              className="px-3 py-1.5 border rounded-md w-full"
+              {...register('type')}
+            >
+              <option value="">-- Please choose an action --</option>
+              {netSettlementActions.map((action) => (
+                <option key={action.id} value={action.id}>
+                  {action.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {type === '8' ? (
             <div className="w-full">
-              <p className="text-sm font-medium text-black">Action</p>
+              <p className="text-sm font-medium text-black">MID</p>
               <select
                 className="px-3 py-1.5 border rounded-md w-full"
-                {...register('type')}
+                {...register('midXFixer')}
               >
-                <option value="">-- Please choose an action --</option>
-                {netSettlementActions.map((action) => (
-                  <option key={action.id} value={action.id}>
-                    {action.name}
+                <option value="">Select</option>
+                {mids?.map((match) => (
+                  <option key={match} value={match}>
+                    {match}
                   </option>
                 ))}
               </select>
             </div>
-
-            {type === '8' ? (
-              <div className="w-full">
-                <p className="text-sm font-medium text-black">MID</p>
-                <select
-                  className="px-3 py-1.5 border rounded-md w-full"
-                  {...register('midXFixer')}
-                >
-                  <option value="">Select</option>
-                  {mids?.map((match) => (
-                    <option key={match} value={match}>
-                      {match}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ) : null}
-          </div>
-
-          <div className="flex flex-col gap-4 w-[500px]">
-            <InputField
-              label="Amount"
-              name="amount"
-              type="number"
-              placeholder="Amount"
-              isRequired
-            />
-            <InputField
-              label="Notes"
-              name="note"
-              type="text"
-              placeholder="Notes"
-              isRequired
-            />
-          </div>
-
+          ) : null}
+          <InputField
+            label="Amount"
+            name="amount"
+            type="number"
+            placeholder="Amount"
+            isRequired
+          />
+          <InputField
+            className="w-full"
+            label="Notes"
+            name="note"
+            type="text"
+            placeholder="Notes"
+            isRequired
+          />
+        </div>
+        <div className="flex">
           <button
             type="button"
             disabled={!isValid || isSubmitting}
@@ -147,8 +146,8 @@ export const WriteOff: React.FC<WriteOffProps> = (props) => {
           >
             Save
           </button>
-        </FormProvider>
-      </div>
+        </div>
+      </FormProvider>
     </section>
   );
 };

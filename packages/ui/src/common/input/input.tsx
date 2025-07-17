@@ -1,4 +1,5 @@
 import { ErrorMessage } from '@hookform/error-message';
+import clsx from 'clsx';
 import type { InputHTMLAttributes } from 'react';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -23,11 +24,12 @@ export const InputField: React.FC<React.PropsWithChildren<InputFieldProps>> = (
     placeholder,
     name,
     isRequired,
+    className,
     ...rest
   } = props;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className={clsx('flex flex-col h-full', className)}>
       {label && (
         <label
           className="block text-sm font-medium text-black dark:text-white"
