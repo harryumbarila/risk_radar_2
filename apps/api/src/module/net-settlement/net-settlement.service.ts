@@ -604,9 +604,11 @@ export class NetSettlementsService {
 
       return await this.getNetSettlementSummaryByMID(mid);
     } catch (error) {
-      this.logger.error(`Error withDraw for MID: ${payload.mid}`);
+      this.logger.error(`Error writeOffNetSettlement for MID: ${payload.mid}`);
       this.logger.error(error);
-      throw new RuntimeException(`Error withDraw for MID: ${payload.mid}`);
+      throw new RuntimeException(
+        `Error writeOffNetSettlement for MID: ${payload.mid}`
+      );
     }
   }
 
@@ -651,9 +653,13 @@ export class NetSettlementsService {
 
       return await this.getNetSettlementSummaryByMID(mid);
     } catch (error) {
-      this.logger.error(`Error withDraw for MID: ${payload.mid}`);
+      this.logger.error(
+        `Error applyCheckDivertTransfer for MID: ${payload.mid}`
+      );
       this.logger.error(error);
-      throw new RuntimeException(`Error withDraw for MID: ${payload.mid}`);
+      throw new RuntimeException(
+        `Error applyCheckDivertTransfer for MID: ${payload.mid}`
+      );
     }
   }
 
@@ -738,9 +744,13 @@ export class NetSettlementsService {
       await this.netSettlementTransWorkSheetRepository.save(workSheetTo);
       return await this.getNetSettlementSummaryByMID(mid);
     } catch (error) {
-      this.logger.error(`Error withDraw for MID: ${payload.mid}`);
+      this.logger.error(
+        `Error applyTransferToAnotherMID for MID: ${payload.mid}`
+      );
       this.logger.error(error);
-      throw new RuntimeException(`Error withDraw for MID: ${payload.mid}`);
+      throw new RuntimeException(
+        `Error applyTransferToAnotherMID for MID: ${payload.mid}`
+      );
     }
   }
 
@@ -854,9 +864,11 @@ export class NetSettlementsService {
       }
       return await this.getNetSettlementSummaryByMID(mid);
     } catch (error) {
-      this.logger.error(`Error withDraw for MID: ${payload.mid}`);
+      this.logger.error(`Error deleteTransaction for MID: ${payload.mid}`);
       this.logger.error(error);
-      throw new RuntimeException(`Error withDraw for MID: ${payload.mid}`);
+      throw new RuntimeException(
+        `Error deleteTransaction for MID: ${payload.mid}`
+      );
     }
   }
 }

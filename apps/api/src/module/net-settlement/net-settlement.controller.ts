@@ -89,12 +89,12 @@ export class NetSettlementsController {
           checkType: 'received',
         });
       case '4': // write off
-        return this.netSettlementsService.applyCheckToNetSettlement({
+        return this.netSettlementsService.writeOffNetSettlement({
           ...payload,
           writeOffType: 'regular',
         });
-      case '5': // write off
-        return this.netSettlementsService.applyCheckToNetSettlement({
+      case '5': // risk write off
+        return this.netSettlementsService.writeOffNetSettlement({
           ...payload,
           writeOffType: 'risk',
         });
