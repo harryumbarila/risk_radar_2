@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class HandleDiverAddDto {
+export class HandleDeleteTransactionDto {
   @ApiProperty({
     description: 'Merchant ID (MID)',
     example: '561100001234',
@@ -15,9 +15,8 @@ export class HandleDiverAddDto {
     example: 'Manual put on divert via NetSettlement',
     required: true,
   })
-  @IsString()
-  @IsOptional()
-  public note: string;
+  @IsNumber()
+  public transactionId: number;
 
   @ApiProperty({
     description: 'Username of the user performing the action',

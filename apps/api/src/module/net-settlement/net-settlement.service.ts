@@ -1,12 +1,15 @@
+/* eslint-disable */
 import { Injectable } from '@nestjs/common';
 import { RuntimeException } from '@nestjs/core/errors/exceptions';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { InjectPinoLogger, Logger } from 'nestjs-pino';
 import { DataSource } from 'typeorm';
+import { differenceInHours } from 'date-fns';
 
 import {
   NetSettlementLabelTypeRepository,
   NetSettlementTransRepository,
+  NetSettlementTransWorkSheetRepository,
 } from '@/crescent-view-db/repositories';
 import {
   RiskRadarMerchAdjParamRepository,
@@ -16,6 +19,8 @@ import {
 import {
   DivertQueueFSPRepository,
   DivertQueueRepository,
+  LeadRepository,
+  MerchantMemoUploadRepository,
   SubscriptionQueueRequestEventJsonSourceRepository,
 } from '@/iris-db/repositories';
 import type {
@@ -23,8 +28,10 @@ import type {
   NetSettlementSummaryHeader,
 } from '@/shared/response';
 
+import type { NetSettlementBaseDto } from './dto/handle-action.dto';
 import type { HandleDiverAddDto } from './dto/handle-divert-add.dto';
 import type { HandleDiverRemovedDto } from './dto/handle-divert-removed.dto copy';
+import { HandleDeleteTransactionDto } from './dto/handle-delete-transaction.dto';
 
 @Injectable()
 export class NetSettlementsService {
@@ -40,7 +47,10 @@ export class NetSettlementsService {
     private readonly netSettlementLabelTypeRepository: NetSettlementLabelTypeRepository,
     private readonly divertQueueFSPRepository: DivertQueueFSPRepository,
     private readonly divertQueueRepository: DivertQueueRepository,
-    private readonly riskRadarMerchAdjParamRepository: RiskRadarMerchAdjParamRepository
+    private readonly riskRadarMerchAdjParamRepository: RiskRadarMerchAdjParamRepository,
+    private readonly netSettlementTransWorkSheetRepository: NetSettlementTransWorkSheetRepository,
+    private readonly leadRepository: LeadRepository,
+    private readonly merchantMemoUploadRepository: MerchantMemoUploadRepository
   ) {}
 
   public async getNetSettlementSummaryByMID(
@@ -123,10 +133,6 @@ export class NetSettlementsService {
         [header.sTIN, mid]
       );
 
-      if (matchingMIDs.length > 0) {
-        matchingMIDs.unshift({ sMID: 'Match Found' });
-      }
-
       const transactions =
         await this.netSettlementTransRepository.getNetSettlementTransactionsSummary(
           mid
@@ -166,7 +172,9 @@ export class NetSettlementsService {
     }
   }
 
-  public async handleDivertAdd(payload: HandleDiverAddDto): Promise<void> {
+  public async handleDivertAdd(
+    payload: HandleDiverAddDto
+  ): Promise<NetSettlementSummary> {
     try {
       const { mid, note, user } = payload;
       const existingFlag = await this.tSYSDivertFlagUpdateRepository.findOne({
@@ -259,6 +267,8 @@ export class NetSettlementsService {
         { mid },
         { isDivert: true }
       );
+
+      return await this.getNetSettlementSummaryByMID(mid);
     } catch (error) {
       this.logger.error(`Error adding divert note for MID: ${payload.mid}`);
       this.logger.error(error);
@@ -270,83 +280,595 @@ export class NetSettlementsService {
 
   public async handleDivertRemove(
     payload: HandleDiverRemovedDto
-  ): Promise<void> {
-    const { mid, user } = payload;
-    const existingActiveFlag =
-      await this.tSYSDivertFlagUpdateRepository.findOne({
-        where: {
-          mid,
-          isHidden: false,
-        },
-      });
+  ): Promise<NetSettlementSummary> {
+    try {
+      const { mid, user } = payload;
+      const existingActiveFlag =
+        await this.tSYSDivertFlagUpdateRepository.findOne({
+          where: {
+            mid,
+            isHidden: false,
+          },
+        });
 
-    if (existingActiveFlag) {
-      await this.tSYSDivertFlagUpdateRepository.update(
-        { mid, isHidden: false },
-        {
-          isHidden: true,
-          removeDate: () => 'GETDATE()',
+      if (existingActiveFlag) {
+        await this.tSYSDivertFlagUpdateRepository.update(
+          { mid, isHidden: false },
+          {
+            isHidden: true,
+            removeDate: () => 'GETDATE()',
+          }
+        );
+      }
+
+      if (['5611', '7905'].some((prefix) => mid.startsWith(prefix))) {
+        const latestDivert = await this.divertQueueRepository
+          .createQueryBuilder('dq')
+          .select('MAX(dq.Id)', 'maxId')
+          .where('dq.MerchantId = :mid', { mid })
+          .getRawOne<{ maxId: number }>();
+
+        if (latestDivert?.maxId) {
+          const lastRecord = await this.divertQueueRepository.findOne({
+            where: { id: latestDivert.maxId },
+          });
+
+          if (lastRecord?.isDiverted) {
+            await this.divertQueueRepository.insert({
+              merchantId: Number(mid),
+              isDiverted: false,
+              divertFlagNotes: 'Manual remove from divert via NetSettlement',
+              createDate: () => 'GETDATE()',
+              createdBy: user,
+            });
+          }
         }
+      }
+
+      if (mid.startsWith('8152')) {
+        const latestDivertFSP = await this.divertQueueFSPRepository
+          .createQueryBuilder('dqf')
+          .select('MAX(dqf.Id)', 'maxId')
+          .where('dqf.MerchantId = :mid', { mid })
+          .getRawOne<{ maxId: number }>();
+
+        if (latestDivertFSP?.maxId) {
+          const lastRecord = await this.divertQueueFSPRepository.findOne({
+            where: { id: latestDivertFSP.maxId },
+          });
+
+          if (lastRecord?.isDiverted) {
+            await this.divertQueueFSPRepository.insert({
+              merchantId: Number(mid),
+              isDiverted: false,
+              divertFlagNotes: 'Manual remove from divert via NetSettlement',
+              createDate: () => 'GETDATE()',
+              createdBy: user,
+            });
+          }
+        }
+      }
+
+      await this.riskRadarNotesRepository.insert({
+        mid,
+        notes: 'Account removed from divert',
+        notesTypeId: 5,
+        userCreated: user,
+      });
+      await this.riskRadarMerchAdjParamRepository.update(
+        { mid },
+        { isDivert: false }
+      );
+      return await this.getNetSettlementSummaryByMID(mid);
+    } catch (error) {
+      this.logger.error(`Error adding divert note for MID: ${payload.mid}`);
+      this.logger.error(error);
+      throw new RuntimeException(
+        `Error adding divert note for MID: ${payload.mid}`
       );
     }
+  }
 
-    if (['5611', '7905'].some((prefix) => mid.startsWith(prefix))) {
-      const latestDivert = await this.divertQueueRepository
-        .createQueryBuilder('dq')
-        .select('MAX(dq.Id)', 'maxId')
-        .where('dq.MerchantId = :mid', { mid })
-        .getRawOne<{ maxId: number }>();
+  public async releaseFunds(
+    payload: NetSettlementBaseDto
+  ): Promise<NetSettlementSummary> {
+    try {
+      const { mid, amount, note, user } = payload;
+      const now = new Date();
+      const mid6 = mid.slice(0, 4);
+      const midRight6 = mid.slice(-6);
 
-      if (latestDivert?.maxId) {
-        const lastRecord = await this.divertQueueRepository.findOne({
-          where: { id: latestDivert.maxId },
+      if (!amount || amount <= 0) {
+        return await this.getNetSettlementSummaryByMID(mid);
+      }
+
+      const trans = await this.netSettlementTransRepository.save(
+        this.netSettlementTransRepository.create({
+          sourceId: 4,
+          categoryId: 8,
+          typeId: 2,
+          bankNumber: mid6,
+          mid6: midRight6,
+          mid,
+          dba: null,
+          amount,
+          createdBy: user,
+        })
+      );
+
+      const transId = trans?.id;
+      if (!transId) return await this.getNetSettlementSummaryByMID(mid);
+
+      await this.netSettlementTransRepository.update(
+        { id: transId },
+        { groupId: transId }
+      );
+
+      await this.netSettlementTransWorkSheetRepository.save(
+        this.netSettlementTransWorkSheetRepository.create({
+          transactionId: transId,
+          transactionCategoryId: 8,
+          transactionTypeId: 2,
+          transactionDate: now,
+          amount,
+          notes: note,
+          isMain: true,
+          createdBy: user,
+        })
+      );
+
+      await this.riskRadarNotesRepository.insert({
+        mid,
+        notes: `Released ${amount}`,
+        notesTypeId: 11,
+        userCreated: user,
+        irisMemoRequestDate: () => 'GETDATE()',
+      });
+
+      const lead = await this.leadRepository.findOne({
+        where: { irisMId: mid },
+      });
+
+      if (lead) {
+        await this.merchantMemoUploadRepository.save(
+          this.merchantMemoUploadRepository.create({
+            irisLeadId: lead.irisLeadId,
+            irisMerchantId: mid,
+            memo: `Net Settlement Note: Released ${amount} - ${user} - ${now.toLocaleString()}`,
+            isProcessed: false,
+            isVisible: false,
+          })
+        );
+      }
+      return await this.getNetSettlementSummaryByMID(mid);
+    } catch (error) {
+      this.logger.error(`Error releaseFunds for MID: ${payload.mid}`);
+      this.logger.error(error);
+      throw new RuntimeException(`Error releaseFunds for MID: ${payload.mid}`);
+    }
+  }
+
+  // withdraw
+  public async withDraw(
+    payload: NetSettlementBaseDto
+  ): Promise<NetSettlementSummary> {
+    try {
+      const { mid, user, amount, note } = payload;
+      const now = new Date();
+
+      const trans = await this.netSettlementTransRepository.save(
+        this.netSettlementTransRepository.create({
+          sourceId: 4,
+          categoryId: 8,
+          typeId: 1,
+          transactionDate: now,
+          bankNumber: mid.substring(0, 4),
+          mid6: mid.substring(mid.length - 6),
+          mid,
+          dba: null,
+          amount,
+          createdBy: user,
+        })
+      );
+
+      await this.netSettlementTransRepository.update(
+        { id: trans.id },
+        { groupId: trans.id }
+      );
+
+      await this.netSettlementTransWorkSheetRepository.save(
+        this.netSettlementTransWorkSheetRepository.create({
+          transactionId: trans.id,
+          transactionCategoryId: trans.categoryId,
+          transactionTypeId: trans.typeId,
+          transactionDate: trans.transactionDate,
+          amount: trans.amount,
+          notes: note,
+          isMain: true,
+          createdBy: user,
+          createdDate: now,
+        })
+      );
+      return await this.getNetSettlementSummaryByMID(mid);
+    } catch (error) {
+      this.logger.error(`Error withDraw for MID: ${payload.mid}`);
+      this.logger.error(error);
+      throw new RuntimeException(`Error withDraw for MID: ${payload.mid}`);
+    }
+  }
+
+  // apply
+  public async applyCheckToNetSettlement(
+    payload: NetSettlementBaseDto
+  ): Promise<NetSettlementSummary> {
+    try {
+      const { mid, amount, note, checkType, user } = payload;
+      const now = new Date();
+
+      const transTypeId = checkType === 'payed' ? 2 : 1;
+
+      const trans = await this.netSettlementTransRepository.save(
+        this.netSettlementTransRepository.create({
+          sourceId: 6,
+          categoryId: 10,
+          typeId: transTypeId,
+          transactionDate: now,
+          bankNumber: mid.substring(0, 4),
+          mid6: mid.substring(mid.length - 6),
+          mid,
+          dba: null,
+          amount,
+          createdBy: user,
+        })
+      );
+
+      await this.netSettlementTransRepository.update(
+        { id: trans.id },
+        { groupId: trans.id }
+      );
+
+      await this.netSettlementTransWorkSheetRepository.save(
+        this.netSettlementTransWorkSheetRepository.create({
+          transactionId: trans.id,
+          transactionCategoryId: trans.categoryId,
+          transactionTypeId: trans.typeId,
+          transactionDate: trans.transactionDate,
+          amount: trans.amount,
+          notes: note,
+          isMain: true,
+          createdBy: user,
+          createdDate: now,
+        })
+      );
+      return await this.getNetSettlementSummaryByMID(mid);
+    } catch (error) {
+      this.logger.error(
+        `Error applyCheckToNetSettlement for MID: ${payload.mid}`
+      );
+      this.logger.error(error);
+      throw new RuntimeException(
+        `Error applyCheckToNetSettlement for MID: ${payload.mid}`
+      );
+    }
+  }
+
+  // write off
+  public async writeOffNetSettlement(
+    payload: NetSettlementBaseDto
+  ): Promise<NetSettlementSummary> {
+    try {
+      const { mid, amount, note, writeOffType, user } = payload;
+
+      const now = new Date();
+
+      const [{ maxEligibleWriteOff = 0 }] =
+        await this.netSettlementTransRepository.getEligibleWriteOffSum(mid);
+
+      if (Math.abs(amount) <= 0 || Math.abs(maxEligibleWriteOff) <= 0) {
+        return await this.getNetSettlementSummaryByMID(mid);
+      }
+
+      const trans = await this.netSettlementTransRepository.save(
+        this.netSettlementTransRepository.create({
+          sourceId: 7,
+          categoryId: writeOffType === 'risk' ? 11 : 9,
+          typeId: maxEligibleWriteOff < 0 ? 1 : 2,
+          bankNumber: mid.substring(0, 4),
+          mid6: mid.substring(mid.length - 6),
+          mid,
+          dba: null,
+          transactionDate: now,
+          amount: Math.abs(amount),
+          createdBy: user,
+        })
+      );
+
+      await this.netSettlementTransRepository.update(
+        { id: trans.id },
+        { groupId: trans.id }
+      );
+
+      await this.netSettlementTransWorkSheetRepository.save(
+        this.netSettlementTransWorkSheetRepository.create({
+          transactionId: trans.id,
+          transactionCategoryId: trans.categoryId,
+          transactionTypeId: trans.typeId,
+          transactionDate: trans.transactionDate,
+          amount: trans.amount,
+          notes: note,
+          isMain: true,
+          createdBy: user,
+          createdDate: now,
+        })
+      );
+
+      return await this.getNetSettlementSummaryByMID(mid);
+    } catch (error) {
+      this.logger.error(`Error writeOffNetSettlement for MID: ${payload.mid}`);
+      this.logger.error(error);
+      throw new RuntimeException(
+        `Error writeOffNetSettlement for MID: ${payload.mid}`
+      );
+    }
+  }
+
+  // transfer
+  public async applyCheckDivertTransfer(
+    payload: NetSettlementBaseDto
+  ): Promise<NetSettlementSummary> {
+    try {
+      const { mid, amount, note, user } = payload;
+      const now = new Date();
+
+      const trans = await this.netSettlementTransRepository.save(
+        this.netSettlementTransRepository.create({
+          sourceId: 8,
+          categoryId: 12,
+          typeId: 1,
+          bankNumber: mid.substring(0, 4),
+          mid6: mid.substring(mid.length - 6),
+          mid,
+          transactionDate: now,
+          amount,
+          createdBy: user,
+        })
+      );
+
+      trans.groupId = trans.id;
+      await this.netSettlementTransRepository.save(trans);
+
+      await this.netSettlementTransWorkSheetRepository.save(
+        this.netSettlementTransWorkSheetRepository.create({
+          transactionId: trans.id,
+          transactionCategoryId: trans.categoryId,
+          transactionTypeId: trans.typeId,
+          transactionDate: trans.transactionDate,
+          amount: trans.amount,
+          notes: `Transferred from Check Divert ${note ?? ''}`,
+          isMain: true,
+          createdBy: user,
+          createdDate: now,
+        })
+      );
+
+      return await this.getNetSettlementSummaryByMID(mid);
+    } catch (error) {
+      this.logger.error(
+        `Error applyCheckDivertTransfer for MID: ${payload.mid}`
+      );
+      this.logger.error(error);
+      throw new RuntimeException(
+        `Error applyCheckDivertTransfer for MID: ${payload.mid}`
+      );
+    }
+  }
+
+  // transfer to another MID
+  public async applyTransferToAnotherMID(
+    payload: NetSettlementBaseDto
+  ): Promise<NetSettlementSummary> {
+    const { mid, midXFixer, amount, futureBalanceAmt, note, user } = payload;
+    try {
+      if (!midXFixer?.trim()) {
+        return await this.getNetSettlementSummaryByMID(mid);
+      }
+
+      const now = new Date();
+
+      // Determine transaction types
+      const typeTo = futureBalanceAmt > 0 ? 2 : 1; // Deposit if futureBalance > 0
+      const typeFrom = futureBalanceAmt > 0 ? 1 : 2; // Withdraw if futureBalance > 0
+
+      // Entry #1 — FROM sMID (withdraw or deposit)
+      const trans = await this.netSettlementTransRepository.save(
+        this.netSettlementTransRepository.create({
+          sourceId: 8,
+          categoryId: 13,
+          typeId: typeTo,
+          bankNumber: mid.substring(0, 4),
+          mid6: mid.slice(-6),
+          mid,
+          transactionDate: now,
+          amount,
+          createdBy: user,
+        })
+      );
+
+      trans.groupId = trans.id;
+      await this.netSettlementTransRepository.save(trans);
+
+      const workSheetFrom = this.netSettlementTransWorkSheetRepository.create({
+        transactionId: trans.id,
+        transactionCategoryId: trans.categoryId,
+        transactionTypeId: trans.typeId,
+        transactionDate: trans.transactionDate,
+        amount: trans.amount,
+        notes: `Transferred to MID ${midXFixer} ${note ?? ''}`,
+        isMain: true,
+        createdBy: user,
+        createdDate: now,
+      });
+
+      await this.netSettlementTransWorkSheetRepository.save(workSheetFrom);
+
+      // Entry #2 — TO sMIDXFER (opposite type)
+      const transTo = await this.netSettlementTransRepository.save(
+        this.netSettlementTransRepository.create({
+          sourceId: 8,
+          categoryId: 13,
+          typeId: typeFrom,
+          bankNumber: midXFixer.substring(0, 4),
+          mid6: midXFixer.slice(-6),
+          mid: midXFixer,
+          transactionDate: now,
+          amount,
+          createdBy: user,
+        })
+      );
+
+      transTo.groupId = transTo.id;
+      await this.netSettlementTransRepository.save(transTo);
+
+      const workSheetTo = this.netSettlementTransWorkSheetRepository.create({
+        transactionId: transTo.id,
+        transactionCategoryId: transTo.categoryId,
+        transactionTypeId: transTo.typeId,
+        transactionDate: transTo.transactionDate,
+        amount: transTo.amount,
+        notes: `Transferred from MID ${mid} ${note ?? ''}`,
+        isMain: true,
+        createdBy: user,
+        createdDate: now,
+      });
+
+      await this.netSettlementTransWorkSheetRepository.save(workSheetTo);
+      return await this.getNetSettlementSummaryByMID(mid);
+    } catch (error) {
+      this.logger.error(
+        `Error applyTransferToAnotherMID for MID: ${payload.mid}`
+      );
+      this.logger.error(error);
+      throw new RuntimeException(
+        `Error applyTransferToAnotherMID for MID: ${payload.mid}`
+      );
+    }
+  }
+
+  public async deleteTransaction(
+    payload: HandleDeleteTransactionDto
+  ): Promise<NetSettlementSummary> {
+    const { mid, transactionId, user } = payload;
+    try {
+      const now = new Date();
+      const formattedTime = now.toTimeString().split(' ')[0].replace(/:/g, '');
+
+      const worksheets = await this.netSettlementTransWorkSheetRepository
+        .createQueryBuilder('ws')
+        .where('ws.transactionCategoryId IN (:...categories)', {
+          categories: [9, 10, 11, 12, 13],
+        })
+        .andWhere('ws.transactionId = :transactionId', { transactionId })
+        .andWhere('ws.isMain = :isMain', { isMain: true })
+        .getMany();
+
+      const matchingCount = worksheets.filter((ws) => {
+        const hoursSinceCreation = Math.abs(
+          differenceInHours(now, ws.createdDate)
+        );
+        return hoursSinceCreation < 3 && formattedTime < '150000';
+      }).length;
+
+      if (matchingCount === 1) {
+        await this.netSettlementTransRepository.update(transactionId, {
+          hidden: true,
+          hiddenAt: now,
+          hiddenBy: user,
         });
 
-        if (lastRecord?.isDiverted) {
-          await this.divertQueueRepository.insert({
-            merchantId: Number(mid),
-            isDiverted: true,
-            divertFlagNotes: 'Manual remove from divert via NetSettlement',
-            createDate: () => 'GETDATE()',
-            createdBy: user,
-          });
-        }
+        await this.netSettlementTransWorkSheetRepository.update(
+          { transactionId },
+          {
+            isHidden: true,
+            hiddenDate: now,
+            hiddenBy: user,
+          }
+        );
       }
-    }
 
-    if (mid.startsWith('8152')) {
-      const latestDivertFSP = await this.divertQueueFSPRepository
-        .createQueryBuilder('dqf')
-        .select('MAX(dqf.Id)', 'maxId')
-        .where('dqf.MerchantId = :mid', { mid })
-        .getRawOne<{ maxId: number }>();
+      // Fetch transaction
+      const trans = await this.netSettlementTransRepository.findOne({
+        where: { id: transactionId },
+      });
 
-      if (latestDivertFSP?.maxId) {
-        const lastRecord = await this.divertQueueFSPRepository.findOne({
-          where: { id: latestDivertFSP.maxId },
+      if (!trans || trans.hidden)
+        return await this.getNetSettlementSummaryByMID(mid);
+
+      const within10Hours = (date?: Date) =>
+        date ? Math.abs(differenceInHours(now, date)) < 10 : false;
+
+      const canSoftDelete =
+        (trans.sourceReferenceKey === null &&
+          trans.categoryId === 8 &&
+          trans.sourceId === 4) ||
+        (trans.categoryId === 10 &&
+          trans.sourceId === 6 &&
+          within10Hours(trans.transactionDate)) ||
+        ([12, 13].includes(trans.categoryId) &&
+          trans.sourceId === 8 &&
+          within10Hours(trans.transactionDate));
+
+      if (canSoftDelete) {
+        await this.netSettlementTransRepository.update(transactionId, {
+          hidden: true,
+          hiddenAt: now,
+          hiddenBy: user,
         });
 
-        if (lastRecord?.isDiverted) {
-          await this.divertQueueFSPRepository.insert({
-            merchantId: Number(mid),
-            isDiverted: true,
-            divertFlagNotes: 'Manual remove from divert via NetSettlement',
-            createDate: () => 'GETDATE()',
-            createdBy: user,
+        const workSheetsToUpdate =
+          await this.netSettlementTransWorkSheetRepository.find({
+            where: {
+              transactionId: transactionId,
+              isHidden: false,
+            },
           });
+        // eslint-disable-next-line no-await-in-loop
+        for (const ws of workSheetsToUpdate) {
+          const wsWithin10Hours = within10Hours(ws.transactionDate);
+          const shouldHide =
+            (trans.sourceReferenceKey === null &&
+              trans.categoryId === 8 &&
+              trans.sourceId === 4 &&
+              ws.transactionCategoryId === 8 &&
+              !ws.achDetail1Id) ||
+            (trans.categoryId === 10 &&
+              trans.sourceId === 6 &&
+              ws.transactionCategoryId === 10 &&
+              wsWithin10Hours) ||
+            (trans.categoryId === 12 &&
+              trans.sourceId === 8 &&
+              ws.transactionCategoryId === 12 &&
+              wsWithin10Hours) ||
+            (trans.categoryId === 13 &&
+              trans.sourceId === 8 &&
+              ws.transactionCategoryId === 13 &&
+              wsWithin10Hours);
+
+          if (shouldHide) {
+            await this.netSettlementTransWorkSheetRepository.update(ws.id, {
+              isHidden: true,
+              hiddenDate: now,
+              hiddenBy: user,
+            });
+          }
         }
       }
+      return await this.getNetSettlementSummaryByMID(mid);
+    } catch (error) {
+      this.logger.error(`Error deleteTransaction for MID: ${payload.mid}`);
+      this.logger.error(error);
+      throw new RuntimeException(
+        `Error deleteTransaction for MID: ${payload.mid}`
+      );
     }
-
-    await this.riskRadarNotesRepository.insert({
-      mid,
-      notes: 'Account removed from divert',
-      notesTypeId: 5,
-      userCreated: user,
-    });
-    await this.riskRadarMerchAdjParamRepository.update(
-      { mid },
-      { isDivert: false }
-    );
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import type { NetSettlementTransactionRow } from '@denali/shared';
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -90,7 +91,6 @@ export class NetSettlementTransRepository extends Repository<NetSettlementTrans>
     return result;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   private pastDueACHCondition(alias: string): string {
     return `(
       (${alias}.fkACHDetail3 IS NOT NULL AND ${alias}.dtACHSent3 IS NOT NULL AND ${alias}.dtACHReturned3 IS NULL AND DATEDIFF(DAY, ${alias}.dtACHSent3, GETDATE()) > 7)
@@ -99,7 +99,6 @@ export class NetSettlementTransRepository extends Repository<NetSettlementTrans>
     )`;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   private pendingACHCondition(alias: string): string {
     return `(
       (${alias}.dtACHSent1 IS NULL AND ${alias}.dtACHReturned1 IS NULL AND ${alias}.dtACHSent2 IS NULL AND ${alias}.dtACHReturned2 IS NULL AND ${alias}.dtACHSent3 IS NULL AND ${alias}.dtACHReturned3 IS NULL)
@@ -107,5 +106,103 @@ export class NetSettlementTransRepository extends Repository<NetSettlementTrans>
       OR (${alias}.dtACHSent2 IS NOT NULL AND ${alias}.dtACHReturned2 IS NULL AND DATEDIFF(DAY, ${alias}.dtACHSent2, GETDATE()) <= 7)
       OR (${alias}.dtACHSent3 IS NOT NULL AND ${alias}.dtACHReturned3 IS NULL AND DATEDIFF(DAY, ${alias}.dtACHSent3, GETDATE()) <= 7)
     )`;
+  }
+
+  public async getEligibleWriteOffSum(
+    mid: string
+  ): Promise<{ maxEligibleWriteOff: number }[]> {
+    return this.manager.query(
+      `
+      SELECT
+        SUM(x.dBalanceAmt + CASE WHEN x.dPendingAmt < 0 THEN x.dPendingAmt ELSE 0 END) AS maxEligibleWriteOff
+      FROM (
+        SELECT
+          SUM(
+            CASE WHEN ws.fkTransType = 1 THEN 1 ELSE -1 END *
+              CASE
+                WHEN ws.fkTransCategory != 8 THEN ws.dAmt
+                WHEN ws.fkTrans_Reference IS NULL AND ws.dtUnCollected IS NULL AND ws.bACHVoided = 0 AND ${this.pastDueACH('ws')} THEN ws.dAmt
+                WHEN ws.fkTrans_Reference IS NOT NULL AND wsr.dtUnCollected IS NULL AND wsr.bACHVoided = 0 AND ${this.pastDueACH('wsr')} THEN ws.dAmt
+                ELSE 0
+              END
+          ) AS dBalanceAmt,
+          SUM(
+            CASE WHEN ws.fkTransType = 1 THEN 1 ELSE -1 END *
+              CASE
+                WHEN ws.fkTransCategory = 8 AND ws.dtUnCollected IS NULL AND ws.bACHVoided = 0 AND ${this.pendingACH('ws')} THEN ws.dAmt
+                WHEN ws.fkTrans_Reference IS NOT NULL AND wsr.fkTransCategory = 8 AND wsr.dtUnCollected IS NULL AND wsr.bACHVoided = 0 AND ${this.pendingACH('wsr')} THEN ws.dAmt
+                ELSE 0
+              END
+          ) AS dPendingAmt
+        FROM tblNetSettlementTrans t
+        JOIN tblNetSettlementTransWorkSheet ws ON ws.fkTrans = t.pkTrans
+        LEFT JOIN tblNetSettlementTransWorkSheet wsr ON wsr.fkTrans = ws.fkTrans_Reference AND wsr.bMain = 1
+        WHERE t.sMID = @0 AND t.bHidden = 0 AND ws.bHidden = 0
+      ) AS x
+    `,
+      [mid]
+    );
+  }
+
+  private pastDueACH(alias: string): string {
+    return `
+    (
+      (
+        ${alias}.fkACHDetail1 IS NOT NULL AND ${alias}.dtACHSent1 IS NOT NULL AND ${alias}.dtACHReturned1 IS NOT NULL AND
+        ${alias}.fkACHDetail2 IS NOT NULL AND ${alias}.dtACHSent2 IS NOT NULL AND ${alias}.dtACHReturned2 IS NOT NULL AND
+        ${alias}.fkACHDetail3 IS NOT NULL AND ${alias}.dtACHSent3 IS NOT NULL AND ${alias}.dtACHReturned3 IS NULL AND
+        DATEDIFF(DAY, ${alias}.dtACHSent3, GETDATE()) > 7
+      ) OR (
+        ${alias}.fkACHDetail1 IS NOT NULL AND ${alias}.dtACHSent1 IS NOT NULL AND ${alias}.dtACHReturned1 IS NOT NULL AND
+        ${alias}.fkACHDetail2 IS NOT NULL AND ${alias}.dtACHSent2 IS NOT NULL AND ${alias}.dtACHReturned2 IS NULL AND
+        ${alias}.fkACHDetail3 IS NULL AND ${alias}.dtACHSent3 IS NULL AND ${alias}.dtACHReturned3 IS NULL AND
+        DATEDIFF(DAY, ${alias}.dtACHSent2, GETDATE()) > 7
+      ) OR (
+        ${alias}.fkACHDetail1 IS NOT NULL AND ${alias}.dtACHSent1 IS NOT NULL AND ${alias}.dtACHReturned1 IS NULL AND
+        ${alias}.fkACHDetail2 IS NULL AND ${alias}.dtACHSent2 IS NULL AND ${alias}.dtACHReturned2 IS NULL AND
+        ${alias}.fkACHDetail3 IS NULL AND ${alias}.dtACHSent3 IS NULL AND ${alias}.dtACHReturned3 IS NULL AND
+        DATEDIFF(DAY, ${alias}.dtACHSent1, GETDATE()) > 7
+      )
+    )
+  `;
+  }
+
+  private pendingACH(alias: string): string {
+    return `
+    (
+      (
+        ${alias}.dtACHSent1 IS NULL AND ${alias}.dtACHReturned1 IS NULL AND
+        ${alias}.dtACHSent2 IS NULL AND ${alias}.dtACHReturned2 IS NULL AND
+        ${alias}.dtACHSent3 IS NULL AND ${alias}.dtACHReturned3 IS NULL
+      ) OR (
+        ${alias}.dtACHSent1 IS NOT NULL AND ${alias}.dtACHReturned1 IS NOT NULL AND
+        ${alias}.dtACHSent2 IS NULL AND ${alias}.dtACHReturned2 IS NULL AND
+        ${alias}.dtACHSent3 IS NULL AND ${alias}.dtACHReturned3 IS NULL
+      ) OR (
+        ${alias}.dtACHSent1 IS NOT NULL AND ${alias}.dtACHReturned1 IS NOT NULL AND
+        ${alias}.dtACHSent2 IS NOT NULL AND ${alias}.dtACHReturned2 IS NOT NULL AND
+        ${alias}.dtACHSent3 IS NULL AND ${alias}.dtACHReturned3 IS NULL
+      ) OR (
+        ${alias}.dtACHSent1 IS NOT NULL AND ${alias}.dtACHReturned1 IS NOT NULL AND
+        ${alias}.dtACHSent2 IS NOT NULL AND ${alias}.dtACHReturned2 IS NOT NULL AND
+        ${alias}.dtACHSent3 IS NOT NULL AND ${alias}.dtACHReturned3 IS NOT NULL
+      ) OR (
+        ${alias}.dtACHSent1 IS NOT NULL AND ${alias}.dtACHReturned1 IS NOT NULL AND
+        ${alias}.dtACHSent2 IS NOT NULL AND ${alias}.dtACHReturned2 IS NOT NULL AND
+        ${alias}.dtACHSent3 IS NOT NULL AND ${alias}.dtACHReturned3 IS NULL AND
+        DATEDIFF(DAY, ${alias}.dtACHSent3, GETDATE()) <= 7
+      ) OR (
+        ${alias}.dtACHSent1 IS NOT NULL AND ${alias}.dtACHReturned1 IS NOT NULL AND
+        ${alias}.dtACHSent2 IS NOT NULL AND ${alias}.dtACHReturned2 IS NULL AND
+        ${alias}.dtACHSent3 IS NULL AND ${alias}.dtACHReturned3 IS NULL AND
+        DATEDIFF(DAY, ${alias}.dtACHSent2, GETDATE()) <= 7
+      ) OR (
+        ${alias}.dtACHSent1 IS NOT NULL AND ${alias}.dtACHReturned1 IS NULL AND
+        ${alias}.dtACHSent2 IS NULL AND ${alias}.dtACHReturned2 IS NULL AND
+        ${alias}.dtACHSent3 IS NULL AND ${alias}.dtACHReturned3 IS NULL AND
+        DATEDIFF(DAY, ${alias}.dtACHSent1, GETDATE()) <= 7
+      )
+    )
+  `;
   }
 }

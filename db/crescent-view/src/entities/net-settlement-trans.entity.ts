@@ -41,7 +41,7 @@ export class NetSettlementTrans {
   public dba?: string;
 
   @Column({ name: 'dtTrans', type: 'datetime', nullable: true })
-  public transAt?: Date;
+  public transactionDate?: Date;
 
   @Column({
     name: 'dAmt',
@@ -49,7 +49,7 @@ export class NetSettlementTrans {
     precision: 18,
     scale: 2,
   })
-  public amount: string; // keep as string to avoid JS floating-point issues
+  public amount: number; // keep as string to avoid JS floating-point issues
 
   @Column({ name: 'sReturnCode', type: 'varchar', length: 3, nullable: true })
   public returnCode?: string;
