@@ -62,6 +62,7 @@ const AttributionUrl: React.FC = () => {
     const attributionData: AttributionDataPayload = {
       user_id: data.irisUser,
       channel_id: data.channel,
+      pb_key: clientConfig.api.talusPbKey,
     };
 
     if (data.rsl) {

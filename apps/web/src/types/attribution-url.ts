@@ -15,6 +15,7 @@ export type FormValues = {
 export type AttributionDataPayload = {
   user_id: string;
   channel_id: string;
+  pb_key: string;
   rsl_user_id?: string;
   referral_partner_user_id?: string;
   source_id?: string;
