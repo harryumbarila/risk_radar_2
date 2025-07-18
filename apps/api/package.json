@@ -7,7 +7,7 @@
     "@aws-sdk/client-s3": "^3.844.0",
     "@aws-sdk/client-ses": "^3.844.0",
     "@aws-sdk/client-sesv2": "^3.844.0",
-    "@aws-sdk/s3-request-presigner": "^3.844.0",
+    "@aws-sdk/s3-request-presigner": "^3.848.0",
     "@denali/connector-db": "*",
     "@denali/crescent-view-db": "*",
     "@denali/data-warehouse-db": "*",
