@@ -8,5 +8,7 @@ export * from './leads-merchant-lead.repository';
 export * from './leads-owner.repository';
 export * from './leads-services.repository';
 export * from './leads-underwriting.repository';
+export * from './merchant-memo-upload.repository';
 export * from './partner-and-sales-agent-identification.repository';
 export * from './source.repository';
+export * from './subscription-queue-request-event-json-source.repository';

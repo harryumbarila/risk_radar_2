@@ -15,6 +15,13 @@ export const env = createEnv({
       .string()
       .url()
       .default('https://taluspay-staging.com'),
+
+    NEXT_PUBLIC_TALUS_PB_KEY: z
+      .string()
+      .min(1)
+      .default(
+        'pb_test_d29d7cc23ecedcc56d6af4490441959d7798077267c297669c9d0ee8977ab5fb30c4ea7c7c7ee4cc69f24288e0bd660ec2a49bb7aaff0709e187303f248b3a6c'
+      ),
   },
 
   server: {
@@ -37,6 +44,7 @@ export const env = createEnv({
     NEXT_PUBLIC_RISK_RADAR_BASE_URL:
       process.env.NEXT_PUBLIC_RISK_RADAR_BASE_URL,
     NEXT_PUBLIC_MERCHANT_BASE_URL: process.env.NEXT_PUBLIC_MERCHANT_BASE_URL,
+    NEXT_PUBLIC_TALUS_PB_KEY: process.env.NEXT_PUBLIC_TALUS_PB_KEY,
 
     FRONTEGG_APP_URL: process.env.FRONTEGG_APP_URL,
     FRONTEGG_BASE_URL: process.env.FRONTEGG_BASE_URL,

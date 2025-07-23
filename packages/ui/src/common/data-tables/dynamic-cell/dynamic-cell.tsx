@@ -57,7 +57,7 @@ export const DynamicCell = <T,>(
             {props.onEdit ? (
               <button
                 type="button"
-                onClick={() => props.onEdit(props.row.original)}
+                onClick={() => props.onEdit?.(props.row.original)}
               >
                 {props.iconOnly ? (
                   <PencilSquareIcon className="h-6 w-6 text-green-600" />
@@ -69,7 +69,7 @@ export const DynamicCell = <T,>(
             {props.onDelete ? (
               <button
                 type="button"
-                onClick={() => props.onDelete(props.row.original)}
+                onClick={() => props.onDelete?.(props.row.original)}
               >
                 {props.iconOnly ? (
                   <TrashIcon className="h-6 w-6 text-red-600" />

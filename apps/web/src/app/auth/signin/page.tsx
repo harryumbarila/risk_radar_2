@@ -20,14 +20,14 @@ const SignIn: React.FC = () => {
         <Link className="mb-5.5 inline-block" href="/">
           <Image
             className="hidden dark:block"
-            src="https://apply.taluspay.com/assets/company-logo.svg"
+            src="/images/talus-only-logo.png"
             alt="Denali Logo"
             width={176}
             height={32}
           />
           <Image
             className="dark:hidden"
-            src="https://apply.taluspay.com/assets/company-logo.svg"
+            src="/images/talus-only-logo.png"
             alt="Denali Logo"
             width={176}
             height={32}

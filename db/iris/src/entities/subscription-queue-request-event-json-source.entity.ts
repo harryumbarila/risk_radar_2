@@ -110,14 +110,14 @@ export class SubscriptionQueueRequestEventJsonSourceEntity {
     type: 'datetime',
     nullable: true,
   })
-  public uwNewAccountHoldOnDivertCapturedInTalusDBDate: Date | null;
+  public uwNewAccountHoldOnDivertCapturedInTalusDBDate?: Date;
 
   @Column({
     name: 'dtUW_NewAccountHold_OffDivertCapturedInTalusDB',
     type: 'datetime',
     nullable: true,
   })
-  public uwNewAccountHoldOffDivertCapturedInTalusDBDate: Date | null;
+  public uwNewAccountHoldOffDivertCapturedInTalusDBDate?: Date;
 
   @Column({
     name: 'sOW_AllOwnersSigned',

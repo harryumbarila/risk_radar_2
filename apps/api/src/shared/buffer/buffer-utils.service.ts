@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 @Injectable()
+// eslint-disable-next-line @darraghor/nestjs-typed/injectable-should-be-provided
 export class BufferUtilsService {
   public constructor(
     @InjectPinoLogger(BufferUtilsService.name)

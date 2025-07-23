@@ -1,4 +1,4 @@
-import type { RiskRadarExceptionsListRow } from '@/shared/response/risk-radar';
+import type { RiskRadarExceptionsListRow } from '@denali/shared/src/response/risk-radar';
 
 import type { RiskUser } from './exception-data';
 

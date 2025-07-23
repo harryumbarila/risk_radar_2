@@ -42,7 +42,7 @@ export const DataTable = <Entry extends BaseModel>(
   const [{ pageIndex, pageSize }, setPagination] =
     React.useState<PaginationState>({
       pageIndex: 0,
-      pageSize: initialItemsPerPage,
+      pageSize: initialItemsPerPage || 50,
     });
 
   React.useEffect(() => {
@@ -193,6 +193,38 @@ export const DataTable = <Entry extends BaseModel>(
               );
             })}
           </tbody>
+          <tfoot>
+            {table.getFooterGroups().map((footerEl) => (
+              <tr key={footerEl.id}>
+                {footerEl.headers.map((columnEl) => {
+                  const align = (
+                    columnEl.column.columnDef?.meta as Record<string, unknown>
+                  )?.align;
+                  return (
+                    <th key={columnEl.id} colSpan={columnEl.colSpan}>
+                      <div
+                        {...{
+                          className: clsx(
+                            'flex w-full items-center font-bold text-black dark:text-white gap-2',
+                            {
+                              'justify-start': align === 'left',
+                              'justify-center': align === 'center',
+                              'justify-end': align === 'right',
+                            }
+                          ),
+                        }}
+                      >
+                        {flexRender(
+                          columnEl.column.columnDef.footer,
+                          columnEl.getContext()
+                        )}
+                      </div>
+                    </th>
+                  );
+                })}
+              </tr>
+            ))}
+          </tfoot>
         </table>
       </div>
       {enablePagination ? (

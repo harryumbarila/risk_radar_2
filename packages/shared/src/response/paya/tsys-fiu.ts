@@ -1,4 +1,4 @@
-import type { PaginationResponse } from '@/shared/common/pagination';
+import type { PaginationResponse } from '@denali/shared/src/common';
 
 export type TsysFiuFile = {
   id: string;

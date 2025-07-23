@@ -24,8 +24,9 @@ import { AppController } from './app.controller';
 import { ExampleMultiDbModule } from './module/example-multi-db/example-multi-db.module';
 import { IrisProxyModule } from './module/iris-proxy/iris-proxy.module';
 import { LegacyDashboardProxyModule } from './module/legacy-dashboard-proxy/legacy-dashboard-proxy.module';
-import { PartnerBanksModule } from './module/partner-banks/partner-banks.module';
 // import { PayaModule } from './module/paya/paya.module';
+import { NetSettlementsModule } from './module/net-settlement/net-settlement.module';
+import { PartnerBanksModule } from './module/partner-banks/partner-banks.module';
 import { RiskRadarModule } from './module/risk-radar/risk-radar.module';
 import { AWSModule } from './shared/aws/aws.module';
 import { rootConfig } from './shared/config/root.config';
@@ -61,6 +62,7 @@ if (process.env.NODE_ENV !== 'production') {
     EmailModule,
     PartnerBanksModule,
     // PayaModule,
+    NetSettlementsModule,
   ],
   controllers: [AppController],
   providers: [

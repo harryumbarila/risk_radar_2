@@ -54,7 +54,7 @@ export const CardHistoryTable: FC<CardHistoryTableProps> = ({ cardNumber }) => {
             className="text-center"
           />
         ),
-        footer: (info) => info.column.id,
+
         enableSorting: false,
         meta: {
           align: 'center',
@@ -71,7 +71,7 @@ export const CardHistoryTable: FC<CardHistoryTableProps> = ({ cardNumber }) => {
           />
         ),
         enableSorting: false,
-        footer: (info) => info.column.id,
+
         meta: {
           align: 'center',
         },
@@ -85,7 +85,7 @@ export const CardHistoryTable: FC<CardHistoryTableProps> = ({ cardNumber }) => {
             className="text-right"
           />
         ),
-        footer: (info) => info.column.id,
+
         enableSorting: false,
         meta: {
           align: 'right',
@@ -100,7 +100,7 @@ export const CardHistoryTable: FC<CardHistoryTableProps> = ({ cardNumber }) => {
             className="text-center"
           />
         ),
-        footer: (info) => info.column.id,
+
         enableSorting: false,
         meta: {
           align: 'center',
@@ -115,7 +115,7 @@ export const CardHistoryTable: FC<CardHistoryTableProps> = ({ cardNumber }) => {
             className="text-center"
           />
         ),
-        footer: (info) => info.column.id,
+
         enableSorting: false,
         meta: {
           align: 'center',
@@ -130,7 +130,7 @@ export const CardHistoryTable: FC<CardHistoryTableProps> = ({ cardNumber }) => {
             className="text-center"
           />
         ),
-        footer: (info) => info.column.id,
+
         enableSorting: false,
         meta: {
           align: 'center',
@@ -145,7 +145,7 @@ export const CardHistoryTable: FC<CardHistoryTableProps> = ({ cardNumber }) => {
             className="text-center"
           />
         ),
-        footer: (info) => info.column.id,
+
         enableSorting: false,
         meta: {
           align: 'center',
@@ -160,7 +160,7 @@ export const CardHistoryTable: FC<CardHistoryTableProps> = ({ cardNumber }) => {
             className="text-center"
           />
         ),
-        footer: (info) => info.column.id,
+
         enableSorting: false,
         meta: {
           align: 'center',
@@ -176,7 +176,7 @@ export const CardHistoryTable: FC<CardHistoryTableProps> = ({ cardNumber }) => {
             className="text-right"
           />
         ),
-        footer: (info) => info.column.id,
+
         enableSorting: false,
         meta: {
           align: 'right',
@@ -192,7 +192,7 @@ export const CardHistoryTable: FC<CardHistoryTableProps> = ({ cardNumber }) => {
             className="text-right"
           />
         ),
-        footer: (info) => info.column.id,
+
         enableSorting: false,
         meta: {
           align: 'right',
