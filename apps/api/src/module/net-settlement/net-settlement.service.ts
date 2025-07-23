@@ -31,7 +31,7 @@ import type {
 
 import type { NetSettlementBaseDto } from './dto/handle-action.dto';
 import type { HandleDiverAddDto } from './dto/handle-divert-add.dto';
-import type { HandleDiverRemovedDto } from './dto/handle-divert-removed.dto copy';
+import type { HandleDiverRemovedDto } from './dto/handle-divert-removed.dto';
 import { HandleDeleteTransactionDto } from './dto/handle-delete-transaction.dto';
 import { NetSettlementMidLabelUpdateDto } from './dto/handle-add-label.dto';
 

@@ -5,7 +5,7 @@ import { NetSettlementBaseDto } from './dto/handle-action.dto';
 import { NetSettlementMidLabelUpdateDto } from './dto/handle-add-label.dto';
 import { HandleDeleteTransactionDto } from './dto/handle-delete-transaction.dto';
 import { HandleDiverAddDto } from './dto/handle-divert-add.dto';
-import { HandleDiverRemovedDto } from './dto/handle-divert-removed.dto copy';
+import { HandleDiverRemovedDto } from './dto/handle-divert-removed.dto';
 import { NetSettlementsService } from './net-settlement.service';
 
 @ApiTags('net-settlement')
