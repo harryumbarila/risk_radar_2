@@ -162,9 +162,14 @@ export class IrisClient {
     });
 
     if (filterByEmail) {
-      combinedResponse.data = combinedResponse.data.filter(
+      const filteredData = combinedResponse.data.filter(
         (user) => user.email === filterByEmail
       );
+
+      // If a user is found, return only user data otherwise return all users (previously fetched)
+      if (filteredData.length > 0) {
+        combinedResponse.data = filteredData;
+      }
     }
 
     return combinedResponse;
