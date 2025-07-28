@@ -13,11 +13,11 @@ export class HandleDiverAddDto {
   @ApiProperty({
     description: 'Notes about the divert action',
     example: 'Manual put on divert via NetSettlement',
-    required: true,
+    required: false,
   })
   @IsString()
   @IsOptional()
-  public note: string;
+  public note?: string;
 
   @ApiProperty({
     description: 'Username of the user performing the action',

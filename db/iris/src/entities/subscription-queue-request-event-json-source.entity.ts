@@ -117,7 +117,7 @@ export class SubscriptionQueueRequestEventJsonSourceEntity {
     type: 'datetime',
     nullable: true,
   })
-  public uwNewAccountHoldOffDivertCapturedInTalusDBDate?: Date;
+  public uwNewAccountHoldOffDivertCapturedInTalusDBDate?: Date | null;
 
   @Column({
     name: 'sOW_AllOwnersSigned',
