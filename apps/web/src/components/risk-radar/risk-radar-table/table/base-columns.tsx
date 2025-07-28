@@ -15,7 +15,7 @@ import {
 // any needs to be used here to avoid a typing issue from tanstack/table
 // https://github.com/TanStack/table/issues/4382#issuecomment-1420412062
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type RiskRadarTableColumn = ColumnDef<RiskRadarExceptionsListRow, any>;
+export type RiskRadarTableColumn = ColumnDef<RiskRadarExceptionsListRow>[];
 
 export const columnHelper = createColumnHelper<RiskRadarExceptionsListRow>();
 
@@ -161,4 +161,4 @@ export const baseColumns = [
     header: 'Exception Created',
     cell: ({ getValue }) => formatDate(getValue() || new Date()),
   }),
-];
+] as ColumnDef<RiskRadarExceptionsListRow>[];

@@ -14,7 +14,6 @@ type Params = {
 
 type PageProps = {
   params: Promise<Params>;
-  [key: string]: unknown;
 };
 
 export const generateStaticParams = generateStaticParamsFor('mdxPath');
