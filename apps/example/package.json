@@ -9,7 +9,7 @@
     "dropzone": "^6.0.0-beta.2",
     "flatpickr": "^4.6.13",
     "jsvectormap": "^1.7.0",
-    "next": "15.3.5",
+    "next": "15.4.4",
     "nouislider": "^15.8.1",
     "react": "19.1.0",
     "react-apexcharts": "^1.4.1",
@@ -30,7 +30,7 @@
     "@testing-library/react": "^16.3.0",
     "@types/dropzone": "^5.7.9",
     "@types/jest": "^29.5.2",
-    "@types/node": "^20.11.24",
+    "@types/node": "^24.1.0",
     "@types/react": "19.1.8",
     "@types/react-dom": "19.1.6",
     "@types/react-table": "^7.7.20",
@@ -63,7 +63,7 @@
     "prettier-plugin-tailwindcss": "^0.6.13",
     "tailwindcss": "^3.4.1",
     "ts-jest": "^29.4.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.8.3"
   },
   "private": true,
   "scripts": {

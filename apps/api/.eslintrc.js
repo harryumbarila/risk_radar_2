@@ -49,7 +49,7 @@ module.exports = {
       ],
       // We allow any on tests for easier mocking
       rules: {
-        '@typescript-eslint/no-unsafe-argument': 'off',
+        '@typescript-eslint/no-unsafe-argument': 'warn',
         '@typescript-eslint/no-unsafe-assignment': 'off',
         '@typescript-eslint/no-unsafe-member-access': 'off',
         '@typescript-eslint/no-unsafe-return': 'off',

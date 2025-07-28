@@ -1,4 +1,5 @@
 import { useAuth } from '@frontegg/nextjs';
+import type { JSX } from 'react';
 import React from 'react';
 import { toast } from 'react-toastify';
 

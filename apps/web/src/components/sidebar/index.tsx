@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import type { FC } from 'react';
+import type { FC, JSX } from 'react';
 import { useEffect, useState } from 'react';
 import SimpleBar from 'simplebar-react';
 

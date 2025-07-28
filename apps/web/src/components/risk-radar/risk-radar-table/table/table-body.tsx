@@ -1,6 +1,10 @@
 'use client';
 
-import type { CellContext, HeaderContext } from '@tanstack/react-table';
+import type {
+  CellContext,
+  ColumnDef,
+  HeaderContext,
+} from '@tanstack/react-table';
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import classNames from 'classnames';
 import { useRouter } from 'next/navigation';
@@ -11,7 +15,6 @@ import type { CommonStatus } from '@/shared/common';
 import type { RiskRadarExceptionsListRow } from '@/shared/response';
 import { Loader } from '@/ui/common';
 
-import type { RiskRadarTableColumn } from './base-columns';
 import { SortHeaderCell } from './sort-header-cell';
 
 type Props = {
@@ -19,7 +22,7 @@ type Props = {
   pageSize: number;
   currentPage: number;
   totalRecords: number;
-  columns: RiskRadarTableColumn[];
+  columns: ColumnDef<RiskRadarExceptionsListRow>[];
   dataStatus?: CommonStatus;
   sortBy?: string;
   sortDirection?: 'ASC' | 'DESC';

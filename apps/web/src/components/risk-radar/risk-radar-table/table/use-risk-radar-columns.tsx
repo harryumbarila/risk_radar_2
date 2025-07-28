@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { useAuth } from '@frontegg/nextjs';
+import type { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { RiskUser } from '@/shared/response/legacy-dashboard-proxy/dto/exception-data';
 import type { RiskRadarFilterState } from '@/shared/response/risk-radar';
 import type { RiskRadarExceptionsListRow } from '@/shared/response/risk-radar/exception-list/exception-list-row';
 
-import type { RiskRadarTableColumn } from './base-columns';
 import { baseColumns, columnHelper } from './base-columns';
 import { ExceptionReviewCheckbox } from './exception-review-checkbox';
 import { ManagerQueuedHeader } from './manager-queued-header';
@@ -29,7 +31,7 @@ export const useRiskRadarTableColumns = ({
   riskRadarUsers,
   onSubmit,
   isLoading,
-}: UseRiskRadarTableColumnsProps): RiskRadarTableColumn[] => {
+}: UseRiskRadarTableColumnsProps) => {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const { user } = useAuth();
 
@@ -71,7 +73,7 @@ export const useRiskRadarTableColumns = ({
     setSelectedIds([]);
   }, [filters.status]);
 
-  const columns = useMemo<RiskRadarTableColumn[]>(() => {
+  const columns = useMemo(() => {
     const idColumn = columnHelper.accessor('id', {
       header: '#',
       cell: ({ row }) => {
@@ -85,88 +87,96 @@ export const useRiskRadarTableColumns = ({
     });
 
     // Reviewed column
-    let reviewedColumn = null;
 
     const canBeReviewed = data.filter((item) => !item.sUserReviewed);
     const isAllSelected = canBeReviewed.length === selectedIds.length;
-
-    switch (String(filters.status)) {
-      case '1': // Not Reviewed
-        reviewedColumn = columnHelper.accessor('pkRiskRadarExceptions', {
-          header: () => (
-            <NotReviewedHeader
-              checked={isAllSelected}
-              onChange={onSelectAllIds}
-              onReview={handleReviewSubmit}
-              isLoading={isLoading}
-              disabled={!canBeReviewed.length}
-            />
-          ),
-          cell: ({ row }) => {
-            const exceptionId = row.original.pkRiskRadarExceptions;
-            if (row.original.sUserReviewed) return row.original.sUserReviewed;
-
-            return (
-              <ExceptionReviewCheckbox
-                reviewed={selectedIds.includes(exceptionId)}
-                exceptionId={exceptionId}
-                onChange={() => {
-                  onSelectedIdChange(exceptionId);
-                }}
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    const getColumn = () => {
+      switch (String(filters.status)) {
+        case '1': // Not Reviewed
+          return columnHelper.accessor('pkRiskRadarExceptions', {
+            header: () => (
+              <NotReviewedHeader
+                checked={isAllSelected}
+                onChange={onSelectAllIds}
+                onReview={handleReviewSubmit}
+                isLoading={isLoading}
+                disabled={!canBeReviewed.length}
               />
-            );
-          },
-          enableSorting: false,
-        });
-        break;
+            ),
+            cell: ({ row }) => {
+              const exceptionId = row.original.pkRiskRadarExceptions;
+              if (row.original.sUserReviewed) return row.original.sUserReviewed;
 
-      case '3': // Manager Queued
-        reviewedColumn = columnHelper.accessor('pkRiskRadarExceptions', {
-          header: () => (
-            <ManagerQueuedHeader
-              riskUsers={riskRadarUsers}
-              onAssign={handleAssignSubmit}
-              checked={isAllSelected}
-              onChange={onSelectAllIds}
-              isLoading={isLoading}
-            />
-          ),
-          cell: ({ row }) => {
-            const exceptionId = row.original.pkRiskRadarExceptions;
-            if (row.original.sUserReviewed) return row.original.sUserReviewed;
+              return (
+                <ExceptionReviewCheckbox
+                  reviewed={selectedIds.includes(exceptionId)}
+                  exceptionId={exceptionId}
+                  onChange={() => {
+                    onSelectedIdChange(exceptionId);
+                  }}
+                />
+              );
+            },
+            enableSorting: false,
+          });
 
-            return (
-              <ExceptionReviewCheckbox
-                reviewed={selectedIds.includes(exceptionId)}
-                exceptionId={exceptionId}
-                onChange={() => {
-                  onSelectedIdChange(exceptionId);
-                }}
+        case '3': // Manager Queued
+          return columnHelper.accessor('pkRiskRadarExceptions', {
+            header: () => (
+              <ManagerQueuedHeader
+                riskUsers={riskRadarUsers}
+                onAssign={handleAssignSubmit}
+                checked={isAllSelected}
+                onChange={onSelectAllIds}
+                isLoading={isLoading}
               />
-            );
-          },
-          enableSorting: false,
-        });
-        break;
+            ),
+            cell: ({ row }) => {
+              const exceptionId = row.original.pkRiskRadarExceptions;
+              if (row.original.sUserReviewed) return row.original.sUserReviewed;
 
-      case '4': // Assigned
-        reviewedColumn = columnHelper.accessor('sNTUserID', {
-          header: 'Assigned to',
-          cell: ({ row }) => row.original.sNTUserID,
-          enableSorting: false,
-        });
-        break;
+              return (
+                <ExceptionReviewCheckbox
+                  reviewed={selectedIds.includes(exceptionId)}
+                  exceptionId={exceptionId}
+                  onChange={() => {
+                    onSelectedIdChange(exceptionId);
+                  }}
+                />
+              );
+            },
+            enableSorting: false,
+          });
 
-      default: // Reviewed
-        reviewedColumn = columnHelper.accessor('sUserReviewed', {
-          header: 'Reviewed',
-          id: 'sUserReviewed',
-          enableSorting: false,
-        });
-        break;
+        case '4': // Assigned
+          return columnHelper.accessor('sNTUserID', {
+            header: 'Assigned to',
+            cell: ({ row }) => row.original.sNTUserID,
+            enableSorting: false,
+          });
+
+        default: // Reviewed
+          return columnHelper.accessor('sUserReviewed', {
+            header: 'Reviewed',
+            id: 'sUserReviewed',
+            enableSorting: false,
+          });
+      }
+    };
+
+    const completedColumns = [
+      idColumn,
+      ...baseColumns,
+    ] as ColumnDef<RiskRadarExceptionsListRow>[];
+    const reviewedColumn = getColumn();
+
+    if (reviewedColumn) {
+      completedColumns.push(
+        reviewedColumn as ColumnDef<RiskRadarExceptionsListRow>
+      );
     }
 
-    const completedColumns = [idColumn, ...baseColumns, reviewedColumn];
     return completedColumns;
   }, [
     data,

@@ -2,7 +2,7 @@
   "name": "@denali/docs",
   "version": "0.0.0",
   "dependencies": {
-    "next": "15.3.5",
+    "next": "15.4.4",
     "nextra": "^4.2.17",
     "nextra-theme-docs": "^4.2.17",
     "react": "19.1.0",
