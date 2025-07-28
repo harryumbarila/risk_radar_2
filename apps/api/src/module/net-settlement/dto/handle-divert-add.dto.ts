@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class HandleDiverAddDto {
@@ -10,7 +10,7 @@ export class HandleDiverAddDto {
   @IsNotEmpty()
   public mid: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Notes about the divert action',
     example: 'Manual put on divert via NetSettlement',
     required: false,
