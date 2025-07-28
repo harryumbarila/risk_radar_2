@@ -2,6 +2,7 @@
   "extends": "@denali/typescript-config/node.json",
   "compilerOptions": {
     "baseUrl": ".",
+    "types": ["node", "jest"],
     "paths": {
       "@denali/*": ["packages/*/src"],
       "@/shared/*": ["./src/*"]

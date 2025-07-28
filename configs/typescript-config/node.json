@@ -3,6 +3,7 @@
   "display": "Node18",
   "compilerOptions": {
     "allowJs": false,
+    "types": ["node", "jest"],
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "composite": false,

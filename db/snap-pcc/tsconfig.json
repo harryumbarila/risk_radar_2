@@ -2,9 +2,9 @@
   "extends": "@denali/typescript-config/node.json",
   "compilerOptions": {
     "baseUrl": ".",
+    "types": ["node", "jest"],
     "paths": {
       "@/db/*": ["./src/*"],
-
       "@/logger/*": ["../../packages/logger/src/*"]
     },
     "experimentalDecorators": true,

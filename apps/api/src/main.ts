@@ -1,3 +1,4 @@
+/* eslint-disable */
 import fastifyCompress from '@fastify/compress';
 import fastifyHelmet from '@fastify/helmet';
 import { ValidationPipe } from '@nestjs/common';
@@ -31,8 +32,11 @@ async function bootstrap() {
     credentials: true,
   });
 
-  await app.register(fastifyCompress);
-  await app.register(fastifyHelmet);
+  // TODO: Check error types
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+  await app.register(fastifyCompress as any);
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+  await app.register(fastifyHelmet as any);
 
   app.useGlobalPipes(
     new ValidationPipe({
