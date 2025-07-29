@@ -29,6 +29,7 @@ import {
 import { MSPMerchantMonthlyBillingRepository } from '@/finance-db/repositories';
 import { EmailTemplateMessage } from '@/api/shared/email/email-template-message';
 import { ListInvoiceInputDto } from './dto/get-invoce.dto';
+import { formatCurrency } from '@/api/utils/number';
 
 @Injectable()
 export class PartnerBanksService {
@@ -150,13 +151,11 @@ export class PartnerBanksService {
 
       const formattedDate = `${(previousDate.getMonth() + 1).toString().padStart(2, '0')}/${previousDate.getDate().toString().padStart(2, '0')}/${previousDate.getFullYear()}`;
 
-      previousDate.setMonth(previousDate.getMonth() - 1);
-
       const year = previousDate.getFullYear();
-      const previousMonth = (previousDate.getMonth() + 1)
+      const currentMonth = (previousDate.getMonth() + 1)
         .toString()
         .padStart(2, '0');
-      const previousYYYYMM = `${year}${previousMonth}`;
+      const currentYYYYMM = `${year}${currentMonth}`;
 
       while (partners.length > 0) {
         await Promise.all(
@@ -229,31 +228,28 @@ export class PartnerBanksService {
                 y: height - 232,
               },
               salesAmount: {
-                label: `${Intl.NumberFormat('en-US', {
-                  style: 'currency',
-                  currency: 'USD',
-                }).format(dMMFSalesVolume)} X ${dMMFRate.toFixed(2)}%)`,
+                label: `${formatCurrency(dMMFSalesVolume)} X ${dMMFRate.toFixed(2)}%)`,
                 x: 172,
                 y: height - 410,
               },
               rate: {
-                label: `${dMMFBilledAmt.toFixed(2)}`,
-                x: 446,
+                label: `${formatCurrency(dMMFBilledAmt)}`,
+                x: 434,
                 y: height - 396,
               },
               amount: {
-                label: `${dMMFBilledAmt.toFixed(2)}`,
-                x: 532,
+                label: `${formatCurrency(dMMFBilledAmt)}`,
+                x: 520,
                 y: height - 396,
               },
               total: {
-                label: `${dMMFBilledAmt.toFixed(2)}`,
-                x: 532,
+                label: `${formatCurrency(dMMFBilledAmt)}`,
+                x: 520,
                 y: height - 606,
               },
               paymentsOrCredit: {
-                label: `-${dMMFBilledAmt.toFixed(2)}`,
-                x: 528,
+                label: `-${formatCurrency(dMMFBilledAmt)}`,
+                x: 516,
                 y: height - 638,
               },
             };
@@ -269,7 +265,7 @@ export class PartnerBanksService {
             const pdf = Buffer.from(filledPdf);
 
             // Save the modified PDF document
-            const fileName = `invoices/${previousYYYYMM}/${IrisMId}_${InvoiceNumber}.pdf`;
+            const fileName = `invoices/${currentYYYYMM}/${IrisMId}_${InvoiceNumber}.pdf`;
             await this.s3Service.uploadFile(
               this.bucketName,
               pdf,
