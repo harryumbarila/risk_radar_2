@@ -67,4 +67,4 @@ COPY --from=prod-deps ${APP_DIR} ./
 
 ENV NODE_ENV=production
 
-USER non-root CMD ["node", "apps/api/dist/apps/api/src/main"]
+CMD ["node", "apps/api/dist/apps/api/src/main"]
