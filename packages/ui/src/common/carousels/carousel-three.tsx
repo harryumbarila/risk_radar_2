@@ -12,7 +12,7 @@ export const CarouselThree: React.FC = () => {
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
       <div className="border-b border-stroke p-4 dark:border-strokedark sm:px-6 xl:px-7.5">
         <h3 className="font-medium text-black dark:text-white">
-          Slider With Controls & Indicators
+          Slider With Controls &amp; Indicators
         </h3>
       </div>
 

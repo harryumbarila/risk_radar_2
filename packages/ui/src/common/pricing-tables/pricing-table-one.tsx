@@ -10,7 +10,7 @@ export const PricingTableOne: React.FC = () => {
         </span>
         <h3>
           <span className="text-xl font-medium text-black dark:text-white">
-            $
+            &dollar;
           </span>
           <span className="text-title-xxl2 font-bold text-black dark:text-white">
             25.00
@@ -25,7 +25,7 @@ export const PricingTableOne: React.FC = () => {
         <ul className="flex flex-col gap-3.5">
           <li className="font-medium">Get Figma Source File</li>
           <li className="font-medium">Use on Unlimited Projects</li>
-          <li className="font-medium">Personal & Commercial Use</li>
+          <li className="font-medium">Personal &amp; Commercial Use</li>
           <li className="font-medium">Downloadable Offline Files</li>
           <li className="font-medium">Lifetime Free Updates</li>
         </ul>
