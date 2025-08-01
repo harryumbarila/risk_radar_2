@@ -69,7 +69,7 @@ export const SelectOptionThree: React.FC = () => {
         aria-label="Languages"
         htmlFor="languages"
       >
-        Which languages & frameworks you know?
+        Which languages &amp; frameworks you know?
       </label>
 
       <div className="flex flex-col gap-2.5">
