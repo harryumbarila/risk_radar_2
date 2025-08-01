@@ -10,7 +10,7 @@ export const PricingTableOne: React.FC = () => {
         </span>
         <h3>
           <span className="text-xl font-medium text-black dark:text-white">
-            &amp;
+            &dollar;
           </span>
           <span className="text-title-xxl2 font-bold text-black dark:text-white">
             25.00
