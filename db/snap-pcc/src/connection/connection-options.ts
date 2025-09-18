@@ -11,5 +11,6 @@ export const connectionOptions: DataSourceOptions = {
     encrypt: config.db.ssl,
     trustServerCertificate: true,
     disableAsciiToUnicodeParamConversion: true,
+    appName: 'Denali',
   },
 };

@@ -45,7 +45,11 @@ export class FspExceptionTransactionService {
       new Date()
     );
 
-    const dtAuthStart = subDays(dtAuthEnd, 1);
+    const dtAuthStart = parse(
+      `${subDays(new Date(dtFundingString), 1).toISOString().split('T')[0]} ${sACHFundingTime}`,
+      'yyyy-MM-dd h:mm a',
+      new Date()
+    );
 
     const rawTransactions = await this.clxReportingRepository
       .createQueryBuilder('s')
