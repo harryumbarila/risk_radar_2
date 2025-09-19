@@ -78,7 +78,9 @@ export const InboxList: React.FC = () => {
             </div>
           </td>
           <td className="hidden w-3/5 p-4 xl:block">
-            <p>Some note & Lorem Ipsum available alteration in some form.</p>
+            <p>
+              Some note &amp; Lorem Ipsum available alteration in some form.
+            </p>
           </td>
           <td className="w-[35%] p-4 lg:pr-10 xl:w-1/5">
             <p className="text-right text-xs xl:text-base">17 Oct, 2024</p>
