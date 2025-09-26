@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { parse, subDays } from 'date-fns';
+import { format, parse, subDays } from 'date-fns';
 
 import {
   CLXReportingSearchAVSResponseLookup,
@@ -37,7 +37,7 @@ export class FspExceptionTransactionService {
     binSearch?: string
   ): Promise<TransactionResult[]> {
     // Dates
-    const dtFundingString = dtFunding.toISOString().split('T')[0]; // Only need date part (YYYY-MM-DD)
+    const dtFundingString = format(dtFunding, 'yyyy-MM-dd'); // Only need date part (YYYY-MM-DD)
 
     const dtAuthEnd = parse(
       `${dtFundingString} ${sACHFundingTime}`,
@@ -46,11 +46,10 @@ export class FspExceptionTransactionService {
     );
 
     const dtAuthStart = parse(
-      `${subDays(new Date(dtFundingString), 1).toISOString().split('T')[0]} ${sACHFundingTime}`,
+      `${subDays(dtFunding, 1).toISOString().split('T')[0]} ${sACHFundingTime}`,
       'yyyy-MM-dd h:mm a',
       new Date()
     );
-
     const rawTransactions = await this.clxReportingRepository
       .createQueryBuilder('s')
       .select([
