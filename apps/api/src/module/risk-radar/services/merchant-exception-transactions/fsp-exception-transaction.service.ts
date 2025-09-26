@@ -44,9 +44,6 @@ export class FspExceptionTransactionService {
       'yyyy-MM-dd h:mm a',
       new Date()
     );
-    dtAuthEnd.setMinutes(
-      dtAuthEnd.getMinutes() - dtAuthEnd.getTimezoneOffset()
-    );
 
     const previousDay = subDays(dtFunding, 1);
     const previousDayString = format(previousDay, 'yyyy-MM-dd');
@@ -55,9 +52,6 @@ export class FspExceptionTransactionService {
       `${previousDayString} ${sACHFundingTime}`,
       'yyyy-MM-dd h:mm a',
       new Date()
-    );
-    dtAuthStart.setMinutes(
-      dtAuthStart.getMinutes() - dtAuthStart.getTimezoneOffset()
     );
 
     const rawTransactions = await this.clxReportingRepository
