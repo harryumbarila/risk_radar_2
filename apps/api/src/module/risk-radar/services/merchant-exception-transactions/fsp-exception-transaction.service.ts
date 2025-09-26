@@ -37,19 +37,29 @@ export class FspExceptionTransactionService {
     binSearch?: string
   ): Promise<TransactionResult[]> {
     // Dates
-    const dtFundingString = format(dtFunding, 'yyyy-MM-dd'); // Only need date part (YYYY-MM-DD)
+    const dtFundingString = format(dtFunding, 'yyyy-MM-dd');
 
     const dtAuthEnd = parse(
       `${dtFundingString} ${sACHFundingTime}`,
       'yyyy-MM-dd h:mm a',
       new Date()
     );
+    dtAuthEnd.setMinutes(
+      dtAuthEnd.getMinutes() - dtAuthEnd.getTimezoneOffset()
+    );
+
+    const previousDay = subDays(dtFunding, 1);
+    const previousDayString = format(previousDay, 'yyyy-MM-dd');
 
     const dtAuthStart = parse(
-      `${subDays(dtFunding, 1).toISOString().split('T')[0]} ${sACHFundingTime}`,
+      `${previousDayString} ${sACHFundingTime}`,
       'yyyy-MM-dd h:mm a',
       new Date()
     );
+    dtAuthStart.setMinutes(
+      dtAuthStart.getMinutes() - dtAuthStart.getTimezoneOffset()
+    );
+
     const rawTransactions = await this.clxReportingRepository
       .createQueryBuilder('s')
       .select([
