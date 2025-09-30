@@ -20,7 +20,7 @@ jobs:
     name: CI
     runs-on: ubuntu-latest
     services:
-      postgres:
+      mssql:
         image: mcr.microsoft.com/mssql/server:2019-latest
         env:
           SA_PASSWORD: Stanley123!
@@ -95,13 +95,18 @@ jobs:
         env:
           FINANCE_DB_URL: mssql://sa:Stanley123!@localhost:1433/master?encrypt=false&trustServerCertificate=true
           IRIS_DB_URL: mssql://sa:Stanley123!@localhost:1433/master?encrypt=false&trustServerCertificate=true
-          REDIS_QUEUE_HOST: localhost
-          REDIS_QUEUE_PORT: 6379
+          CONNECTOR_DB_URL: mssql://sa:Stanley123!@localhost:1433/master?encrypt=false&trustServerCertificate=true
+          CRESCENT_VIEW_DB_URL: mssql://sa:Stanley123!@localhost:1433/master?encrypt=false&trustServerCertificate=true
+          DATA_WAREHOUSE_DB_URL: mssql://sa:Stanley123!@localhost:1433/master?encrypt=false&trustServerCertificate=true
+          DSM_DB_URL: mssql://sa:Stanley123!@localhost:1433/master?encrypt=false&trustServerCertificate=true
+          EZ_ENROLL_DB_URL: mssql://sa:Stanley123!@localhost:1433/master?encrypt=false&trustServerCertificate=true
+          EZ_ENROLL_PCC_DB_URL: mssql://sa:Stanley123!@localhost:1433/master?encrypt=false&trustServerCertificate=true
+          SNAP_PCC_DB_URL: mssql://sa:Stanley123!@localhost:1433/master?encrypt=false&trustServerCertificate=true
 
         run: |
           yarn run lint type-check
           yarn test:unit
-          # yarn test:e2e
+          yarn test:e2e
 
       - name: Run build
         run: yarn build
