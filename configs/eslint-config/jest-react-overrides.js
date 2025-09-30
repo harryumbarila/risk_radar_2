@@ -1,27 +1,37 @@
-module.exports = {
-  overrides: [
-    {
-      env: {
-        jest: true,
+import { config as baseConfig } from './base.js';
+
+/**
+ * A custom ESLint configuration for Node.js libraries.
+ *
+ * @type {import("eslint").Linter.Config[]}
+ * */
+export const libraryConfig = [
+  ...baseConfig,
+  {
+    languageOptions: {
+      globals: {
+        React: true,
+        JSX: true,
       },
-      files: [
-        'jest.setup.[jt]s',
-        '**/__tests__/**/*.@(js|jsx|ts|tsx)',
-        '**/?(*.)+(spec|test).@(js|jsx|ts|tsx)',
-        'tests/**/*.@(js|jsx|ts|tsx)',
-      ],
-      extends: ['plugin:testing-library/react', 'plugin:jest/recommended'],
-      rules: {
-        'import/no-extraneous-dependencies': [
-          'off',
-          {
-            devDependencies: [
-              'jest.setup.[jt]s',
-              '**/?(*.)+(spec|test).@(js|jsx|ts|tsx)',
-            ],
-          },
-        ],
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
       },
     },
-  ],
-};
+    env: {
+      node: true,
+    },
+    settings: {
+      'import/resolver': {
+        typescript: {
+          project: './tsconfig.json',
+        },
+      },
+    },
+  },
+  {
+    ignores: ['.*.js', 'node_modules/', 'dist/'],
+  },
+];
+
+export default libraryConfig;

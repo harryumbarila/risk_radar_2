@@ -39,7 +39,7 @@
     "db:generate": "dotenv -e ../../apps/api/.env -- npm run typeorm -- migration:generate ./src/migrations/migration --timestamp -d ./src/connection/cli-data-source.ts",
     "db:migrate": "dotenv -e ../../apps/api/.env -- npm run typeorm -- migration:run -d ./src/connection/cli-data-source.ts",
     "db:revert": "dotenv -e ../../apps/api/.env -- npm run typeorm -- migration:revert -d ./src/connection/cli-data-source.ts",
-    "lint": "eslint --ext .ts --max-warnings=0 .",
+    "lint": "eslint --max-warnings=0 .",
     "type-check": "tsc --noEmit",
     "typeorm": "dotenv -e ../apps/api/.env -- node --require ts-node/register ../../node_modules/typeorm/cli.js"
   },
