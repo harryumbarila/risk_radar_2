@@ -44,11 +44,11 @@ export const loggerConfig = {
         return 'error';
       }
 
-      if (res.statusCode >= 500) {
+      if (res.statusCode && res.statusCode >= 500) {
         return 'error';
       }
 
-      if (res.statusCode >= 400) {
+      if (res.statusCode && res.statusCode >= 400) {
         return 'warn';
       }
 

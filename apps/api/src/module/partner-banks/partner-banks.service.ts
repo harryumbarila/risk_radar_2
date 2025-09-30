@@ -43,7 +43,10 @@ export class PartnerBanksService {
     private readonly configService: ConfigService,
     @InjectPinoLogger(PartnerBanksService.name) private readonly logger: Logger
   ) {
-    this.bucketName = this.configService.get('AWS_PARTNER_BANK_INVOICE_BUCKET');
+    this.bucketName = this.configService.get(
+      'AWS_PARTNER_BANK_INVOICE_BUCKET',
+      ''
+    );
   }
 
   // @Cron(CronExpression.EVERY_10_SECONDS, {

@@ -2,10 +2,10 @@ import { env } from './env';
 
 export const config = {
   app: {
-    port: env.PORT,
+    port: env.PORT || 3001,
   },
   node: {
-    env: env.NODE_ENV,
+    env: env.NODE_ENV || 'production',
   },
   frontegg: {
     client: {

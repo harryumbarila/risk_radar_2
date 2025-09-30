@@ -40,7 +40,7 @@ export class IrisClient {
       timeout: 10000,
     });
 
-    this.apiKey = configService.get('IRIS_API_KEY');
+    this.apiKey = configService.get('IRIS_API_KEY') || '';
 
     // Add request interceptor for logging
     this.client.interceptors.request.use(

@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import classNames from 'classnames';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import z from 'zod';
+import { z } from 'zod/v3';
 
 import type { NetSettlementBaseDto } from '@/shared/response';
 
@@ -38,7 +38,7 @@ type HandleActionType = z.infer<typeof schema>;
 export const WriteOff: React.FC<WriteOffProps> = (props) => {
   const { mid, totalAmounts, mids, handleAction } = props;
 
-  const methods = useForm({
+  const methods = useForm<HandleActionType>({
     mode: 'all',
     resolver: zodResolver(schema),
     defaultValues: {

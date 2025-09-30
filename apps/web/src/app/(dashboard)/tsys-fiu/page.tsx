@@ -61,7 +61,7 @@ const TsysFiuPage: React.FC = () => {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+     
     fetchTsysFiuFile({ page, limit });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);

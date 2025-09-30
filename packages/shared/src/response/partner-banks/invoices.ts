@@ -1,7 +1,7 @@
 export interface InvoiceResponseDto {
   objects: File[];
   folders: string[];
-  nextContinuationToken: string;
+  nextContinuationToken?: string;
   isTruncated: boolean;
   currentPrefix: string;
   searchTerm?: string; // Add this

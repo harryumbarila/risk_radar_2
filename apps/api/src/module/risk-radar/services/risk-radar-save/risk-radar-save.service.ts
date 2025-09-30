@@ -101,17 +101,19 @@ export class RiskRadarSaveService {
         this.logger.log(
           `Step 2: Fetching exception data for exceptionId: ${exceptionId}`
         );
-        exceptionJeff = await this.exceptionsJeffRepository.findOne({
+        const exceptionJeffFind = await this.exceptionsJeffRepository.findOne({
           where: {
             id: exceptionId,
           },
         });
-        this.logger.debug(`Exception data fetched:`, exceptionJeff);
+        this.logger.debug(`Exception data fetched:`, exceptionJeffFind);
 
-        if (!exceptionJeff) {
-          this.logger.error(`Exception Jeff not found for ID: ${exceptionId}`);
-          throw new BadRequestException('Exception Jeff not found.');
-        }
+        exceptionJeff = exceptionJeffFind;
+      }
+
+      if (!exceptionJeff) {
+        this.logger.error(`Exception Jeff not found for ID: ${exceptionId}`);
+        throw new BadRequestException('Exception Jeff not found.');
       }
 
       // Create an object with only the fields that are explicitly provided
@@ -442,7 +444,7 @@ export class RiskRadarSaveService {
           );
 
           // Check if exception is already in manager queue (status 3)
-          if (exceptionJeff.exceptionStatusId === 3) {
+          if (exceptionJeff?.exceptionStatusId === 3) {
             this.logger.warn(
               `Exception ${exceptionId} is already in manager queue. Rejecting duplicate request by ${createdBy}.`
             );
@@ -495,8 +497,10 @@ export class RiskRadarSaveService {
             this.logger.log(
               `Step 10b.2: Updating exception status to manager queue (3) and clearing reviewer`
             );
-            exceptionJeff.exceptionStatusId = 3;
-            exceptionJeff.userReviewed = null; // Clear reviewer when moving to managers queue
+            if (exceptionJeff) {
+              exceptionJeff.exceptionStatusId = 3;
+              exceptionJeff.userReviewed = null; // Clear reviewer when moving to managers queue
+            }
             this.logger.log(
               `Step 10b.2 Complete: Exception status updated successfully`
             );

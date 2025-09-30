@@ -8,9 +8,9 @@ export type TemplateType =
   | 'tsys-fiu-changed-file'
   | 'risk-radar-memo';
 
-export class EmailTemplateMessage extends PartialType(
-  OmitType(EmailMessage, ['body'] as const)
-) {
+export class EmailTemplateMessage extends OmitType(EmailMessage, [
+  'body',
+] as const) {
   public template: TemplateType;
 
   public constructor(

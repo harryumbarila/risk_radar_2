@@ -2,16 +2,16 @@
   "name": "@denali/docs",
   "version": "0.0.0",
   "dependencies": {
-    "next": "15.4.4",
+    "next": "15.5.4",
     "nextra": "^4.2.17",
     "nextra-theme-docs": "^4.2.17",
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
   },
   "devDependencies": {
     "@denali/eslint-config": "*",
     "@denali/typescript-config": "*",
-    "eslint": "^8.57.0",
+    "eslint": "^9.36.0",
     "eslint-plugin-mdx": "^3.6.2"
   },
   "private": true,

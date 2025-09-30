@@ -1,5 +1,5 @@
 export type TransactionResult = {
-  transactionDate: Date; // Transaction date
+  transactionDate?: Date; // Transaction date
   transactionAmount: number; // Transaction amount
   posEntryMode: string; // POS entry mode
   avsResponseCode: string; // AVS response code

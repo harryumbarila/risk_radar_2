@@ -34,7 +34,10 @@ export class PayaService {
     private readonly configService: ConfigService,
     @InjectPinoLogger(PayaService.name) private readonly logger: Logger
   ) {
-    this.bucketName = this.configService.get('AWS_PARTNER_BANK_INVOICE_BUCKET');
+    this.bucketName = this.configService.get(
+      'AWS_PARTNER_BANK_INVOICE_BUCKET',
+      ''
+    );
   }
 
   public async listFiles(
@@ -46,19 +49,19 @@ export class PayaService {
       const [files, totalResults] =
         await this.tsysFiuFileRepository.findAndCount({
           take: limit,
-          skip: (page - 1) * limit,
+          skip: (Number(page) - 1) * Number(limit),
           order: {
             createdAt: 'DESC',
           },
           relations: ['variants'],
         });
 
-      const pageCount = Math.ceil(totalResults / limit);
+      const pageCount = Math.ceil(totalResults / Number(limit));
 
       return {
         data: files,
         count: files.length,
-        page,
+        page: Number(page),
         pageCount,
         total: totalResults,
       };
@@ -76,6 +79,10 @@ export class PayaService {
       const item = await this.tsysFiuFileVariantRepository.findOneBy({
         id,
       });
+
+      if (!item) {
+        throw new Error('No item found');
+      }
 
       if (item.downloaderIp) {
         throw new Error('File already downloaded');
@@ -114,6 +121,10 @@ export class PayaService {
       });
 
       if (item) {
+        throw new Error('File already SUBMITTED');
+      }
+
+      if (!file?.buffer) {
         throw new Error('File already SUBMITTED');
       }
 

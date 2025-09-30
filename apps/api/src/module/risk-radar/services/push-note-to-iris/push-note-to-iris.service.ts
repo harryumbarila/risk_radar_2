@@ -6,7 +6,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { AxiosError } from 'axios';
+import { AxiosError, isAxiosError } from 'axios';
 import { format } from 'date-fns';
 import { InjectPinoLogger } from 'nestjs-pino';
 import { Logger } from 'pino';
@@ -15,6 +15,7 @@ import { IrisClient } from '@/api/shared/module/iris/iris.client';
 import { RiskRadarNotesRepository } from '@/finance-db/repositories/risk-radar-notes.repository';
 
 import type { PushNoteToIrisInputDto } from './dto/push-note-to-iris-input.dto';
+import { IsNull } from 'typeorm';
 
 export enum IrisMemoVisibility {
   Yes = 'Yes',
@@ -31,9 +32,10 @@ export class PushNoteToIrisService {
 
   public async pushNoteToIris(input: PushNoteToIrisInputDto): Promise<unknown> {
     const { merchantId, noteId } = input;
+
     // Get & format note
     const note = await this.riskRadarNotesRepository.findOne({
-      where: { id: noteId, irisMemoRequestDate: null },
+      where: { id: noteId, irisMemoRequestDate: null } as any,
     });
 
     if (!note) {
@@ -68,20 +70,20 @@ export class PushNoteToIrisService {
       );
     } catch (error) {
       // TODO: Find a reusable way to handle this
-      if (error instanceof AxiosError) {
-        if (error.response.status === 404) {
+      if (isAxiosError(error)) {
+        if (error.response?.status === 404) {
           throw new NotFoundException(`Merchant not found`);
         }
 
-        if (error.response.status === 400) {
+        if (error.response?.status === 400) {
           throw new BadRequestException(`Bad Request `);
         }
 
-        if (error.response.status === 401) {
+        if (error.response?.status === 401) {
           throw new UnauthorizedException(`Unauthorized`);
         }
 
-        if (error.response.status === 403) {
+        if (error.response?.status === 403) {
           throw new ForbiddenException(`Forbidden`);
         }
       }

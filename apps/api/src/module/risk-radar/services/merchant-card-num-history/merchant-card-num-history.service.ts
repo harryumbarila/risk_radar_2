@@ -180,27 +180,27 @@ export class MerchantCardNumHistoryService {
     cardNumber: string
   ): TransactionData {
     return {
-      mid: transaction.batch.merchantId,
-      transmissionDate: transaction.batch.transmissionDate,
+      mid: transaction.batch?.merchantId || '',
+      transmissionDate: transaction.batch?.transmissionDate || '',
       transactionDate: transaction.transactionDate,
-      amount: transaction.transactionAmount,
+      amount: transaction.transactionAmount || 0,
       posEntryMode: transaction.posEntryMode,
       avsResponseCode: transaction.avsResponseCode,
-      authCode: transaction.authorizationCode,
+      authCode: transaction.authorizationCode || '',
       cardNumber,
       debitNetworkIdentifier: transaction.debitNetworkIdentifier,
-      netDepositAmount: transaction.batch.netDepositAmount,
+      netDepositAmount: transaction.batch?.netDepositAmount || 0,
     };
   }
 
   private formatReportingSearch(search: CLXReportingSearch): TransactionData {
     return {
       mid: search.siteId,
-      transmissionDate: null,
+      transmissionDate: undefined,
       transactionDate: search.transactionDateTime,
       amount: search.amount,
       posEntryMode: search.posData,
-      avsResponseCode: null,
+      avsResponseCode: undefined,
       authCode: search.authorizationCode,
       cardNumber: search.accountNumber,
       debitNetworkIdentifier: search.drdNetwork,
@@ -213,13 +213,13 @@ export class MerchantCardNumHistoryService {
     cardNumber: string
   ): TransactionData {
     return {
-      mid: transaction.merchantId,
+      mid: transaction.merchantId || '',
       transmissionDate: transaction.transmissionDate,
       transactionDate: transaction.transactionDate,
-      amount: transaction.transactionAmount,
+      amount: transaction.transactionAmount || 0,
       posEntryMode: transaction.posEntryMode,
       avsResponseCode: transaction.avsResponseCode,
-      authCode: transaction.authorizationCode,
+      authCode: transaction.authorizationCode || '',
       cardNumber,
       debitNetworkIdentifier: transaction.debitNetworkIdentifier,
       netDepositAmount: transaction.netDepositAmount,
@@ -236,6 +236,8 @@ export class MerchantCardNumHistoryService {
     return transactions.sort((a, b) => {
       const valueA = a[sortBy];
       const valueB = b[sortBy];
+
+      if (!valueA || !valueB) return 0;
 
       if (valueA < valueB) return sortType === SortType.DESC ? 1 : -1;
       if (valueA > valueB) return sortType === SortType.DESC ? -1 : 1;

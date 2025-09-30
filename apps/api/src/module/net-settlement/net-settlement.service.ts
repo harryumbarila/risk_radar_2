@@ -391,7 +391,6 @@ export class NetSettlementsService {
           bankNumber: mid6,
           mid6: midRight6,
           mid,
-          dba: null,
           amount,
           createdBy: user,
         })
@@ -430,7 +429,7 @@ export class NetSettlementsService {
         where: { irisMId: mid },
       });
 
-      if (lead) {
+      if (lead?.irisLeadId) {
         await this.merchantMemoUploadRepository.save(
           this.merchantMemoUploadRepository.create({
             irisLeadId: lead.irisLeadId,
@@ -466,7 +465,6 @@ export class NetSettlementsService {
           bankNumber: mid.substring(0, 4),
           mid6: mid.substring(mid.length - 6),
           mid,
-          dba: null,
           amount,
           createdBy: user,
         })
@@ -517,7 +515,6 @@ export class NetSettlementsService {
           bankNumber: mid.substring(0, 4),
           mid6: mid.substring(mid.length - 6),
           mid,
-          dba: null,
           amount,
           createdBy: user,
         })
@@ -577,7 +574,6 @@ export class NetSettlementsService {
           bankNumber: mid.substring(0, 4),
           mid6: mid.substring(mid.length - 6),
           mid,
-          dba: null,
           transactionDate: now,
           amount: Math.abs(amount),
           createdBy: user,

@@ -34,7 +34,7 @@ export class CommissionService {
     private readonly configService: ConfigService,
     @InjectPinoLogger(CommissionService.name) private readonly logger: Logger
   ) {
-    this.bucketName = this.configService.get('AWS_COMISSION_BUCKET');
+    this.bucketName = this.configService.get('AWS_COMISSION_BUCKET', '');
   }
 
   public async listFiles(
@@ -46,19 +46,19 @@ export class CommissionService {
       const [files, totalResults] =
         await this.commissionFileRepository.findAndCount({
           take: limit,
-          skip: (page - 1) * limit,
+          skip: (Number(page) - 1) * Number(limit),
           order: {
             createdAt: 'DESC',
           },
           relations: ['variants'],
         });
 
-      const pageCount = Math.ceil(totalResults / limit);
+      const pageCount = Math.ceil(totalResults / Number(limit));
 
       return {
         data: files,
         count: files.length,
-        page,
+        page: Number(page),
         pageCount,
         total: totalResults,
       };
@@ -77,7 +77,11 @@ export class CommissionService {
         id,
       });
 
-      if (item.downloaderIp) {
+      if (!item) {
+        throw new Error('Item not found');
+      }
+
+      if (item?.downloaderIp) {
         throw new Error('File already downloaded');
       }
 
@@ -119,6 +123,10 @@ export class CommissionService {
         throw new Error('File already SUBMITTED');
       }
 
+      if (!file) {
+        throw new Error('File already SUBMITTED');
+      }
+
       const previousFileVariant =
         variant === CommissionFileVariantType.SUBMITTED
           ? CommissionFileVariantType.PROVIDED
@@ -132,6 +140,10 @@ export class CommissionService {
       );
 
       const fileContent = file.buffer;
+
+      if (!fileContent) {
+        throw new Error('File already SUBMITTED');
+      }
       const contentHash = createHash('sha256')
         .update(fileContent)
         .digest('hex');
@@ -166,7 +178,7 @@ export class CommissionService {
 
       const s3UploadResult = await this.s3Service.uploadFile(
         this.bucketName,
-        file.buffer,
+        fileContent,
         s3DirectoryPath
       );
 

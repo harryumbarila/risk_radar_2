@@ -14,8 +14,8 @@ export class AuthService {
 
   public constructor(config: ConfigService<AuthServiceConfig>) {
     this.identityClient = new IdentityClient({
-      FRONTEGG_CLIENT_ID: config.get('FRONTEGG_CLIENT_ID'),
-      FRONTEGG_API_KEY: config.get('FRONTEGG_API_KEY'),
+      FRONTEGG_CLIENT_ID: config.get('FRONTEGG_CLIENT_ID') || '',
+      FRONTEGG_API_KEY: config.get('FRONTEGG_API_KEY') || '',
     });
   }
 

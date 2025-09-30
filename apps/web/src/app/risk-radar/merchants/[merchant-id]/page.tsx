@@ -1,7 +1,7 @@
-/* eslint-disable jsx-a11y/control-has-associated-label */
-/* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable eqeqeq */
-/* eslint-disable no-nested-ternary */
+ 
+ 
+ 
+ 
 
 'use client';
 

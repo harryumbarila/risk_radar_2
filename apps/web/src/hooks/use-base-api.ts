@@ -4,7 +4,7 @@ import useSWR from 'swr';
 
 import { clientConfig } from '@/config/client';
 
-// eslint-disable-next-line import/no-default-export
+ 
 export default function useBaseApi(): {
   makeRequest: <T>(endpoint: string, options?: RequestInit) => Promise<T>;
   getSWRFetcher: () => <T>(url: string, options?: RequestInit) => Promise<T>;
@@ -39,7 +39,7 @@ export default function useBaseApi(): {
       throw new Error(`Error: ${responseBody.error} ${responseBody.message}`);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+     
     return response.json();
   };
 
@@ -52,12 +52,12 @@ export default function useBaseApi(): {
   };
 
   // For use with SWR
-  /* eslint-disable */
+   
   const getSWRFetcher = () => {
     return <T>(url: string, options?: RequestInit) =>
       authFetcher<T>(url, options);
   };
-  /* eslint-enable */
+   
   return { makeRequest, getSWRFetcher };
 }
 
@@ -69,7 +69,7 @@ export function useApiSWR<Data = never, Error = never>(
 ): SWRResponse<Data, Error> {
   const { getSWRFetcher } = useBaseApi();
   const fetcher = getSWRFetcher();
-  /* eslint-disable */
+   
   return useSWR<Data, Error>(
     key,
     key ? (url) => fetcher<Data>(url, options) : null,
@@ -82,5 +82,5 @@ export function useApiSWR<Data = never, Error = never>(
       ...swrOptions,
     }
   );
-  /* eslint-enable */
+   
 }
