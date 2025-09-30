@@ -27,12 +27,6 @@ jobs:
           node-version: '24'
           cache: 'yarn'
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Run npm audit
-        run: yarn audit --level high --recursive
-
       - name: Install Semgrep
         if: (github.actor != 'dependabot[bot]')
         run: python3 -m pip install semgrep
@@ -46,3 +40,9 @@ jobs:
       - name: Semgrep ci
         if: (github.actor != 'dependabot[bot]')
         run: semgrep ci --supply-chain
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run npm audit
+        run: yarn audit --level high --recursive
