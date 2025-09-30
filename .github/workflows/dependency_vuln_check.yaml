@@ -1,0 +1,48 @@
+name: Check for dependency vulnerabilities
+
+on:
+  schedule:
+    - cron: '0 0 * * 1'
+  pull_request:
+    branches: [master, develop]
+
+permissions:
+  contents: read
+
+jobs:
+  dependencies-and-secrets:
+    name: dependencycheck
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run npm audit
+        run: yarn audit --severity=high --recursive
+
+      - name: Install Semgrep
+        if: (github.actor != 'dependabot[bot]')
+        run: python3 -m pip install semgrep
+
+      - name: Add semgrep token to publish results in SAST platform
+        if: (github.actor != 'dependabot[bot]')
+        run: |-
+          mkdir -p ~/.config/.semgrep
+          echo "api_token: ${{ secrets.SEMGREP_APP_TOKEN }}" > ~/.config/.semgrep/settings.yml
+
+      - name: Semgrep ci
+        if: (github.actor != 'dependabot[bot]')
+        run: semgrep ci --supply-chain
