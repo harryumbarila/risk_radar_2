@@ -109,11 +109,11 @@ export class RiskRadarSaveService {
         this.logger.debug(`Exception data fetched:`, exceptionJeffFind);
 
         exceptionJeff = exceptionJeffFind;
-      }
 
-      if (!exceptionJeff) {
-        this.logger.error(`Exception Jeff not found for ID: ${exceptionId}`);
-        throw new BadRequestException('Exception Jeff not found.');
+        if (!exceptionJeff) {
+          this.logger.error(`Exception Jeff not found for ID: ${exceptionId}`);
+          throw new BadRequestException('Exception Jeff not found.');
+        }
       }
 
       // Create an object with only the fields that are explicitly provided

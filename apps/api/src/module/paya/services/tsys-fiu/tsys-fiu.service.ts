@@ -34,9 +34,9 @@ export class PayaService {
     private readonly configService: ConfigService,
     @InjectPinoLogger(PayaService.name) private readonly logger: Logger
   ) {
-    this.bucketName = this.configService.get(
+    this.bucketName = this.configService.get<string>(
       'AWS_PARTNER_BANK_INVOICE_BUCKET',
-      ''
+      { infer: true }
     );
   }
 
@@ -125,7 +125,7 @@ export class PayaService {
       }
 
       if (!file?.buffer) {
-        throw new Error('File already SUBMITTED');
+        throw new Error('Invalid file');
       }
 
       const previousFileVariant =

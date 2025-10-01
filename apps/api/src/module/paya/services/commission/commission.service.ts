@@ -34,7 +34,9 @@ export class CommissionService {
     private readonly configService: ConfigService,
     @InjectPinoLogger(CommissionService.name) private readonly logger: Logger
   ) {
-    this.bucketName = this.configService.get('AWS_COMISSION_BUCKET', '');
+    this.bucketName = this.configService.get<string>('AWS_COMISSION_BUCKET', {
+      infer: true,
+    });
   }
 
   public async listFiles(
@@ -123,8 +125,8 @@ export class CommissionService {
         throw new Error('File already SUBMITTED');
       }
 
-      if (!file) {
-        throw new Error('File already SUBMITTED');
+      if (!file?.buffer) {
+        throw new Error('Invalid file');
       }
 
       const previousFileVariant =
@@ -141,9 +143,6 @@ export class CommissionService {
 
       const fileContent = file.buffer;
 
-      if (!fileContent) {
-        throw new Error('File already SUBMITTED');
-      }
       const contentHash = createHash('sha256')
         .update(fileContent)
         .digest('hex');
