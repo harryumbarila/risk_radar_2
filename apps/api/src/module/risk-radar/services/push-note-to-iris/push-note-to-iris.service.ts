@@ -15,7 +15,6 @@ import { IrisClient } from '@/api/shared/module/iris/iris.client';
 import { RiskRadarNotesRepository } from '@/finance-db/repositories/risk-radar-notes.repository';
 
 import type { PushNoteToIrisInputDto } from './dto/push-note-to-iris-input.dto';
-import { IsNull } from 'typeorm';
 
 export enum IrisMemoVisibility {
   Yes = 'Yes',
@@ -35,7 +34,7 @@ export class PushNoteToIrisService {
 
     // Get & format note
     const note = await this.riskRadarNotesRepository.findOne({
-      where: { id: noteId, irisMemoRequestDate: null } as any,
+      where: { id: noteId, irisMemoRequestDate: null },
     });
 
     if (!note) {

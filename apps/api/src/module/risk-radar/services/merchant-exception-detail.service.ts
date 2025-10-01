@@ -1,9 +1,9 @@
- 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { InjectPinoLogger } from 'nestjs-pino';
 import { Logger } from 'pino';
-import { DataSource, MssqlParameter } from 'typeorm';
+import { DataSource } from 'typeorm';
 
 import type {
   MerchantBusinessInfoDto,

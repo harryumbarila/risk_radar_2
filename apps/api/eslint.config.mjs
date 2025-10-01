@@ -1,7 +1,22 @@
 import eslintNestJsTyped from '@darraghor/eslint-plugin-nestjs-typed';
+import js from '@eslint/js';
+import eslintConfigPrettier from 'eslint-config-prettier';
+import turboPlugin from 'eslint-plugin-turbo';
+import tseslint from 'typescript-eslint';
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
+  js.configs.recommended,
+  eslintConfigPrettier,
+  ...tseslint.configs.recommended,
+  {
+    plugins: {
+      turbo: turboPlugin,
+    },
+    rules: {
+      'turbo/no-undeclared-env-vars': 'off',
+    },
+  },
   ...eslintNestJsTyped.configs.flatRecommended,
   {
     rules: {
@@ -73,6 +88,7 @@ export default [
       'jest-e2e.ts',
       'node_modules/**',
       'dist/**',
+      '.lintstagedrc.cjs',
       'build/**',
       'coverage/**',
       '*.config.js',
