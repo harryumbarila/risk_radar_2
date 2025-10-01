@@ -1,4 +1,3 @@
-/* eslint-disable class-methods-use-this */
 import type { NetSettlementTransactionRow } from '@denali/shared';
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';

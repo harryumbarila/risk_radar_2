@@ -34,7 +34,7 @@ export class RiskRadarNotesEntity {
   public userCreated: string;
 
   @Column({ name: 'dtIrisMemoRequest', type: 'datetime', nullable: true })
-  public irisMemoRequestDate: Date;
+  public irisMemoRequestDate: Date | null;
 
   @Column({
     name: 'dtIrisMemoRequestFulfilled',

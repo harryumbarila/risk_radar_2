@@ -1,11 +1,19 @@
-import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { connectionOptions } from './connection-options';
+import SnakeNamingStrategy from 'typeorm-naming-strategy';
 
-const nestjsModuleOptions: TypeOrmModuleOptions = {
+import { config } from '../config/db';
+import * as entities from '../entities';
+
+export const DbTypeORMModule = TypeOrmModule.forRoot({
   name: 'paya',
-  ...connectionOptions,
-};
-
-export const DbTypeORMModule = TypeOrmModule.forRoot(nestjsModuleOptions);
+  type: 'postgres',
+  url: config.db.connectionString,
+  entities,
+  namingStrategy: new SnakeNamingStrategy(),
+  extra: {
+    ssl: {
+      rejectUnauthorized: config.db.ssl,
+    },
+  },
+});

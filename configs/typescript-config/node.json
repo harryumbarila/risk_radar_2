@@ -12,7 +12,6 @@
     "isolatedModules": true,
     "lib": ["ES2022"],
     "module": "CommonJS",
-    "moduleResolution": "node",
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
     "noImplicitReturns": false,

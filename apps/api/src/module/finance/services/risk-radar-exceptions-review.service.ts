@@ -5,7 +5,7 @@ import { RiskRadarExceptionsJeffRepository } from '@/finance-db/repositories/ris
 import { RiskRadarNotesRepository } from '@/finance-db/repositories/risk-radar-notes.repository';
 
 @Injectable()
-// eslint-disable-next-line @darraghor/nestjs-typed/injectable-should-be-provided
+ 
 export class RiskRadarExceptionsReviewService {
   public constructor(
     private readonly exceptionsRepository: RiskRadarExceptionsJeffRepository,

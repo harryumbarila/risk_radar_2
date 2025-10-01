@@ -7,127 +7,127 @@ export class RiskRadarExceptionsListResultDto {
 
   @IsOptional()
   @IsNumber()
-  public dNetDepAmt?: number;
+  public dNetDepAmt?: number | null;
 
   @IsOptional()
   @IsString()
-  public sDBA?: string;
+  public sDBA?: string | null;
 
   @IsOptional()
   @IsString()
-  public sSolutionConsultant?: string;
+  public sSolutionConsultant?: string | null;
 
   @IsOptional()
   @IsString()
-  public bSelfGen?: string;
+  public bSelfGen?: string | null;
 
   @IsOptional()
   @IsInt()
-  public iTransAmtAboveLimit?: number;
+  public iTransAmtAboveLimit?: number | null;
 
   @IsOptional()
   @IsInt()
-  public iNumOfKeyedTransAboveLimit?: number;
+  public iNumOfKeyedTransAboveLimit?: number | null;
 
   @IsOptional()
   @IsInt()
-  public iBatchVolAboveLimit?: number;
+  public iBatchVolAboveLimit?: number | null;
 
   @IsOptional()
   @IsInt()
-  public iDupCard?: number;
+  public iDupCard?: number | null;
 
   @IsOptional()
   @IsString()
-  public bNewAcct?: string;
+  public bNewAcct?: string | null;
 
   @IsOptional()
   @IsInt()
-  public iDupBin?: number;
+  public iDupBin?: number | null;
 
   @IsOptional()
   @IsInt()
-  public iLatePostTrans?: number;
+  public iLatePostTrans?: number | null;
 
   @IsOptional()
   @IsInt()
-  public iFgnkeyedTrans?: number;
+  public iFgnkeyedTrans?: number | null;
 
   @IsOptional()
   @IsInt()
-  public iNoAuthTrans?: number;
+  public iNoAuthTrans?: number | null;
 
   @IsOptional()
   @IsInt()
-  public iChbkOrIRR?: number;
+  public iChbkOrIRR?: number | null;
 
   @IsOptional()
   @IsString()
-  public bNextDayFundingAcct?: string;
+  public bNextDayFundingAcct?: string | null;
 
   @IsString()
   public sMID: string;
 
   @IsOptional()
   @IsString()
-  public sNTUserID?: string;
+  public sNTUserID?: string | null;
 
   @IsOptional()
   @Type(() => Date)
   @IsDate()
-  public dtTransmission?: Date;
+  public dtTransmission?: Date | null;
 
   @IsOptional()
   @IsString()
-  public bDivert?: string;
+  public bDivert?: string | null;
 
   @IsOptional()
   @IsString()
-  public sAMEXOptBlueInd?: string;
+  public sAMEXOptBlueInd?: string | null;
 
   @IsOptional()
   @IsInt()
-  public iAuthCaptureAmtLargeVariation?: number;
+  public iAuthCaptureAmtLargeVariation?: number | null;
 
   @IsOptional()
   @IsString()
-  public bRiskWatch?: string;
+  public bRiskWatch?: string | null;
 
   @IsOptional()
   @IsNumber()
-  public dSettlementBalance?: number;
+  public dSettlementBalance?: number | null;
 
   @IsOptional()
   @IsInt()
-  public iAvgBatch?: number;
+  public iAvgBatch?: number | null;
 
   @IsOptional()
   @IsInt()
-  public iNegDailyBatches?: number;
+  public iNegDailyBatches?: number | null;
 
   @IsOptional()
   @IsInt()
-  public iMototIoAVS?: number;
+  public iMototIoAVS?: number | null;
 
   @IsOptional()
   @IsInt()
-  public iAuthDecline?: number;
+  public iAuthDecline?: number | null;
 
   @IsOptional()
   @IsInt()
-  public iTotalPoints?: number;
+  public iTotalPoints?: number | null;
 
   @IsNumber()
   public dAuthDeclineAmt: number;
 
   @IsOptional()
   @IsString()
-  public sUserReviewed?: string;
+  public sUserReviewed?: string | null;
 
   @IsOptional()
   @Type(() => Date)
   @IsDate()
-  public dtActivated?: Date;
+  public dtActivated?: Date | null;
 
   @Type(() => Date)
   @IsDate()
@@ -138,28 +138,28 @@ export class RiskRadarExceptionsListResultDto {
 
   @IsOptional()
   @IsInt()
-  public iAutoHold?: number;
+  public iAutoHold?: number | null;
 
   @IsOptional()
   @Type(() => Date)
   @IsDate()
-  public dtAutoApproved?: Date;
+  public dtAutoApproved?: Date | null;
 
   @IsOptional()
   @IsInt()
-  public iTransAmtAboveHighTicketLimit?: number;
+  public iTransAmtAboveHighTicketLimit?: number | null;
 
   @IsOptional()
   @IsInt()
-  public iCreditRule?: number;
+  public iCreditRule?: number | null;
 
   @IsOptional()
   @IsInt()
-  public iSalesChannelRule?: number;
+  public iSalesChannelRule?: number | null;
 
   @IsOptional()
   @IsInt()
-  public iFundingExclusionAndException?: number;
+  public iFundingExclusionAndException?: number | null;
 
   @IsNumber()
   public dAuthNonDeclinedAmt: number;

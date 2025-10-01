@@ -1,27 +1,32 @@
-version: '3.8'
-
 services:
-  db:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    platform: linux/amd64
-    container_name: sql-server-db
+  # db:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   platform: linux/amd64
+  #   container_name: sql-server-db
+  #   ports:
+  #     - '1433:1433'
+  #   volumes:
+  #     - mssql_data:/var/opt/mssql
+  #   networks:
+  #     - denali-network
+  #   healthcheck:
+  #     test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "Denali123!" -Q "SELECT 1" || exit 1
+  #     interval: 10s
+  #     timeout: 3s
+  #     retries: 10
+  #     start_period: 10s
+  redis:
+    container_name: denali-redisdb
+    image: 'redis/redis-stack-server:latest'
     ports:
-      - '1433:1433'
-    volumes:
-      - mssql_data:/var/opt/mssql
-    networks:
-      - denali-network
-    healthcheck:
-      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "Denali123!" -Q "SELECT 1" || exit 1
-      interval: 10s
-      timeout: 3s
-      retries: 10
-      start_period: 10s
-networks:
-  denali-network:
-    driver: bridge
+      - '6379:6379'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+# networks:
+#   denali-network:
+#     driver: bridge
 
-volumes:
-  mssql_data:
+# volumes:
+#   mssql_data:

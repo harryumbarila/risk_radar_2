@@ -1,4 +1,3 @@
-/* eslint-disable */
 import type {
   ListObjectsV2CommandInput,
   ListObjectsV2CommandOutput,
@@ -140,7 +139,7 @@ export class S3Service {
           searchTerm: undefined,
         } as InvoiceResponseDto;
       } else {
-        let allObjects: _Object[] = [];
+        const allObjects: _Object[] = [];
         let nextToken: string | undefined = continuationToken;
 
         do {

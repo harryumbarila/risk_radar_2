@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Injectable } from '@nestjs/common';
 import { InjectPinoLogger } from 'nestjs-pino';
 import { Logger } from 'pino';
@@ -266,6 +266,7 @@ export class ExceptionsListService {
   }
 
   // Helper method to build a full query with all joins
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private buildFullQuery(params?: ExceptionListInputDto) {
     const query = this.exceptionsJeffRepository
       .createQueryBuilder('exception')

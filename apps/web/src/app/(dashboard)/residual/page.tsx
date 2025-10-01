@@ -62,7 +62,7 @@ const CommissionPage: React.FC = () => {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+     
     fetchCommissionFile({ page, limit });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);

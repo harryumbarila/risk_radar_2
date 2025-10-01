@@ -1,45 +1,32 @@
-module.exports = {
-  extends: ['plugin:import/recommended', 'plugin:prettier/recommended'],
-  plugins: ['import', 'simple-import-sort', 'prettier'],
-  rules: {
-    // imports
-    curly: 'error',
-    'no-restricted-imports': [
-      'error',
-      {
-        patterns: [
-          {
-            group: ['src/**/*', '../**/*'],
-            message:
-              'usage of src/* and ../**/* imports is not allowed, use paths defined in tsconfig',
-          },
-        ],
-      },
-    ],
+import js from '@eslint/js';
+import eslintConfigPrettier from 'eslint-config-prettier';
+import turboPlugin from 'eslint-plugin-turbo';
+import tseslint from 'typescript-eslint';
+import onlyWarn from 'eslint-plugin-only-warn';
 
-    'import/no-default-export': 'error',
-    'import/prefer-default-export': 'off',
-    'import/order': 'off',
-
-    'simple-import-sort/imports': 'error',
-    'simple-import-sort/exports': 'error',
-  },
-  overrides: [
-    {
-      files: ['jest.config.ts', 'tailwind.config.ts'],
-      rules: {
-        'import/no-default-export': 'off',
-      },
+/**
+ * A shared ESLint configuration for the repository.
+ *
+ * @type {import("eslint").Linter.Config[]}
+ * */
+export const config = [
+  js.configs.recommended,
+  eslintConfigPrettier,
+  ...tseslint.configs.recommended,
+  {
+    plugins: {
+      turbo: turboPlugin,
     },
-  ],
-  ignorePatterns: [
-    '.eslintrc.js',
-    '**/*.json',
-    'node_modules',
-    'public',
-    'styles',
-    'coverage',
-    'dist',
-    '.turbo',
-  ],
-};
+    rules: {
+      'turbo/no-undeclared-env-vars': 'warn',
+    },
+  },
+  {
+    plugins: {
+      onlyWarn,
+    },
+  },
+  {
+    ignores: ['dist/**'],
+  },
+];

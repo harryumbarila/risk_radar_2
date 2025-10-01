@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { LoggerModule } from 'nestjs-pino';
+import { BullModule } from '@nestjs/bullmq';
 
 import { GlobalModule } from '@/api/module/global/global.module';
 import { JwtAuthGuard } from '@/api/shared/auth/guard/jwt-auth.guard';
@@ -31,6 +32,7 @@ import { RiskRadarModule } from './module/risk-radar/risk-radar.module';
 import { AWSModule } from './shared/aws/aws.module';
 import { rootConfig } from './shared/config/root.config';
 import { EmailModule } from './shared/email/email.module';
+import { bullConfigAsync } from '@/api/shared/config/bull.config';
 
 // Load dotenv only in development mode (DBs)
 // eslint-disable-next-line no-restricted-properties
@@ -42,6 +44,7 @@ if (process.env.NODE_ENV !== 'production') {
   imports: [
     ConfigModule.forRoot(rootConfig),
     ScheduleModule.forRoot(),
+    BullModule.forRootAsync(bullConfigAsync),
     DataWarehouseDbTypeOrmModule,
     ConnectorDbTypeOrmModule,
     CrescentViewDbTypeOrmModule,

@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as Handlebars from 'handlebars';
 import * as path from 'path';
-import * as sanitizeHtml from 'sanitize-html';
+import sanitizeHtml from 'sanitize-html';
 
 import type { TemplateEngineInterface } from '@/api/shared/email/template-engine.interface';
 import { TemplateType } from '@/api/shared/email/email-template-message';

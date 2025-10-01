@@ -1,7 +1,7 @@
 'use client';
 
 // import 'jsvectormap/dist/jsvectormap.css';
-// eslint-disable-next-line import/no-unresolved, import/extensions
+ 
 // import '@/js/us-aea-en';
 
 import React, { useEffect } from 'react';

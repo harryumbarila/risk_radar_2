@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
+ 
 import { useAuth } from '@frontegg/nextjs';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -90,7 +90,7 @@ export const useRiskRadarTableColumns = ({
 
     const canBeReviewed = data.filter((item) => !item.sUserReviewed);
     const isAllSelected = canBeReviewed.length === selectedIds.length;
-    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+     
     const getColumn = () => {
       switch (String(filters.status)) {
         case '1': // Not Reviewed

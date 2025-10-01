@@ -1,14 +1,14 @@
 import type { BaseModel } from '@denali/shared/src/common';
 
 export interface NetSettlementSummaryHeader {
-  sMID16Exist: string;
-  sDBA: string;
-  sMerchantBankRoutingNumber: string;
-  sMerchantBankAccountNumber: string;
-  sTIN: string;
+  sMID16Exist?: string | null;
+  sDBA?: string | null;
+  sMerchantBankRoutingNumber?: string | null;
+  sMerchantBankAccountNumber?: string | null;
+  sTIN?: string | null;
   divertFlag: boolean;
-  divertReason: string;
-  netSettlementLabelTypeId: number;
+  divertReason?: string | null;
+  netSettlementLabelTypeId?: number | null;
   uwNewAccountHoldAllowRiskToEdit: boolean;
 }
 

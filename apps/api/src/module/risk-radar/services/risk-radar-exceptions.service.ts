@@ -16,7 +16,7 @@ import {
 import { PartnerAndSalesAgentIdentificationRepository } from '@/iris-db/repositories';
 
 @Injectable()
-// eslint-disable-next-line @darraghor/nestjs-typed/injectable-should-be-provided
+ 
 export class RiskRadarExceptionsService {
   public constructor(
     @InjectPinoLogger(RiskRadarExceptionsService.name)
@@ -45,7 +45,7 @@ export class RiskRadarExceptionsService {
     this.logger.info('PROFILING: Starting getExceptionsList method');
 
     // Parse exception list
-    const exceptionTypes = params.sExceptionList
+    const exceptionTypes = (params.sExceptionList || '')
       .split(',')
       .map(Number)
       .filter((n: number) => !Number.isNaN(n));
@@ -511,7 +511,7 @@ export class RiskRadarExceptionsService {
       return (
         params.bViewAll ||
         result.iNegDailyBatches !== null ||
-        (result.iTotalPoints !== null && result.iTotalPoints > 20) ||
+        (result.iTotalPoints && result.iTotalPoints > 20) ||
         (params.sMIDSearch && result.sMID === params.sMIDSearch)
       );
     });

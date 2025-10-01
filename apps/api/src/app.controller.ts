@@ -70,7 +70,6 @@ export class AppController {
   @ApiResponse({
     status: 502,
     description: 'Not operational - Bad Gateway Exception',
-    type: null,
   })
   @ApiResponse({
     status: 503,

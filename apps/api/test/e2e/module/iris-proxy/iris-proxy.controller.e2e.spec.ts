@@ -111,6 +111,12 @@ describe('IrisProxyController (e2e)', () => {
       controllers: [IrisProxyController],
       providers: [
         IrisProxyService,
+        {
+          provide: 'BullQueue_assigned-users',
+          useValue: {
+            add: jest.fn(), // mock queue add
+          },
+        },
         { provide: IrisClient, useValue: irisClientMock },
         { provide: ConfigService, useValue: configServiceMock },
         { provide: IrisProxyService, useValue: irisProxyServiceMock },
@@ -227,6 +233,12 @@ describe('IrisProxyController (e2e)', () => {
         controllers: [IrisProxyController],
         providers: [
           IrisProxyService,
+          {
+            provide: 'BullQueue_assigned-users',
+            useValue: {
+              add: jest.fn(), // mock queue add
+            },
+          },
           { provide: IrisClient, useValue: stagingIrisClientMock },
           { provide: ConfigService, useValue: stagingConfigServiceMock },
         ],

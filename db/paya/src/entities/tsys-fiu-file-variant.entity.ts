@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 import { Column, Entity, JoinColumn, ManyToOne, Unique } from 'typeorm';
 
 import { TsysFiuFileVariantType } from '../enums';
