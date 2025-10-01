@@ -4,8 +4,6 @@
  */
 const ImageResize = () => {
   if (document.querySelectorAll('#pane').length) {
-    ('use strict');
-
     // Minimum resizable area
     var minWidth = 60;
     var minHeight = 40;

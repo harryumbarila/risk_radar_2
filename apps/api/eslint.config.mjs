@@ -1,65 +1,82 @@
-import tsEslintPlugin from '@typescript-eslint/eslint-plugin';
-import globals from 'globals';
-import tsParser from '@typescript-eslint/parser';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import js from '@eslint/js';
-import { FlatCompat } from '@eslint/eslintrc';
+import eslintNestJsTyped from '@darraghor/eslint-plugin-nestjs-typed';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
-});
-
+/** @type {import('eslint').Linter.Config[]} */
 export default [
-  ...compat.extends(
-    'plugin:@typescript-eslint/recommended',
-    'plugin:prettier/recommended'
-  ),
+  ...eslintNestJsTyped.configs.flatRecommended,
   {
-    plugins: {
-      '@typescript-eslint': tsEslintPlugin,
-    },
-    languageOptions: {
-      globals: {
-        ...globals.node,
-        ...globals.jest,
-      },
-      parser: tsParser,
-      ecmaVersion: 5,
-      sourceType: 'module',
-      parserOptions: {
-        project: 'tsconfig.json',
-        tsconfigRootDir: __dirname,
-      },
-    },
     rules: {
-      '@typescript-eslint/interface-name-prefix': 'off',
+      '@darraghor/nestjs-typed/validated-non-primitive-property-needs-type-decorator':
+        'off',
+      '@darraghor/nestjs-typed/api-enum-property-best-practices': 'off',
+      '@darraghor/nestjs-typed/injectable-should-be-provided': 'off',
+      '@darraghor/nestjs-typed/all-properties-have-explicit-defined': 'off',
+    },
+  },
+  {
+    rules: {
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
-      'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': ['error'],
-      'require-await': 'off',
-      '@typescript-eslint/require-await': 'error',
-      '@typescript-eslint/no-floating-promises': 'error',
-      'no-restricted-syntax': [
+      '@typescript-eslint/unbound-method': 'off',
+      'max-classes-per-file': 'off',
+      'class-methods-use-this': 'off',
+      'no-restricted-properties': [
         'error',
         {
-          selector:
-            'CallExpression[callee.object.name=configService][callee.property.name=/^(get|getOrThrow)$/]:not(:has([arguments.1] Property[key.name=infer][value.value=true])), CallExpression[callee.object.property.name=configService][callee.property.name=/^(get|getOrThrow)$/]:not(:has([arguments.1] Property[key.name=infer][value.value=true]))',
+          object: 'process',
+          property: 'env',
           message:
-            'Add "{ infer: true }" to configService.get() for correct typechecking. Example: configService.get("database.port", { infer: true })',
-        },
-        {
-          selector:
-            'CallExpression[callee.name=it][arguments.0.value!=/^should/]',
-          message: '"it" should start with "should"',
+            'Avoid using process.env directly. Use @/config/* files instead.',
         },
       ],
     },
+  },
+
+  {
+    settings: {
+      'import/resolver': {
+        typescript: {
+          alwaysTryTypes: true,
+          project: ['packages/*/tsconfig.json', 'tsconfig.json'],
+        },
+      },
+    },
+  },
+
+  // Test files
+  {
+    files: [
+      'test/*.e2e.spec.ts',
+      '**/test/**/*.e2e.spec.ts',
+      '**/test/*.unit.spec.ts',
+      '**/test/**/*.unit.spec.ts',
+    ],
+    rules: {
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+    },
+  },
+
+  // Env config file
+  {
+    files: ['src/config/env.ts'],
+    rules: {
+      'no-restricted-properties': 'off',
+    },
+  },
+
+  {
+    ignores: [
+      'jest-unit.ts',
+      'jest-e2e.ts',
+      'node_modules/**',
+      'dist/**',
+      'build/**',
+      'coverage/**',
+      '*.config.js',
+      '*.config.ts',
+    ],
   },
 ];

@@ -20,7 +20,7 @@ export type AWSSesClientConfig = {
 };
 
 @Injectable()
-// eslint-disable-next-line @darraghor/nestjs-typed/injectable-should-be-provided
+ 
 export class AwsSesClient implements EmailClientInterface {
   public constructor(
     private readonly configService: ConfigService<AWSSesClientConfig>

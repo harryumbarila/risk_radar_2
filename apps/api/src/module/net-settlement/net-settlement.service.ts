@@ -1,4 +1,4 @@
-/* eslint-disable */
+ 
 import { Injectable } from '@nestjs/common';
 import { RuntimeException } from '@nestjs/core/errors/exceptions';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -828,7 +828,7 @@ export class NetSettlementsService {
               isHidden: false,
             },
           });
-        // eslint-disable-next-line no-await-in-loop
+         
         for (const ws of workSheetsToUpdate) {
           const wsWithin10Hours = within10Hours(ws.transactionDate);
           const shouldHide =

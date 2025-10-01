@@ -12,7 +12,7 @@ import { AppModule } from './app.module';
 import { config } from './config';
 
 // TODO: Handle as a env variable
-// eslint-disable-next-line no-restricted-properties
+ 
 process.env.TZ = 'America/Chicago';
 
 async function bootstrap() {
@@ -86,5 +86,5 @@ async function bootstrap() {
   await app.listen(config.app.port, '0.0.0.0');
 }
 
-// eslint-disable-next-line no-console
+ 
 bootstrap().catch(console.error);

@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 import { Column, Entity, OneToMany } from 'typeorm';
 
 import { BaseEntity } from '../models';

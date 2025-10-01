@@ -129,7 +129,6 @@ import { RiskRadarUserService } from './services/risk-radar-user/risk-radar-user
     EmailModule,
   ],
   controllers: [RiskRadarController],
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   providers: [
     // Entity repos
     LeadRepository,

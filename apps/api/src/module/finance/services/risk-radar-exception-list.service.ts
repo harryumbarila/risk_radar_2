@@ -7,7 +7,7 @@ import type {
 import { RiskRadarExceptionListLookupRepository } from '@/finance-db/repositories/risk-radar-exception-list-lookup.repository';
 
 @Injectable()
-// eslint-disable-next-line @darraghor/nestjs-typed/injectable-should-be-provided
+ 
 export class RiskRadarExceptionListService {
   public constructor(
     private readonly lookupRepository: RiskRadarExceptionListLookupRepository

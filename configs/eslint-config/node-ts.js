@@ -6,7 +6,7 @@ import { config as baseConfig } from './base.js';
  *
  * @type {import("eslint").Linter.Config[]}
  * */
-export const nestJsConfig = [
+export const config = [
   ...baseConfig,
   {
     languageOptions: {

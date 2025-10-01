@@ -36,9 +36,12 @@
   "exports": {
     "./base": "./base.js",
     "./base-ts": "./base-ts.js",
-    "./next-js": "./next.js",
+    "./node-ts": "./node-ts.js",
+    "./next-js": "./next-ts.js",
     "./nest-js": "./nest.js",
+    "./react-ts": "./react-ts.js",
     "./prettier-base": "./prettier-base.js",
-    "./react-internal": "./react-internal.js"
+    "./react-internal": "./react-internal.js",
+    "./jest-overrides": "./jest-overrides.js"
   }
 }

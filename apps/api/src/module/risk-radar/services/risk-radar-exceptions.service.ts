@@ -16,7 +16,7 @@ import {
 import { PartnerAndSalesAgentIdentificationRepository } from '@/iris-db/repositories';
 
 @Injectable()
-// eslint-disable-next-line @darraghor/nestjs-typed/injectable-should-be-provided
+ 
 export class RiskRadarExceptionsService {
   public constructor(
     @InjectPinoLogger(RiskRadarExceptionsService.name)

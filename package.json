@@ -22,8 +22,7 @@
     "sync-packages": "syncpack fix-mismatches",
     "test:e2e": "turbo run test:e2e",
     "test:unit": "turbo run test:unit",
-    "type-check": "turbo run type-check",
-    "ui:example": "yarn workspace @denali/example run dev-example"
+    "type-check": "turbo run type-check"
   },
   "config": {
     "commitizen": {

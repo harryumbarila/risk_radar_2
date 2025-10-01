@@ -1,4 +1,4 @@
-/* eslint-disable */
+ 
 import { RuntimeException } from '@nestjs/core/errors/exceptions';
 import { Injectable } from '@nestjs/common';
 

@@ -38,7 +38,7 @@ export const Popover: FC<PropsWithChildren<PopoverProps>> = ({
     }
   };
 
-  // eslint-disable-next-line consistent-return
+   
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent): void => {
       if (

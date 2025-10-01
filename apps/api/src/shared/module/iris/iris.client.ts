@@ -107,14 +107,14 @@ export class IrisClient {
       },
     };
 
-    // eslint-disable-next-line no-restricted-syntax
+     
     for (const classId of classIds) {
       let currentPage = 1;
       let hasNextPage = true;
 
       while (hasNextPage) {
         try {
-          // eslint-disable-next-line no-await-in-loop
+           
           const response = await this.get<IrisUsersResponseDto>(
             `/api/v1/users/list?page=${currentPage}&per_page=${rowsPerPage}&sort_by=name&sort_dir=asc&class=${classId}&active=Yes`,
             {
