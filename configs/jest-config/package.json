@@ -6,6 +6,11 @@
     "jest-transform-stub": "^2.0.0",
     "ts-jest": "^29.4.4"
   },
+  "exports": {
+    "./jest-nextjs": "./jest-nextjs.ts",
+    "./jest-node": "./jest-node.ts",
+    "./jest-react": "./jest-react.js"
+  },
   "peerDependencies": {
     "next": "15.5.4"
   },

@@ -1,4 +1,4 @@
-name: Stanley CI
+name: Denali CI
 
 permissions:
   contents: write
