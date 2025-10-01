@@ -1,5 +1,5 @@
 import type { CanActivate, ExecutionContext } from '@nestjs/common';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { FastifyRequest } from 'fastify';
 
@@ -9,6 +9,7 @@ import { IS_PUBLIC_KEY } from '@/api/shared/auth/decorator/public.decorator';
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   public static readonly REQUEST_USER_ENTITY_KEY: string = 'userEntity';
+  private logger = new Logger(JwtAuthGuard.name);
 
   public constructor(
     private authService: AuthService,
@@ -40,7 +41,8 @@ export class JwtAuthGuard implements CanActivate {
         return true;
       }
     } catch (e) {
-      throw new UnauthorizedException(e);
+      this.logger.error(e);
+      throw new UnauthorizedException();
     }
 
     throw new UnauthorizedException();

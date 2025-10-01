@@ -12,7 +12,6 @@ import {
 import { AssignedByMapper } from '@/api/module/iris-proxy/mappers';
 import { IrisClient } from '@/api/shared/module/iris/iris.client';
 import { LeadDetailResponse } from '@/shared/response';
-import { IrisProxyControllerConfig } from '@/api/module/example-multi-db/example-multi-db.controller';
 
 @Processor('assigned-users')
 export class AssignedUsersConsumer extends WorkerHost {
@@ -22,7 +21,7 @@ export class AssignedUsersConsumer extends WorkerHost {
 
   constructor(
     private readonly client: IrisClient,
-    private readonly configService: ConfigService<IrisProxyControllerConfig>
+    private readonly configService: ConfigService
   ) {
     super();
 
@@ -179,6 +178,7 @@ export class AssignedUsersConsumer extends WorkerHost {
       return { success: true };
     } catch (error) {
       this.logger.error(error);
+      return { success: false };
     }
   }
 
