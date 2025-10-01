@@ -12,7 +12,7 @@ import { AppModule } from './app.module';
 import { config } from './config';
 
 // TODO: Handle as a env variable
- 
+
 process.env.TZ = 'America/Chicago';
 
 async function bootstrap() {
@@ -33,9 +33,9 @@ async function bootstrap() {
   });
 
   // TODO: Check error types
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+
   await app.register(fastifyCompress as any);
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+
   await app.register(fastifyHelmet as any);
 
   app.useGlobalPipes(
@@ -86,5 +86,4 @@ async function bootstrap() {
   await app.listen(config.app.port, '0.0.0.0');
 }
 
- 
 bootstrap().catch(console.error);

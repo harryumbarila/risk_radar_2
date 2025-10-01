@@ -1,4 +1,4 @@
-import { OmitType, PartialType } from '@nestjs/swagger';
+import { OmitType } from '@nestjs/swagger';
 
 import type { Attachment } from '@/api/shared/aws/email/email-message';
 import { EmailMessage } from '@/api/shared/aws/email/email-message';

@@ -24,7 +24,6 @@ jobs:
         image: mcr.microsoft.com/mssql/server:2019-latest
         env:
           SA_PASSWORD: Stanley123!
-          POSTGRES_DB: test
           MSSQL_PID: Express
           MSSQL_AGENT_ENABLED: true
           MSSQL_TCP_PORT: 1433
@@ -102,7 +101,8 @@ jobs:
           EZ_ENROLL_DB_URL: mssql://sa:Stanley123!@localhost:1433/master?encrypt=false&trustServerCertificate=true
           EZ_ENROLL_PCC_DB_URL: mssql://sa:Stanley123!@localhost:1433/master?encrypt=false&trustServerCertificate=true
           SNAP_PCC_DB_URL: mssql://sa:Stanley123!@localhost:1433/master?encrypt=false&trustServerCertificate=true
-
+          REDIS_QUEUE_HOST: localhost
+          REDIS_QUEUE_PORT: 6379
         run: |
           yarn run lint type-check
           yarn test:unit
