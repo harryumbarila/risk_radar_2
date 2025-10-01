@@ -1,4 +1,4 @@
-import nextJest from 'next/jest';
+import nextJest from 'next/jest.js';
 
 const collectCoverage = process.env.COLLECT_COVERAGE === 'true';
 
