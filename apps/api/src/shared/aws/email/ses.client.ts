@@ -20,7 +20,7 @@ export type AWSSesClientConfig = {
 };
 
 @Injectable()
-// eslint-disable-next-line @darraghor/nestjs-typed/injectable-should-be-provided
+ 
 export class AwsSesClient implements EmailClientInterface {
   public constructor(
     private readonly configService: ConfigService<AWSSesClientConfig>
@@ -56,7 +56,8 @@ export class AwsSesClient implements EmailClientInterface {
         },
         ReplyToAddresses: [
           email.sender ||
-            this.configService.get('AWS_SES_SENDER_EMAIL_ADDRESS'),
+            this.configService.get('AWS_SES_SENDER_EMAIL_ADDRESS') ||
+            '',
           ...(email.cc || []),
         ],
       });
@@ -65,7 +66,9 @@ export class AwsSesClient implements EmailClientInterface {
     const run = async () => {
       const sendEmailCommand = createSendEmailCommand(
         email.to,
-        email.sender || this.configService.get('AWS_SES_SENDER_EMAIL_ADDRESS')
+        email.sender ||
+          this.configService.get('AWS_SES_SENDER_EMAIL_ADDRESS') ||
+          ''
       );
 
       const prodConfig: SESv2ClientConfig = {

@@ -296,9 +296,9 @@ export class MerchantExceptionDetailRepository {
       WHERE l.IrisMId = @0 AND l.IsArchived = 0 AND LEN(l.IrisMId) > 11
     `;
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+     
     const results = await this.dataSource.query(query, [mid, exceptionId]);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
+     
     return results[0] || null;
   }
 }

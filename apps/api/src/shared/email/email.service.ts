@@ -23,7 +23,7 @@ export class EmailService {
       cc: dto.cc,
       sender: dto.sender,
       subject: dto.subject,
-      body: dto.stringTemplate,
+      body: dto.stringTemplate || '',
       context: dto.context,
       attachments: dto.attachments,
       stringTemplate: dto.stringTemplate,

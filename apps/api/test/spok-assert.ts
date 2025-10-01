@@ -1,5 +1,5 @@
 // We allow any type here because we are trying to replicate the spok assert
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { expect } from '@jest/globals';
 import type { Assert } from 'spok';
 

@@ -1,4 +1,4 @@
-/* eslint-disable */
+ 
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { InjectPinoLogger } from 'nestjs-pino';
@@ -246,7 +246,7 @@ export class MerchantExceptionDetailService {
 
     // Get source
     const source = await this.sourceRepository.findOne({
-      where: { id: lead.sourceId },
+      where: { id: Number(lead.sourceId) },
     });
 
     // Get merchant adjust parameters using the specialized method

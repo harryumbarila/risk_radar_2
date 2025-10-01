@@ -34,7 +34,7 @@ export const env = createEnv({
     FRONTEGG_HOSTED_LOGIN: z
       .enum(['true', 'false'])
       .transform((val) => val === 'true')
-      .default('true'),
+      .default(true),
     FRONTEGG_LOG_LEVEL: z.enum(['debug', 'info', 'error']).default('error'),
     FRONTEGG_JWT_PUBLIC_KEY: z.string().min(1).optional(), // Not required yet
   },

@@ -283,7 +283,7 @@ const NetSettlementPage: React.FC = () => {
   React.useEffect(() => {
     if (data) {
       methods.reset({
-        mid: data.header.sMID16Exist,
+        mid: data.header.sMID16Exist || '',
         netSettlementLabelTypeId: data.header.netSettlementLabelTypeId || 0,
         divertReason: data.header.divertReason || '',
       });
@@ -385,7 +385,7 @@ const NetSettlementPage: React.FC = () => {
                           })
                         }
                       >
-                        <option value={data?.header.sMID16Exist}>
+                        <option value={data?.header.sMID16Exist || ''}>
                           {data?.header.sMID16Exist}
                         </option>
                         {data?.matchingMIDs.map((match) => (

@@ -81,7 +81,6 @@ export class RiskRadarExceptionsJeffRepository extends Repository<RiskRadarExcep
     return uniqueMIDs;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   public getCategoriesFilter(
     category: string[]
   ): FindOptionsWhere<RiskRadarExceptionsJeffEntity>[] {
@@ -215,7 +214,6 @@ export class RiskRadarExceptionsJeffRepository extends Repository<RiskRadarExcep
     return wheres;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   public applyCategoriesFilter2(
     query: SelectQueryBuilder<RiskRadarExceptionsJeffEntity>,
     category: string[]

@@ -22,8 +22,7 @@
     "sync-packages": "syncpack fix-mismatches",
     "test:e2e": "turbo run test:e2e",
     "test:unit": "turbo run test:unit",
-    "type-check": "turbo run type-check",
-    "ui:example": "yarn workspace @denali/example run dev-example"
+    "type-check": "turbo run type-check"
   },
   "config": {
     "commitizen": {
@@ -45,7 +44,7 @@
     "husky": "^9.0.11",
     "jscodeshift": "^17.3.0",
     "lint-staged": "^16.1.2",
-    "prettier": "^3.2.5",
+    "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
     "syncpack": "^13.0.4",
     "turbo": "^2.5.4"

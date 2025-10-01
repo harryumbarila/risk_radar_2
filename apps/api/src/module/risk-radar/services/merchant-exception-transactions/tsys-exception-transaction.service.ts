@@ -279,16 +279,17 @@ export class TsysExceptionTransactionService {
       posEntryMode: `${t.posmode?.slice(0, 2)} ${t.sPOSEntryMode}`.trim() ?? '',
       avsResponseCode: '',
       authCode: t.authnum ? String(t.authnum) : '',
-      cardNumber: t.cardnum_truncated.replace('x', '*') ?? '',
+      cardNumber: t?.cardnum_truncated?.replace('x', '*') ?? '',
       debitNetworkIdentifier: '',
       transactionId: t.transactionid?.slice(-4) ?? '',
       authAmount: Number(t.authamt ?? 0),
       exceptionList: '3',
       exceptionTitle: 'Auth Decl',
       authResponseDescription: t.Definition ?? '',
-      binSearchMatchFlag: binSearch
-        ? t.cardnum_truncated.startsWith(binSearch)
-        : false,
+      binSearchMatchFlag:
+        binSearch && t.cardnum_truncated
+          ? t.cardnum_truncated.startsWith(binSearch)
+          : false,
     }));
 
     return transformed;

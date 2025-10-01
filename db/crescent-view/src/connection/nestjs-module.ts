@@ -1,11 +1,17 @@
-import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { connectionOptions } from './connection-options';
+import { config } from '../config/db';
+import * as entities from '../entities';
 
-export const nestjsModuleOptions: TypeOrmModuleOptions = {
+export const DbTypeORMModule = TypeOrmModule.forRoot({
   name: 'crescent-view',
-  ...connectionOptions,
-};
-
-export const DbTypeORMModule = TypeOrmModule.forRoot(nestjsModuleOptions);
+  type: 'mssql',
+  url: config.db.connectionString,
+  entities,
+  options: {
+    encrypt: config.db.ssl,
+    trustServerCertificate: true,
+    disableAsciiToUnicodeParamConversion: true,
+    appName: 'Denali',
+  },
+});

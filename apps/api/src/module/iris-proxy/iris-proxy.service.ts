@@ -29,9 +29,11 @@ export class IrisProxyService {
   ): AssignedByMapper | undefined => {
     return users.reduce<AssignedByMapper | undefined>(
       (highestPriorityUser, user) => {
+        if (!user?.userClass || !user?.id) return highestPriorityUser;
+
         const priorityIndex = priorityOrder.indexOf(user.userClass);
         if (priorityIndex !== -1) {
-          const highestPriorityIndex = highestPriorityUser
+          const highestPriorityIndex = highestPriorityUser?.userClass
             ? priorityOrder.indexOf(highestPriorityUser.userClass)
             : Infinity;
 
@@ -81,7 +83,7 @@ export class IrisProxyService {
         })
       );
 
-      if (!lead.id) {
+      if (!lead?.id) {
         throw new Error('Lead ID is required');
       }
 
@@ -112,22 +114,25 @@ export class IrisProxyService {
 
       // Find the highest priority user for each category
       const solutionConsultantUser = this.findHighestPriorityUser(
-        assignedUsers,
+        assignedUsers || [],
         solutionConsultantPriority
       );
       let referralPartnerUser = this.findHighestPriorityUser(
-        assignedUsers,
+        assignedUsers || [],
         referralPartnerPriority
       );
       const resellerUser = this.findHighestPriorityUser(
-        assignedUsers,
+        assignedUsers || [],
         resellerPriority
       );
-      const isvUser = this.findHighestPriorityUser(assignedUsers, isvPriority);
+      const isvUser = this.findHighestPriorityUser(
+        assignedUsers || [],
+        isvPriority
+      );
 
       // If the referral partner is not found in the assigned users, try to fetch it from the lead details and get from the source
       if (!referralPartnerUser?.name) {
-        referralPartnerUser = await this.getLeadSource(lead.id);
+        referralPartnerUser = (await this.getLeadSource(lead.id)) || undefined;
       }
 
       this.logger.log(
@@ -236,19 +241,22 @@ export class IrisProxyService {
         `/api/v1/leads/${leadId}`
       );
 
-      const dbaName = data.details
-        .find((detail) => detail.name === 'Business Information')
-        ?.fields.find((field) => field.field === 'DBA Name')?.value;
+      const dbaName =
+        data.details
+          .find((detail) => detail.name === 'Business Information')
+          ?.fields.find((field) => field.field === 'DBA Name')?.value || '';
 
-      const contactPhone = data.details
-        .find((detail) => detail.name === 'Business Information')
-        ?.fields.find((field) => field.field === 'Contact Phone Number')?.value;
+      const contactPhone =
+        data.details
+          .find((detail) => detail.name === 'Business Information')
+          ?.fields.find((field) => field.field === 'Contact Phone Number')
+          ?.value || '';
 
-      const contactEmail = data.details
-        .find((detail) => detail.name === 'Business Information')
-        ?.fields.find(
-          (field) => field.field === 'Contact Email Address'
-        )?.value;
+      const contactEmail =
+        data.details
+          .find((detail) => detail.name === 'Business Information')
+          ?.fields.find((field) => field.field === 'Contact Email Address')
+          ?.value || '';
 
       return { dbaName, contactPhone, contactEmail };
     } catch (error) {

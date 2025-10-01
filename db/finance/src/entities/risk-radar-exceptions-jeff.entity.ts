@@ -172,7 +172,7 @@ export class RiskRadarExceptionsJeffEntity {
     length: 25,
     nullable: true,
   })
-  public userReviewed: string;
+  public userReviewed?: string | null;
 
   @Column({ name: 'iAutoHold', type: 'int', nullable: true })
   public autoHold: number;

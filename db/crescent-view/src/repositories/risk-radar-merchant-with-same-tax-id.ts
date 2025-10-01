@@ -33,7 +33,6 @@ export class RiskRadarMerchantTaxIdRepository extends Repository<MerchantTIN> {
       .orderBy('m.sMID', 'ASC')
       .getRawMany();
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     return merchants.map((m) => m.sMID as unknown as string);
   }
 }
