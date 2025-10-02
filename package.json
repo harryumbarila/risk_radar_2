@@ -52,5 +52,9 @@
   "engines": {
     "node": ">=22"
   },
-  "packageManager": "yarn@1.22.21"
+  "packageManager": "yarn@1.22.21",
+  "resolutions": {
+    "cookie": "^1.0.2",
+    "tmp": "^0.2.5"
+  }
 }

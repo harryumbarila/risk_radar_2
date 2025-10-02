@@ -28,7 +28,7 @@ ls:
 ignore:
   - .git
   - node_modules
-  - '{apps,configs,packages}/*/{node_modules,.expo,.turbo,.next,.swc,.react-email,coverage}'
+  - '{apps,configs,packages}/*/{node_modules,.expo,.turbo,.next,.swc,.react-email,coverage, out}'
   - coverage
 
   # Frontegg specific (as they need to follow a different convention)

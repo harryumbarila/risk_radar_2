@@ -1,7 +1,10 @@
 import createJestConfig from '@denali/jest-config/jest-nextjs';
 import { pathsToModuleNameMapper } from 'ts-jest';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
-import tsConfig from './tsconfig.json';
+const tsConfigPath = join(process.cwd(), 'tsconfig.json');
+const tsConfig = JSON.parse(readFileSync(tsConfigPath, 'utf-8'));
 
 const config = createJestConfig({
   coverageThreshold: {
