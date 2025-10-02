@@ -1,9 +1,21 @@
 import { Logger } from '@nestjs/common';
-import { Processor, WorkerHost } from '@nestjs/bullmq';
+
+import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { ConfigService } from '@nestjs/config';
 
 import { Job } from 'bullmq';
-import { bufferTime, debounceTime, filter, map, Subject } from 'rxjs';
+import {
+  bufferTime,
+  catchError,
+  debounceTime,
+  filter,
+  from,
+  map,
+  of,
+  Subject,
+  Subscription,
+  switchMap,
+} from 'rxjs';
 
 import {
   LeadUserAssignedInputDto,
@@ -12,12 +24,14 @@ import {
 import { AssignedByMapper } from '@/api/module/iris-proxy/mappers';
 import { IrisClient } from '@/api/shared/module/iris/iris.client';
 import { LeadDetailResponse } from '@/shared/response';
+import { isAxiosError } from 'axios';
 
 @Processor('assigned-users')
 export class AssignedUsersConsumer extends WorkerHost {
   private readonly logger = new Logger(AssignedUsersConsumer.name);
   private update$ = new Subject<LeadUserAssignedInputDto>();
-  private windowsMS = 1_000;
+  private windowsMS = 60_000;
+  private subscription: Subscription; // Track the subscription
 
   constructor(
     private readonly client: IrisClient,
@@ -25,17 +39,18 @@ export class AssignedUsersConsumer extends WorkerHost {
   ) {
     super();
 
-    this.update$
+    this.subscription = this.update$
       .pipe(
         bufferTime(this.windowsMS),
         debounceTime(this.windowsMS),
         filter((batch) => batch.length > 0),
         map((batch) => {
+          this.logger.log(`Processing batch of ${batch.length} jobs`);
+
           const grouped: Record<string, AssignedByMapper[]> = {};
 
           for (const curr of batch) {
             const { data } = curr;
-
             const leadId = data.lead.id;
 
             if (!grouped[leadId]) {
@@ -44,14 +59,44 @@ export class AssignedUsersConsumer extends WorkerHost {
 
             grouped[leadId].push(...data.lead.assignedUsers);
           }
+          this.logger.log(`Grouped into ${Object.keys(grouped).length} leads`);
 
           return grouped;
-        })
+        }),
+        switchMap((mergedData) =>
+          from(this.processLeadAssignment(mergedData)).pipe(
+            catchError((error) => {
+              this.logger.error('Error in processLeadAssignment:', error);
+              return of(null);
+            })
+          )
+        )
       )
-      .subscribe(async (mergedData) => {
-        await this.processLeadAssignment(mergedData);
+      .subscribe({
+        next: (result) => {
+          if (result) {
+            this.logger.log('Batch processing completed successfully');
+          }
+        },
+        error: (error) => {
+          this.logger.error('Error in update$ observable chain:', error);
+        },
       });
   }
+
+  // Add cleanup method
+  async onApplicationShutdown(signal?: string) {
+    this.logger.log(`Shutting down with signal: ${signal}`);
+    this.subscription.unsubscribe();
+    this.update$.complete();
+  }
+
+  onModuleDestroy() {
+    this.logger.log('Module destroying - cleaning up subscriptions');
+    this.subscription.unsubscribe();
+    this.update$.complete();
+  }
+
   async processLeadAssignment(mergedData: Record<string, AssignedByMapper[]>) {
     try {
       // Define priority order for each category
@@ -100,13 +145,18 @@ export class AssignedUsersConsumer extends WorkerHost {
         }
 
         this.logger.log(
-          JSON.stringify({
-            msg: 'lead-assigned-webhook',
-            solutionConsultantUser,
-            referralPartnerUser,
-            resellerUser,
-            isvUser,
-          })
+          JSON.stringify(
+            {
+              msg: 'lead-assigned-webhook',
+              leadId,
+              solutionConsultantUser,
+              referralPartnerUser,
+              resellerUser,
+              isvUser,
+            },
+            null,
+            2
+          )
         );
 
         // Prod Stag
@@ -174,7 +224,14 @@ export class AssignedUsersConsumer extends WorkerHost {
             },
           ],
         });
+        this.logger.log(
+          JSON.stringify({
+            msg: 'lead-assigned-webhook',
+            status: `finished for lead ${leadId}`,
+          })
+        );
       }
+
       return { success: true };
     } catch (error) {
       this.logger.error(error);
@@ -183,8 +240,19 @@ export class AssignedUsersConsumer extends WorkerHost {
   }
 
   async process(job: Job<LeadUserAssignedInputDto>): Promise<void> {
-    this.logger.log(job.data);
-    this.update$.next(job.data);
+    this.logger.log(
+      JSON.stringify({
+        msg: 'lead-assigned-webhook',
+        status: `started for lead ${job?.data?.data?.lead?.id}`,
+        ...job.data,
+      })
+    );
+    if (!this.update$.closed) {
+      this.update$.next(job.data);
+    } else {
+      this.logger.error('update$ subject is closed, cannot process job');
+      throw new Error('Processor is shutting down');
+    }
   }
 
   public findHighestPriorityUser = (
@@ -232,5 +300,20 @@ export class AssignedUsersConsumer extends WorkerHost {
       this.logger.error(error);
     }
     return null;
+  }
+
+  @OnWorkerEvent('failed')
+  async onFailed(job: Job<LeadUserAssignedInputDto>, err: Error) {
+    const leadId = job?.data?.data?.lead?.id;
+
+    this.logger.error(`❌ ${leadId} ${Object.keys(job.id)} failed:`, {
+      error: err?.message,
+    });
+
+    if (isAxiosError(err)) {
+      this.logger.error(`❌ ${leadId} ${Object.keys(job.id)} failed:`, {
+        response: err?.response.data,
+      });
+    }
   }
 }
