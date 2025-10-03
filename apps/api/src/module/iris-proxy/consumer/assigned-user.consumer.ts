@@ -17,20 +17,21 @@ import {
   switchMap,
 } from 'rxjs';
 
-import {
-  LeadUserAssignedInputDto,
-  LeadUserAssignedSource,
-} from '@/api/module/iris-proxy/dto';
+import { LeadUserAssignedInputDto } from '@/api/module/iris-proxy/dto';
 import { AssignedByMapper } from '@/api/module/iris-proxy/mappers';
 import { IrisClient } from '@/api/shared/module/iris/iris.client';
-import { LeadDetailResponse } from '@/shared/response';
+import {
+  AssignedUser,
+  LeadDetailResponse,
+  LeadUsersAssignedResponse,
+} from '@/shared/response';
 import { isAxiosError } from 'axios';
 
 @Processor('assigned-users')
 export class AssignedUsersConsumer extends WorkerHost {
   private readonly logger = new Logger(AssignedUsersConsumer.name);
-  private update$ = new Subject<LeadUserAssignedInputDto>();
-  private windowsMS = 60_000;
+  private leadIds$ = new Subject<number>();
+  private windowsMS = 5_000;
   private subscription: Subscription; // Track the subscription
 
   constructor(
@@ -39,30 +40,12 @@ export class AssignedUsersConsumer extends WorkerHost {
   ) {
     super();
 
-    this.subscription = this.update$
+    this.subscription = this.leadIds$
       .pipe(
         bufferTime(this.windowsMS),
         debounceTime(this.windowsMS),
         filter((batch) => batch.length > 0),
-        map((batch) => {
-          this.logger.log(`Processing batch of ${batch.length} jobs`);
-
-          const grouped: Record<string, AssignedByMapper[]> = {};
-
-          for (const curr of batch) {
-            const { data } = curr;
-            const leadId = data.lead.id;
-
-            if (!grouped[leadId]) {
-              grouped[leadId] = [];
-            }
-
-            grouped[leadId].push(...data.lead.assignedUsers);
-          }
-          this.logger.log(`Grouped into ${Object.keys(grouped).length} leads`);
-
-          return grouped;
-        }),
+        map((jobIds) => [...new Set(jobIds)]),
         switchMap((mergedData) =>
           from(this.processLeadAssignment(mergedData)).pipe(
             catchError((error) => {
@@ -79,7 +62,7 @@ export class AssignedUsersConsumer extends WorkerHost {
           }
         },
         error: (error) => {
-          this.logger.error('Error in update$ observable chain:', error);
+          this.logger.error('Error in leadIds$ observable chain:', error);
         },
       });
   }
@@ -88,16 +71,16 @@ export class AssignedUsersConsumer extends WorkerHost {
   async onApplicationShutdown(signal?: string) {
     this.logger.log(`Shutting down with signal: ${signal}`);
     this.subscription.unsubscribe();
-    this.update$.complete();
+    this.leadIds$.complete();
   }
 
   onModuleDestroy() {
     this.logger.log('Module destroying - cleaning up subscriptions');
     this.subscription.unsubscribe();
-    this.update$.complete();
+    this.leadIds$.complete();
   }
 
-  async processLeadAssignment(mergedData: Record<string, AssignedByMapper[]>) {
+  async processLeadAssignment(leadIds: number[]) {
     try {
       // Define priority order for each category
       const solutionConsultantPriority = [
@@ -120,27 +103,33 @@ export class AssignedUsersConsumer extends WorkerHost {
       ];
       const isvPriority = ['ISV Full Serv $'];
 
-      for (const [leadId, assignedUsers] of Object.entries(mergedData)) {
+      for (const leadId of leadIds) {
+        const req = await this.client.get<LeadUsersAssignedResponse>(
+          `/api/v1/leads/${leadId}/users`
+        );
+
+        const assignedUsers = req.data.data;
+
         // Find the highest priority user for each category
-        const solutionConsultantUser = this.findHighestPriorityUser(
+        const solutionConsultantUser = this.findHighestPriorityUserIrisApi(
           assignedUsers || [],
           solutionConsultantPriority
         );
-        let referralPartnerUser = this.findHighestPriorityUser(
+        let referralPartnerUser = this.findHighestPriorityUserIrisApi(
           assignedUsers || [],
           referralPartnerPriority
         );
-        const resellerUser = this.findHighestPriorityUser(
+        const resellerUser = this.findHighestPriorityUserIrisApi(
           assignedUsers || [],
           resellerPriority
         );
-        const isvUser = this.findHighestPriorityUser(
+        const isvUser = this.findHighestPriorityUserIrisApi(
           assignedUsers || [],
           isvPriority
         );
 
         // If the referral partner is not found in the assigned users, try to fetch it from the lead details and get from the source
-        if (!referralPartnerUser?.name) {
+        if (!referralPartnerUser?.full_name) {
           referralPartnerUser = (await this.getLeadSource(leadId)) || undefined;
         }
 
@@ -186,19 +175,19 @@ export class AssignedUsersConsumer extends WorkerHost {
             fields: [
               {
                 id: codeMap.consultant,
-                value: solutionConsultantUser?.name || '',
+                value: solutionConsultantUser?.full_name || '',
               },
               {
                 id: codeMap.partner,
-                value: referralPartnerUser?.name || '',
+                value: referralPartnerUser?.full_name || '',
               },
               {
                 id: codeMap.reseller,
-                value: resellerUser?.name || '',
+                value: resellerUser?.full_name || '',
               },
               {
                 id: codeMap.isv,
-                value: isvUser?.name || '',
+                value: isvUser?.full_name || '',
               },
             ],
           })
@@ -208,19 +197,19 @@ export class AssignedUsersConsumer extends WorkerHost {
           fields: [
             {
               id: codeMap.consultant,
-              value: solutionConsultantUser?.name || '',
+              value: solutionConsultantUser?.full_name || '',
             },
             {
               id: codeMap.partner,
-              value: referralPartnerUser?.name || '',
+              value: referralPartnerUser?.full_name || '',
             },
             {
               id: codeMap.reseller,
-              value: resellerUser?.name || '',
+              value: resellerUser?.full_name || '',
             },
             {
               id: codeMap.isv,
-              value: isvUser?.name || '',
+              value: isvUser?.full_name || '',
             },
           ],
         });
@@ -247,10 +236,10 @@ export class AssignedUsersConsumer extends WorkerHost {
         ...job.data,
       })
     );
-    if (!this.update$.closed) {
-      this.update$.next(job.data);
+    if (!this.leadIds$.closed) {
+      this.leadIds$.next(job.data.data.lead.id);
     } else {
-      this.logger.error('update$ subject is closed, cannot process job');
+      this.logger.error('leadIds$ subject is closed, cannot process job');
       throw new Error('Processor is shutting down');
     }
   }
@@ -283,9 +272,35 @@ export class AssignedUsersConsumer extends WorkerHost {
     );
   };
 
-  public async getLeadSource(
-    leadId: string
-  ): Promise<LeadUserAssignedSource | null> {
+  public findHighestPriorityUserIrisApi = (
+    users: AssignedUser[],
+    priorityOrder: string[]
+  ): AssignedUser | undefined => {
+    return users.reduce<AssignedUser | undefined>(
+      (highestPriorityUser, user) => {
+        if (!user?.class || !user?.id) return highestPriorityUser;
+
+        const priorityIndex = priorityOrder.indexOf(user.class);
+        if (priorityIndex !== -1) {
+          const highestPriorityIndex = highestPriorityUser?.class
+            ? priorityOrder.indexOf(highestPriorityUser.class)
+            : Infinity;
+
+          if (
+            priorityIndex < highestPriorityIndex ||
+            (priorityIndex === highestPriorityIndex &&
+              user.id < (highestPriorityUser?.id || Infinity))
+          ) {
+            return user;
+          }
+        }
+        return highestPriorityUser;
+      },
+      undefined
+    );
+  };
+
+  public async getLeadSource(leadId: number): Promise<AssignedUser | null> {
     try {
       const req = await this.client.get<LeadDetailResponse>(
         `/api/v1/leads/${leadId}`
@@ -294,7 +309,7 @@ export class AssignedUsersConsumer extends WorkerHost {
       const keywords = ['Referral Partner -', 'FI -'];
 
       return source && keywords.some((keyword) => source.includes(keyword))
-        ? { name: source }
+        ? { full_name: source }
         : null;
     } catch (error) {
       this.logger.error(error);
