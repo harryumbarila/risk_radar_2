@@ -4,3 +4,7 @@ export function formatCurrency(amount: number) {
     currency: 'USD',
   }).format(amount);
 }
+
+export function parseCurrency(value: string): number {
+  return Number.parseFloat(value.replace(/,/g, ''));
+}

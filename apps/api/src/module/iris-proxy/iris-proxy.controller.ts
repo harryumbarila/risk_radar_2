@@ -19,6 +19,7 @@ import {
 import type { LeadUserAssignedOutputDto } from './dto';
 import { LeadUserAssignedInputDto } from './dto';
 import { IrisProxyService } from './iris-proxy.service';
+import { LeadStatusUpdatedInputDto } from './dto/lead-status-updated.dto';
 
 export type IrisProxyControllerConfig = {
   IRIS_ENV: string;
@@ -83,6 +84,26 @@ export class IrisProxyController {
       return { success: true };
     }
     return this.irisProxyService.leadAssignmentWebhook(payload);
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'The lead sources response.',
+  })
+  @ApiOperation({
+    operationId: 'lead-equipment-webhook',
+    summary: 'Webhook for assigned leads',
+  })
+  @Public()
+  @Post('lead-equipment-webhook')
+  public async leadEquipmentWebhook(
+    @Body() payload: LeadStatusUpdatedInputDto
+  ): Promise<LeadUserAssignedOutputDto> {
+    // Iris health check
+    if (payload?.hook?.event === 'subscription.test') {
+      return { success: true };
+    }
+    return this.irisProxyService.leadEquipmentWebhook(payload);
   }
 
   /**
