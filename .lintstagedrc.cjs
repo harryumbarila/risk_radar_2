@@ -3,7 +3,7 @@ module.exports = {
     'prettier --write',
   ],
   '{.prettierrc,.eslintrc,.releaserc,.commitlintrc}': ['prettier --write'],
-  '**/!(*generated).{ts,tsx}': ['yarn eslint --max-warnings=0 --fix'],
+  '**/!(*generated).{ts,tsx}': ['yarn eslint --max-warnings=0 --no-warn-ignored --fix'],
   '**/package.json': (filenames) =>
     `yarn syncpack format --source ${filenames.join(' --source ')}`,
 };
