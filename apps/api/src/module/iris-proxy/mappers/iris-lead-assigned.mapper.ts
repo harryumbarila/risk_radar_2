@@ -106,6 +106,13 @@ export class AssignedByMapper implements AssignedBy {
   })
   public email?: string;
 
+  @ApiPropertyOptional({
+    description: 'User status',
+    example: 'active',
+    type: String,
+  })
+  public status?: string;
+
   public constructor(values: AssignedBy) {
     Object.assign(this, values);
   }
@@ -116,6 +123,7 @@ export class AssignedByMapper implements AssignedBy {
       name: assignedBy.name,
       userClass: assignedBy.userClass,
       email: assignedBy.email,
+      status: assignedBy.status,
     });
   }
 }
