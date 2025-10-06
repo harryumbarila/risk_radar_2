@@ -31,7 +31,7 @@ import { isAxiosError } from 'axios';
 export class AssignedUsersConsumer extends WorkerHost {
   private readonly logger = new Logger(AssignedUsersConsumer.name);
   private leadIds$ = new Subject<number>();
-  private windowsMS = 5_000;
+  private windowsMS = 60_000;
   private subscription: Subscription; // Track the subscription
 
   constructor(
