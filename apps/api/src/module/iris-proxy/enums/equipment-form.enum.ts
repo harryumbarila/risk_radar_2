@@ -1,6 +1,7 @@
 import { IrisEnv } from '@/api/shared/constanst/iris';
 
 export enum EquipmentFormFields {
+  ID = 'ID',
   FDEquipment1 = 'FD Equipment',
   TSYSEquipment1 = 'TSYS Equipment',
 
@@ -42,6 +43,8 @@ export const EquipmentFormTab: Record<
   Record<EquipmentFormFields, number | null>
 > = {
   staging: {
+    [EquipmentFormFields.ID]: 51,
+
     [EquipmentFormFields.FDEquipment1]: 6854,
     [EquipmentFormFields.TSYSEquipment1]: 7217,
     [EquipmentFormFields.PurchasePrice1]: 7915,
@@ -72,6 +75,8 @@ export const EquipmentFormTab: Record<
     [EquipmentFormFields.MonthlyRentalTotal]: 7964,
   },
   prod: {
+    [EquipmentFormFields.ID]: 56,
+
     [EquipmentFormFields.FDEquipment1]: 6887,
     [EquipmentFormFields.TSYSEquipment1]: 6885,
     [EquipmentFormFields.PurchasePrice1]: 7856,
