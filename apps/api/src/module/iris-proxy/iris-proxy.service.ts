@@ -1,26 +1,30 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
+import { ConfigService } from '@nestjs/config';
 
 import axios from 'axios';
 import { Queue } from 'bullmq';
 
-import { IrisClient } from '@/api/shared/module/iris/iris.client';
 import type { LeadDetailResponse } from '@/shared/response';
 import type { IrisBasicInfoResponseDto } from '@/shared/response/iris-proxy';
 
-import type {
-  LeadUserAssignedInputDto,
-  LeadUserAssignedOutputDto,
-} from './dto';
-import { LeadStatusUpdatedInputDto } from './dto/lead-status-updated.dto';
+import { IrisClient } from '@/api/shared/module/iris/iris.client';
 import { extractMappedValues } from '@/api/utils/extract-iris-field';
+import { IrisEnv } from '@/api/shared/constanst/iris';
+
+import { LeadStatusFields, LeadStatusTab } from './enums/lead-status.enum';
 import {
   EquipmentFormFields,
   EquipmentFormTab,
 } from './enums/equipment-form.enum';
-import { IrisEnv } from '@/api/shared/constanst/iris';
-import { ConfigService } from '@nestjs/config';
+
 import { parseCurrency } from '@/api/utils/number';
+
+import type {
+  LeadUserAssignedInputDto,
+  LeadUserAssignedOutputDto,
+  LeadStatusUpdatedInputDto,
+} from './dto';
 
 @Injectable()
 export class IrisProxyService {
@@ -64,6 +68,14 @@ export class IrisProxyService {
       const req = await this.client.get<LeadDetailResponse>(
         `/api/v1/leads/${leadId}`
       );
+      const leadStatusTab = LeadStatusTab[currentEnv];
+
+      const status = req.data.general?.status?.id;
+
+      if (status !== leadStatusTab[LeadStatusFields.PROSPECTING]) {
+        return { success: true };
+      }
+
       const equipmentFieldIds = EquipmentFormTab[currentEnv];
 
       const equipmentFormTab = req.data.details.find(
