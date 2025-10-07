@@ -48,6 +48,14 @@ export class IrisProxyService {
     try {
       const leadId = payload.data.lead.id;
 
+      this.logger.log(
+        JSON.stringify({
+          msg: 'lead-equipment-webhook',
+          status: `started for lead ${leadId}`,
+          payload,
+        })
+      );
+
       const currentEnv = this.configService.get<IrisEnv>('IRIS_ENV', 'prod');
 
       const req = await this.client.get<LeadDetailResponse>(
@@ -120,6 +128,31 @@ export class IrisProxyService {
           'RentalPrice3',
           'QuantityR3',
         ]
+      );
+
+      this.logger.log(
+        JSON.stringify({
+          msg: 'lead-equipment-webhook',
+          leadId,
+          FDEquipment1,
+          TSYSEquipment1,
+          PurchasePrice1,
+          QuantityP1,
+          RentalPrice1,
+          QuantityR1,
+          FDEquipment2,
+          TSYSEquipment2,
+          PurchasePrice2,
+          QuantityP2,
+          RentalPrice2,
+          QuantityR2,
+          FDEquipment3,
+          TSYSEquipment3,
+          PurchasePrice3,
+          QuantityP3,
+          RentalPrice3,
+          QuantityR3,
+        })
       );
 
       let purchaseTotalSum = 0;
@@ -257,6 +290,13 @@ export class IrisProxyService {
         monthlyRentalTotalSum += rentalTotal3;
       }
 
+      this.logger.log(
+        JSON.stringify({
+          msg: 'lead-equipment-webhook',
+          updatedFields,
+        })
+      );
+
       await this.client.patch(`/api/v1/leads/${leadId}`, {
         fields: [
           ...updatedFields,
@@ -270,6 +310,13 @@ export class IrisProxyService {
           },
         ],
       });
+
+      this.logger.log(
+        JSON.stringify({
+          msg: 'lead-equipment-webhook',
+          status: `ended for lead ${leadId}`,
+        })
+      );
 
       return { success: true };
     } catch (error) {
