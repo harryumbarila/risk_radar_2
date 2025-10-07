@@ -56,7 +56,10 @@ export class IrisProxyService {
         })
       );
 
-      const currentEnv = this.configService.get<IrisEnv>('IRIS_ENV', 'prod');
+      const currentEnv = this.configService.get<IrisEnv>(
+        'IRIS_ENV',
+        'production'
+      );
 
       const req = await this.client.get<LeadDetailResponse>(
         `/api/v1/leads/${leadId}`

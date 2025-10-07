@@ -1,4 +1,4 @@
-export type IrisEnv = 'staging' | 'prod';
+export type IrisEnv = 'staging' | 'production';
 
 export interface IrisField {
   id: number;
