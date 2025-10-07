@@ -74,7 +74,7 @@ export const EquipmentFormTab: Record<
     [EquipmentFormFields.PurchaseTotal]: 7918,
     [EquipmentFormFields.MonthlyRentalTotal]: 7964,
   },
-  prod: {
+  production: {
     [EquipmentFormFields.ID]: 56,
 
     [EquipmentFormFields.FDEquipment1]: 6887,
