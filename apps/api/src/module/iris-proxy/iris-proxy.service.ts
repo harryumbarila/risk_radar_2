@@ -61,10 +61,12 @@ export class IrisProxyService {
       const req = await this.client.get<LeadDetailResponse>(
         `/api/v1/leads/${leadId}`
       );
-
-      const equipmentFormTab = req.data.details.find((d) => d.id === 51);
-
       const equipmentFieldIds = EquipmentFormTab[currentEnv];
+
+      const equipmentFormTab = req.data.details.find(
+        (d) => d.id === equipmentFieldIds[EquipmentFormFields.ID]
+      );
+
       if (!equipmentFormTab) return;
       const {
         FDEquipment1,
