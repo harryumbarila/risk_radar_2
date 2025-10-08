@@ -45,4 +45,22 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Run npm audit
-        run: yarn audit --level high --recursive
+        run: |
+          # Run audit with JSON output to parse results
+          AUDIT_JSON=$(yarn audit --level high --recursive --json 2>/dev/null || echo "")
+
+          # Extract vulnerability counts from JSON
+          HIGH_COUNT=$(echo "$AUDIT_JSON" | grep '"high"' | wc -l || echo "0")
+          CRITICAL_COUNT=$(echo "$AUDIT_JSON" | grep '"critical"' | wc -l || echo "0")
+
+          # Show audit results
+          yarn audit --level high --recursive
+
+          # Fail only if there are high or critical vulnerabilities
+          if [ "$HIGH_COUNT" -gt 0 ] || [ "$CRITICAL_COUNT" -gt 0 ]; then
+            echo "❌ Found $HIGH_COUNT high and $CRITICAL_COUNT critical vulnerabilities!"
+            exit 1
+          else
+            echo "✅ No high or critical vulnerabilities found."
+            exit 0
+          fi
