@@ -57,9 +57,11 @@ jobs:
 
       - name: Run tests unit
         run: yarn test:unit
+        timeout-minutes: 10
 
       - name: Run tests e2e
         run: yarn test:e2e
+        timeout-minutes: 15
 
       - name: Create WEB .env file
         run: |

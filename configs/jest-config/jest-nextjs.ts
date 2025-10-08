@@ -17,6 +17,9 @@ const createJestConfig = (config = {}) => {
       '.+\\.(css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$':
         'jest-transform-stub',
     },
+    testTimeout: 30000,
+    forceExit: true,
+    detectOpenHandles: true,
   };
 
   if (collectCoverage) {
