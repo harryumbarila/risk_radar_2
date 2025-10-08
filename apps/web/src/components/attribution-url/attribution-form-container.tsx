@@ -1,17 +1,15 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { useUsersData } from '@/hooks/attribution-url/use-users-data';
 import type { IrisBasicInfoResponseDto } from '@/shared/response/iris-proxy';
 import type { FormValues } from '@/types/attribution-url';
-import { GenerationFormMode } from '@/types/attribution-url';
 
 import type { AutoSelectOption } from './auto-select-field';
 import { AutoSelectField } from './auto-select-field';
 import { SubmitButton } from './submit-button';
 
 type AttributionFormContainerProps = {
-  generationMode: GenerationFormMode;
   canWrite: boolean;
   updateSelectedPartnerName: (partnerName: string) => void;
   leadData?: IrisBasicInfoResponseDto;
@@ -22,7 +20,6 @@ type AttributionFormContainerProps = {
 export const AttributionFormContainer: React.FC<
   AttributionFormContainerProps
 > = ({
-  generationMode,
   canWrite,
   leadData,
   isLoading,
@@ -35,7 +32,6 @@ export const AttributionFormContainer: React.FC<
     formState: { errors, isDirty },
     trigger,
     control,
-    clearErrors,
   } = useFormContext<FormValues>();
 
   const { data: usersData, isLoading: usersLoading } = useUsersData();
@@ -123,13 +119,6 @@ export const AttributionFormContainer: React.FC<
       }))
     : [];
 
-  // Clear existingLeadId error when not in EXISTING_LEAD mode
-  useEffect(() => {
-    if (generationMode !== GenerationFormMode.EXISTING_LEAD) {
-      clearErrors('existingLeadId');
-    }
-  }, [generationMode, clearErrors]);
-
   return (
     <>
       {/* IRIS User (Controller) */}
@@ -150,7 +139,7 @@ export const AttributionFormContainer: React.FC<
               await handleIrisUserChange(v);
             }}
             loading={usersLoading}
-            disabled={usersLoading || irisUserOptions.length <= 1}
+            disabled={usersLoading}
           />
         )}
       />
@@ -170,7 +159,7 @@ export const AttributionFormContainer: React.FC<
             value={field.value || ''}
             onChange={(v) => field.onChange(v)}
             loading={usersLoading}
-            disabled={usersLoading || (channels?.length ?? 0) <= 1}
+            disabled={usersLoading}
           />
         )}
       />
@@ -188,7 +177,7 @@ export const AttributionFormContainer: React.FC<
             value={field.value || ''}
             onChange={(v) => field.onChange(v)}
             loading={usersLoading}
-            disabled={usersLoading || (rslOptions?.length ?? 0) <= 1}
+            disabled={usersLoading}
           />
         )}
       />
@@ -209,56 +198,54 @@ export const AttributionFormContainer: React.FC<
               await handlePartnerChange(v);
             }}
             loading={usersLoading}
-            disabled={usersLoading || (partnerOptions?.length ?? 0) <= 1}
+            disabled={usersLoading}
           />
         )}
       />
 
       {/* Lead ID field */}
-      {generationMode === GenerationFormMode.EXISTING_LEAD && (
-        <div className="mb-4.5">
-          <label
-            className="mb-2.5 block text-black dark:text-white"
-            htmlFor="existingLeadId"
-          >
-            Lead ID
-            <span className="text-meta-1">*</span>
-          </label>
-          <input
-            id="existingLeadId"
-            {...register('existingLeadId', {
-              required: 'Lead ID is required',
-            })}
-            placeholder="Enter lead ID"
-            className={`w-full rounded border ${
-              errors.existingLeadId ? 'border-danger' : 'border-stroke'
-            } bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary`}
-          />
+      <div className="mb-4.5">
+        <label
+          className="mb-2.5 block text-black dark:text-white"
+          htmlFor="existingLeadId"
+        >
+          Lead ID
+          <span className="text-meta-1">*</span>
+        </label>
+        <input
+          id="existingLeadId"
+          {...register('existingLeadId', {
+            required: 'Lead ID is required',
+          })}
+          placeholder="Enter lead ID"
+          className={`w-full rounded border ${
+            errors.existingLeadId ? 'border-danger' : 'border-stroke'
+          } bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary`}
+        />
 
-          {leadData && !isLoading && (
-            <div className="mt-2 text-sm text-gray-500 italic">
-              <p>
-                Creating URL for <b>{leadData.dbaName}</b> with contact
-                information: <b>{leadData.contactPhone}</b> /{' '}
-                <b>{leadData.contactEmail}</b>
-              </p>
-            </div>
-          )}
+        {leadData && !isLoading && (
+          <div className="mt-2 text-sm text-gray-500 italic">
+            <p>
+              Creating URL for <b>{leadData.dbaName}</b> with contact
+              information: <b>{leadData.contactPhone}</b> /{' '}
+              <b>{leadData.contactEmail}</b>
+            </p>
+          </div>
+        )}
 
-          {isDirty && !leadData && !isLoading && (
-            <div className="mt-2 text-sm text-danger">
-              There is no lead data for the provided lead ID. Please check the
-              lead ID and try again.
-            </div>
-          )}
+        {isDirty && !leadData && !isLoading && (
+          <div className="mt-2 text-sm text-danger">
+            There is no lead data for the provided lead ID. Please check the
+            lead ID and try again.
+          </div>
+        )}
 
-          {errors.existingLeadId && (
-            <span className="text-sm text-danger">
-              {errors.existingLeadId.message}
-            </span>
-          )}
-        </div>
-      )}
+        {errors.existingLeadId && (
+          <span className="text-sm text-danger">
+            {errors.existingLeadId.message}
+          </span>
+        )}
+      </div>
 
       <SubmitButton
         isLoading={isLoading}
