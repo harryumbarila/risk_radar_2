@@ -2,13 +2,12 @@
 
 import { Breadcrumb, showNotification } from '@denali/ui';
 import { useAuth } from '@frontegg/nextjs';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useDebounce } from 'use-debounce';
 
 import { AttributionFormContainer } from '@/components/attribution-url/attribution-form-container';
 import { AttributionResult } from '@/components/attribution-url/attribution-result';
-import { GenerationModeSelector } from '@/components/attribution-url/generation-mode-selector';
 import { DefaultLayout } from '@/components/layouts/default-layout';
 import { clientConfig } from '@/config/client';
 import { useLeadBasicInfo } from '@/hooks/attribution-url/use-lead-basic-info';
@@ -18,7 +17,6 @@ import type {
   AttributionDataPayload,
   FormValues,
 } from '@/types/attribution-url';
-import { GenerationFormMode } from '@/types/attribution-url';
 import { permissions } from '@/types/permissions';
 
 const AttributionUrl: React.FC = () => {
@@ -29,7 +27,6 @@ const AttributionUrl: React.FC = () => {
 
   const methods = useForm<FormValues>({
     defaultValues: {
-      generationMode: GenerationFormMode.EXISTING_LEAD,
       existingLeadId: '',
       irisUser: '',
       channel: '',
@@ -39,8 +36,7 @@ const AttributionUrl: React.FC = () => {
     mode: 'onChange',
   });
 
-  const { watch, handleSubmit, setValue } = methods;
-  const generationMode = watch('generationMode');
+  const { watch, handleSubmit } = methods;
 
   // Get lead basic info to validate
   const leadId = watch('existingLeadId');
@@ -83,9 +79,7 @@ const AttributionUrl: React.FC = () => {
       }
     }
 
-    if (data.generationMode === GenerationFormMode.EXISTING_LEAD) {
-      attributionData.lead_id = data.existingLeadId;
-    }
+    attributionData.lead_id = data.existingLeadId;
 
     return attributionData;
   };
@@ -121,17 +115,6 @@ const AttributionUrl: React.FC = () => {
     setSelectedPartnerName(partnerName);
   };
 
-  // Handle generation mode change
-  const handleModeChange = (mode: GenerationFormMode): void => {
-    setValue('generationMode', mode);
-    setValue('existingLeadId', '');
-    setGeneratedLink('');
-  };
-
-  const isDisabled = useMemo(() => {
-    return generationMode === GenerationFormMode.EXISTING_LEAD && !isValidLead;
-  }, [generationMode, isValidLead]);
-
   return (
     <DefaultLayout>
       <Breadcrumb pageName="Attribution URL Generator" />
@@ -144,18 +127,12 @@ const AttributionUrl: React.FC = () => {
         <div className="p-6.5">
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
-              <GenerationModeSelector
-                generationMode={generationMode}
-                onModeChange={handleModeChange}
-              />
-
               <AttributionFormContainer
-                generationMode={generationMode}
                 canWrite={forResource('ATTRIBUTION_LINK').canWrite}
                 updateSelectedPartnerName={updateSelectedPartnerName}
                 leadData={leadBasicInfoData}
                 isLoading={isLeadBasicInfoLoading}
-                isDisabled={isDisabled}
+                isDisabled={!isValidLead}
               />
               {generatedLink && (
                 <AttributionResult generatedLink={generatedLink} />
