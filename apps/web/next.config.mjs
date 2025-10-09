@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-module.exports = {
+const nextConfig = {
   reactStrictMode: true,
   eslint: {
     ignoreDuringBuilds: !!process.env.CI,
@@ -10,3 +10,5 @@ module.exports = {
   },
   transpilePackages: ['@denali/shared', '@denali/ui'],
 };
+
+export default nextConfig;
