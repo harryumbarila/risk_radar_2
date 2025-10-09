@@ -99,6 +99,5 @@
     "test:cov": "cross-env COLLECT_COVERAGE=true jest --verbose --runInBand",
     "test:unit": "jest --verbose",
     "type-check": "tsc --noEmit"
-  },
-  "type": "module"
+  }
 }
