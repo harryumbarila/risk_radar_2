@@ -71,7 +71,7 @@ const NetSettlementPage: React.FC = () => {
         if (result.isConfirmed) {
           await removeTransaction(payload);
         }
-      } catch (error) {
+      } catch (_) {
         await Swal.fire({
           icon: 'error',
           title: 'Oops...',

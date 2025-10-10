@@ -56,13 +56,12 @@ const CommissionPage: React.FC = () => {
 
       const output = (await res.json()) as { ip: string };
       return output.ip;
-    } catch (err) {
+    } catch (_) {
       return '';
     }
   };
 
   useEffect(() => {
-     
     fetchCommissionFile({ page, limit });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);

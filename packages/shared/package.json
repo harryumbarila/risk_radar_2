@@ -19,7 +19,7 @@
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "ts-jest": "^29.4.4",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.3"
   },
   "main": "./src/index.ts",
   "private": true,
