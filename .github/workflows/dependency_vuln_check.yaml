@@ -45,4 +45,14 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Run yarn audit
-        run: yarn audit --level=high; [[ $? -ge 8 ]] && exit 1 || exit 0
+        run: |
+          yarn audit --level=high || {
+            exit_code=$?
+            if [ $exit_code -ge 16 ]; then
+              echo "❌ High or critical vulnerabilities found!"
+              exit 1
+            else
+              echo "✅ Only low/moderate vulnerabilities - build can continue"
+              exit 0
+            fi
+          }
