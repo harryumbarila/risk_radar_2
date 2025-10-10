@@ -3,7 +3,6 @@ import type { $NextraMetadata, Heading } from 'nextra';
 import { generateStaticParamsFor, importPage } from 'nextra/pages';
 import type { FC } from 'react';
 
-// eslint-disable-next-line no-restricted-imports
 import { useMDXComponents as getMDXComponents } from '../../../mdx-components';
 
 const Wrapper = getMDXComponents().wrapper;
@@ -32,12 +31,13 @@ const Page: FC<PageProps> = async ({ params: paramsPromise, ...props }) => {
     default: FC<PageProps>;
     toc: Heading[];
     metadata: $NextraMetadata;
+    sourceCode: string;
   };
 
-  const { default: MDXContent, toc, metadata } = result;
+  const { default: MDXContent, toc, metadata, sourceCode } = result;
 
   return (
-    <Wrapper toc={toc} metadata={metadata}>
+    <Wrapper toc={toc} metadata={metadata} sourceCode={sourceCode}>
       <MDXContent {...props} params={paramsPromise} />
     </Wrapper>
   );
