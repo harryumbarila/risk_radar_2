@@ -1,8 +1,3 @@
- 
- 
- 
- 
-
 'use client';
 
 import { Breadcrumb, Loader, Popover } from '@denali/ui';
@@ -664,7 +659,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
       // Refresh data
       refetch();
       notesRefetch();
-    } catch (error) {
+    } catch (_) {
       toast.error(`Error saving merchant data`);
     } finally {
       setIsSaving(false);
@@ -757,7 +752,7 @@ const RiskRadarMerchantPage: FC<Props> = ({ params }) => {
         text: `Sent to ${email}`,
         icon: 'success',
       });
-    } catch (error) {
+    } catch (_) {
       await Swal.fire({
         icon: 'error',
         title: 'Oops...',

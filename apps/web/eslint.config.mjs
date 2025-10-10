@@ -17,10 +17,6 @@ const eslintConfig = [
         ...globals.jest,
       },
     },
-    rules: {
-      'no-unused-vars': 'warn',
-      'no-undef': 'warn',
-    },
   },
   // Next.js core config
   ...compat.extends('next/core-web-vitals'),
@@ -63,9 +59,17 @@ const eslintConfig = [
       '@typescript-eslint': typescriptEslint,
     },
     rules: {
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
       '@typescript-eslint/explicit-module-boundary-types': 'error',
       '@typescript-eslint/no-empty-object-type': 'off',
-      '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
     },
   },
