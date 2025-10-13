@@ -21,7 +21,7 @@ env:
   FRONTEGG_BASE_URL: 'https://app-XXX.frontegg.com'
   FRONTEGG_CLIENT_ID: '550e8400-e29b-41d4-a716-446655440000'
   FRONTEGG_APP_ID: '123e4567-e89b-12d3-a456-426614174000'
-  FRONTEGG_ENCRYPTION_PASSWORD: 'a1b2c3d4e5f67890123456789abcdef01234567890abcdef1234567890abcdef'
+  FRONTEGG_ENCRYPTION_PASSWORD: 'b4dc6f649655acc89987a63cf4044e36cd821e0f345007e656641dd26d6424a6'
   FRONTEGG_COOKIE_NAME: 'fe_session'
   FRONTEGG_HOSTED_LOGIN: true
   FRONTEGG_LOG_LEVEL: 'debug'
@@ -102,6 +102,20 @@ jobs:
 
       - name: Run ls-lint
         run: yarn ls-lint
+
+      - name: Create WEB .env file
+        run: |
+          echo "🔧 Creating .env file for WEB app..."
+          cat <<EOF > apps/web/.env
+          FRONTEGG_APP_URL=${FRONTEGG_APP_URL}
+          FRONTEGG_BASE_URL=${FRONTEGG_BASE_URL}
+          FRONTEGG_CLIENT_ID=${FRONTEGG_CLIENT_ID}
+          FRONTEGG_APP_ID=${FRONTEGG_APP_ID}
+          FRONTEGG_ENCRYPTION_PASSWORD=${FRONTEGG_ENCRYPTION_PASSWORD}
+          FRONTEGG_COOKIE_NAME=${FRONTEGG_COOKIE_NAME}
+          FRONTEGG_HOSTED_LOGIN=${FRONTEGG_HOSTED_LOGIN}
+          FRONTEGG_LOG_LEVEL=${FRONTEGG_LOG_LEVEL}
+          EOF
 
       - name: Run Checks
         env:

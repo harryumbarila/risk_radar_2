@@ -1,5 +1,5 @@
 # Stage 1: Install dependencies (leverages caching)
-FROM node:22-alpine3.21 as deps
+FROM node:22-alpine3.21 AS deps
 
 ENV APP_WORKDIR=/var/www/html
 WORKDIR "${APP_WORKDIR}"
@@ -8,8 +8,10 @@ COPY package.json yarn.lock ./
 
 RUN yarn install --frozen-lockfile
 
+USER node
+
 # Stage 2: Turbo Prune (reduces unnecessary files before build)
-FROM node:22-alpine3.21 as pruner
+FROM node:22-alpine3.21 AS pruner
 
 ENV APP_WORKDIR=/var/www/html
 WORKDIR "${APP_WORKDIR}"
@@ -19,8 +21,10 @@ COPY package.json turbo.json yarn.lock ./
 
 RUN yarn turbo prune --scope=@denali/web --docker
 
+USER node
+
 # Stage 3: Build Web Application
-FROM node:22-alpine3.21 as builder-web
+FROM node:22-alpine3.21 AS builder-web
 
 ENV APP_WORKDIR=/var/www/html
 WORKDIR "${APP_WORKDIR}"
@@ -28,9 +32,9 @@ WORKDIR "${APP_WORKDIR}"
 COPY --from=pruner ${APP_WORKDIR}/ ./
 ADD dist.tgz ./
 
-ENV NPM_CONFIG_LOGLEVEL warn
-ENV CI true
-ENV HUSKY 0
+ENV NPM_CONFIG_LOGLEVEL=warn
+ENV CI=true
+ENV HUSKY=0
 
 RUN echo "FRONTEGG_ENCRYPTION_PASSWORD=5ab5578cbdad6d7937db3f8f8b3d7d1d32d115e4b6c03de1ce9dcea37cb1ca06" >> /var/www/html/apps/web/.env.local && \
   echo "FRONTEGG_APP_URL=http://localhost:3000" >> /var/www/html/apps/web/.env.local && \
@@ -42,10 +46,12 @@ RUN yarn turbo run build --filter=@denali/web
 
 RUN rm -rv /var/www/html/apps/web/.env* || true
 
+USER node
+
 # Stage 4: Final Runtime Image (Minimized)
 FROM node:22-alpine3.21
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 ENV APP_WORKDIR=/var/www/html
 WORKDIR "${APP_WORKDIR}"
 
