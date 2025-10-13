@@ -17,16 +17,6 @@ concurrency:
 
 env:
   CI: true
-  FRONTEGG_APP_URL: 'http://localhost:3000'
-  FRONTEGG_BASE_URL: 'https://app-XXX.frontegg.com'
-  FRONTEGG_CLIENT_ID: '550e8400-e29b-41d4-a716-446655440000'
-  FRONTEGG_APP_ID: '123e4567-e89b-12d3-a456-426614174000'
-  FRONTEGG_ENCRYPTION_PASSWORD: 'a1b2c3d4e5f67890123456789abcdef01234567890abcdef1234567890abcdef'
-  FRONTEGG_COOKIE_NAME: 'fe_session'
-  FRONTEGG_HOSTED_LOGIN: true
-  FRONTEGG_LOG_LEVEL: 'debug'
-  NEXT_PUBLIC_RISK_RADAR_BASE_URL: 'http://localhost:3000'
-  NEXT_PUBLIC_MERCHANT_BASE_URL: 'http://localhost:3000'
 
 jobs:
   container-job:
@@ -116,6 +106,16 @@ jobs:
           SNAP_PCC_DB_URL: mssql://sa:Stanley123!@localhost:1433/master?encrypt=false&trustServerCertificate=true
           REDIS_QUEUE_HOST: localhost
           REDIS_QUEUE_PORT: 6379
+          FRONTEGG_APP_URL: 'http://localhost:3000'
+          FRONTEGG_BASE_URL: 'https://app-XXX.frontegg.com'
+          FRONTEGG_CLIENT_ID: '550e8400-e29b-41d4-a716-446655440000'
+          FRONTEGG_APP_ID: '123e4567-e89b-12d3-a456-426614174000'
+          FRONTEGG_ENCRYPTION_PASSWORD: 'b4dc6f649655acc89987a63cf4044e36cd821e0f345007e656641dd26d6424a6'
+          FRONTEGG_COOKIE_NAME: 'fe_session'
+          FRONTEGG_HOSTED_LOGIN: true
+          FRONTEGG_LOG_LEVEL: 'debug'
+          NEXT_PUBLIC_RISK_RADAR_BASE_URL: 'http://localhost:3000'
+          NEXT_PUBLIC_MERCHANT_BASE_URL: 'http://localhost:3000'
         run: |
           yarn run lint type-check
           yarn test:unit
