@@ -40,7 +40,28 @@ export class IrisProxyService {
     payload: LeadUserAssignedInputDto
   ): Promise<LeadUserAssignedOutputDto> {
     try {
-      await this.assignedQueue.add('assigned-users', payload);
+      const leadId = payload.data.lead.id;
+      const timestamp = Date.now();
+
+      await this.assignedQueue.add('assigned-users', payload, {
+        removeOnComplete: {
+          age: 7 * 24 * 3600, // Remove jobs after 7 days
+          count: 150,
+        },
+        jobId: `assigned-${leadId}-immediate-${timestamp}`,
+      });
+
+      await this.assignedQueue.add('assigned-users', payload, {
+        delay: 60_000, // 1 minute delay
+        removeOnComplete: true,
+        jobId: `assigned-${leadId}-1min-${timestamp}`,
+      });
+
+      await this.assignedQueue.add('assigned-users', payload, {
+        delay: 1_800_000, // 30 minutes delay
+        removeOnComplete: true,
+        jobId: `assigned-${leadId}-30min-${timestamp}`,
+      });
       return { success: true };
     } catch (error) {
       this.logger.error(error);
