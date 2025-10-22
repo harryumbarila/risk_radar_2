@@ -26,6 +26,9 @@ import {
   LeadUsersAssignedResponse,
 } from '@/shared/response';
 import { isAxiosError } from 'axios';
+import { LeadDataFields, LeadDataTab } from '../enums/lead-data.enum';
+import { IrisEnv } from '@/api/shared/constanst/iris';
+import { extractMappedValues } from '@/api/utils/extract-iris-field';
 
 @Processor('assigned-users')
 export class AssignedUsersConsumer extends WorkerHost {
@@ -104,11 +107,13 @@ export class AssignedUsersConsumer extends WorkerHost {
       const isvPriority = ['ISV Full Serv $'];
 
       for (const leadId of leadIds) {
-        const req = await this.client.get<LeadUsersAssignedResponse>(
-          `/api/v1/leads/${leadId}/users`
-        );
-
-        const assignedUsers = req.data.data;
+        const [assignedUsersReq, leadReq] = await Promise.all([
+          await this.client.get<LeadUsersAssignedResponse>(
+            `/api/v1/leads/${leadId}/users`
+          ),
+          await this.client.get<LeadDetailResponse>(`/api/v1/leads/${leadId}`),
+        ]);
+        const assignedUsers = assignedUsersReq.data.data;
 
         // Find the highest priority user for each category
         const solutionConsultantUser = this.findHighestPriorityUserIrisApi(
@@ -147,76 +152,103 @@ export class AssignedUsersConsumer extends WorkerHost {
             2
           )
         );
+        const currentEnv = this.configService.get<IrisEnv>(
+          'IRIS_ENV',
+          'production'
+        );
 
-        // Prod Stag
-        // 8046	8438	Solution Consultant
-        // 8047	8439	Referral Partner
-        // 8048	8440	Reseller
-        // 8049	8441	ISV
+        const leadDataFieldIds = LeadDataTab[currentEnv];
 
-        const codeMap =
-          this.configService.get('IRIS_ENV') === 'staging'
-            ? {
-                consultant: '8438',
-                partner: '8439',
-                reseller: '8440',
-                isv: '8441',
-              }
-            : {
-                consultant: '8046',
-                partner: '8047',
-                reseller: '8048',
-                isv: '8049',
-              };
+        const leadDataTab = leadReq.data.details.find(
+          (d) => d.id === leadDataFieldIds[LeadDataFields.ID]
+        );
+
+        const { SolutionConsultant, ReferralPartner, Reseller, ISV } =
+          extractMappedValues(
+            leadDataTab.fields,
+            'id',
+            [
+              leadDataFieldIds[LeadDataFields.SolutionConsultant],
+              leadDataFieldIds[LeadDataFields.ReferralPartner],
+              leadDataFieldIds[LeadDataFields.Reseller],
+              leadDataFieldIds[LeadDataFields.ISV],
+            ],
+            ['SolutionConsultant', 'ReferralPartner', 'Reseller', 'ISV']
+          );
+
+        // Prepare new values
+        const newSolutionConsultant = solutionConsultantUser?.full_name || '';
+        const newReferralPartner = referralPartnerUser?.full_name || '';
+        const newReseller = resellerUser?.full_name || '';
+        const newISV = isvUser?.full_name || '';
+
+        const fieldsToUpdate = [
+          {
+            id: leadDataFieldIds[LeadDataFields.SolutionConsultant],
+            value: newSolutionConsultant,
+            changed: SolutionConsultant !== newSolutionConsultant,
+          },
+          {
+            id: leadDataFieldIds[LeadDataFields.ReferralPartner],
+            value: newReferralPartner,
+            changed: ReferralPartner !== newReferralPartner,
+          },
+          {
+            id: leadDataFieldIds[LeadDataFields.Reseller],
+            value: newReseller,
+            changed: Reseller !== newReseller,
+          },
+          {
+            id: leadDataFieldIds[LeadDataFields.ISV],
+            value: newISV,
+            changed: ISV !== newISV,
+          },
+        ]
+          .filter((field) => field.changed)
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          .map(({ changed, ...field }) => field);
+
+        // If no fields to update, skip the PATCH request
+        if (fieldsToUpdate.length === 0) {
+          this.logger.log(
+            JSON.stringify({
+              msg: 'lead-assigned-webhook',
+              status: `no changes detected for lead ${leadId}, skipping update`,
+              currentValues: {
+                SolutionConsultant,
+                ReferralPartner,
+                Reseller,
+                ISV,
+              },
+              newValues: {
+                SolutionConsultant: newSolutionConsultant,
+                ReferralPartner: newReferralPartner,
+                Reseller: newReseller,
+                ISV: newISV,
+              },
+            })
+          );
+          continue;
+        }
 
         this.logger.log(
           JSON.stringify({
             msg: 'lead-assigned-webhook',
-            fields: [
-              {
-                id: codeMap.consultant,
-                value: solutionConsultantUser?.full_name || '',
-              },
-              {
-                id: codeMap.partner,
-                value: referralPartnerUser?.full_name || '',
-              },
-              {
-                id: codeMap.reseller,
-                value: resellerUser?.full_name || '',
-              },
-              {
-                id: codeMap.isv,
-                value: isvUser?.full_name || '',
-              },
-            ],
+            fieldsToUpdate: fieldsToUpdate,
+            fieldsCount: fieldsToUpdate.length,
           })
         );
 
         await this.client.patch(`/api/v1/leads/${leadId}`, {
-          fields: [
-            {
-              id: codeMap.consultant,
-              value: solutionConsultantUser?.full_name || '',
-            },
-            {
-              id: codeMap.partner,
-              value: referralPartnerUser?.full_name || '',
-            },
-            {
-              id: codeMap.reseller,
-              value: resellerUser?.full_name || '',
-            },
-            {
-              id: codeMap.isv,
-              value: isvUser?.full_name || '',
-            },
-          ],
+          fields: fieldsToUpdate,
         });
+
         this.logger.log(
           JSON.stringify({
             msg: 'lead-assigned-webhook',
             status: `finished for lead ${leadId}`,
+            changesApplied: true,
+            updatedFieldsCount: fieldsToUpdate.length,
           })
         );
       }
