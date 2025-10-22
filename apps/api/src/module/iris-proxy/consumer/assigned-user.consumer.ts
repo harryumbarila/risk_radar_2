@@ -108,10 +108,10 @@ export class AssignedUsersConsumer extends WorkerHost {
 
       for (const leadId of leadIds) {
         const [assignedUsersReq, leadReq] = await Promise.all([
-          await this.client.get<LeadUsersAssignedResponse>(
+          this.client.get<LeadUsersAssignedResponse>(
             `/api/v1/leads/${leadId}/users`
           ),
-          await this.client.get<LeadDetailResponse>(`/api/v1/leads/${leadId}`),
+          this.client.get<LeadDetailResponse>(`/api/v1/leads/${leadId}`),
         ]);
         const assignedUsers = assignedUsersReq.data.data;
 
@@ -163,9 +163,11 @@ export class AssignedUsersConsumer extends WorkerHost {
           (d) => d.id === leadDataFieldIds[LeadDataFields.ID]
         );
 
+        const fields = leadDataTab?.fields || [];
+
         const { SolutionConsultant, ReferralPartner, Reseller, ISV } =
           extractMappedValues(
-            leadDataTab.fields,
+            fields,
             'id',
             [
               leadDataFieldIds[LeadDataFields.SolutionConsultant],
