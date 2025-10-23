@@ -46,8 +46,7 @@ const AttributionUrl: React.FC = () => {
   const { data: leadBasicInfoData, isLoading: isLeadBasicInfoLoading } =
     useLeadBasicInfo(debouncedLeadId);
 
-  const isValidLead =
-    leadBasicInfoData?.dbaName && leadBasicInfoData.contactPhone;
+  const isValidLead = leadBasicInfoData?.dbaName;
 
   const [generatedLink, setGeneratedLink] = React.useState('');
   const [selectedPartnerName, setSelectedPartnerName] =

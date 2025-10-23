@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { useUsersData } from '@/hooks/attribution-url/use-users-data';
@@ -119,6 +119,35 @@ export const AttributionFormContainer: React.FC<
       }))
     : [];
 
+  const leadDisplayName = useMemo(() => {
+    const leadContactInfo = [leadData?.contactPhone, leadData?.contactEmail]
+      .filter(Boolean)
+      .join(' / ');
+    const leadDisplayName = leadData?.dbaName;
+
+    if (!leadDisplayName) {
+      return (
+        <p className="text-danger">
+          No DBA name found for the provided lead ID.
+        </p>
+      );
+    }
+
+    return (
+      <p>
+        Creating URL for <b>{leadDisplayName}</b>
+        {leadContactInfo ? (
+          <>
+            {' '}
+            with contact information: <b>{leadContactInfo}</b>
+          </>
+        ) : (
+          <> without contact information</>
+        )}
+      </p>
+    );
+  }, [leadData]);
+
   return (
     <>
       {/* IRIS User (Controller) */}
@@ -225,11 +254,7 @@ export const AttributionFormContainer: React.FC<
 
         {leadData && !isLoading && (
           <div className="mt-2 text-sm text-gray-500 italic">
-            <p>
-              Creating URL for <b>{leadData.dbaName}</b> with contact
-              information: <b>{leadData.contactPhone}</b> /{' '}
-              <b>{leadData.contactEmail}</b>
-            </p>
+            {leadDisplayName}
           </div>
         )}
 

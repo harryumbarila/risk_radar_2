@@ -35,12 +35,25 @@ export class IrisClient {
   private readonly apiKey: string;
 
   public constructor(configService: ConfigService<IrisClientConfig>) {
+    const irisUrl = configService.get('IRIS_URL');
+    const irisApiKey = configService.get('IRIS_API_KEY');
+
+    if (!irisUrl) {
+      this.logger.error('IRIS_URL environment variable is not set');
+      throw new Error('IRIS_URL environment variable is required');
+    }
+
+    if (!irisApiKey) {
+      this.logger.error('IRIS_API_KEY environment variable is not set');
+      throw new Error('IRIS_API_KEY environment variable is required');
+    }
+
     this.client = axios.create({
-      baseURL: configService.get('IRIS_URL'),
+      baseURL: irisUrl,
       timeout: 10000,
     });
 
-    this.apiKey = configService.get('IRIS_API_KEY') || '';
+    this.apiKey = irisApiKey;
 
     // Add request interceptor for logging
     this.client.interceptors.request.use(
@@ -107,14 +120,12 @@ export class IrisClient {
       },
     };
 
-     
     for (const classId of classIds) {
       let currentPage = 1;
       let hasNextPage = true;
 
       while (hasNextPage) {
         try {
-           
           const response = await this.get<IrisUsersResponseDto>(
             `/api/v1/users/list?page=${currentPage}&per_page=${rowsPerPage}&sort_by=name&sort_dir=asc&class=${classId}&active=Yes`,
             {
