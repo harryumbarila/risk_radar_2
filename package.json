@@ -10,7 +10,6 @@
   "scripts": {
     "build": "turbo build",
     "commit": "git-cz",
-    "create-db-pkg": "node configs/toolkit/add-db-package.js",
     "dev": "turbo dev",
     "docs": "yarn workspace @denali/docs run dev-docs",
     "format": "prettier --write .",

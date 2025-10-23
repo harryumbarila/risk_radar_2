@@ -13,5 +13,4 @@ export const connectionOptions: DataSourceOptions = {
     disableAsciiToUnicodeParamConversion: true,
     appName: 'Denali',
   },
-  logging: ['query', 'error'],
 };
