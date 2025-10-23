@@ -72,7 +72,7 @@ export const formatDate = (
     if (!value) return DEFAULT_BLANK_VALUE;
 
     return formatInTimeZone(value, DEFAULT_TIME_ZONE, format);
-  } catch (error) {
+  } catch (_) {
     const parsedDate = parseDate(value);
     if (!parsedDate || !isValid(parsedDate)) return DEFAULT_BLANK_VALUE;
     return formatInTimeZone(parsedDate, DEFAULT_TIME_ZONE, format);

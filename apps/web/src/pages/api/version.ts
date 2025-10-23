@@ -35,7 +35,7 @@ export default function handler(
         created_at: '',
       });
     }
-  } catch (error) {
+  } catch (_) {
     // Return default version data in case of error
     res.status(200).json({
       version: '1.0.0',

@@ -12,6 +12,8 @@ COPY . .
 
 RUN yarn global add turbo && turbo prune --scope=@denali/api --docker
 
+USER node
+
 # Stage 2: Cache dependencies
 FROM base AS deps
 
@@ -24,6 +26,8 @@ COPY --from=prunner ${APP_DIR}/out/yarn.lock ./
 # Prefer offline install to avoid network download if possible
 RUN yarn install --frozen-lockfile --prefer-offline
 
+USER node
+
 # Stage 3: Cache only prod dependencies and clean cache for a lighter image
 FROM base AS prod-deps
 
@@ -35,6 +39,8 @@ COPY --from=prunner ${APP_DIR}/out/yarn.lock ./
 
 # Prefer offline install to avoid network download if possible
 RUN yarn install --frozen-lockfile --production --prefer-offline && yarn cache clean
+
+USER node
 
 # Stage 4: Build with the pruned dependencies & code
 FROM base AS builder
@@ -53,6 +59,8 @@ ENV CI=true
 RUN yarn turbo run build --filter=@denali/api
 RUN rm -rv ${APP_DIR}/apps/api/.env || true
 
+USER node
+
 # Stage 5: Runner (final image) 
 FROM base AS runner
 
@@ -67,4 +75,5 @@ COPY --from=prod-deps ${APP_DIR} ./
 
 ENV NODE_ENV=production
 
+USER node
 CMD ["node", "apps/api/dist/apps/api/src/main"]

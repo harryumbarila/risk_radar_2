@@ -3,21 +3,21 @@
   "version": "0.0.0",
   "dependencies": {
     "next": "15.5.4",
-    "nextra": "^4.2.17",
-    "nextra-theme-docs": "^4.2.17",
+    "nextra": "^4.6.0",
+    "nextra-theme-docs": "^4.6.0",
     "react": "19.1.1",
     "react-dom": "19.1.1"
   },
   "devDependencies": {
     "@denali/eslint-config": "*",
     "@denali/typescript-config": "*",
-    "eslint": "^9.36.0",
+    "eslint": "^9.38.0",
     "eslint-plugin-mdx": "^3.6.2"
   },
   "private": true,
   "scripts": {
     "build": "next build",
     "clean": "rimraf .next .turbo",
-    "dev-docs": "next dev --port 3005 "
+    "dev-docs": "next dev --port 3005"
   }
 }

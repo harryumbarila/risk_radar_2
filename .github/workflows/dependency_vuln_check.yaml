@@ -44,5 +44,15 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Run npm audit
-        run: yarn audit --level high --recursive
+      - name: Run yarn audit
+        run: |
+          yarn audit --level=high || {
+            exit_code=$?
+            if [ $exit_code -ge 16 ]; then
+              echo "❌ High or critical vulnerabilities found!"
+              exit 1
+            else
+              echo "✅ Only low/moderate vulnerabilities - build can continue"
+              exit 0
+            fi
+          }

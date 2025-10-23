@@ -1,4 +1,6 @@
-import createJestConfig from '@denali/jest-config/jest-nextjs';
+import type { Config } from 'jest';
+import nextJest from 'next/jest.js';
+
 import { pathsToModuleNameMapper } from 'ts-jest';
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -6,7 +8,13 @@ import { join } from 'path';
 const tsConfigPath = join(process.cwd(), 'tsconfig.json');
 const tsConfig = JSON.parse(readFileSync(tsConfigPath, 'utf-8'));
 
-const config = createJestConfig({
+const createJestConfig = nextJest({
+  dir: './',
+});
+
+const config: Config = {
+  coverageProvider: 'v8',
+  testEnvironment: 'jsdom',
   coverageThreshold: {
     global: {
       branches: 0,
@@ -20,6 +28,6 @@ const config = createJestConfig({
   moduleNameMapper: pathsToModuleNameMapper(tsConfig.compilerOptions.paths, {
     prefix: '<rootDir>/',
   }),
-});
+};
 
-export default config;
+export default createJestConfig(config);
