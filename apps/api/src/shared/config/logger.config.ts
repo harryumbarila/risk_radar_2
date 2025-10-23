@@ -9,6 +9,17 @@ export const loggerConfig = {
         return { level: label.toUpperCase() };
       },
     },
+    log: (object) => {
+      const now = process.hrtime.bigint();
+      const timestamp = new Date().toISOString();
+
+      return {
+        ...object,
+        '@timestamp': timestamp,
+        service_name: 'Denali',
+        timestamp_ns: now.toString(), // nanosecond precision
+      };
+    },
     // Define a custom request id function
     genReqId(req, res) {
       const existingID = req.id ?? req.headers['x-request-id'];
@@ -31,29 +42,27 @@ export const loggerConfig = {
       if (
         // eslint-disable-next-line no-restricted-properties
         process.env.NODE_ENV === 'production' &&
-        (res.statusCode === 404 || err.statusCode === 404)
+        (res.statusCode === 404 || err?.statusCode === 404)
       ) {
         return 'silent'; // Skip logging for 404
       }
-
       if (err && err.statusCode >= 400 && err.statusCode < 500) {
         return 'warn';
       }
-
       if (err && err.statusCode >= 500) {
         return 'error';
       }
-
-      if (res.statusCode && res.statusCode >= 500) {
+      if (res.statusCode >= 500) {
         return 'error';
       }
-
-      if (res.statusCode && res.statusCode >= 400) {
+      if (res.statusCode >= 400) {
         return 'warn';
       }
-
       return 'info';
     },
   },
-  exclude: [{ path: '/', method: RequestMethod.GET }],
+  exclude: [
+    { path: '/', method: RequestMethod.GET },
+    { path: '/status', method: RequestMethod.GET },
+  ],
 } as Params;
