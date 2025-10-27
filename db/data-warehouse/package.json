@@ -3,7 +3,7 @@
   "description": "TypeORM DataWarehouse database integration",
   "version": "0.0.0",
   "dependencies": {
-    "@nestjs/common": "^11.1.7",
+    "@nestjs/common": "^11.1.8",
     "@nestjs/typeorm": "^11.0.0",
     "@t3-oss/env-core": "^0.13.8",
     "mssql": "^12.0.0",
