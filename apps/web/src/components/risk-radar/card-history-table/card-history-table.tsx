@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unstable-nested-components */
 import { DataTable, DynamicCell, Loader } from '@denali/ui';
 import type { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';

@@ -58,6 +58,7 @@ export const WriteOff: React.FC<WriteOffProps> = (props) => {
     formState: { isValid, isSubmitting },
   } = methods;
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const { type } = watch();
 
   const onSubmit = async (data: HandleActionType): Promise<void> => {

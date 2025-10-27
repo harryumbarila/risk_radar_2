@@ -1,5 +1,5 @@
 import type { ApexOptions } from 'apexcharts';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { ApexChartWrapper } from './wrapper/apex-chart-wrapper';
 
@@ -124,7 +124,7 @@ type ChartOneState = {
 };
 
 export const ChartOne: React.FC = () => {
-  const [state, setState] = useState<ChartOneState>({
+  const [state] = useState<ChartOneState>({
     series: [
       {
         name: 'Product One',
@@ -137,16 +137,6 @@ export const ChartOne: React.FC = () => {
       },
     ],
   });
-
-  const handleReset = (): void => {
-    setState((prevState) => ({
-      ...prevState,
-    }));
-  };
-
-  useEffect(() => {
-    handleReset();
-  }, []);
 
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-8">

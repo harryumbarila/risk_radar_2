@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-import React from 'react';
+import React, { useId } from 'react';
 
 type TooltipPosition = 'top' | 'right' | 'bottom' | 'left';
 
@@ -24,7 +24,8 @@ export const Tooltip: React.FC<TooltipProps> = ({
   tooltipClassName,
   children,
 }) => {
-  const tooltipId = `tooltip-${Math.random().toString(36).substr(2, 9)}`;
+  const id = useId();
+  const tooltipId = `tooltip-${id}`;
 
   return (
     <div className="relative group inline-block" aria-describedby={tooltipId}>

@@ -1,5 +1,5 @@
 import type { ApexOptions } from 'apexcharts';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { ApexChartWrapper } from './wrapper/apex-chart-wrapper';
 
@@ -8,7 +8,7 @@ type ChartNineState = {
 };
 
 export const ChartNine: React.FC = () => {
-  const [state, setState] = useState<ChartNineState>({
+  const [state] = useState<ChartNineState>({
     series: [
       {
         data: [268, 385, 201, 298, 187, 195, 291],
@@ -18,18 +18,6 @@ export const ChartNine: React.FC = () => {
       },
     ],
   });
-
-  // Update the state
-  const updateState = (): void => {
-    setState((prevState) => ({
-      ...prevState,
-      // Update the desired properties
-    }));
-  };
-
-  useEffect(() => {
-    updateState();
-  }, []);
 
   const options: ApexOptions = {
     colors: ['#3C50E0', '#80CAEE'],

@@ -1,5 +1,5 @@
 import type { ApexOptions } from 'apexcharts';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { ApexChartWrapper } from './wrapper/apex-chart-wrapper';
 
@@ -8,21 +8,9 @@ type ChartEightState = {
 };
 
 export const ChartEight: React.FC = () => {
-  const [state, setState] = useState<ChartEightState>({
+  const [state] = useState<ChartEightState>({
     series: [70, 20, 10],
   });
-
-  // Update the state
-  const updateState = (): void => {
-    setState((prevState) => ({
-      ...prevState,
-      // Update the desired properties
-    }));
-  };
-
-  useEffect(() => {
-    updateState();
-  }, []);
 
   const options: ApexOptions = {
     chart: {

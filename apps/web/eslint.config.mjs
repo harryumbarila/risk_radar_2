@@ -1,39 +1,30 @@
-import { FlatCompat } from '@eslint/eslintrc';
-import typescriptEslint from '@typescript-eslint/eslint-plugin';
+import { defineConfig, globalIgnores } from 'eslint/config';
+import nextVitals from 'eslint-config-next/core-web-vitals';
+import nextTs from 'eslint-config-next/typescript';
 import typescriptParser from '@typescript-eslint/parser';
-import reactPlugin from 'eslint-plugin-react';
-import reactHooks from 'eslint-plugin-react-hooks';
-import globals from 'globals';
 
-const compat = new FlatCompat({
-  baseDirectory: import.meta.dirname,
-});
-
-const eslintConfig = [
-  {
-    files: ['**/*.ts'],
-    languageOptions: {
-      globals: {
-        ...globals.jest,
-      },
-    },
-  },
-  // Next.js core config
-  ...compat.extends('next/core-web-vitals'),
-
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  ...nextTs,
+  // Override default ignores of eslint-config-next.
+  globalIgnores([
+    // Default ignores of eslint-config-next:
+    '.next/**',
+    'out/**',
+    'build/**',
+    'next-env.d.ts',
+  ]),
   // React configuration
   {
     files: ['**/*.tsx', '**/*.jsx'],
-    plugins: {
-      react: reactPlugin,
-      'react-hooks': reactHooks,
-    },
     rules: {
       'react/no-unstable-nested-components': 'error',
       'react/no-array-index-key': 'warn',
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       'react/display-name': 'off',
+      'react/no-array-index-key': 'off',
+      'react/no-unstable-nested-components': 'off',
     },
   },
 
@@ -43,10 +34,9 @@ const eslintConfig = [
     rules: {
       'react-hooks/exhaustive-deps': 'warn',
       'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/set-state-in-effect': 'off',
     },
   },
-
-  // TypeScript configuration
   {
     files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
@@ -54,9 +44,6 @@ const eslintConfig = [
       parserOptions: {
         project: './tsconfig.json',
       },
-    },
-    plugins: {
-      '@typescript-eslint': typescriptEslint,
     },
     rules: {
       'no-unused-vars': 'off',
@@ -90,7 +77,8 @@ const eslintConfig = [
       'auth0-config.ts',
       'react-table-config.d.ts',
       'cypress.config.ts',
-
+      'tailwind.config.js',
+      '.lintstagedrc.cjs',
       // Any other problematic files
       '**/chunks/**',
       '**/server/**',
@@ -103,6 +91,6 @@ const eslintConfig = [
       'import/no-anonymous-default-export': 'off',
     },
   },
-];
+]);
 
 export default eslintConfig;

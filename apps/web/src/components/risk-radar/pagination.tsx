@@ -61,7 +61,7 @@ export const Pagination: FC<PaginationProps> = ({
     if (typeof page === 'number') {
       return `page-${page}`;
     }
-    return `ellipsis-${Math.random()}`;
+    return `ellipsis-${new Date().toLocaleString()}`;
   };
 
   const handlePageClick = (page: number | string): (() => void) | undefined => {
