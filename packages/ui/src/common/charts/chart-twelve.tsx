@@ -1,7 +1,7 @@
 'use client';
 
 import type { ApexOptions } from 'apexcharts';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { ApexChartWrapper } from './wrapper/apex-chart-wrapper';
 
@@ -13,7 +13,7 @@ type ChartTwelveState = {
 };
 
 export const ChartTwelve: React.FC = () => {
-  const [state, setState] = useState<ChartTwelveState>({
+  const [state] = useState<ChartTwelveState>({
     series: [
       {
         name: 'Total Investment',
@@ -252,18 +252,6 @@ export const ChartTwelve: React.FC = () => {
       },
     ],
   });
-
-  // Update the state
-  const updateState = (): void => {
-    setState((prevState) => ({
-      ...prevState,
-      // Update the desired properties
-    }));
-  };
-
-  useEffect(() => {
-    updateState();
-  }, []);
 
   const options: ApexOptions = {
     colors: ['#3C50E0'],

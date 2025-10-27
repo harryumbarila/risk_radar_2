@@ -1,5 +1,5 @@
 import type { ApexOptions } from 'apexcharts';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { ApexChartWrapper } from './wrapper/apex-chart-wrapper';
 
@@ -11,7 +11,7 @@ type ChartSevenState = {
 };
 
 export const ChartSeven: React.FC = () => {
-  const [state, setState] = useState<ChartSevenState>({
+  const [state] = useState<ChartSevenState>({
     series: [
       {
         name: 'Received Amount',
@@ -23,18 +23,6 @@ export const ChartSeven: React.FC = () => {
       },
     ],
   });
-
-  // Update the state
-  const updateState = (): void => {
-    setState((prevState) => ({
-      ...prevState,
-      // Update the desired properties
-    }));
-  };
-
-  useEffect(() => {
-    updateState();
-  }, []);
 
   const options: ApexOptions = {
     legend: {

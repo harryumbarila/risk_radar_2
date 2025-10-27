@@ -71,9 +71,9 @@ export const AppsIcon: FC<AppsIconProps> = () => {
           cursor: 'pointer',
         }}
       >
-        {Array.from({ length: 9 }).map(() => (
+        {Array.from({ length: 9 }, (_, v) => 0 + v).map((idx) => (
           <div
-            key={`google-apps-icon-${Math.random().toString(36).substr(2, 9)}`}
+            key={`google-apps-icon-${idx}`}
             style={{
               width: '2px',
               height: '2px',
