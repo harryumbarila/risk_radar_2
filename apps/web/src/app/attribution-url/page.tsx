@@ -39,6 +39,7 @@ const AttributionUrl: React.FC = () => {
   const { watch, handleSubmit } = methods;
 
   // Get lead basic info to validate
+  // eslint-disable-next-line react-hooks/incompatible-library
   const leadId = watch('existingLeadId');
   const [debouncedLeadId] = useDebounce(leadId, 800);
 

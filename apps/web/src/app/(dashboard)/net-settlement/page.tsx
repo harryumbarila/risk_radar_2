@@ -1,5 +1,3 @@
-/* eslint-disable react/no-unstable-nested-components */
-
 'use client';
 
 import {
@@ -53,6 +51,7 @@ const NetSettlementPage: React.FC = () => {
     mode: 'onChange',
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const { mid } = methods.watch();
 
   const onDeleteTransaction = useCallback(

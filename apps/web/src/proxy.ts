@@ -1,7 +1,7 @@
 import { handleSessionOnEdge } from '@frontegg/nextjs/edge';
 import type { NextRequest } from 'next/server';
 
-export const middleware = async (
+export const proxy = async (
   request: NextRequest
 ): Promise<Response | undefined> => {
   const { pathname, searchParams } = request.nextUrl;

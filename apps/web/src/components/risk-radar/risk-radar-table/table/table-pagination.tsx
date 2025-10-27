@@ -158,7 +158,7 @@ export const TablePagination: FC<TablePaginationProps> = ({
           ) : (
             <span
               // Its needed to avoid duplicate keys
-              // eslint-disable-next-line react/no-array-index-key
+
               key={`ellipsis-${p}-${index}`}
               className="mx-1 flex items-center justify-center p-1 px-3"
             >

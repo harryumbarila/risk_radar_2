@@ -4,6 +4,7 @@
  */
 const ImageResize = () => {
   if (document.querySelectorAll('#pane').length) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     ('use strict');
 
     // Minimum resizable area

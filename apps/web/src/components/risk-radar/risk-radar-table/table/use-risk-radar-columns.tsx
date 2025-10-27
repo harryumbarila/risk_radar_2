@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
- 
 import { useAuth } from '@frontegg/nextjs';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -31,7 +29,7 @@ export const useRiskRadarTableColumns = ({
   riskRadarUsers,
   onSubmit,
   isLoading,
-}: UseRiskRadarTableColumnsProps) => {
+}: UseRiskRadarTableColumnsProps): ColumnDef<RiskRadarExceptionsListRow>[] => {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const { user } = useAuth();
 
@@ -63,11 +61,11 @@ export const useRiskRadarTableColumns = ({
     [onSubmit, selectedIds]
   );
 
-  const handleReviewSubmit = useCallback(() => {
+  const handleReviewSubmit = useCallback((): void => {
     if (!user?.name) return;
 
     onSubmit(selectedIds, user.name);
-  }, [onSubmit, selectedIds, user?.name]);
+  }, [onSubmit, selectedIds, user]);
 
   useEffect(() => {
     setSelectedIds([]);
@@ -90,7 +88,7 @@ export const useRiskRadarTableColumns = ({
 
     const canBeReviewed = data.filter((item) => !item.sUserReviewed);
     const isAllSelected = canBeReviewed.length === selectedIds.length;
-     
+
     const getColumn = () => {
       switch (String(filters.status)) {
         case '1': // Not Reviewed
