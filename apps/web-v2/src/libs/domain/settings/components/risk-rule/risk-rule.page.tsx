@@ -12,7 +12,7 @@ import {
 } from '@chakra-ui/react';
 import { MdAdd } from 'react-icons/md';
 import AddParamValueDialog from '../add-risk-rule/add-risk-rule';
-import { $riskApi } from '@/libs/shared/api/risk.api';
+// import { $riskApi } from '@/libs/shared/api/risk.api';
 
 const mockRiskRules = {
   edges: [
@@ -181,24 +181,18 @@ export default function RiskRulePage() {
   const [selectedRule, setSelectedRule] = React.useState<RiskRule | null>(null);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
-  const { data, isLoading } = $riskApi.useQuery('get', '/v1/risk-rule', {
-    params: {
-      query: {
-        join: ['source', 'ruleType', 'parameters', 'parameters.values'],
-      },
-    },
-  });
-
-  console.log({ data, isLoading });
+  // const { data, isLoading } = $riskApi.useQuery('get', '/v1/risk-rule', {
+  //   params: {
+  //     query: {
+  //       join: ['source', 'ruleType', 'parameters', 'parameters.values'],
+  //     },
+  //   },
+  // });
 
   const handleAddParamValue = (rule: RiskRule) => {
     setSelectedRule(rule);
     setIsDialogOpen(true);
   };
-
-  console.log({
-    selectedRule,
-  });
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {

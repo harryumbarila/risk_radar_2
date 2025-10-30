@@ -61,7 +61,7 @@ export default function ReactQueryProvider({
       >
         {children}
       </NetworkStateContext.Provider>
-      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+      <ReactQueryDevtools initialIsOpen={false} />
     </PersistQueryClientProvider>
   );
 }
