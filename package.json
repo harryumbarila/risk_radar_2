@@ -8,6 +8,7 @@
     "db/*"
   ],
   "scripts": {
+    "add:component": "npx hygen component new",
     "build": "turbo build",
     "commit": "git-cz",
     "dev": "turbo dev",
@@ -39,6 +40,7 @@
     "cross-env": "^10.1.0",
     "cz-git": "^1.12.0",
     "dotenv-cli": "^10.0.0",
+    "enquirer": "^2.4.1",
     "git-cz": "^4.9.0",
     "husky": "^9.1.7",
     "jscodeshift": "^17.3.0",
