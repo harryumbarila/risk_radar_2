@@ -107,7 +107,6 @@ const columns = [
 ] as ColumnDef<MerchantTransaction>[];
 
 function CollapsibleContent(props: CollapsibleBodyProps<MerchantTransaction>) {
-  console.log({ props });
   return (
     <Box
       p={6}
@@ -131,7 +130,7 @@ function CollapsibleContent(props: CollapsibleBodyProps<MerchantTransaction>) {
           <Text fontWeight="normal" color="gray.500">
             Transaction ID
           </Text>
-          <Text fontWeight="bold">tx-001</Text>
+          <Text fontWeight="bold">{props.row.original.id}</Text>
         </VStack>
 
         <VStack align="start" gap={1}>

@@ -24,8 +24,7 @@ export const buttonRecipe = defineRecipe({
 });
 // ConfigRecipeSlots
 const theme = defineConfig({
-  cssVarsRoot: ':where(:root, :host)',
-  cssVarsPrefix: 'ts',
+  cssVarsPrefix: 'talus',
   theme: {
     tokens,
     recipes: {
@@ -41,6 +40,8 @@ const theme = defineConfig({
 });
 
 const config = mergeConfigs(defaultConfig, theme);
-const system = createSystem(config);
+const system = createSystem(config, {
+  disableLayers: true,
+});
 
 export default system;

@@ -41,7 +41,11 @@ const Login: React.FC = () => {
         />
         <Box minW={{ base: '90%', md: '468px' }}>
           <Stack gap={4} p="1rem">
-            <Button width="full" onClick={() => loginWithRedirect()}>
+            <Button
+              variant="outline"
+              width="full"
+              onClick={() => loginWithRedirect()}
+            >
               Login
             </Button>
           </Stack>

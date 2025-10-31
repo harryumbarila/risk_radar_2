@@ -28,6 +28,8 @@ export default function AuthHeader(): React.JSX.Element {
   const router = useRouter();
   const { user } = useAuth();
 
+  console.log({ user });
+
   const handleSignOut = React.useCallback(() => {
     router.replace('/account/logout');
   }, [router]);
