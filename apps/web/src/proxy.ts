@@ -1,9 +1,9 @@
 import { handleSessionOnEdge } from '@frontegg/nextjs/edge';
 import type { NextRequest } from 'next/server';
 
-export async function proxy(
+export const proxy = async (
   request: NextRequest
-): Promise<Response | undefined> {
+): Promise<Response | undefined> => {
   const { pathname, searchParams } = request.nextUrl;
   const { headers } = request;
 
@@ -15,8 +15,9 @@ export async function proxy(
   // shouldByPassMiddleware from getSessionOnEdge was moved under the hood of handleSessionOnEdge
 
   // Additional logic if needed
+
   return handleSessionOnEdge({ request, pathname, searchParams, headers });
-}
+};
 
 export const config = {
   matcher: [

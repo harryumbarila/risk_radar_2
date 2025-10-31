@@ -1,52 +1,46 @@
 'use client';
 
-import { Flex, Stack, Heading, Box, Button } from '@chakra-ui/react';
+import Image from 'next/image';
+import Link from 'next/link';
 import React from 'react';
 
+import { NoAuthLayout } from '@/components/layouts/no-auth-layout';
+
 const SignIn: React.FC = () => {
-  const handleClick = (): void => {
+  const handleClick = (event: React.MouseEvent<HTMLInputElement>): void => {
+    event.preventDefault();
     if (typeof window !== 'undefined') {
       window.location.assign('/api/auth/login');
     }
   };
 
   return (
-    <Flex
-      flexDirection="column"
-      width="100wh"
-      height="100vh"
-      backgroundColor="gray.200"
-      justifyContent="center"
-      alignItems="center"
-    >
-      <Stack
-        flexDir="column"
-        mb="2"
-        justifyContent="center"
-        alignItems="center"
-      >
-        <Heading color="teal.400">Welcome</Heading>
-        <Box minW={{ base: '90%', md: '468px' }}>
-          <Stack
-            gap={4}
-            p="1rem"
-            backgroundColor="whiteAlpha.900"
-            boxShadow="md"
-          >
-            <Button
-              borderRadius={0}
-              type="button"
-              variant="solid"
-              colorScheme="teal"
-              width="full"
-              onClick={handleClick}
-            >
-              Login
-            </Button>
-          </Stack>
-        </Box>
-      </Stack>
-    </Flex>
+    <NoAuthLayout>
+      <div className="flex flex-col items-center">
+        <Link className="mb-5.5 inline-block" href="/">
+          <Image
+            className="hidden dark:block"
+            src="/images/talus-only-logo.png"
+            alt="Denali Logo"
+            width={176}
+            height={32}
+          />
+          <Image
+            className="dark:hidden"
+            src="/images/talus-only-logo.png"
+            alt="Denali Logo"
+            width={176}
+            height={32}
+          />
+        </Link>
+        <input
+          type="submit"
+          value="Sign In"
+          onClick={handleClick}
+          className="w-32 cursor-pointer rounded-lg border border-primary bg-primary p-2 text-white transition hover:bg-opacity-90"
+        />
+      </div>
+    </NoAuthLayout>
   );
 };
 
