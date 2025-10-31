@@ -11,7 +11,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["AppController_getHello"];
+        get: operations["Version"];
         put?: never;
         post?: never;
         delete?: never;
@@ -20,17 +20,833 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/risk-rule/{id}": {
+    "/status": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Retrieve a single RiskRule */
-        get: operations["getOneBaseRiskRulesControllerRiskRule"];
+        get: operations["Status"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/legacy_dashboard_proxy/kpi": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get KPI statistics */
+        get: operations["kpi"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/legacy_dashboard_proxy/exception_data": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get exception data */
+        get: operations["exception_data"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/legacy_dashboard_proxy/risk_radar_users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["LegacyDashboardProxyController_getRiskRadarUsers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/legacy_dashboard_proxy/card_history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["LegacyDashboardProxyController_getCardHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/legacy_dashboard_proxy/email_templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["LegacyDashboardProxyController_getEmailTemplates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/legacy_dashboard_proxy/push_note_to_iris": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["LegacyDashboardProxyController_pushNoteToIris"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/legacy_dashboard_proxy/save_new_net_settlement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["LegacyDashboardProxyController_saveNewNetSettlement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/legacy_dashboard_proxy/review_exception": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["LegacyDashboardProxyController_reviewException"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/legacy_dashboard_proxy/managers_queue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["LegacyDashboardProxyController_managersQueue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/legacy_dashboard_proxy/assign_exception_to_user": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["LegacyDashboardProxyController_assignExceptionToUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/legacy_dashboard_proxy/mark_exception_as_divert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["LegacyDashboardProxyController_markExceptionsAsDivert"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/legacy_dashboard_proxy/save_merchant_data": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["LegacyDashboardProxyController_saveMerchantData"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/legacy_dashboard_proxy/toggle_managers_queue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["LegacyDashboardProxyController_postManagersQueue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/legacy_dashboard_proxy/toggle_auto_hold_white_label": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["LegacyDashboardProxyController_putExecuteAutoHoldWhiteLabelCommand"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/legacy_dashboard_proxy/toggle_risk_watch_command": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["LegacyDashboardProxyController_putExecuteRisKWatchCommand"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/legacy_dashboard_proxy/merchant": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get merchant */
+        get: operations["merchant"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/legacy_dashboard_proxy/merchant_contact_info": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get merchant contact information */
+        get: operations["merchantContactInfo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/legacy_dashboard_proxy/transaction_exceptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get merchant transaction exceptions */
+        get: operations["transactionExceptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/legacy_dashboard_proxy/merchant_notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get merchant notes */
+        get: operations["merchantNotes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/legacy_dashboard_proxy/merchant_chargebacks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get merchant chargebacks */
+        get: operations["merchantChargebacks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/legacy_dashboard_proxy/merchant_net_settlement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get merchant net settlement */
+        get: operations["merchantNetSettlement"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/legacy_dashboard_proxy/risk_radar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get risk radar */
+        get: operations["risk_radar"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/iris_proxy/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get filtered users */
+        get: operations["users"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/iris_proxy/lead-sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get lead sources */
+        get: operations["lead-sources"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/iris_proxy/lead-assigned-webhook": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Webhook for assigned leads */
+        post: operations["lead-assigned-webhook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/iris_proxy/lead-equipment-webhook": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Webhook for assigned leads */
+        post: operations["lead-equipment-webhook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/iris_proxy/channels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get channels */
+        get: operations["channels"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/iris_proxy/partners": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get partners */
+        get: operations["partners"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/iris_proxy/lead-basic-info/{leadId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get lead basic info */
+        get: operations["lead-basic-info"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/multi_dn/get-merchant-tin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Merchant TIN */
+        get: operations["merchantTIN"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/risk-radar/send-exception-memo-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["RiskRadarController_sendExceptionMemoEmail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/risk-radar/merchant-exception-detail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get merchant exception details
+         * @description Retrieves detailed information about a merchant exception
+         */
+        get: operations["RiskRadarController_getMerchantExceptionDetail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/risk-radar/merchant-card-num-history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RiskRadarController_getMerchantCardNumHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/risk-radar/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get risk radar exceptions list with filtering and sorting options */
+        get: operations["getRiskRadarExceptionsList"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/risk-radar/exception_data": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get exception data
+         * @description Returns exception statuses and related data for UI dropdowns
+         */
+        get: operations["RiskRadarController_getExceptionData"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/risk-radar/review-exceptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Review exceptions
+         * @description Marks risk radar exceptions as reviewed by the specified user
+         */
+        post: operations["RiskRadarController_reviewExceptions"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/risk-radar/save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["RiskRadarController_saveRiskRadar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/risk-radar/merchant-exception-transaction": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RiskRadarController_getMerchantExceptionTransactions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/risk-radar/exception-list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RiskRadarController_getExceptionList"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/risk-radar/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RiskRadarController_getNotes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/risk-radar/chargeback-transactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RiskRadarController_getChargebackTransactions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/risk-radar/email-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get active email templates
+         * @description Retrieves a list of all active email templates
+         */
+        get: operations["RiskRadarController_getEmailTemplates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/risk-radar/merchants-with-same-tax-id": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get merchants with the same tax ID
+         * @description Retrieves a list of merchant IDs that have the same tax ID as the provided merchant
+         */
+        get: operations["RiskRadarController_getMerchantsWithSameTaxId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/risk-radar/assign-exceptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Assign exceptions to a user
+         * @description Assigns selected risk radar exceptions to a specific user
+         */
+        post: operations["RiskRadarController_assignExceptions"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/risk-radar/push-note-to-iris": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Push a note to Iris
+         * @description Pushes a note to Iris for a given merchant ID
+         */
+        post: operations["RiskRadarController_pushNoteToIris"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/partner-banks/invoices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Retrieve invoices from s3 */
+        get: operations["partner-banks-invoices"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/partner-banks/download-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Retrieve invoice url from s3 */
+        get: operations["partner-banks-invoice-url"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/partner-banks/execute": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Execute msp mernchant invoice generation */
+        post: operations["partner-banks-invoice-url"];
         delete?: never;
         options?: never;
         head?: never;
@@ -44,10 +860,111 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Retrieve multiple RiskRules */
-        get: operations["getManyBaseRiskRulesControllerRiskRule"];
+        get: operations["RiskRulesController_listRiskRules"];
+        put?: never;
+        post: operations["RiskRulesController_createParamValue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/net-settlement/summary/{mid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Net Settlement summary given a MID */
+        get: operations["net-settlement-summary"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/net-settlement/summary/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add a divert note given a MID */
+        post: operations["net-settlement-summary"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/net-settlement/summary/remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add a divert note given a MID */
+        post: operations["net-settlement-summary"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/net-settlement/summary/transaction/remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Delete a transaction given a MID */
+        post: operations["net-settlement-summary"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/net-settlement/summary/label/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Delete a transaction given a MID */
+        post: operations["net-settlement-summary"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/net-settlement/summary/action": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add a divert note given a MID */
+        post: operations["net-settlement-summary"];
         delete?: never;
         options?: never;
         head?: never;
@@ -58,12 +975,458 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        GetManyRiskRuleResponseDto: {
-            data: components["schemas"]["RiskRule"][];
-            count: number;
-            total: number;
-            page: number;
-            pageCount: number;
+        AppVersionResponseDto: {
+            /** @description Current app version */
+            version: string;
+            /** @description Current app version branch */
+            branch: string;
+            /** @description Current app version commit */
+            commit: string;
+            /** @description Current app created at */
+            created_at: string;
+            /** @description Server time */
+            current_server_time: string;
+        };
+        AppStatusResponseDto: {
+            /**
+             * @description Current app version
+             * @enum {string}
+             */
+            status: "UP" | "DOWN";
+        };
+        HookMapper: {
+            /** @description Request ID */
+            requestId?: number;
+            /**
+             * @description Event type
+             * @example lead.assigned
+             */
+            event?: string;
+        };
+        AssignedByMapper: {
+            /**
+             * @description User ID
+             * @example 123
+             */
+            id?: number;
+            /**
+             * @description User name
+             * @example John Doe
+             */
+            name?: string;
+            /**
+             * @description User class
+             * @example admin
+             */
+            userClass?: string;
+            /**
+             * @description User email
+             * @example example@gmail.com
+             */
+            email?: string;
+            /**
+             * @description User status
+             * @example active
+             */
+            status?: string;
+        };
+        AddressMapper: {
+            /**
+             * @description Address
+             * @example 123 Main St
+             */
+            address?: string;
+            /**
+             * @description City
+             * @example New York
+             */
+            city?: string;
+            /**
+             * @description State
+             * @example NY
+             */
+            state?: string;
+            /**
+             * @description Zip code
+             * @example 10001
+             */
+            zip?: string;
+        };
+        LeadMapper: {
+            /**
+             * @description Lead ID
+             * @example 123
+             */
+            id?: number;
+            /**
+             * @description Lead name
+             * @example John Doe
+             */
+            name?: string;
+            /**
+             * @description Lead URL
+             * @example https://example.com/lead/123
+             */
+            lead_url?: string;
+            /** @description Assigned users */
+            assignedUsers?: components["schemas"]["AssignedByMapper"][];
+            /**
+             * @description Lead email
+             * @example example@gmail.com
+             */
+            email?: string;
+            /** @description Lead address */
+            address?: components["schemas"]["AddressMapper"];
+            /**
+             * @description Assigned date
+             * @example 2021-01-01T00:00:00.000Z
+             */
+            assignedAt?: string;
+            /** @description User who assigned the lead */
+            user?: components["schemas"]["AssignedByMapper"];
+            /** @description User who assigned the lead */
+            assignedBy?: components["schemas"]["AssignedByMapper"];
+        };
+        LeadDataMapper: {
+            /** @description Lead information */
+            lead?: components["schemas"]["LeadMapper"];
+            /** @description List of leads */
+            leads?: components["schemas"]["LeadMapper"][];
+        };
+        LeadUserAssignedInputDto: {
+            /** @description Hook information */
+            hook?: components["schemas"]["HookMapper"];
+            /** @description Data information */
+            data?: components["schemas"]["LeadDataMapper"];
+        };
+        LeadStatusUpdatedInputDto: {
+            /** @description Hook information */
+            hook?: components["schemas"]["HookMapper"];
+            /** @description Data information */
+            data?: components["schemas"]["LeadDataMapper"];
+        };
+        SendExceptionMemoEmailDto: Record<string, never>;
+        MerchantBusinessInfoDto: {
+            /**
+             * @description DBA Name
+             * @example Acme Corp
+             */
+            dbaName: string;
+            /**
+             * @description DBA Address
+             * @example 123 Main St
+             */
+            dbaAddress: string;
+            /**
+             * @description DBA City
+             * @example New York
+             */
+            dbaCity: string;
+            /**
+             * @description DBA State
+             * @example NY
+             */
+            dbaState: string;
+            /**
+             * @description DBA Zip
+             * @example 10001
+             */
+            dbaZip: string;
+            /**
+             * @description Contact phone number
+             * @example 555-123-4567
+             */
+            contactPhoneNumber: string;
+            /**
+             * @description DBA fax
+             * @example 555-123-4568
+             */
+            dbaFax: string;
+            /**
+             * @description Contact email
+             * @example contact@acme.com
+             */
+            contactEmail: string;
+            /**
+             * @description Website
+             * @example www.acme.com
+             */
+            website: string;
+            /**
+             * @description Legal name
+             * @example Acme Corporation Inc.
+             */
+            legalName: string;
+            /**
+             * @description Legal address
+             * @example 456 Business Ave
+             */
+            legalAddress: string;
+            /**
+             * @description Legal city
+             * @example New York
+             */
+            legalCity: string;
+            /**
+             * @description Legal state
+             * @example NY
+             */
+            legalState: string;
+            /**
+             * @description Legal zip
+             * @example 10002
+             */
+            legalZip: string;
+            /**
+             * @description Ownership type
+             * @example Corporation
+             */
+            ownershipType: string;
+            /**
+             * @description MCC code with description
+             * @example 5411 (Grocery Stores)
+             */
+            mccCode: string;
+            /**
+             * @description Self-generated
+             * @example Yes
+             */
+            selfGenerated: string;
+            /**
+             * @description Business type
+             * @example Retail
+             */
+            businessType: string;
+            /**
+             * Format: date-time
+             * @description Activated date
+             * @example 2023-01-01T00:00:00.000Z
+             */
+            activatedDate: string;
+            /**
+             * @description Monthly volume
+             * @example 100000
+             */
+            monthlyVolume: number;
+            /**
+             * @description Average ticket
+             * @example 150
+             */
+            averageTicket: number;
+            /**
+             * @description Swiped percentage
+             * @example 85
+             */
+            swipedPercentage: number;
+            /**
+             * @description Average ticket size amount
+             * @example 150
+             */
+            averageTicketSizeAmount: number;
+            /**
+             * @description Chargeback count
+             * @example 5
+             */
+            chargebackCount: number;
+            /**
+             * @description IRR count
+             * @example 2
+             */
+            irrCount: number;
+            /**
+             * @description Divert flag
+             * @example true
+             */
+            isDivert: boolean;
+            /**
+             * @description Preferred contact
+             * @example Email
+             */
+            preferredContact: string;
+            /**
+             * @description Exception status ID
+             * @example 1
+             */
+            exceptionStatusId: number;
+            /**
+             * @description Has cash advance
+             * @example Yes
+             */
+            hasCashAdvance: string;
+            /**
+             * @description Risk watch
+             * @example true
+             */
+            isRiskWatch: boolean;
+            /**
+             * @description Net settlement balance
+             * @example 5000
+             */
+            netSettlementBalance: number;
+            /**
+             * @description Swiped percentage based on transaction count for current month
+             * @example 83
+             */
+            swipedPercentageTransCount: number;
+            /**
+             * @description Channel
+             * @example Retail
+             */
+            channel: string;
+            /**
+             * @description ISA
+             * @example John Smith
+             */
+            isa: string;
+            /**
+             * @description Average monthly sales volume
+             * @example 95000
+             */
+            averageMonthlySalesVolume: number;
+            /**
+             * @description Store front swiped percentage
+             * @example 78
+             */
+            storeFrontSwiped: number;
+            /**
+             * @description Auto hold white label
+             * @example false
+             */
+            isAutoHoldWhiteLabel: boolean;
+            /**
+             * @description Highest ticket amount
+             * @example 750
+             */
+            highestTicket: number;
+            /**
+             * @description Whether risk can edit UW new account hold
+             * @example true
+             */
+            uwNewAccountHoldAllowRiskToEdit: boolean;
+            /**
+             * @description Reseller
+             * @example ABC Reseller
+             */
+            reseller: string;
+            /**
+             * @description Referral partner
+             * @example XYZ Partner
+             */
+            referralPartner: string;
+            /**
+             * @description TalusPay account indicator
+             * @example Yes
+             */
+            talusPayAccountIndicator: string;
+            /**
+             * @description ISV
+             * @example ISV Provider
+             */
+            isv: string;
+        };
+        PartnerLeadResponseDto: {
+            /** @description Customer Service Email */
+            customerServiceEmail: string;
+        };
+        MerchantExceptionDetailResponseDto: {
+            /** @description Merchant business information */
+            businessInfo: components["schemas"]["MerchantBusinessInfoDto"];
+            /** @description Merchant owners */
+            owners: unknown[][];
+            /** @description Monthly processing summaries */
+            processingSummaries: unknown[][];
+            /** @description Exception types */
+            exceptionTypes: unknown[][];
+            /** @description Partner Lead */
+            partnerLead: components["schemas"]["PartnerLeadResponseDto"];
+        };
+        ReviewExceptionInputDto: {
+            /**
+             * @description Comma-separated list of Risk Radar Exception IDs to review
+             * @example 123,456,789
+             */
+            reviewList: string;
+            /**
+             * @description Username who is reviewing the exceptions
+             * @example jsmith
+             */
+            user: string;
+        };
+        RiskRadarSaveInputDto: Record<string, never>;
+        EmailTemplatesResponseDto: {
+            /** @description List of active email templates */
+            templates: unknown[][];
+        };
+        AssignExceptionsDto: {
+            /**
+             * @description Comma-separated list of Risk Radar Exception IDs to assign
+             * @example 123,456,789
+             */
+            exceptionIds: string;
+            /**
+             * @description ID of the Risk Radar User to assign the exceptions to
+             * @example 42
+             */
+            assignToUserId: number;
+            /**
+             * @description Username of the person making the assignment
+             * @example jsmith
+             */
+            createdBy: string;
+        };
+        AssignExceptionsResponseDto: {
+            /**
+             * @description Indicates if the assignment was successful
+             * @example true
+             */
+            success: boolean;
+        };
+        PushNoteToIrisInputDto: Record<string, never>;
+        RiskSourceOutputDto: {
+            definition: string;
+        };
+        RiskRuleTypeOutputDto: {
+            definition: string;
+            code?: string;
+        };
+        RiskRuleParamValueOutputDto: {
+            id: number;
+            /** Format: date-time */
+            effectiveDate: string;
+            definition: string;
+            value: number;
+        };
+        RiskRuleOutputDto: {
+            id: number;
+            definition: string;
+            source: components["schemas"]["RiskSourceOutputDto"];
+            ruleType: components["schemas"]["RiskRuleTypeOutputDto"];
+            paramValues: components["schemas"]["RiskRuleParamValueOutputDto"][];
+        };
+        ListRiskRulesPaginationOutput: {
+            /** @description Total pages of pagination */
+            data?: components["schemas"]["RiskRuleOutputDto"][];
+            /** @description Total pages of pagination */
+            count?: number;
+            /** @description Total pages of pagination */
+            total?: number;
+            /** @description Total pages of pagination */
+            page?: number;
+            /** @description Total pages of pagination */
+            pageCount?: number;
+        };
+        CreateRiskRuleParamValueDto: {
+            /** @description Foreign key referencing the related rule parameter. */
+            ruleParamId?: number;
+            /** @description Numeric value assigned to this parameter. */
+            value?: number;
+            /** @description Who created this parameter. */
+            createdBy?: string;
+            /**
+             * Format: date-time
+             * @description Date from which this parameter value is effective.
+             */
+            effectiveDate: string;
         };
         RiskRuleParam: {
             /** @description Primary key identifier of the rule parameter. */
@@ -91,6 +1454,8 @@ export interface components {
             ruleParamId?: number;
             /** @description Numeric value assigned to this parameter. */
             value?: number;
+            /** @description Who created this parameter. */
+            createdBy?: string;
             /**
              * Format: date-time
              * @description Date from which this parameter value is effective.
@@ -157,6 +1522,70 @@ export interface components {
              */
             createdAt: string;
         };
+        HandleDiverAddDto: {
+            /**
+             * @description Merchant ID (MID)
+             * @example 561100001234
+             */
+            mid: string;
+            /**
+             * @description Notes about the divert action
+             * @example Manual put on divert via NetSettlement
+             */
+            note?: string;
+            /**
+             * @description Username of the user performing the action
+             * @example admin.user
+             */
+            user: string;
+        };
+        HandleDiverRemovedDto: {
+            /**
+             * @description Merchant ID (MID)
+             * @example 561100001234
+             */
+            mid: string;
+            /**
+             * @description Username of the user performing the action
+             * @example admin.user
+             */
+            user: string;
+        };
+        HandleDeleteTransactionDto: {
+            /**
+             * @description Merchant ID (MID)
+             * @example 561100001234
+             */
+            mid: string;
+            /**
+             * @description Notes about the divert action
+             * @example Manual put on divert via NetSettlement
+             */
+            transactionId: number;
+            /**
+             * @description Username of the user performing the action
+             * @example admin.user
+             */
+            user: string;
+        };
+        NetSettlementMidLabelUpdateDto: {
+            /**
+             * @description Merchant ID (MID)
+             * @example 561100001234
+             */
+            mid: string;
+            /**
+             * @description Label type id
+             * @example 1
+             */
+            netSettlementLabelTypeId: number;
+            /**
+             * @description Username of the user performing the action
+             * @example admin.user
+             */
+            user: string;
+        };
+        NetSettlementBaseDto: Record<string, never>;
     };
     responses: never;
     parameters: never;
@@ -166,7 +1595,807 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    AppController_getHello: {
+    Version: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Shows the current App version response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppVersionResponseDto"];
+                };
+            };
+        };
+    };
+    Status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Shows the current status of App - Operational */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppStatusResponseDto"];
+                };
+            };
+            /** @description Not operational - Bad Gateway Exception */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not operational - Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "status": "DOWN"
+                     *     }
+                     */
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    kpi: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The KPI statistics response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    exception_data: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The exception data response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LegacyDashboardProxyController_getRiskRadarUsers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The risk radar users response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LegacyDashboardProxyController_getCardHistory: {
+        parameters: {
+            query: {
+                cardNumber: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The card history response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LegacyDashboardProxyController_getEmailTemplates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The email templates response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LegacyDashboardProxyController_pushNoteToIris: {
+        parameters: {
+            query: {
+                noteId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The exception data response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LegacyDashboardProxyController_saveNewNetSettlement: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    LegacyDashboardProxyController_reviewException: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    LegacyDashboardProxyController_managersQueue: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    LegacyDashboardProxyController_assignExceptionToUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    LegacyDashboardProxyController_markExceptionsAsDivert: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    LegacyDashboardProxyController_saveMerchantData: {
+        parameters: {
+            query: {
+                mid: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    LegacyDashboardProxyController_postManagersQueue: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    LegacyDashboardProxyController_putExecuteAutoHoldWhiteLabelCommand: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    LegacyDashboardProxyController_putExecuteRisKWatchCommand: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    merchant: {
+        parameters: {
+            query: {
+                mid: string;
+                exceptionId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The merchant response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    merchantContactInfo: {
+        parameters: {
+            query: {
+                mid: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    transactionExceptions: {
+        parameters: {
+            query: {
+                mid: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    merchantNotes: {
+        parameters: {
+            query: {
+                mid: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    merchantChargebacks: {
+        parameters: {
+            query: {
+                mid: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    merchantNetSettlement: {
+        parameters: {
+            query: {
+                mid: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    risk_radar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The risk radar response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    users: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The filtered users response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "lead-sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The lead sources response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "lead-assigned-webhook": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LeadUserAssignedInputDto"];
+            };
+        };
+        responses: {
+            /** @description The lead sources response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "lead-equipment-webhook": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LeadStatusUpdatedInputDto"];
+            };
+        };
+        responses: {
+            /** @description The lead sources response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    channels: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The channels response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    partners: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The partners response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "lead-basic-info": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                leadId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The lead basic info. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    merchantTIN: {
+        parameters: {
+            query: {
+                mid: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    RiskRadarController_sendExceptionMemoEmail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SendExceptionMemoEmailDto"];
+            };
+        };
+        responses: {
+            /** @description Send exception memo emails */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    RiskRadarController_getMerchantExceptionDetail: {
+        parameters: {
+            query: {
+                merchantId: string;
+                exceptionId: number;
+                user: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The merchant exception details have been successfully retrieved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MerchantExceptionDetailResponseDto"];
+                };
+            };
+        };
+    };
+    RiskRadarController_getMerchantCardNumHistory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getRiskRadarExceptionsList: {
+        parameters: {
+            query: {
+                from_date: string;
+                to_date: string;
+                status: number;
+                assigned_to: number;
+                MID: string;
+                dba_or_sic: string;
+                exception_type: string;
+                view_all_exceptions: boolean;
+                iSortBy: number;
+                source_type: number;
+                page: number;
+                per_page: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get risk radar exceptions list. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    RiskRadarController_getExceptionData: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Exception data successfully retrieved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    RiskRadarController_reviewExceptions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReviewExceptionInputDto"];
+            };
+        };
+        responses: {
+            /** @description The exceptions were successfully reviewed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    RiskRadarController_saveRiskRadar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RiskRadarSaveInputDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    RiskRadarController_getMerchantExceptionTransactions: {
         parameters: {
             query?: never;
             header?: never;
@@ -183,58 +2412,27 @@ export interface operations {
             };
         };
     };
-    getOneBaseRiskRulesControllerRiskRule: {
+    RiskRadarController_getExceptionList: {
         parameters: {
-            query?: {
-                /** @description Selects resource fields. <a href="https://github.com/nestjsx/crud/wiki/Requests#select" target="_blank">Docs</a> */
-                fields?: string[];
-                /** @description Adds relational resources. <a href="https://github.com/nestjsx/crud/wiki/Requests#join" target="_blank">Docs</a> */
-                join?: string[];
-                /** @description Reset cache (if was enabled). <a href="https://github.com/nestjsx/crud/wiki/Requests#cache" target="_blank">Docs</a> */
-                cache?: number;
-            };
+            query?: never;
             header?: never;
-            path: {
-                id: number;
-            };
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Get one base response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": components["schemas"]["RiskRule"];
-                };
+                content?: never;
             };
         };
     };
-    getManyBaseRiskRulesControllerRiskRule: {
+    RiskRadarController_getNotes: {
         parameters: {
-            query?: {
-                /** @description Selects resource fields. <a href="https://github.com/nestjsx/crud/wiki/Requests#select" target="_blank">Docs</a> */
-                fields?: string[];
-                /** @description Adds search condition. <a href="https://github.com/nestjsx/crud/wiki/Requests#search" target="_blank">Docs</a> */
-                s?: string;
-                /** @description Adds filter condition. <a href="https://github.com/nestjsx/crud/wiki/Requests#filter" target="_blank">Docs</a> */
-                filter?: string[];
-                /** @description Adds OR condition. <a href="https://github.com/nestjsx/crud/wiki/Requests#or" target="_blank">Docs</a> */
-                or?: string[];
-                /** @description Adds sort by field. <a href="https://github.com/nestjsx/crud/wiki/Requests#sort" target="_blank">Docs</a> */
-                sort?: string[];
-                /** @description Adds relational resources. <a href="https://github.com/nestjsx/crud/wiki/Requests#join" target="_blank">Docs</a> */
-                join?: string[];
-                /** @description Limit amount of resources. <a href="https://github.com/nestjsx/crud/wiki/Requests#limit" target="_blank">Docs</a> */
-                limit?: number;
-                /** @description Offset amount of resources. <a href="https://github.com/nestjsx/crud/wiki/Requests#offset" target="_blank">Docs</a> */
-                offset?: number;
-                /** @description Page portion of resources. <a href="https://github.com/nestjsx/crud/wiki/Requests#page" target="_blank">Docs</a> */
-                page?: number;
-                /** @description Reset cache (if was enabled). <a href="https://github.com/nestjsx/crud/wiki/Requests#cache" target="_blank">Docs</a> */
-                cache?: number;
+            query: {
+                mid: string;
             };
             header?: never;
             path?: never;
@@ -246,9 +2444,361 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": components["schemas"]["GetManyRiskRuleResponseDto"];
+                content?: never;
+            };
+        };
+    };
+    RiskRadarController_getChargebackTransactions: {
+        parameters: {
+            query: {
+                mid: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
                 };
+                content?: never;
+            };
+        };
+    };
+    RiskRadarController_getEmailTemplates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of active email templates successfully retrieved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmailTemplatesResponseDto"];
+                };
+            };
+        };
+    };
+    RiskRadarController_getMerchantsWithSameTaxId: {
+        parameters: {
+            query: {
+                merchantId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of merchant IDs with the same tax ID as the provided merchant */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description List of merchant IDs with the same tax ID */
+                        merchantIds?: string[];
+                    };
+                };
+            };
+        };
+    };
+    RiskRadarController_assignExceptions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignExceptionsDto"];
+            };
+        };
+        responses: {
+            /** @description The exceptions were successfully assigned */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssignExceptionsResponseDto"];
+                };
+            };
+        };
+    };
+    RiskRadarController_pushNoteToIris: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PushNoteToIrisInputDto"];
+            };
+        };
+        responses: {
+            /** @description The note was successfully pushed to Iris */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "partner-banks-invoices": {
+        parameters: {
+            query?: {
+                /** @description The prefix/folder path to list */
+                prefix?: string;
+                /** @description Continuation token for pagination */
+                continuationToken?: string;
+                /** @description Maximum number of keys to return per page (max: 1000) */
+                maxKeys?: number;
+                /** @description Search term */
+                searchTerm?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The invoices from aws */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "partner-banks-invoice-url": {
+        parameters: {
+            query: {
+                key: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The invoices from aws */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "partner-banks-invoice-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The invoices from aws */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    RiskRulesController_listRiskRules: {
+        parameters: {
+            query?: {
+                /** @description Total pages of pagination */
+                page?: number;
+                /** @description Limit of records */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated list of risk rules and their parameters. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListRiskRulesPaginationOutput"];
+                };
+            };
+        };
+    };
+    RiskRulesController_createParamValue: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateRiskRuleParamValueDto"];
+            };
+        };
+        responses: {
+            /** @description Creates a new risk rule parameter value. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiskRuleParamValue"];
+                };
+            };
+        };
+    };
+    "net-settlement-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                mid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List Net Settlement summary */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "net-settlement-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HandleDiverAddDto"];
+            };
+        };
+        responses: {
+            /** @description Added a divert note given a MID */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "net-settlement-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HandleDiverRemovedDto"];
+            };
+        };
+        responses: {
+            /** @description Added a divert note given a MID */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "net-settlement-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HandleDeleteTransactionDto"];
+            };
+        };
+        responses: {
+            /** @description Deleted a transaction given a MID */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "net-settlement-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NetSettlementMidLabelUpdateDto"];
+            };
+        };
+        responses: {
+            /** @description Deleted a transaction given a MID */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "net-settlement-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NetSettlementBaseDto"];
+            };
+        };
+        responses: {
+            /** @description Added a divert note given a MID */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

@@ -33,6 +33,13 @@ export class RiskRuleParamValue {
   value?: number;
 
   @ApiProperty({
+    description: 'Who created this parameter.',
+    required: false,
+  })
+  @Column({ name: 'created_by', type: 'varchar', length: 50, nullable: true })
+  createdBy?: string;
+
+  @ApiProperty({
     description: 'Date from which this parameter value is effective.',
   })
   @Column({ name: 'effective_date', type: 'datetime' })

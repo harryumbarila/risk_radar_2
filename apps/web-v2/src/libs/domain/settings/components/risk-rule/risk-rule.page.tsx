@@ -9,187 +9,29 @@ import {
   VStack,
   Badge,
   Separator,
+  Loader,
+  Center,
 } from '@chakra-ui/react';
 import { MdAdd } from 'react-icons/md';
 import AddParamValueDialog from '../add-risk-rule/add-risk-rule';
-// import { $riskApi } from '@/libs/shared/api/risk.api';
-
-const mockRiskRules = {
-  edges: [
-    {
-      node: {
-        id: '1',
-        definition: 'Bank Change Rule',
-        source: { definition: 'TSYS ADF Auth' },
-        ruleType: { definition: 'Auto Hold', code: 'AH' },
-        paramValues: {
-          edges: [
-            {
-              node: {
-                id: '1',
-                effectiveDate: '2025-08-30T14:19:19.547Z',
-                value: 30,
-              },
-            },
-          ],
-        },
-      },
-    },
-    {
-      node: {
-        id: '2',
-        definition: 'Foreign Card Rule',
-        source: { definition: 'TSYS ADF Auth' },
-        ruleType: { definition: 'Auto Hold', code: 'AH' },
-        paramValues: {
-          edges: [
-            {
-              node: {
-                id: '2',
-                effectiveDate: '2025-08-30T14:19:19.547Z',
-                value: 300,
-              },
-            },
-          ],
-        },
-      },
-    },
-    {
-      node: {
-        id: '3',
-        definition: 'High Trans Rule',
-        source: { definition: 'TSYS ADF Auth' },
-        ruleType: { definition: 'Auto Hold', code: 'AH' },
-        paramValues: {
-          edges: [
-            {
-              node: {
-                id: '3',
-                effectiveDate: '2025-08-30T14:19:19.547Z',
-                value: 500,
-              },
-            },
-          ],
-        },
-      },
-    },
-    {
-      node: {
-        id: '4',
-        definition: 'High $ Batch Rule',
-        source: { definition: 'TSYS ADF Auth' },
-        ruleType: { definition: 'Auto Hold', code: 'AH' },
-        paramValues: {
-          edges: [
-            {
-              node: {
-                id: '4',
-                effectiveDate: '2025-08-30T14:19:19.547Z',
-                value: 20000,
-              },
-            },
-          ],
-        },
-      },
-    },
-    {
-      node: {
-        id: '5',
-        definition: 'Dormant account of 90 days',
-        source: { definition: 'TSYS ADF Auth' },
-        ruleType: { definition: 'Auto Hold', code: 'AH' },
-        paramValues: {
-          edges: [
-            {
-              node: {
-                id: '5',
-                effectiveDate: '2025-08-30T14:19:19.547Z',
-                value: 75,
-              },
-            },
-          ],
-        },
-      },
-    },
-    {
-      node: {
-        id: '6',
-        definition: 'Prepaid Rule',
-        source: { definition: 'TSYS ADF Auth' },
-        ruleType: { definition: 'Auto Hold', code: 'AH' },
-        paramValues: {
-          edges: [
-            {
-              node: {
-                id: '6',
-                effectiveDate: '2025-08-30T14:19:19.547Z',
-                value: 25000,
-              },
-            },
-          ],
-        },
-      },
-    },
-    {
-      node: {
-        id: '7',
-        definition: 'Risk thresholds',
-        source: { definition: 'TSYS ADF Auth' },
-        ruleType: { definition: 'Auto Hold', code: 'AH' },
-        paramValues: {
-          edges: [
-            {
-              node: {
-                id: '7',
-                effectiveDate: '2025-08-30T14:19:19.547Z',
-                value: 50000,
-              },
-            },
-          ],
-        },
-      },
-    },
-    {
-      node: {
-        id: '8',
-        definition: 'Location rule',
-        source: { definition: 'TSYS ADF Auth' },
-        ruleType: { definition: 'Auto Hold', code: 'AH' },
-        paramValues: { edges: [] },
-      },
-    },
-  ],
-};
-
-interface RiskRule {
-  id: string;
-  definition: string;
-  source: { definition: string };
-  ruleType: { definition: string; code: string };
-  paramValues: {
-    edges: Array<{
-      node: {
-        id: string;
-        effectiveDate: string;
-        value: number;
-      };
-    }>;
-  };
-}
+import { $riskApi } from '@/libs/shared/api/risk.api';
+import { components } from '@/libs/shared/api/schemas/schema';
 
 export default function RiskRulePage() {
-  const [selectedRule, setSelectedRule] = React.useState<RiskRule | null>(null);
+  const [selectedRule, setSelectedRule] = React.useState<
+    components['schemas']['RiskRuleParamValueOutputDto'] | null
+  >(null);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
-  // const { data, isLoading } = $riskApi.useQuery('get', '/v1/risk-rule', {
-  //   params: {
-  //     query: {
-  //       join: ['source', 'ruleType', 'parameters', 'parameters.values'],
-  //     },
-  //   },
-  // });
+  const { data, isLoading } = $riskApi.useQuery('get', '/v1/risk-rule');
 
-  const handleAddParamValue = (rule: RiskRule) => {
+  console.log({
+    data,
+  });
+
+  const handleAddParamValue = (
+    rule: components['schemas']['RiskRuleParamValueOutputDto']
+  ) => {
     setSelectedRule(rule);
     setIsDialogOpen(true);
   };
@@ -201,6 +43,14 @@ export default function RiskRulePage() {
       day: 'numeric',
     });
   };
+
+  if (isLoading) {
+    return (
+      <Center>
+        <Loader />
+      </Center>
+    );
+  }
 
   return (
     <Box ml="260px" p={10} mt={50}>
@@ -219,85 +69,89 @@ export default function RiskRulePage() {
         <Separator mb={6} />
 
         <VStack gap={4} align="stretch">
-          {mockRiskRules.edges.map(({ node: rule }) => (
-            <Box
-              key={rule.id}
-              p={4}
-              borderRadius="lg"
-              border="1px solid"
-              borderColor="gray.200"
-              _hover={{ bg: 'gray.50', borderColor: 'brand.300' }}
-              transition="all 0.2s"
-            >
-              <HStack justify="space-between" align="start">
-                <VStack align="start" gap={2} flex={1}>
-                  <HStack gap={2}>
-                    <Text fontSize="lg" fontWeight="semibold" color="gray.800">
-                      {rule.definition}
-                    </Text>
-                    <Badge variant="subtle">{rule.ruleType.code}</Badge>
+          {data?.data && data.data?.length > 0
+            ? data.data?.map((rule) => (
+                <Box
+                  key={rule.id}
+                  p={4}
+                  borderRadius="lg"
+                  border="1px solid"
+                  borderColor="gray.200"
+                  _hover={{ bg: 'gray.50', borderColor: 'brand.300' }}
+                  transition="all 0.2s"
+                >
+                  <HStack justify="space-between" align="start">
+                    <VStack align="start" gap={2} flex={1}>
+                      <HStack gap={2}>
+                        <Text
+                          fontSize="lg"
+                          fontWeight="semibold"
+                          color="gray.800"
+                        >
+                          {rule.definition}
+                        </Text>
+                        <Badge variant="subtle">{rule.ruleType?.code}</Badge>
+                      </HStack>
+
+                      <HStack gap={4} fontSize="sm" color="gray.600">
+                        <HStack gap={1}>
+                          <Text fontWeight="medium">Source:</Text>
+                          <Text>{rule.source.definition}</Text>
+                        </HStack>
+                        <Text color="gray.300">|</Text>
+                        <HStack gap={1}>
+                          <Text fontWeight="medium">Type:</Text>
+                          <Text>{rule.ruleType.definition}</Text>
+                        </HStack>
+                      </HStack>
+
+                      {rule.paramValues.length > 0 && (
+                        <Box
+                          mt={2}
+                          pt={2}
+                          borderTop="1px solid"
+                          borderColor="gray.100"
+                          w="full"
+                        >
+                          <VStack gap={2} align="start">
+                            {rule.paramValues.map((param) => (
+                              <HStack
+                                key={param.id}
+                                gap={3}
+                                fontSize="sm"
+                                p={2}
+                                bg="brand.50"
+                                borderRadius="md"
+                                w="full"
+                              >
+                                <Text fontWeight="medium" color="brand.700">
+                                  {param.definition.replace(
+                                    'XXX',
+                                    String(param.value)
+                                  )}
+                                </Text>
+                                <Text color="gray.400">•</Text>
+                                <Text color="gray.600">
+                                  Effective: {formatDate(param.effectiveDate)}
+                                </Text>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleAddParamValue(param)}
+                                >
+                                  <MdAdd size={16} />
+                                  <Text ml={1}>Edit</Text>
+                                </Button>
+                              </HStack>
+                            ))}
+                          </VStack>
+                        </Box>
+                      )}
+                    </VStack>
                   </HStack>
-
-                  <HStack gap={4} fontSize="sm" color="gray.600">
-                    <HStack gap={1}>
-                      <Text fontWeight="medium">Source:</Text>
-                      <Text>{rule.source.definition}</Text>
-                    </HStack>
-                    <Text color="gray.300">|</Text>
-                    <HStack gap={1}>
-                      <Text fontWeight="medium">Type:</Text>
-                      <Text>{rule.ruleType.definition}</Text>
-                    </HStack>
-                  </HStack>
-
-                  {rule.paramValues.edges.length > 0 && (
-                    <Box
-                      mt={2}
-                      pt={2}
-                      borderTop="1px solid"
-                      borderColor="gray.100"
-                      w="full"
-                    >
-                      <Text
-                        fontSize="xs"
-                        fontWeight="semibold"
-                        color="gray.500"
-                        mb={2}
-                      >
-                        PARAMETER VALUES
-                      </Text>
-                      <VStack gap={2} align="start">
-                        {rule.paramValues.edges.map(({ node: param }) => (
-                          <HStack
-                            key={param.id}
-                            gap={3}
-                            fontSize="sm"
-                            p={2}
-                            bg="brand.50"
-                            borderRadius="md"
-                            w="full"
-                          >
-                            <Text fontWeight="medium" color="brand.700">
-                              Value: {param.value}
-                            </Text>
-                            <Text color="gray.400">•</Text>
-                            <Text color="gray.600">
-                              Effective: {formatDate(param.effectiveDate)}
-                            </Text>
-                          </HStack>
-                        ))}
-                      </VStack>
-                    </Box>
-                  )}
-                </VStack>
-
-                <Button size="sm" onClick={() => handleAddParamValue(rule)}>
-                  <MdAdd size={16} />
-                  <Text ml={1}>Add Value</Text>
-                </Button>
-              </HStack>
-            </Box>
-          ))}
+                </Box>
+              ))
+            : null}
         </VStack>
 
         <AddParamValueDialog

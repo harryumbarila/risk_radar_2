@@ -7,7 +7,7 @@ import { RiskRule } from '../entities';
 
 @Injectable()
 export class RiskRuleRepository extends Repository<RiskRule> {
-  public constructor(@InjectDataSource('RiskRadar') dataSource: DataSource) {
+  public constructor(@InjectDataSource('risk-radar') dataSource: DataSource) {
     super(RiskRule, dataSource.createEntityManager());
   }
 }

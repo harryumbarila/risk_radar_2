@@ -4,7 +4,7 @@ import { config } from '../config/db';
 import * as entities from '../entities';
 
 export const DbTypeORMModule = TypeOrmModule.forRoot({
-  name: 'connector',
+  name: 'risk-radar',
   type: 'mssql',
   url: config.db.connectionString,
   entities,

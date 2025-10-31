@@ -26,7 +26,7 @@
       "@/dsm-db/*": ["../../db/dsm/src/*"],
       "@/snap-pcc-db/*": ["../../db/snap-pcc/src/*"],
       "@/paya-db/*": ["../../db/paya/src/*"],
-      "@/risk-radar/*": ["../../db/risk-radar/src/*"]
+      "@/risk-radar-db/*": ["../../db/risk-radar/src/*"]
     },
     "incremental": true,
     "skipLibCheck": true,
