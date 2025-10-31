@@ -6,15 +6,5 @@ import { ThemeProvider as NextThemeProvider } from 'next-themes';
 import system from './chakra-theme';
 
 export default function ThemeProvider(props: React.PropsWithChildren) {
-  return (
-    <ChakraProvider value={system}>
-      <NextThemeProvider
-        attribute="class"
-        disableTransitionOnChange
-        defaultTheme="light"
-      >
-        {props.children}
-      </NextThemeProvider>
-    </ChakraProvider>
-  );
+  return <ChakraProvider value={system}>{props.children}</ChakraProvider>;
 }

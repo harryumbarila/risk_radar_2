@@ -24,7 +24,8 @@ export const buttonRecipe = defineRecipe({
 });
 // ConfigRecipeSlots
 const theme = defineConfig({
-  cssVarsRoot: ':where(html)',
+  cssVarsRoot: ':where(:root, :host)',
+  cssVarsPrefix: 'ts',
   theme: {
     tokens,
     recipes: {

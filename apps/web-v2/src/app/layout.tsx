@@ -19,13 +19,13 @@ export default function RootLayout({ children }: RootLayoutProps): JSX.Element {
     keepSessionAlive: true, // Uncomment this in order to maintain the session alive
   };
   return (
-    <html lang="en">
+    <html>
       <body suppressHydrationWarning={true}>
-        <FronteggAppProvider authOptions={authOptions}>
-          <ThemeProvider>
+        <ThemeProvider>
+          <FronteggAppProvider authOptions={authOptions}>
             <ReactQueryProvider>{children}</ReactQueryProvider>
-          </ThemeProvider>
-        </FronteggAppProvider>
+          </FronteggAppProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
