@@ -13,11 +13,12 @@ import {
   RiskRuleWhiteListMccRepositoryAuditLog,
 } from '@/risk-radar-db/repositories';
 import { CreateRiskRuleParamValueDto } from './dto/create-risk-rule-param-value.dto';
-import { RiskRuleParam, RiskRuleParamValue } from '@/risk-radar-db/entities';
+import { RiskRuleParam, RiskRuleParamValue, RiskRuleWhiteListMccEntity } from '@/risk-radar-db/entities';
 import { RiskRuleWhiteListMidEntity } from '@/risk-radar-db/entities/risk-rule_white_list_mid.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateOrUpdateWhiteListMidDto } from './dto/create-or-update-white-list-mids.dto';
+import { CreateOrUpdateWhiteListMccDto } from './dto/create-or-update-white-list-mcc.dto';
 
 export interface RiskRuleListItem {
   ruleTypeDefinition: string;
@@ -209,6 +210,64 @@ export class RiskRulesService {
     });
 
     return await this.paramValueRepository.save(newValue);
+  }
+
+  async getWhiteListMccs(mcc: string): Promise<RiskRuleWhiteListMccEntity[]> {
+    return this.riskRuleWhiteListMccRepository
+      .createQueryBuilder('mcc')
+      .where('mcc.MCC LIKE :mcc', { mcc: `%${mcc}%` })
+      .getMany();
+  }
+
+  async createOrUpdateWhiteListMcc(dto: CreateOrUpdateWhiteListMccDto): Promise<RiskRuleWhiteListMccEntity> {
+
+    const existingWhiteListMcc = await this.riskRuleWhiteListMccRepository.findOne({
+      where: { MCC: dto.mcc },
+    });
+
+    const whiteListData = {
+      MCC: dto.mcc,
+      AH01: dto.AH01,
+      AH02: dto.AH02,
+      AH03: dto.AH03,
+      AH04: dto.AH04,
+      AH05: dto.AH05,
+      AH06: dto.AH06,
+      AH07: dto.AH07,
+      AH08: dto.AH08,
+      AH09: dto.AH09,
+      AH10: dto.AH10,
+      AH11: dto.AH11,
+      AH12: dto.AH12,
+      AH13: dto.AH13,
+      AH14: dto.AH14,
+      AH15: dto.AH15,
+      AH16: dto.AH16,
+      lastUpdatedBy: dto.lastUpdatedBy,
+    };
+
+    if (existingWhiteListMcc) {
+      Object.assign(existingWhiteListMcc, whiteListData);
+
+      const updatedWhiteListMcc = await this.riskRuleWhiteListMccRepository.save(existingWhiteListMcc);
+      
+      const auditLog = this.riskRuleWhiteListMccAuditLogRepository.create({
+        ...whiteListData,
+      });
+      await this.riskRuleWhiteListMccAuditLogRepository.save(auditLog);
+
+      return updatedWhiteListMcc;
+    }
+
+    const newWhiteListMcc = this.riskRuleWhiteListMccRepository.create(whiteListData);
+    const createdWhiteListMcc = await this.riskRuleWhiteListMccRepository.save(newWhiteListMcc);
+    
+    const auditLog = this.riskRuleWhiteListMccAuditLogRepository.create({
+      ...whiteListData,
+    });
+    await this.riskRuleWhiteListMccAuditLogRepository.save(auditLog);
+    
+    return createdWhiteListMcc;
   }
 
   async getWhiteListMids(mid: string): Promise<RiskRuleWhiteListMidEntity[]> {

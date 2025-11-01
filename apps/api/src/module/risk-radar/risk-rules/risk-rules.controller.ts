@@ -7,10 +7,11 @@ import {
   ListRiskRulesPaginationOutput,
 } from './dto/risk-rules.dto';
 import { Public } from '@/api/shared/auth/decorator/public.decorator';
-import { RiskRuleParamValue } from '@/risk-radar-db/entities';
+import { RiskRuleParamValue, RiskRuleWhiteListMccEntity } from '@/risk-radar-db/entities';
 import { CreateRiskRuleParamValueDto } from './dto/create-risk-rule-param-value.dto';
 import { CreateOrUpdateWhiteListMidDto } from './dto/create-or-update-white-list-mids.dto';
 import { RiskRuleWhiteListMidEntity } from '@/risk-radar-db/entities/risk-rule_white_list_mid.entity';
+import { CreateOrUpdateWhiteListMccDto } from './dto/create-or-update-white-list-mcc.dto';
 
 @ApiTags('risk-rule')
 @Controller('v1/risk-rule')
@@ -65,5 +66,29 @@ export class RiskRulesController {
     return this.riskRuleService.getWhiteListMids(
       mid
     );
+  }
+
+  @Post('white-list-mcc')
+  @Public()
+  @ApiCreatedResponse({
+    description: 'Creates a new white list mcc.',
+    type: RiskRuleWhiteListMccEntity,
+  })
+  async createOrUpdateWhiteListMcc(
+    @Body() dto: CreateOrUpdateWhiteListMccDto
+  ): Promise<RiskRuleWhiteListMccEntity> {
+    return this.riskRuleService.createOrUpdateWhiteListMcc(dto);
+  }
+
+  @Get('white-list-mcc')
+  @Public()
+  @ApiOkResponse({
+    description: 'Gets a list of white list mccs.',
+    type: [RiskRuleWhiteListMccEntity],
+  })
+  async getWhiteListMccs(
+    @Query('mcc') mcc: string
+  ): Promise<RiskRuleWhiteListMccEntity[]> {
+    return this.riskRuleService.getWhiteListMccs(mcc);
   }
 }
