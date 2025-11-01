@@ -9,6 +9,8 @@ import {
 import { Public } from '@/api/shared/auth/decorator/public.decorator';
 import { RiskRuleParamValue } from '@/risk-radar-db/entities';
 import { CreateRiskRuleParamValueDto } from './dto/create-risk-rule-param-value.dto';
+import { CreateOrUpdateWhiteListMidDto } from './dto/create-or-update-white-list-mids.dto';
+import { RiskRuleWhiteListMidEntity } from '@/risk-radar-db/entities/risk-rule_white_list_mid.entity';
 
 @ApiTags('risk-rule')
 @Controller('v1/risk-rule')
@@ -37,5 +39,31 @@ export class RiskRulesController {
     @Body() dto: CreateRiskRuleParamValueDto
   ): Promise<RiskRuleParamValue> {
     return this.riskRuleService.createParamValue(dto);
+  }
+
+  @Post('white-list-mid')
+  @Public()
+  @ApiCreatedResponse({
+    description: 'Creates a new white list mid.',
+    type: RiskRuleWhiteListMidEntity,
+  })
+  async createOrUpdateWhiteListMid(
+    @Body() dto: CreateOrUpdateWhiteListMidDto
+  ): Promise<RiskRuleWhiteListMidEntity> {
+    return this.riskRuleService.createOrUpdateWhiteListMid(dto);
+  }
+
+  @Get('white-list-mid')
+  @Public()
+  @ApiOkResponse({
+    description: 'Gets a list of white list mids.',
+    type: [RiskRuleWhiteListMidEntity],
+  })
+  async getWhiteListMids(
+    @Query('mid') mid: string
+  ): Promise<RiskRuleWhiteListMidEntity[]> {
+    return this.riskRuleService.getWhiteListMids(
+      mid
+    );
   }
 }

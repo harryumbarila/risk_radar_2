@@ -3,3 +3,7 @@ export * from './risk-rule.entity';
 export * from './risk-rule-param-value.entity';
 export * from './tbl-source.entity';
 export * from './rule-type.entity';
+export * from './risk-rule_white_list_mid.entity';
+export * from './risk-rule_white_list_mid_audit_log.entity';
+export * from './risk-rule_white_list_mcc.entity';
+export * from './risk-rule_white_list_mcc_audit_log.entity';

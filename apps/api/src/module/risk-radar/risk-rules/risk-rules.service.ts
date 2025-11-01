@@ -5,11 +5,19 @@ import {
   ListRiskRulesPaginationOutput,
   RiskRuleOutputDto,
 } from './dto/risk-rules.dto';
-import { RiskRuleRepository } from '@/risk-radar-db/repositories';
+import {
+  RiskRuleRepository,
+  RiskRuleWhiteListMidRepository,
+  RiskRuleWhiteListMidRepositoryAuditLog,
+  RiskRuleWhiteListMccRepository,
+  RiskRuleWhiteListMccRepositoryAuditLog,
+} from '@/risk-radar-db/repositories';
 import { CreateRiskRuleParamValueDto } from './dto/create-risk-rule-param-value.dto';
 import { RiskRuleParam, RiskRuleParamValue } from '@/risk-radar-db/entities';
+import { RiskRuleWhiteListMidEntity } from '@/risk-radar-db/entities/risk-rule_white_list_mid.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CreateOrUpdateWhiteListMidDto } from './dto/create-or-update-white-list-mids.dto';
 
 export interface RiskRuleListItem {
   ruleTypeDefinition: string;
@@ -32,7 +40,11 @@ export class RiskRulesService {
     @InjectRepository(RiskRuleParam, 'risk-radar')
     private readonly paramRepository: Repository<RiskRuleParam>,
     @InjectRepository(RiskRuleParamValue, 'risk-radar')
-    private readonly paramValueRepository: Repository<RiskRuleParamValue>
+    private readonly paramValueRepository: Repository<RiskRuleParamValue>,
+    private readonly riskRuleWhiteListMidRepository: RiskRuleWhiteListMidRepository,
+    private readonly riskRuleWhiteListMccRepository: RiskRuleWhiteListMccRepository,
+    private readonly riskRuleWhiteListMidAuditLogRepository: RiskRuleWhiteListMidRepositoryAuditLog,
+    private readonly riskRuleWhiteListMccAuditLogRepository: RiskRuleWhiteListMccRepositoryAuditLog,
   ) {}
 
   mapToRiskRuleHierarchy(rows: RiskRuleListItem[]): RiskRuleOutputDto[] {
@@ -197,5 +209,62 @@ export class RiskRulesService {
     });
 
     return await this.paramValueRepository.save(newValue);
+  }
+
+  async getWhiteListMids(mid: string): Promise<RiskRuleWhiteListMidEntity[]> {
+    return this.riskRuleWhiteListMidRepository
+      .createQueryBuilder('mid')
+      .where('mid.MId LIKE :mid', { mid: `%${mid}%` })
+      .getMany();
+  }
+
+  async createOrUpdateWhiteListMid(dto: CreateOrUpdateWhiteListMidDto): Promise<RiskRuleWhiteListMidEntity> {
+    const existingWhiteListMid = await this.riskRuleWhiteListMidRepository.findOne({
+      where: { MId: dto.mid },
+    });
+
+    const whiteListData = {
+      MId: dto.mid,
+      AH01: dto.AH01,
+      AH02: dto.AH02,
+      AH03: dto.AH03,
+      AH04: dto.AH04,
+      AH05: dto.AH05,
+      AH06: dto.AH06,
+      AH07: dto.AH07,
+      AH08: dto.AH08,
+      AH09: dto.AH09,
+      AH10: dto.AH10,
+      AH11: dto.AH11,
+      AH12: dto.AH12,
+      AH13: dto.AH13,
+      AH14: dto.AH14,
+      AH15: dto.AH15,
+      AH16: dto.AH16,
+      lastUpdatedBy: dto.lastUpdatedBy,
+    };
+
+    if (existingWhiteListMid) {
+      Object.assign(existingWhiteListMid, whiteListData);
+
+      const updatedWhiteListMid = await this.riskRuleWhiteListMidRepository.save(existingWhiteListMid);
+      
+      const auditLog = this.riskRuleWhiteListMidAuditLogRepository.create({
+        ...whiteListData,
+      });
+      await this.riskRuleWhiteListMidAuditLogRepository.save(auditLog);
+
+      return updatedWhiteListMid;
+    }
+
+    const newWhiteListMid = this.riskRuleWhiteListMidRepository.create(whiteListData);
+    const createdWhiteListMid = await this.riskRuleWhiteListMidRepository.save(newWhiteListMid);
+    
+    const auditLog = this.riskRuleWhiteListMidAuditLogRepository.create({
+      ...whiteListData,
+    });
+    await this.riskRuleWhiteListMidAuditLogRepository.save(auditLog);
+    
+    return createdWhiteListMid;
   }
 }
