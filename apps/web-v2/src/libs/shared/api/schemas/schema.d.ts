@@ -869,6 +869,55 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/risk-rule/white-list-mid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RiskRulesController_getWhiteListMids"];
+        put?: never;
+        post: operations["RiskRulesController_createOrUpdateWhiteListMid"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/risk-rule/white-list-mcc": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RiskRulesController_getWhiteListMccs"];
+        put?: never;
+        post: operations["RiskRulesController_createOrUpdateWhiteListMcc"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/risk-rule/param-values": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List risk rule parameter values with pagination and optional filter by ruleParamId */
+        get: operations["RiskRulesController_listRiskRuleParamValue"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/net-settlement/summary/{mid}": {
         parameters: {
             query?: never;
@@ -1416,17 +1465,26 @@ export interface components {
             pageCount?: number;
         };
         CreateRiskRuleParamValueDto: {
-            /** @description Foreign key referencing the related rule parameter. */
-            ruleParamId?: number;
-            /** @description Numeric value assigned to this parameter. */
-            value?: number;
-            /** @description Who created this parameter. */
-            createdBy?: string;
             /**
-             * Format: date-time
+             * @description Foreign key referencing the related rule parameter.
+             * @example 10
+             */
+            ruleParamId: number;
+            /**
+             * @description Numeric value assigned to this parameter.
+             * @example 250
+             */
+            value: number;
+            /**
              * @description Date from which this parameter value is effective.
+             * @example 2025-10-31T17:29:00Z
              */
             effectiveDate: string;
+            /**
+             * @description Username or identifier of the creator of this parameter value.
+             * @example user
+             */
+            createdBy?: string;
         };
         RiskRuleParam: {
             /** @description Primary key identifier of the rule parameter. */
@@ -1521,6 +1579,53 @@ export interface components {
              * @description Record creation timestamp.
              */
             createdAt: string;
+        };
+        CreateOrUpdateWhiteListMidDto: Record<string, never>;
+        RiskRuleWhiteListMidEntity: {
+            /** @description Primary key identifier of the parameter value. */
+            id: number;
+            /**
+             * Format: date-time
+             * @description Record creation timestamp.
+             */
+            lastUpdatedDate: string;
+        };
+        CreateOrUpdateWhiteListMccDto: Record<string, never>;
+        RiskRuleWhiteListMccEntity: {
+            /** @description Primary key identifier of the parameter value. */
+            id: number;
+            /**
+             * Format: date-time
+             * @description Record creation timestamp.
+             */
+            lastUpdatedDate: string;
+        };
+        RiskRuleParamValuePaginationOutputDto: {
+            /** @description Primary key identifier of the parameter value. */
+            id: number;
+            /** @description Foreign key referencing the related rule parameter. */
+            ruleParamId?: number;
+            /** @description Numeric value assigned to this parameter. */
+            value?: number;
+            /** @description Who created this parameter. */
+            createdBy?: string;
+            /**
+             * Format: date-time
+             * @description Date from which this parameter value is effective.
+             */
+            effectiveDate: string;
+            /**
+             * Format: date-time
+             * @description Record creation timestamp.
+             */
+            createdAt: string;
+        };
+        ListRiskRuleParamValuesOutput: {
+            data: components["schemas"]["RiskRuleParamValuePaginationOutputDto"][];
+            count: number;
+            total: number;
+            page: number;
+            pageCount: number;
         };
         HandleDiverAddDto: {
             /**
@@ -2668,6 +2773,125 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RiskRuleParamValue"];
+                };
+            };
+        };
+    };
+    RiskRulesController_getWhiteListMids: {
+        parameters: {
+            query: {
+                mid: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Gets a list of white list mids. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiskRuleWhiteListMidEntity"][];
+                };
+            };
+        };
+    };
+    RiskRulesController_createOrUpdateWhiteListMid: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateOrUpdateWhiteListMidDto"];
+            };
+        };
+        responses: {
+            /** @description Creates a new white list mid. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiskRuleWhiteListMidEntity"];
+                };
+            };
+        };
+    };
+    RiskRulesController_getWhiteListMccs: {
+        parameters: {
+            query: {
+                mcc: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Gets a list of white list mccs. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiskRuleWhiteListMccEntity"][];
+                };
+            };
+        };
+    };
+    RiskRulesController_createOrUpdateWhiteListMcc: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateOrUpdateWhiteListMccDto"];
+            };
+        };
+        responses: {
+            /** @description Creates a new white list mcc. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiskRuleWhiteListMccEntity"];
+                };
+            };
+        };
+    };
+    RiskRulesController_listRiskRuleParamValue: {
+        parameters: {
+            query?: {
+                /** @description Total pages of pagination */
+                page?: number;
+                /** @description Limit of records */
+                limit?: number;
+                /** @description Filter by risk rule parameter ID (fk_risk_rules_params) */
+                ruleParamId?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List risk rule parameter values. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListRiskRuleParamValuesOutput"];
                 };
             };
         };

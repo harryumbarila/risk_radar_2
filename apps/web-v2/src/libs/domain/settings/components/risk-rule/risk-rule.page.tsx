@@ -12,28 +12,36 @@ import {
   Loader,
   Center,
 } from '@chakra-ui/react';
-import { MdAdd } from 'react-icons/md';
-import AddParamValueDialog from '../add-risk-rule/add-risk-rule';
+import { MdAdd, MdOutlineRemoveRedEye } from 'react-icons/md';
+
 import { $riskApi } from '@/libs/shared/api/risk.api';
 import { components } from '@/libs/shared/api/schemas/schema';
 
-export default function RiskRulePage() {
+import AddParamValueDialog from '../add-risk-rule/add-risk-rule';
+import ParamValuesHistory from '../list-param-values/list-param-values';
+
+export default function RiskRulePage(): React.JSX.Element {
   const [selectedRule, setSelectedRule] = React.useState<
     components['schemas']['RiskRuleParamValueOutputDto'] | null
   >(null);
+
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = React.useState(false);
 
-  const { data, isLoading } = $riskApi.useQuery('get', '/v1/risk-rule');
-
-  console.log({
-    data,
-  });
+  const { data, isLoading } = $riskApi.useSuspenseQuery('get', '/v1/risk-rule');
 
   const handleAddParamValue = (
     rule: components['schemas']['RiskRuleParamValueOutputDto']
   ) => {
     setSelectedRule(rule);
     setIsDialogOpen(true);
+  };
+
+  const handleViewHistory = (
+    rule: components['schemas']['RiskRuleParamValueOutputDto']
+  ) => {
+    setSelectedRule(rule);
+    setIsHistoryDialogOpen(true);
   };
 
   const formatDate = (dateString: string) => {
@@ -142,6 +150,14 @@ export default function RiskRulePage() {
                                   <MdAdd size={16} />
                                   <Text ml={1}>Edit</Text>
                                 </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleViewHistory(param)}
+                                >
+                                  <MdOutlineRemoveRedEye size={16} />
+                                  <Text ml={1}>View</Text>
+                                </Button>
                               </HStack>
                             ))}
                           </VStack>
@@ -157,6 +173,11 @@ export default function RiskRulePage() {
         <AddParamValueDialog
           isOpen={isDialogOpen}
           onClose={() => setIsDialogOpen(false)}
+          rule={selectedRule}
+        />
+        <ParamValuesHistory
+          isOpen={isHistoryDialogOpen}
+          onClose={() => setIsHistoryDialogOpen(false)}
           rule={selectedRule}
         />
       </Box>
