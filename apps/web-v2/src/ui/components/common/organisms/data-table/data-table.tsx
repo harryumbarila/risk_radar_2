@@ -115,7 +115,7 @@ const DataTable = <Entry extends BaseModel>(
   //   return () => onSelectRow?.(entry);
   // };
   return (
-    <Table.ScrollArea borderWidth="1px">
+    <Table.ScrollArea borderWidth="1px" w="full">
       <Table.Root stickyHeader size="sm" variant="outline">
         <Table.Header>
           {table.getCenterHeaderGroups().map((headerGroup) => (

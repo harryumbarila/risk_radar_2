@@ -11,13 +11,17 @@ export const ROUTE_STRUCTURE = {
         label: 'Risk Rules',
         href: '/settings/risk-rules',
       },
-      'mcc-configuration': {
+      'mcc-config': {
         label: 'MCC Configuration',
         href: '/settings/mcc-config',
       },
-      'mid-configuration': {
+      'mid-config': {
         label: 'MID Configuration',
         href: '/settings/mid-config',
+      },
+      'merchant-risk-thresholds': {
+        label: 'Merchant Risk Thresholds',
+        href: '/settings/merchant-risk-thresholds',
       },
     },
   },

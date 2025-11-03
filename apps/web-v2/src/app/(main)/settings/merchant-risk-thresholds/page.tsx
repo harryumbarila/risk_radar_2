@@ -1,15 +1,16 @@
 import React from 'react';
-import SettingsMidConfig from '@/libs/domain/settings/mid-config/mid-config';
-
 import type { Metadata } from 'next';
+
+import SettingsMerchantRiskThresholds from '@/libs/domain/settings/merchant-risk-thresholds/merchant-risk-thresholds';
+
 export const metadata: Metadata = {
-  title: 'MID Configuration',
+  title: 'Merchant Risk Thresholds',
 };
 
 export default function MidConfigPage(): React.JSX.Element {
   return (
     <>
-      <SettingsMidConfig />
+      <SettingsMerchantRiskThresholds />
     </>
   );
 }

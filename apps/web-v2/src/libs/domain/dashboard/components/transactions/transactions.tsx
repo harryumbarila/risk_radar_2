@@ -11,8 +11,12 @@ import {
   Portal,
   createListCollection,
 } from '@chakra-ui/react';
-import { Eye, Check, Ban } from 'lucide-react';
-import { MdOutlineArrowUpward, MdCheck } from 'react-icons/md';
+import { Check, Ban } from 'lucide-react';
+import {
+  MdOutlineArrowUpward,
+  MdCheck,
+  MdOutlineRemoveRedEye,
+} from 'react-icons/md';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
 import { riskColor, statusColor } from '@/libs/utils/utils';
@@ -89,12 +93,12 @@ const columns = [
             colorScheme="gray"
             onClick={(e) => e.stopPropagation()}
           >
-            <Eye size={14} />
+            <MdOutlineRemoveRedEye />
             View
           </Button>
         </ExceptionDrawer>
         <Button size="sm" bg="black" color="white" _hover={{ bg: 'gray.800' }}>
-          <Check size={14} />
+          <MdCheck size={14} />
           Review
         </Button>
         <Button size="sm" colorPalette="red">

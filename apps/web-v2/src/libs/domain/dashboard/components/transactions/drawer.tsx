@@ -17,7 +17,7 @@ import {
   Table,
   HStack,
 } from '@chakra-ui/react';
-import { Check } from 'lucide-react';
+import { MdCheck } from 'react-icons/md';
 import { MdOutlineArrowBack } from 'react-icons/md';
 import { RiExpandDiagonalFill } from 'react-icons/ri';
 
@@ -407,7 +407,7 @@ export default function ExceptionDrawer(
             <Drawer.Footer>
               <Box display="flex" flexDirection="column" w="100%" gap={4}>
                 <Button flexGrow={1}>
-                  <Check size={14} />
+                  <MdCheck size={14} />
                   Mark as Reviewed
                 </Button>
                 <Drawer.ActionTrigger asChild>

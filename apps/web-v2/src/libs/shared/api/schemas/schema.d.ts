@@ -1598,201 +1598,201 @@ export interface components {
         };
         CreateOrUpdateWhiteListMidDto: {
             /**
-             * @description Primary key identifier of the parameter value.
+             * @description Primary key identifier of the whitelist entry.
              * @example 1
              */
             id?: number;
             /**
-             * @description Merchant ID associated with the whitelist entry.
+             * @description Merchant ID associated with this whitelist record.
              * @example MID123456789012
              */
             MId?: string;
             /**
              * @description Indicates whether the rule AH01 is active for this MID.
-             * @example true
+             * @example false
              */
             AH01?: boolean;
             /**
-             * @description Indicates whether the rule AH02 is active.
+             * @description Indicates whether the rule AH02 is active for this MID.
              * @example false
              */
             AH02?: boolean;
             /**
-             * @description Indicates whether the rule AH03 is active.
-             * @example true
+             * @description Indicates whether the rule AH03 is active for this MID.
+             * @example false
              */
             AH03?: boolean;
             /**
-             * @description Indicates whether the rule AH04 is active.
+             * @description Indicates whether the rule AH04 is active for this MID.
              * @example false
              */
             AH04?: boolean;
             /**
-             * @description Indicates whether the rule AH05 is active.
-             * @example true
+             * @description Indicates whether the rule AH05 is active for this MID.
+             * @example false
              */
             AH05?: boolean;
             /**
-             * @description Indicates whether the rule AH06 is active.
+             * @description Indicates whether the rule AH06 is active for this MID.
              * @example false
              */
             AH06?: boolean;
             /**
-             * @description Indicates whether the rule AH07 is active.
-             * @example true
+             * @description Indicates whether the rule AH07 is active for this MID.
+             * @example false
              */
             AH07?: boolean;
             /**
-             * @description Indicates whether the rule AH08 is active.
-             * @example true
+             * @description Indicates whether the rule AH08 is active for this MID.
+             * @example false
              */
             AH08?: boolean;
             /**
-             * @description Indicates whether the rule AH09 is active.
+             * @description Indicates whether the rule AH09 is active for this MID.
              * @example false
              */
             AH09?: boolean;
             /**
-             * @description Indicates whether the rule AH10 is active.
-             * @example true
+             * @description Indicates whether the rule AH10 is active for this MID.
+             * @example false
              */
             AH10?: boolean;
             /**
-             * @description Indicates whether the rule AH11 is active.
+             * @description Indicates whether the rule AH11 is active for this MID.
              * @example false
              */
             AH11?: boolean;
             /**
-             * @description Indicates whether the rule AH12 is active.
-             * @example true
+             * @description Indicates whether the rule AH12 is active for this MID.
+             * @example false
              */
             AH12?: boolean;
             /**
-             * @description Indicates whether the rule AH13 is active.
+             * @description Indicates whether the rule AH13 is active for this MID.
              * @example false
              */
             AH13?: boolean;
             /**
-             * @description Indicates whether the rule AH14 is active.
-             * @example true
+             * @description Indicates whether the rule AH14 is active for this MID.
+             * @example false
              */
             AH14?: boolean;
             /**
-             * @description Indicates whether the rule AH15 is active.
+             * @description Indicates whether the rule AH15 is active for this MID.
              * @example false
              */
             AH15?: boolean;
             /**
-             * @description Indicates whether the rule AH16 is active.
-             * @example true
+             * @description Indicates whether the rule AH16 is active for this MID.
+             * @example false
              */
             AH16?: boolean;
             /**
-             * @description Username or identifier of the user who last updated this record.
-             * @example admin_user
+             * @description User who last updated the record.
+             * @example system_admin
              */
             lastUpdatedBy?: string;
         };
         RiskRuleWhiteListMidEntity: {
             /**
-             * @description Primary key identifier of the parameter value.
+             * @description Primary key identifier of the whitelist entry.
              * @example 1
              */
             id: number;
             /**
-             * @description Merchant ID associated with the whitelist entry.
+             * @description Merchant ID associated with this whitelist record.
              * @example MID123456789012
              */
-            MId?: string;
+            MId: string;
             /**
              * @description Indicates whether the rule AH01 is active for this MID.
-             * @example true
-             */
-            AH01?: boolean;
-            /**
-             * @description Indicates whether the rule AH02 is active.
              * @example false
              */
-            AH02?: boolean;
+            AH01: boolean;
             /**
-             * @description Indicates whether the rule AH03 is active.
-             * @example true
-             */
-            AH03?: boolean;
-            /**
-             * @description Indicates whether the rule AH04 is active.
+             * @description Indicates whether the rule AH02 is active for this MID.
              * @example false
              */
-            AH04?: boolean;
+            AH02: boolean;
             /**
-             * @description Indicates whether the rule AH05 is active.
-             * @example true
-             */
-            AH05?: boolean;
-            /**
-             * @description Indicates whether the rule AH06 is active.
+             * @description Indicates whether the rule AH03 is active for this MID.
              * @example false
              */
-            AH06?: boolean;
+            AH03: boolean;
             /**
-             * @description Indicates whether the rule AH07 is active.
-             * @example true
-             */
-            AH07?: boolean;
-            /**
-             * @description Indicates whether the rule AH08 is active.
-             * @example true
-             */
-            AH08?: boolean;
-            /**
-             * @description Indicates whether the rule AH09 is active.
+             * @description Indicates whether the rule AH04 is active for this MID.
              * @example false
              */
-            AH09?: boolean;
+            AH04: boolean;
             /**
-             * @description Indicates whether the rule AH10 is active.
-             * @example true
-             */
-            AH10?: boolean;
-            /**
-             * @description Indicates whether the rule AH11 is active.
+             * @description Indicates whether the rule AH05 is active for this MID.
              * @example false
              */
-            AH11?: boolean;
+            AH05: boolean;
             /**
-             * @description Indicates whether the rule AH12 is active.
-             * @example true
-             */
-            AH12?: boolean;
-            /**
-             * @description Indicates whether the rule AH13 is active.
+             * @description Indicates whether the rule AH06 is active for this MID.
              * @example false
              */
-            AH13?: boolean;
+            AH06: boolean;
             /**
-             * @description Indicates whether the rule AH14 is active.
-             * @example true
-             */
-            AH14?: boolean;
-            /**
-             * @description Indicates whether the rule AH15 is active.
+             * @description Indicates whether the rule AH07 is active for this MID.
              * @example false
              */
-            AH15?: boolean;
+            AH07: boolean;
             /**
-             * @description Indicates whether the rule AH16 is active.
-             * @example true
+             * @description Indicates whether the rule AH08 is active for this MID.
+             * @example false
              */
-            AH16?: boolean;
+            AH08: boolean;
+            /**
+             * @description Indicates whether the rule AH09 is active for this MID.
+             * @example false
+             */
+            AH09: boolean;
+            /**
+             * @description Indicates whether the rule AH10 is active for this MID.
+             * @example false
+             */
+            AH10: boolean;
+            /**
+             * @description Indicates whether the rule AH11 is active for this MID.
+             * @example false
+             */
+            AH11: boolean;
+            /**
+             * @description Indicates whether the rule AH12 is active for this MID.
+             * @example false
+             */
+            AH12: boolean;
+            /**
+             * @description Indicates whether the rule AH13 is active for this MID.
+             * @example false
+             */
+            AH13: boolean;
+            /**
+             * @description Indicates whether the rule AH14 is active for this MID.
+             * @example false
+             */
+            AH14: boolean;
+            /**
+             * @description Indicates whether the rule AH15 is active for this MID.
+             * @example false
+             */
+            AH15: boolean;
+            /**
+             * @description Indicates whether the rule AH16 is active for this MID.
+             * @example false
+             */
+            AH16: boolean;
             /**
              * Format: date-time
-             * @description Record creation or last update timestamp.
-             * @example 2024-11-03T15:24:00Z
+             * @description Date and time when the record was last updated.
+             * @example 2025-11-03T13:29:51.000Z
              */
             lastUpdatedDate: string;
             /**
-             * @description Username or identifier of the user who last updated this record.
-             * @example admin_user
+             * @description User who last updated the record.
+             * @example system_admin
              */
             lastUpdatedBy?: string;
         };
@@ -1996,8 +1996,96 @@ export interface components {
              */
             lastUpdatedBy: string;
         };
-        CreateOrUpdateMerchantRiskThresholdDto: Record<string, never>;
-        MerchanRiskThresholdsEntity: Record<string, never>;
+        CreateOrUpdateMerchantRiskThresholdDto: {
+            /**
+             * @description Primary key identifier of the merchant risk threshold record.
+             * @example 1
+             */
+            id?: number;
+            /**
+             * @description Merchant identifier (MID).
+             * @example MID123456789012
+             */
+            mid?: string;
+            /**
+             * @description Percentage of keyed (manually entered) transactions.
+             * @example 15
+             */
+            keyedPercentage?: number;
+            /**
+             * @description Maximum allowed monthly transaction volume for the merchant.
+             * @example 250000
+             */
+            monthlyVolume?: number;
+            /**
+             * @description Maximum single transaction amount considered high-ticket.
+             * @example 5000
+             */
+            highTicket?: number;
+            /**
+             * @description Maximum number of transactions allowed per month.
+             * @example 1200
+             */
+            transactionCount?: number;
+            /**
+             * @description Allowed percentage of declined transactions.
+             * @example 3
+             */
+            declinePercentage?: number;
+            /**
+             * @description User or system account that last updated this record.
+             * @example system_admin
+             */
+            lastUpdatedBy?: string;
+        };
+        MerchanRiskThresholdsEntity: {
+            /**
+             * @description Primary key identifier of the merchant risk threshold record.
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description Merchant identifier (MID).
+             * @example MID123456789012
+             */
+            mid?: string;
+            /**
+             * @description Percentage of keyed (manually entered) transactions.
+             * @example 15
+             */
+            keyedPercentage?: number;
+            /**
+             * @description Maximum allowed monthly transaction volume for the merchant.
+             * @example 250000
+             */
+            monthlyVolume?: number;
+            /**
+             * @description Maximum single transaction amount considered high-ticket.
+             * @example 5000
+             */
+            highTicket?: number;
+            /**
+             * @description Maximum number of transactions allowed per month.
+             * @example 1200
+             */
+            transactionCount?: number;
+            /**
+             * @description Allowed percentage of declined transactions.
+             * @example 3
+             */
+            declinePercentage?: number;
+            /**
+             * Format: date-time
+             * @description Date and time when the record was last updated.
+             * @example 2025-11-03T12:00:00.000Z
+             */
+            lastUpdatedDate?: string;
+            /**
+             * @description User or system account that last updated this record.
+             * @example system_admin
+             */
+            lastUpdatedBy?: string;
+        };
         RiskRuleParamValuePaginationOutputDto: {
             /** @description Primary key identifier of the parameter value. */
             id: number;
