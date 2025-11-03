@@ -1,30 +1,32 @@
 'use client';
-import { useState } from 'react';
-import { Button, Input, VStack, HStack, Text, Portal } from '@chakra-ui/react';
-import { Dialog } from '@chakra-ui/react';
-import { components } from '@/libs/shared/api/schemas/schema';
-import { $riskApi } from '@/libs/shared/api/risk.api';
+import { JSX } from 'react';
+
+import {
+  Button,
+  Input,
+  VStack,
+  HStack,
+  Text,
+  Portal,
+  Dialog,
+} from '@chakra-ui/react';
+import { useQueryClient } from '@tanstack/react-query';
+
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useQueryClient } from '@tanstack/react-query';
-interface AddParamValueDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  rule: components['schemas']['RiskRuleParamValueOutputDto'] | null;
-}
 
-export const validateSchema = z.object({
-  effectiveDate: z.string(),
-  value: z.string(),
-});
-export type ParameterValueFormModel = z.infer<typeof validateSchema>;
+import { $riskApi } from '@/libs/shared/api/risk.api';
+import {
+  AddParamValueDialogProps,
+  ParameterValueFormModel,
+  validateSchema,
+} from './add-risk-rule.model';
 
 const AddParamValueDialog = ({
   isOpen,
   onClose,
   rule,
-}: AddParamValueDialogProps) => {
+}: AddParamValueDialogProps): JSX.Element | null => {
   const queryClient = useQueryClient();
   const methods = useForm<ParameterValueFormModel>({
     mode: 'all',
@@ -37,12 +39,9 @@ const AddParamValueDialog = ({
 
   const {
     register,
-    watch,
-    formState: { isValid, isSubmitting, errors },
+    formState: { isValid, isSubmitting },
     handleSubmit,
   } = methods;
-
-  console.log({ rule });
 
   const { mutateAsync } = $riskApi.useMutation('post', '/v1/risk-rule');
 
@@ -53,7 +52,7 @@ const AddParamValueDialog = ({
           effectiveDate: data.effectiveDate,
           value: Number(data.value),
           createdBy: 'user',
-          ruleParamId: rule?.id,
+          ruleParamId: Number(rule?.id),
         },
       });
       await queryClient.invalidateQueries({

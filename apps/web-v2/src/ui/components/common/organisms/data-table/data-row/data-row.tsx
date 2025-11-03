@@ -3,6 +3,12 @@ import { flexRender } from '@tanstack/react-table';
 import { DataRowProps } from './data-row.model';
 import { BaseModel } from '@/data/interfaces/api';
 
+const textAlignMap: Record<string, string> = {
+  left: 'start',
+  center: 'center',
+  right: 'end',
+};
+
 export default function DataRow<Entry extends BaseModel>({
   row,
   colSpan,
@@ -17,11 +23,16 @@ export default function DataRow<Entry extends BaseModel>({
           CollapsibleBody && collapsible.setOpen(!collapsible.open)
         }
       >
-        {row.getVisibleCells().map((cell) => (
-          <Table.Cell key={cell.id}>
-            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-          </Table.Cell>
-        ))}
+        {row.getVisibleCells().map((cell) => {
+          const align = (cell.column.columnDef?.meta as Record<string, unknown>)
+            ?.align as string;
+          console.log({ align });
+          return (
+            <Table.Cell key={cell.id} textAlign={textAlignMap[align]}>
+              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+            </Table.Cell>
+          );
+        })}
       </Table.Row>
 
       {CollapsibleBody && (

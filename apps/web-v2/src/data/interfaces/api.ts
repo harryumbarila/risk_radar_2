@@ -12,7 +12,7 @@ export type PaginationInput = {
 };
 
 export type BaseModel = {
-  id: string;
+  id: string | number;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 };

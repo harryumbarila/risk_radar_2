@@ -13,7 +13,12 @@ import {
   RiskRuleWhiteListMccRepositoryAuditLog,
 } from '@/risk-radar-db/repositories';
 import { CreateRiskRuleParamValueDto } from './dto/create-risk-rule-param-value.dto';
-import { MerchanRiskThresholdsEntity, RiskRuleParam, RiskRuleParamValue, RiskRuleWhiteListMccEntity } from '@/risk-radar-db/entities';
+import {
+  MerchanRiskThresholdsEntity,
+  RiskRuleParam,
+  RiskRuleParamValue,
+  RiskRuleWhiteListMccEntity,
+} from '@/risk-radar-db/entities';
 import { RiskRuleWhiteListMidEntity } from '@/risk-radar-db/entities/risk-rule_white_list_mid.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -22,6 +27,10 @@ import { CreateOrUpdateWhiteListMccDto } from './dto/create-or-update-white-list
 import { MerchantRiskThresholdsRepository } from '@/risk-radar-db/repositories/merchant_risk_thresholds.repository';
 import { MerchantRiskThresholdsAuditLogsRepository } from '@/risk-radar-db/repositories/merchant_risk_thresholds_audit_logs.repository';
 import { CreateOrUpdateMerchantRiskThresholdDto } from './dto/create-or-update-merchant_risk_threshold.dto';
+import {
+  ListRiskRuleParamValuesInput,
+  ListRiskRuleParamValuesOutput,
+} from './dto/risk-rule-param-value.dto';
 
 export interface RiskRuleListItem {
   ruleTypeDefinition: string;
@@ -298,11 +307,13 @@ export class RiskRulesService {
     return createdMerchantRiskThreshold;
   }
 
-  async createOrUpdateWhiteListMcc(dto: CreateOrUpdateWhiteListMccDto): Promise<RiskRuleWhiteListMccEntity> {
-
-    const existingWhiteListMcc = await this.riskRuleWhiteListMccRepository.findOne({
-      where: { MCC: dto.mcc },
-    });
+  async createOrUpdateWhiteListMcc(
+    dto: CreateOrUpdateWhiteListMccDto
+  ): Promise<RiskRuleWhiteListMccEntity> {
+    const existingWhiteListMcc =
+      await this.riskRuleWhiteListMccRepository.findOne({
+        where: { MCC: dto.mcc },
+      });
 
     if (existingWhiteListMcc) {
       // Use query builder for update to properly handle GETDATE()
@@ -383,7 +394,7 @@ export class RiskRulesService {
     const { id: _id, ...auditData } = createdWhiteListMcc;
     const auditLog = this.riskRuleWhiteListMccAuditLogRepository.create(auditData);
     await this.riskRuleWhiteListMccAuditLogRepository.save(auditLog);
-    
+
     return createdWhiteListMcc;
   }
 
@@ -394,10 +405,13 @@ export class RiskRulesService {
       .getMany();
   }
 
-  async createOrUpdateWhiteListMid(dto: CreateOrUpdateWhiteListMidDto): Promise<RiskRuleWhiteListMidEntity> {
-    const existingWhiteListMid = await this.riskRuleWhiteListMidRepository.findOne({
-      where: { MId: dto.mid },
-    });
+  async createOrUpdateWhiteListMid(
+    dto: CreateOrUpdateWhiteListMidDto
+  ): Promise<RiskRuleWhiteListMidEntity> {
+    const existingWhiteListMid =
+      await this.riskRuleWhiteListMidRepository.findOne({
+        where: { MId: dto.mid },
+      });
 
     if (existingWhiteListMid) {
       // Use query builder for update to properly handle GETDATE()
@@ -478,9 +492,33 @@ export class RiskRulesService {
     const { id: _id, ...auditData } = createdWhiteListMid;
     const auditLog = this.riskRuleWhiteListMidAuditLogRepository.create(auditData);
     await this.riskRuleWhiteListMidAuditLogRepository.save(auditLog);
-    
+
     return createdWhiteListMid;
   }
 
+  async listRiskRuleParamValue(
+    input: ListRiskRuleParamValuesInput
+  ): Promise<ListRiskRuleParamValuesOutput> {
+    const { page = 1, limit = 50, ruleParamId } = input;
 
+    const qb = this.paramValueRepository.createQueryBuilder('paramValue');
+
+    if (ruleParamId) {
+      qb.where('paramValue.ruleParamId = :ruleParamId', { ruleParamId });
+    }
+
+    qb.orderBy('paramValue.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    const [data, total] = await qb.getManyAndCount();
+
+    return {
+      data,
+      count: data.length,
+      total,
+      page,
+      pageCount: Math.ceil(total / limit),
+    };
+  }
 }
