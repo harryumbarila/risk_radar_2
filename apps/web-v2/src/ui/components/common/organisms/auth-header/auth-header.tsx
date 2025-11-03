@@ -1,8 +1,8 @@
 'use client';
 import React from 'react';
 
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@frontegg/nextjs';
+import { usePathname, useRouter } from 'next/navigation';
+// import { useAuth } from '@frontegg/nextjs';
 
 import {
   Box,
@@ -11,7 +11,6 @@ import {
   Button,
   Portal,
   HStack,
-  Text,
   IconButton,
   Popover,
 } from '@chakra-ui/react';
@@ -22,13 +21,67 @@ import {
   MdLogout,
 } from 'react-icons/md';
 
-import { ColorModeButton } from '../../molecules';
+import { ROUTE_STRUCTURE } from '@/libs/navigation/routes.config';
+
+import { ColorModeButton, CustomBreadcrumb } from '../../molecules';
 
 export default function AuthHeader(): React.JSX.Element {
-  const router = useRouter();
-  const { user } = useAuth();
+  const pathname = usePathname();
 
-  console.log({ user });
+  const segments = pathname?.split('/').filter(Boolean) || [];
+
+  let currentLevel: any = ROUTE_STRUCTURE;
+
+  // Build breadcrumb items from the current route path
+  const paths = segments.map((segment, index) => {
+    const node = currentLevel?.[segment];
+    const label = node?.label || segment;
+    const href = node?.href || '/' + segments.slice(0, index + 1).join('/');
+
+    // For the *current segment*, dropdown should show its children (if any)
+    const children =
+      node?.children &&
+      Object.entries(node.children).map(([key, value]: [string, any]) => ({
+        label: value.label || key,
+        value: value.label || key,
+        href:
+          value.href ||
+          '/' +
+            segments
+              .slice(0, index + 1)
+              .concat(key)
+              .join('/'),
+      }));
+
+    // Move deeper in the structure
+    currentLevel = node?.children;
+
+    return {
+      label,
+      href,
+      menu: children || [],
+      isCurrent: index === segments.length - 1,
+    };
+  });
+
+  // Always prepend Dashboard (root)
+  const fullPaths = [
+    {
+      label: ROUTE_STRUCTURE.dashboard.label,
+      href: ROUTE_STRUCTURE.dashboard.href,
+      menu: [],
+      isCurrent: segments.length === 0,
+    },
+    ...paths,
+  ];
+
+  const router = useRouter();
+  console.log({
+    fullPaths,
+  });
+  // const { user } = useAuth();
+
+  // console.log({ user });
 
   const handleSignOut = React.useCallback(() => {
     router.replace('/account/logout');
@@ -50,11 +103,7 @@ export default function AuthHeader(): React.JSX.Element {
       <Flex h="full" align="center" justify="space-between">
         {/* Breadcrumb */}
         <HStack gap={2} fontSize="sm" color="gray.fg">
-          <Text>Pages</Text>
-          <Text>/</Text>
-          <Text fontWeight="bold" color="gray.fg">
-            Dashboard
-          </Text>
+          <CustomBreadcrumb paths={fullPaths} />
         </HStack>
 
         {/* Right Side */}
@@ -88,7 +137,7 @@ export default function AuthHeader(): React.JSX.Element {
                       </Popover.Title>
 
                       <VStack align="stretch" gap={2} divideX="2px">
-                        <Text>{user?.email}</Text>
+                        {/* <Text>{user?.email}</Text> */}
                         <Button
                           variant="ghost"
                           justifyContent="flex-start"

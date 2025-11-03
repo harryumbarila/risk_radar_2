@@ -21,7 +21,7 @@ import {
 } from '@/risk-radar-db/entities';
 import { RiskRuleWhiteListMidEntity } from '@/risk-radar-db/entities/risk-rule_white_list_mid.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { CreateOrUpdateWhiteListMidDto } from './dto/create-or-update-white-list-mids.dto';
 import { CreateOrUpdateWhiteListMccDto } from './dto/create-or-update-white-list-mcc.dto';
 import { MerchantRiskThresholdsRepository } from '@/risk-radar-db/repositories/merchant_risk_thresholds.repository';
@@ -59,7 +59,7 @@ export class RiskRulesService {
     private readonly riskRuleWhiteListMidAuditLogRepository: RiskRuleWhiteListMidRepositoryAuditLog,
     private readonly riskRuleWhiteListMccAuditLogRepository: RiskRuleWhiteListMccRepositoryAuditLog,
     private readonly merchantRiskThresholdsRepository: MerchantRiskThresholdsRepository,
-    private readonly merchantRiskThresholdsAuditLogsRepository: MerchantRiskThresholdsAuditLogsRepository,
+    private readonly merchantRiskThresholdsAuditLogsRepository: MerchantRiskThresholdsAuditLogsRepository
   ) {}
 
   mapToRiskRuleHierarchy(rows: RiskRuleListItem[]): RiskRuleOutputDto[] {
@@ -233,18 +233,22 @@ export class RiskRulesService {
       .getMany();
   }
 
-  async getMerchantRiskThresholds(mId: string): Promise<MerchanRiskThresholdsEntity[]> {
+  async getMerchantRiskThresholds(
+    mId: string
+  ): Promise<MerchanRiskThresholdsEntity[]> {
     return this.merchantRiskThresholdsRepository
       .createQueryBuilder('merchantRiskThreshold')
       .where('merchantRiskThreshold.MId LIKE :mId', { mId: `%${mId}%` })
       .getMany();
   }
 
-  async createOrUpdateMerchantRiskThreshold(dto: CreateOrUpdateMerchantRiskThresholdDto): Promise<MerchanRiskThresholdsEntity> {
-
-    const existingMerchantRiskThreshold = await this.merchantRiskThresholdsRepository.findOne({
-      where: { MId: dto.mid },
-    });
+  async createOrUpdateMerchantRiskThreshold(
+    dto: CreateOrUpdateMerchantRiskThresholdDto
+  ): Promise<MerchanRiskThresholdsEntity> {
+    const existingMerchantRiskThreshold =
+      await this.merchantRiskThresholdsRepository.findOne({
+        where: { MId: dto.mid },
+      });
 
     if (existingMerchantRiskThreshold) {
       // Use query builder for update to properly handle GETDATE()
@@ -264,14 +268,16 @@ export class RiskRulesService {
         .execute();
 
       // Fetch the updated record
-      const updatedMerchantRiskThreshold = await this.merchantRiskThresholdsRepository.findOne({
-        where: { MId: dto.mid },
-      });
+      const updatedMerchantRiskThreshold =
+        await this.merchantRiskThresholdsRepository.findOne({
+          where: { MId: dto.mid },
+        });
 
       // Create new audit log entry (exclude id to create new record)
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id: _id, ...auditData } = updatedMerchantRiskThreshold;
-      const auditLog = this.merchantRiskThresholdsAuditLogsRepository.create(auditData);
+      const auditLog =
+        this.merchantRiskThresholdsAuditLogsRepository.create(auditData);
       await this.merchantRiskThresholdsAuditLogsRepository.save(auditLog);
 
       return updatedMerchantRiskThreshold;
@@ -294,14 +300,16 @@ export class RiskRulesService {
       .execute();
 
     // Fetch the created record
-    const createdMerchantRiskThreshold = await this.merchantRiskThresholdsRepository.findOne({
-      where: { MId: dto.mid },
-    });
+    const createdMerchantRiskThreshold =
+      await this.merchantRiskThresholdsRepository.findOne({
+        where: { MId: dto.mid },
+      });
 
     // Create new audit log entry (exclude id to create new record)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id: _id, ...auditData } = createdMerchantRiskThreshold;
-    const auditLog = this.merchantRiskThresholdsAuditLogsRepository.create(auditData);
+    const auditLog =
+      this.merchantRiskThresholdsAuditLogsRepository.create(auditData);
     await this.merchantRiskThresholdsAuditLogsRepository.save(auditLog);
 
     return createdMerchantRiskThreshold;
@@ -312,7 +320,7 @@ export class RiskRulesService {
   ): Promise<RiskRuleWhiteListMccEntity> {
     const existingWhiteListMcc =
       await this.riskRuleWhiteListMccRepository.findOne({
-        where: { MCC: dto.mcc },
+        where: { MCC: dto.MCC },
       });
 
     if (existingWhiteListMcc) {
@@ -340,18 +348,20 @@ export class RiskRulesService {
           lastUpdatedBy: dto.lastUpdatedBy,
           lastUpdatedDate: () => 'GETDATE()',
         })
-        .where('MCC = :mcc', { mcc: dto.mcc })
+        .where('MCC = :mcc', { mcc: dto.MCC })
         .execute();
 
       // Fetch the updated record
-      const updatedWhiteListMcc = await this.riskRuleWhiteListMccRepository.findOne({
-        where: { MCC: dto.mcc },
-      });
-      
+      const updatedWhiteListMcc =
+        await this.riskRuleWhiteListMccRepository.findOne({
+          where: { MCC: dto.MCC },
+        });
+
       // Create new audit log entry (exclude id to create new record)
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id: _id, ...auditData } = updatedWhiteListMcc;
-      const auditLog = this.riskRuleWhiteListMccAuditLogRepository.create(auditData);
+      const auditLog =
+        this.riskRuleWhiteListMccAuditLogRepository.create(auditData);
       await this.riskRuleWhiteListMccAuditLogRepository.save(auditLog);
 
       return updatedWhiteListMcc;
@@ -362,7 +372,7 @@ export class RiskRulesService {
       .createQueryBuilder()
       .insert()
       .values({
-        MCC: dto.mcc,
+        MCC: dto.MCC,
         AH01: dto.AH01,
         AH02: dto.AH02,
         AH03: dto.AH03,
@@ -385,14 +395,16 @@ export class RiskRulesService {
       .execute();
 
     // Fetch the created record
-    const createdWhiteListMcc = await this.riskRuleWhiteListMccRepository.findOne({
-      where: { MCC: dto.mcc },
-    });
-    
+    const createdWhiteListMcc =
+      await this.riskRuleWhiteListMccRepository.findOne({
+        where: { MCC: dto.MCC },
+      });
+
     // Create new audit log entry (exclude id to create new record)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id: _id, ...auditData } = createdWhiteListMcc;
-    const auditLog = this.riskRuleWhiteListMccAuditLogRepository.create(auditData);
+    const auditLog =
+      this.riskRuleWhiteListMccAuditLogRepository.create(auditData);
     await this.riskRuleWhiteListMccAuditLogRepository.save(auditLog);
 
     return createdWhiteListMcc;
@@ -401,7 +413,7 @@ export class RiskRulesService {
   async getWhiteListMids(mid: string): Promise<RiskRuleWhiteListMidEntity[]> {
     return this.riskRuleWhiteListMidRepository
       .createQueryBuilder('mid')
-      .where('mid.MId D :mid', { mid: `%${mid}%` })
+      .where('mid.MId LIKE :mid', { mid: `%${mid}%` })
       .getMany();
   }
 
@@ -410,7 +422,7 @@ export class RiskRulesService {
   ): Promise<RiskRuleWhiteListMidEntity> {
     const existingWhiteListMid =
       await this.riskRuleWhiteListMidRepository.findOne({
-        where: { MId: dto.mid },
+        where: { MId: dto.MId },
       });
 
     if (existingWhiteListMid) {
@@ -438,18 +450,20 @@ export class RiskRulesService {
           lastUpdatedBy: dto.lastUpdatedBy,
           lastUpdatedDate: () => 'GETDATE()',
         })
-        .where('MId = :mid', { mid: dto.mid })
+        .where('MId = :mid', { mid: dto.MId })
         .execute();
 
       // Fetch the updated record
-      const updatedWhiteListMid = await this.riskRuleWhiteListMidRepository.findOne({
-        where: { MId: dto.mid },
-      });
-      
+      const updatedWhiteListMid =
+        await this.riskRuleWhiteListMidRepository.findOne({
+          where: { MId: dto.MId },
+        });
+
       // Create new audit log entry (exclude id to create new record)
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id: _id, ...auditData } = updatedWhiteListMid;
-      const auditLog = this.riskRuleWhiteListMidAuditLogRepository.create(auditData);
+      const auditLog =
+        this.riskRuleWhiteListMidAuditLogRepository.create(auditData);
       await this.riskRuleWhiteListMidAuditLogRepository.save(auditLog);
 
       return updatedWhiteListMid;
@@ -460,7 +474,7 @@ export class RiskRulesService {
       .createQueryBuilder()
       .insert()
       .values({
-        MId: dto.mid,
+        MId: dto.MId,
         AH01: dto.AH01,
         AH02: dto.AH02,
         AH03: dto.AH03,
@@ -483,14 +497,16 @@ export class RiskRulesService {
       .execute();
 
     // Fetch the created record
-    const createdWhiteListMid = await this.riskRuleWhiteListMidRepository.findOne({
-      where: { MId: dto.mid },
-    });
-    
+    const createdWhiteListMid =
+      await this.riskRuleWhiteListMidRepository.findOne({
+        where: { MId: dto.MId },
+      });
+
     // Create new audit log entry (exclude id to create new record)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id: _id, ...auditData } = createdWhiteListMid;
-    const auditLog = this.riskRuleWhiteListMidAuditLogRepository.create(auditData);
+    const auditLog =
+      this.riskRuleWhiteListMidAuditLogRepository.create(auditData);
     await this.riskRuleWhiteListMidAuditLogRepository.save(auditLog);
 
     return createdWhiteListMid;

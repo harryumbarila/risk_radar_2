@@ -13,7 +13,7 @@ export const buttonRecipe = defineRecipe({
   },
   variants: {
     variant: {
-      solid: { bg: 'brand.500', color: 'white' },
+      solid: { bg: 'brand.500', color: 'white', },
       outline: { borderWidth: '1px', borderColor: 'brand.500' },
     },
     size: {

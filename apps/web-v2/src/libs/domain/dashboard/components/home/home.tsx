@@ -63,8 +63,8 @@ export default function Home() {
   ];
 
   return (
-    <Box ml="260px" p={8}>
-      <VStack gap={6} align="stretch" pt="70px">
+    <Box>
+      <VStack gap={6} align="stretch">
         {/* Stats Row */}
         <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} gap={6}>
           <StatCard

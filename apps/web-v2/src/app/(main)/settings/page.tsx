@@ -1,17 +1,80 @@
-import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
+import React from 'react';
+import Link from 'next/link';
 
-import RiskRulePage from '@/libs/domain/settings/components/risk-rule/risk-rule.page';
-import { getQueryClient } from '@/libs/shared/providers/query-client';
-import { $riskApi } from '@/libs/shared/api/risk.api';
+import {
+  Box,
+  Heading,
+  Text,
+  SimpleGrid,
+} from '@chakra-ui/react';
+import { MdSecurity, MdCategory, MdStore } from 'react-icons/md';
 
-export default function SettingsPage() {
-  const queryClient = getQueryClient();
-
-  queryClient.prefetchQuery($riskApi.queryOptions('get', '/v1/risk-rule'));
+export default function SettingsPage(): React.JSX.Element {
+  const modules = [
+    {
+      title: 'Risk Rules',
+      description: 'Configure risk management rules and parameters',
+      icon: MdSecurity,
+      path: '/settings/risk-rules',
+      color: 'brand.600',
+    },
+    {
+      title: 'MCC Configuration',
+      description: 'Manage Merchant Category Code settings',
+      icon: MdCategory,
+      path: '/settings/mcc-config',
+      color: 'brand.600',
+    },
+    {
+      title: 'MID Configuration',
+      description: 'Manage Merchant ID configurations',
+      icon: MdStore,
+      path: '/settings/mid-config',
+      color: 'brand.600',
+    },
+  ];
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <RiskRulePage />
-    </HydrationBoundary>
+      <Box>
+        <Heading size="xl" mb={2} color="brand.700">
+          Settings
+        </Heading>
+        <Text color="gray.600" mb={6}>
+          Configure application modules and settings
+        </Text>
+
+        <SimpleGrid
+          columns={{
+            base: 2,
+            md: 4,
+          }}
+          gap={6}
+        >
+          {modules.map((module) => (
+            <Link key={module.path} href={module.path} passHref>
+              <Box
+                bg="white"
+                p={6}
+                borderRadius="lg"
+                shadow="sm"
+                cursor="pointer"
+                transition="all 0.2s"
+                _hover={{
+                  shadow: 'md',
+                  transform: 'translateY(-2px)',
+                }}
+              >
+                <module.icon size={32} />
+                <Heading size="md" mb={2} color="brand.700">
+                  {module.title}
+                </Heading>
+                <Text color="gray.600" fontSize="sm">
+                  {module.description}
+                </Text>
+              </Box>
+            </Link>
+          ))}
+        </SimpleGrid>
+    </Box>
   );
 }

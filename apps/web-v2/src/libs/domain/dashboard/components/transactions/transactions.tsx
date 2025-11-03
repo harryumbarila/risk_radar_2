@@ -97,7 +97,7 @@ const columns = [
           <Check size={14} />
           Review
         </Button>
-        <Button size="sm" colorScheme="red">
+        <Button size="sm" colorPalette="red">
           <Ban size={14} />
           Divert
         </Button>

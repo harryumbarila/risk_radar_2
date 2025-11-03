@@ -17,10 +17,10 @@ import { MdAdd, MdOutlineRemoveRedEye } from 'react-icons/md';
 import { $riskApi } from '@/libs/shared/api/risk.api';
 import { components } from '@/libs/shared/api/schemas/schema';
 
-import AddParamValueDialog from '../add-risk-rule/add-risk-rule';
-import ParamValuesHistory from '../list-param-values/list-param-values';
+import AddParamValueDialog from './components/add-risk-rule/add-risk-rule';
+import ParamValuesHistory from './components/list-param-values/list-param-values';
 
-export default function RiskRulePage(): React.JSX.Element {
+export default function SettingRiskRule(): React.JSX.Element {
   const [selectedRule, setSelectedRule] = React.useState<
     components['schemas']['RiskRuleParamValueOutputDto'] | null
   >(null);
@@ -61,8 +61,7 @@ export default function RiskRulePage(): React.JSX.Element {
   }
 
   return (
-    <Box ml="260px" p={10} mt={50}>
-      <Box bg="white" borderRadius="xl" boxShadow="md" p={4}>
+      <Box >
         <HStack justify="space-between" mb={6}>
           <VStack align="start" gap={1}>
             <Text fontSize="2xl" fontWeight="bold" color="gray.700">
@@ -181,6 +180,5 @@ export default function RiskRulePage(): React.JSX.Element {
           rule={selectedRule}
         />
       </Box>
-    </Box>
   );
 }

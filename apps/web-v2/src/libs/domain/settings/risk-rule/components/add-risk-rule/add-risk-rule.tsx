@@ -21,6 +21,7 @@ import {
   ParameterValueFormModel,
   validateSchema,
 } from './add-risk-rule.model';
+import { InputField } from '@/ui/components/form';
 
 const AddParamValueDialog = ({
   isOpen,
@@ -38,7 +39,6 @@ const AddParamValueDialog = ({
   });
 
   const {
-    register,
     formState: { isValid, isSubmitting },
     handleSubmit,
   } = methods;
@@ -85,28 +85,25 @@ const AddParamValueDialog = ({
                       Risk Rule
                     </Text>
                     <Text fontSize="md" color="gray.600">
-                      {rule.definition}
+                      {rule.definition.replace('XXX', String(rule.value))}
                     </Text>
                   </VStack>
 
                   <VStack align="start" gap={2}>
-                    <Text fontSize="sm" fontWeight="medium" color="gray.700">
-                      Value
-                    </Text>
-                    <Input
-                      placeholder="Enter parameter value"
-                      {...register('value')}
+                    <InputField
                       type="number"
+                      name="value"
+                      label="Value"
+                      placeholder="Value"
                     />
                   </VStack>
 
                   <VStack align="start" gap={2}>
-                    <Text fontSize="sm" fontWeight="medium" color="gray.700">
-                      Effective Date
-                    </Text>
-                    <Input
+                    <InputField
                       type="datetime-local"
-                      {...register('effectiveDate')}
+                      name="effectiveDate"
+                      label="Effective Date"
+                      placeholder="Effective date"
                     />
                   </VStack>
                 </VStack>

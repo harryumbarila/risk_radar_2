@@ -72,7 +72,8 @@ export class RiskRulesController {
   @Public()
   @ApiOkResponse({
     description: 'Gets a list of white list mids.',
-    type: [RiskRuleWhiteListMidEntity],
+    type: RiskRuleWhiteListMidEntity,
+    isArray: true,
   })
   async getWhiteListMids(
     @Query('mid') mid: string

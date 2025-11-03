@@ -1,7 +1,10 @@
+import React from 'react';
+
 import { Collapsible, Table, useCollapsible } from '@chakra-ui/react';
 import { flexRender } from '@tanstack/react-table';
-import { DataRowProps } from './data-row.model';
+
 import { BaseModel } from '@/data/interfaces/api';
+import { DataRowProps } from './data-row.model';
 
 const textAlignMap: Record<string, string> = {
   left: 'start',
@@ -13,7 +16,7 @@ export default function DataRow<Entry extends BaseModel>({
   row,
   colSpan,
   CollapsibleBody,
-}: DataRowProps<Entry>) {
+}: DataRowProps<Entry>): React.JSX.Element {
   const collapsible = useCollapsible();
 
   return (
@@ -26,7 +29,6 @@ export default function DataRow<Entry extends BaseModel>({
         {row.getVisibleCells().map((cell) => {
           const align = (cell.column.columnDef?.meta as Record<string, unknown>)
             ?.align as string;
-          console.log({ align });
           return (
             <Table.Cell key={cell.id} textAlign={textAlignMap[align]}>
               {flexRender(cell.column.columnDef.cell, cell.getContext())}

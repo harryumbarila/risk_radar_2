@@ -901,6 +901,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/risk-rule/merchant-risk-threshold": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RiskRulesController_getMerchantRiskThresholds"];
+        put?: never;
+        post: operations["RiskRulesController_createOrUpdateMerchantRiskThreshold"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/risk-rule/param-values": {
         parameters: {
             query?: never;
@@ -1580,26 +1596,408 @@ export interface components {
              */
             createdAt: string;
         };
-        CreateOrUpdateWhiteListMidDto: Record<string, never>;
+        CreateOrUpdateWhiteListMidDto: {
+            /**
+             * @description Primary key identifier of the parameter value.
+             * @example 1
+             */
+            id?: number;
+            /**
+             * @description Merchant ID associated with the whitelist entry.
+             * @example MID123456789012
+             */
+            MId?: string;
+            /**
+             * @description Indicates whether the rule AH01 is active for this MID.
+             * @example true
+             */
+            AH01?: boolean;
+            /**
+             * @description Indicates whether the rule AH02 is active.
+             * @example false
+             */
+            AH02?: boolean;
+            /**
+             * @description Indicates whether the rule AH03 is active.
+             * @example true
+             */
+            AH03?: boolean;
+            /**
+             * @description Indicates whether the rule AH04 is active.
+             * @example false
+             */
+            AH04?: boolean;
+            /**
+             * @description Indicates whether the rule AH05 is active.
+             * @example true
+             */
+            AH05?: boolean;
+            /**
+             * @description Indicates whether the rule AH06 is active.
+             * @example false
+             */
+            AH06?: boolean;
+            /**
+             * @description Indicates whether the rule AH07 is active.
+             * @example true
+             */
+            AH07?: boolean;
+            /**
+             * @description Indicates whether the rule AH08 is active.
+             * @example true
+             */
+            AH08?: boolean;
+            /**
+             * @description Indicates whether the rule AH09 is active.
+             * @example false
+             */
+            AH09?: boolean;
+            /**
+             * @description Indicates whether the rule AH10 is active.
+             * @example true
+             */
+            AH10?: boolean;
+            /**
+             * @description Indicates whether the rule AH11 is active.
+             * @example false
+             */
+            AH11?: boolean;
+            /**
+             * @description Indicates whether the rule AH12 is active.
+             * @example true
+             */
+            AH12?: boolean;
+            /**
+             * @description Indicates whether the rule AH13 is active.
+             * @example false
+             */
+            AH13?: boolean;
+            /**
+             * @description Indicates whether the rule AH14 is active.
+             * @example true
+             */
+            AH14?: boolean;
+            /**
+             * @description Indicates whether the rule AH15 is active.
+             * @example false
+             */
+            AH15?: boolean;
+            /**
+             * @description Indicates whether the rule AH16 is active.
+             * @example true
+             */
+            AH16?: boolean;
+            /**
+             * @description Username or identifier of the user who last updated this record.
+             * @example admin_user
+             */
+            lastUpdatedBy?: string;
+        };
         RiskRuleWhiteListMidEntity: {
-            /** @description Primary key identifier of the parameter value. */
+            /**
+             * @description Primary key identifier of the parameter value.
+             * @example 1
+             */
             id: number;
             /**
+             * @description Merchant ID associated with the whitelist entry.
+             * @example MID123456789012
+             */
+            MId?: string;
+            /**
+             * @description Indicates whether the rule AH01 is active for this MID.
+             * @example true
+             */
+            AH01?: boolean;
+            /**
+             * @description Indicates whether the rule AH02 is active.
+             * @example false
+             */
+            AH02?: boolean;
+            /**
+             * @description Indicates whether the rule AH03 is active.
+             * @example true
+             */
+            AH03?: boolean;
+            /**
+             * @description Indicates whether the rule AH04 is active.
+             * @example false
+             */
+            AH04?: boolean;
+            /**
+             * @description Indicates whether the rule AH05 is active.
+             * @example true
+             */
+            AH05?: boolean;
+            /**
+             * @description Indicates whether the rule AH06 is active.
+             * @example false
+             */
+            AH06?: boolean;
+            /**
+             * @description Indicates whether the rule AH07 is active.
+             * @example true
+             */
+            AH07?: boolean;
+            /**
+             * @description Indicates whether the rule AH08 is active.
+             * @example true
+             */
+            AH08?: boolean;
+            /**
+             * @description Indicates whether the rule AH09 is active.
+             * @example false
+             */
+            AH09?: boolean;
+            /**
+             * @description Indicates whether the rule AH10 is active.
+             * @example true
+             */
+            AH10?: boolean;
+            /**
+             * @description Indicates whether the rule AH11 is active.
+             * @example false
+             */
+            AH11?: boolean;
+            /**
+             * @description Indicates whether the rule AH12 is active.
+             * @example true
+             */
+            AH12?: boolean;
+            /**
+             * @description Indicates whether the rule AH13 is active.
+             * @example false
+             */
+            AH13?: boolean;
+            /**
+             * @description Indicates whether the rule AH14 is active.
+             * @example true
+             */
+            AH14?: boolean;
+            /**
+             * @description Indicates whether the rule AH15 is active.
+             * @example false
+             */
+            AH15?: boolean;
+            /**
+             * @description Indicates whether the rule AH16 is active.
+             * @example true
+             */
+            AH16?: boolean;
+            /**
              * Format: date-time
-             * @description Record creation timestamp.
+             * @description Record creation or last update timestamp.
+             * @example 2024-11-03T15:24:00Z
              */
             lastUpdatedDate: string;
+            /**
+             * @description Username or identifier of the user who last updated this record.
+             * @example admin_user
+             */
+            lastUpdatedBy?: string;
         };
-        CreateOrUpdateWhiteListMccDto: Record<string, never>;
+        CreateOrUpdateWhiteListMccDto: {
+            /**
+             * @description Primary key identifier of the record.
+             * @example 1
+             */
+            id?: number;
+            /**
+             * @description Merchant Category Code (MCC).
+             * @example 1234
+             */
+            MCC?: string;
+            /**
+             * @description Flag for rule AH01.
+             * @example false
+             */
+            AH01?: boolean;
+            /**
+             * @description Flag for rule AH02.
+             * @example false
+             */
+            AH02?: boolean;
+            /**
+             * @description Flag for rule AH03.
+             * @example false
+             */
+            AH03?: boolean;
+            /**
+             * @description Flag for rule AH04.
+             * @example false
+             */
+            AH04?: boolean;
+            /**
+             * @description Flag for rule AH05.
+             * @example false
+             */
+            AH05?: boolean;
+            /**
+             * @description Flag for rule AH06.
+             * @example false
+             */
+            AH06?: boolean;
+            /**
+             * @description Flag for rule AH07.
+             * @example false
+             */
+            AH07?: boolean;
+            /**
+             * @description Flag for rule AH08.
+             * @example false
+             */
+            AH08?: boolean;
+            /**
+             * @description Flag for rule AH09.
+             * @example false
+             */
+            AH09?: boolean;
+            /**
+             * @description Flag for rule AH10.
+             * @example false
+             */
+            AH10?: boolean;
+            /**
+             * @description Flag for rule AH11.
+             * @example false
+             */
+            AH11?: boolean;
+            /**
+             * @description Flag for rule AH12.
+             * @example false
+             */
+            AH12?: boolean;
+            /**
+             * @description Flag for rule AH13.
+             * @example false
+             */
+            AH13?: boolean;
+            /**
+             * @description Flag for rule AH14.
+             * @example false
+             */
+            AH14?: boolean;
+            /**
+             * @description Flag for rule AH15.
+             * @example false
+             */
+            AH15?: boolean;
+            /**
+             * @description Flag for rule AH16.
+             * @example false
+             */
+            AH16?: boolean;
+            /**
+             * @description Username or system identifier that last updated this record.
+             * @example system_user
+             */
+            lastUpdatedBy?: string;
+        };
         RiskRuleWhiteListMccEntity: {
-            /** @description Primary key identifier of the parameter value. */
+            /**
+             * @description Primary key identifier of the record.
+             * @example 1
+             */
             id: number;
             /**
+             * @description Merchant Category Code (MCC).
+             * @example 1234
+             */
+            MCC: string;
+            /**
+             * @description Flag for rule AH01.
+             * @example false
+             */
+            AH01: boolean;
+            /**
+             * @description Flag for rule AH02.
+             * @example false
+             */
+            AH02: boolean;
+            /**
+             * @description Flag for rule AH03.
+             * @example false
+             */
+            AH03: boolean;
+            /**
+             * @description Flag for rule AH04.
+             * @example false
+             */
+            AH04: boolean;
+            /**
+             * @description Flag for rule AH05.
+             * @example false
+             */
+            AH05: boolean;
+            /**
+             * @description Flag for rule AH06.
+             * @example false
+             */
+            AH06: boolean;
+            /**
+             * @description Flag for rule AH07.
+             * @example false
+             */
+            AH07: boolean;
+            /**
+             * @description Flag for rule AH08.
+             * @example false
+             */
+            AH08: boolean;
+            /**
+             * @description Flag for rule AH09.
+             * @example false
+             */
+            AH09: boolean;
+            /**
+             * @description Flag for rule AH10.
+             * @example false
+             */
+            AH10: boolean;
+            /**
+             * @description Flag for rule AH11.
+             * @example false
+             */
+            AH11: boolean;
+            /**
+             * @description Flag for rule AH12.
+             * @example false
+             */
+            AH12: boolean;
+            /**
+             * @description Flag for rule AH13.
+             * @example false
+             */
+            AH13: boolean;
+            /**
+             * @description Flag for rule AH14.
+             * @example false
+             */
+            AH14: boolean;
+            /**
+             * @description Flag for rule AH15.
+             * @example false
+             */
+            AH15: boolean;
+            /**
+             * @description Flag for rule AH16.
+             * @example false
+             */
+            AH16: boolean;
+            /**
              * Format: date-time
-             * @description Record creation timestamp.
+             * @description Date and time when this record was last updated.
+             * @example 2025-11-03T09:27:51.000Z
              */
             lastUpdatedDate: string;
+            /**
+             * @description Username or system identifier that last updated this record.
+             * @example system_user
+             */
+            lastUpdatedBy: string;
         };
+        CreateOrUpdateMerchantRiskThresholdDto: Record<string, never>;
+        MerchanRiskThresholdsEntity: Record<string, never>;
         RiskRuleParamValuePaginationOutputDto: {
             /** @description Primary key identifier of the parameter value. */
             id: number;
@@ -2865,6 +3263,52 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RiskRuleWhiteListMccEntity"];
+                };
+            };
+        };
+    };
+    RiskRulesController_getMerchantRiskThresholds: {
+        parameters: {
+            query: {
+                mid: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Gets a list of merchant risk thresholds. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MerchanRiskThresholdsEntity"][];
+                };
+            };
+        };
+    };
+    RiskRulesController_createOrUpdateMerchantRiskThreshold: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateOrUpdateMerchantRiskThresholdDto"];
+            };
+        };
+        responses: {
+            /** @description Creates a new merchant risk threshold. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MerchanRiskThresholdsEntity"];
                 };
             };
         };
