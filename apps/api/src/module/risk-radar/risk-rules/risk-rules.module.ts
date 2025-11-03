@@ -9,6 +9,8 @@ import {
   RiskRuleWhiteListMidRepositoryAuditLog,
   RiskRuleWhiteListMccRepository,
   RiskRuleWhiteListMccRepositoryAuditLog,
+  MerchantRiskThresholdsRepository,
+  MerchantRiskThresholdsAuditLogsRepository,
 } from '@/risk-radar-db/repositories';
 
 import { RiskRulesController } from './risk-rules.controller';
@@ -24,6 +26,8 @@ import { RiskRulesService } from './risk-rules.service';
     RiskRuleWhiteListMidRepositoryAuditLog,
     RiskRuleWhiteListMccRepository,
     RiskRuleWhiteListMccRepositoryAuditLog,
+    MerchantRiskThresholdsRepository,
+    MerchantRiskThresholdsAuditLogsRepository,
   ],
 })
 export class RiskRulesModule {}

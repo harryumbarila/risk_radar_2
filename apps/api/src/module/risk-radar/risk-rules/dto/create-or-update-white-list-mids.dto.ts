@@ -40,7 +40,5 @@ export class CreateOrUpdateWhiteListMidDto {
   @IsString()
   @Length(1, 25)
   public lastUpdatedBy: string;
-
-  public lastUpdatedDate: Date;
 }
 

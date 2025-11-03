@@ -7,3 +7,5 @@ export * from './risk-rule_white_list_mid.entity';
 export * from './risk-rule_white_list_mid_audit_log.entity';
 export * from './risk-rule_white_list_mcc.entity';
 export * from './risk-rule_white_list_mcc_audit_log.entity';
+export * from './merchant_risk_thresholds';
+export * from './merchant_risk_thresholds_audit_logs';

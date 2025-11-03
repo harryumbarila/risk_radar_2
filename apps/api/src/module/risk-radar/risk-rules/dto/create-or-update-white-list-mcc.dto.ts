@@ -1,4 +1,4 @@
-import { IsBoolean, IsDate, IsString, Length } from "class-validator";
+import { IsBoolean, IsString, Length } from "class-validator";
 
 export class CreateOrUpdateWhiteListMccDto {
   @IsString()
@@ -40,7 +40,5 @@ export class CreateOrUpdateWhiteListMccDto {
   @IsString()
   @Length(1, 25)
   public lastUpdatedBy: string;
-
-  public lastUpdatedDate: Date;
 }
 
