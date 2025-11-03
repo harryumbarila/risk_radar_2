@@ -7,11 +7,12 @@ import {
   ListRiskRulesPaginationOutput,
 } from './dto/risk-rules.dto';
 import { Public } from '@/api/shared/auth/decorator/public.decorator';
-import { RiskRuleParamValue, RiskRuleWhiteListMccEntity } from '@/risk-radar-db/entities';
+import { MerchanRiskThresholdsEntity, RiskRuleParamValue, RiskRuleWhiteListMccEntity } from '@/risk-radar-db/entities';
 import { CreateRiskRuleParamValueDto } from './dto/create-risk-rule-param-value.dto';
 import { CreateOrUpdateWhiteListMidDto } from './dto/create-or-update-white-list-mids.dto';
 import { RiskRuleWhiteListMidEntity } from '@/risk-radar-db/entities/risk-rule_white_list_mid.entity';
 import { CreateOrUpdateWhiteListMccDto } from './dto/create-or-update-white-list-mcc.dto';
+import { CreateOrUpdateMerchantRiskThresholdDto } from './dto/create-or-update-merchant_risk_threshold.dto';
 
 @ApiTags('risk-rule')
 @Controller('v1/risk-rule')
@@ -90,5 +91,29 @@ export class RiskRulesController {
     @Query('mcc') mcc: string
   ): Promise<RiskRuleWhiteListMccEntity[]> {
     return this.riskRuleService.getWhiteListMccs(mcc);
+  }
+
+  @Post('merchant-risk-threshold')
+  @Public()
+  @ApiCreatedResponse({
+    description: 'Creates a new merchant risk threshold.',
+    type: MerchanRiskThresholdsEntity,
+  })
+  async createOrUpdateMerchantRiskThreshold(
+    @Body() dto: CreateOrUpdateMerchantRiskThresholdDto
+  ): Promise<MerchanRiskThresholdsEntity> {
+    return this.riskRuleService.createOrUpdateMerchantRiskThreshold(dto);
+  }
+
+  @Get('merchant-risk-threshold')
+  @Public()
+  @ApiOkResponse({
+    description: 'Gets a list of merchant risk thresholds.',
+    type: [MerchanRiskThresholdsEntity],
+  })
+  async getMerchantRiskThresholds(
+    @Query('mid') mid: string
+  ): Promise<MerchanRiskThresholdsEntity[]> {
+    return this.riskRuleService.getMerchantRiskThresholds(mid);
   }
 }
