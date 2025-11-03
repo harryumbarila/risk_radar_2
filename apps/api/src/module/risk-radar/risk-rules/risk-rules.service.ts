@@ -21,7 +21,7 @@ import {
 } from '@/risk-radar-db/entities';
 import { RiskRuleWhiteListMidEntity } from '@/risk-radar-db/entities/risk-rule_white_list_mid.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateOrUpdateWhiteListMidDto } from './dto/create-or-update-white-list-mids.dto';
 import { CreateOrUpdateWhiteListMccDto } from './dto/create-or-update-white-list-mcc.dto';
 import { MerchantRiskThresholdsRepository } from '@/risk-radar-db/repositories/merchant_risk_thresholds.repository';
@@ -247,7 +247,7 @@ export class RiskRulesService {
   ): Promise<MerchanRiskThresholdsEntity> {
     const existingMerchantRiskThreshold =
       await this.merchantRiskThresholdsRepository.findOne({
-        where: { MId: dto.mid },
+        where: { mid: dto.mid },
       });
 
     if (existingMerchantRiskThreshold) {
@@ -270,7 +270,7 @@ export class RiskRulesService {
       // Fetch the updated record
       const updatedMerchantRiskThreshold =
         await this.merchantRiskThresholdsRepository.findOne({
-          where: { MId: dto.mid },
+          where: { mid: dto.mid },
         });
 
       // Create new audit log entry (exclude id to create new record)
@@ -288,7 +288,7 @@ export class RiskRulesService {
       .createQueryBuilder()
       .insert()
       .values({
-        MId: dto.mid,
+        mid: dto.mid,
         keyedPercentage: dto.keyedPercentage,
         monthlyVolume: dto.monthlyVolume,
         highTicket: dto.highTicket,
@@ -302,7 +302,7 @@ export class RiskRulesService {
     // Fetch the created record
     const createdMerchantRiskThreshold =
       await this.merchantRiskThresholdsRepository.findOne({
-        where: { MId: dto.mid },
+        where: { mid: dto.mid },
       });
 
     // Create new audit log entry (exclude id to create new record)
