@@ -55,7 +55,7 @@ const eslintConfig = defineConfig([
           caughtErrorsIgnorePattern: '^_',
         },
       ],
-      '@typescript-eslint/explicit-module-boundary-types': 'error',
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
     },

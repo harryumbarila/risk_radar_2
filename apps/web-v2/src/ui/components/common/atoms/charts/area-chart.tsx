@@ -1,4 +1,4 @@
-import { Chart, useChart } from "@chakra-ui/charts";
+import { Chart, useChart } from '@chakra-ui/charts';
 import {
   Area,
   AreaChart,
@@ -6,16 +6,16 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from "recharts";
+} from 'recharts';
 
 const data = [
-  { name: "Product A", uv: 4000, pv: 2400, amt: 2400 },
-  { name: "Product B", uv: 3000, pv: 1398, amt: 2210 },
-  { name: "Product C", uv: -1000, pv: 9800, amt: 2290 },
-  { name: "Product D", uv: 500, pv: 3908, amt: 2000 },
-  { name: "Product E", uv: -2000, pv: 4800, amt: 2181 },
-  { name: "Product F", uv: -250, pv: 3800, amt: 2500 },
-  { name: "Product G", uv: 3490, pv: 4300, amt: 2100 },
+  { name: 'Product A', uv: 4000, pv: 2400, amt: 2400 },
+  { name: 'Product B', uv: 3000, pv: 1398, amt: 2210 },
+  { name: 'Product C', uv: -1000, pv: 9800, amt: 2290 },
+  { name: 'Product D', uv: 500, pv: 3908, amt: 2000 },
+  { name: 'Product E', uv: -2000, pv: 4800, amt: 2181 },
+  { name: 'Product F', uv: -250, pv: 3800, amt: 2500 },
+  { name: 'Product G', uv: 3490, pv: 4300, amt: 2100 },
 ];
 
 const gradientOffset = () => {
@@ -32,33 +32,29 @@ export default function CustomAreaChart() {
   const chart = useChart({
     data,
     series: [
-      { name: "uv", color: "teal.solid" },
-      { name: "pv", color: "purple.solid" },
+      { name: 'uv', color: 'teal.solid' },
+      { name: 'pv', color: 'purple.solid' },
     ],
-  });
-
-  console.log({
-    color: chart.color("border"),
   });
 
   return (
     <Chart.Root maxH="sm" chart={chart} bg="white">
       <AreaChart data={chart.data}>
-        <CartesianGrid strokeDasharray="3 3" stroke={chart.color("border")} />
+        <CartesianGrid strokeDasharray="3 3" stroke={chart.color('border')} />
         <XAxis
           axisLine={false}
           tickLine={false}
-          dataKey={chart.key("name")}
-          tickFormatter={(value) => value.replace("Product ", "")}
+          dataKey={chart.key('name')}
+          tickFormatter={(value) => value.replace('Product ', '')}
         />
         <YAxis
           axisLine={false}
           tickLine={false}
           tickFormatter={chart.formatNumber({
-            style: "currency",
-            currency: "USD",
-            currencyDisplay: "narrowSymbol",
-            notation: "compact",
+            style: 'currency',
+            currency: 'USD',
+            currencyDisplay: 'narrowSymbol',
+            notation: 'compact',
           })}
         />
         <Tooltip
@@ -70,18 +66,18 @@ export default function CustomAreaChart() {
           <Chart.Gradient
             id="uv-gradient"
             stops={[
-              { offset, color: "teal.solid", opacity: 1 },
-              { offset, color: "red.solid", opacity: 1 },
+              { offset, color: 'teal.solid', opacity: 1 },
+              { offset, color: 'red.solid', opacity: 1 },
             ]}
           />
         </defs>
         <Area
           type="monotone"
           isAnimationActive={false}
-          dataKey={chart.key("uv")}
+          dataKey={chart.key('uv')}
           fill="url(#uv-gradient)"
           fillOpacity={0.2}
-          stroke={chart.color("gray.solid")}
+          stroke={chart.color('gray.solid')}
         />
       </AreaChart>
     </Chart.Root>

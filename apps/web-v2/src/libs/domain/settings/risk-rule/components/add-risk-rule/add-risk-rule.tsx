@@ -1,15 +1,7 @@
 'use client';
 import { JSX } from 'react';
 
-import {
-  Button,
-  Input,
-  VStack,
-  HStack,
-  Text,
-  Portal,
-  Dialog,
-} from '@chakra-ui/react';
+import { Button, VStack, HStack, Text, Portal, Dialog } from '@chakra-ui/react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { FormProvider, useForm } from 'react-hook-form';
@@ -23,16 +15,16 @@ import {
 } from './add-risk-rule.model';
 import { InputField } from '@/ui/components/form';
 
-const AddParamValueDialog = ({
-  isOpen,
-  onClose,
-  rule,
-}: AddParamValueDialogProps): JSX.Element | null => {
+export default function AddParamValueDialog(
+  props: AddParamValueDialogProps
+): JSX.Element | null {
+  const { isOpen, onClose, rule } = props;
+
   const queryClient = useQueryClient();
   const methods = useForm<ParameterValueFormModel>({
     mode: 'all',
     defaultValues: {
-      value: '',
+      value: '0',
       effectiveDate: '',
     },
     resolver: zodResolver(validateSchema),
@@ -130,6 +122,4 @@ const AddParamValueDialog = ({
       </Portal>
     </Dialog.Root>
   );
-};
-
-export default AddParamValueDialog;
+}

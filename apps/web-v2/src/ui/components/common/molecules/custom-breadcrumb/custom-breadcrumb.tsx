@@ -34,6 +34,7 @@ function BreadCrumbMenuItem({ label, items }: CustomBreadcrumbMenuItemProps) {
                     as={Link}
                     key={item.value}
                     value={item.value}
+                    // @ts-expect-error href is valid on <Link>
                     href={item.href}
                   >
                     {item.label}

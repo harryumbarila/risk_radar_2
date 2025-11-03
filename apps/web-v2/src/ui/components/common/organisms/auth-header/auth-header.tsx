@@ -23,46 +23,55 @@ import {
 
 import { ROUTE_STRUCTURE } from '@/libs/navigation/routes.config';
 
-import { ColorModeButton, CustomBreadcrumb } from '../../molecules';
+import {
+  ColorModeButton,
+  CustomBreadcrumb,
+  CustomBreadcrumbPath,
+} from '../../molecules';
 
 export default function AuthHeader(): React.JSX.Element {
   const pathname = usePathname();
 
   const segments = pathname?.split('/').filter(Boolean) || [];
 
-  let currentLevel: any = ROUTE_STRUCTURE;
+  const paths = segments.reduce(
+    (acc, segment, index) => {
+      // Get the current route level safely
+      const parentLevel =
+        index === 0 ? ROUTE_STRUCTURE : acc[index - 1]?.node?.children;
 
-  // Build breadcrumb items from the current route path
-  const paths = segments.map((segment, index) => {
-    const node = currentLevel?.[segment];
-    const label = node?.label || segment;
-    const href = node?.href || '/' + segments.slice(0, index + 1).join('/');
+      const node = parentLevel?.[segment];
+      if (!node) return acc;
 
-    // For the *current segment*, dropdown should show its children (if any)
-    const children =
-      node?.children &&
-      Object.entries(node.children).map(([key, value]: [string, any]) => ({
-        label: value.label || key,
-        value: value.label || key,
-        href:
-          value.href ||
-          '/' +
-            segments
-              .slice(0, index + 1)
-              .concat(key)
-              .join('/'),
-      }));
+      const label = node.label || segment;
+      const href = node.href || '/' + segments.slice(0, index + 1).join('/');
 
-    // Move deeper in the structure
-    currentLevel = node?.children;
+      const children =
+        node.children &&
+        Object.entries(node.children).map(([key, value]: [string, any]) => ({
+          label: value.label || key,
+          value: value.label || key,
+          href:
+            value.href ||
+            '/' +
+              segments
+                .slice(0, index + 1)
+                .concat(key)
+                .join('/'),
+        }));
 
-    return {
-      label,
-      href,
-      menu: children || [],
-      isCurrent: index === segments.length - 1,
-    };
-  });
+      acc.push({
+        label,
+        href,
+        menu: children || [],
+        isCurrent: index === segments.length - 1,
+        node,
+      });
+
+      return acc;
+    },
+    [] as Array<CustomBreadcrumbPath & { node?: any }>
+  );
 
   // Always prepend Dashboard (root)
   const fullPaths = [
@@ -76,9 +85,6 @@ export default function AuthHeader(): React.JSX.Element {
   ];
 
   const router = useRouter();
-  console.log({
-    fullPaths,
-  });
   // const { user } = useAuth();
 
   // console.log({ user });

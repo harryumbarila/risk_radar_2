@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 
-import { Alert, Button, Flex, Heading, Text } from '@chakra-ui/react';
+import { Alert, Button, Flex, Heading } from '@chakra-ui/react';
 import { MdPlusOne, MdSearch } from 'react-icons/md';
 
 import { useQueryClient } from '@tanstack/react-query';

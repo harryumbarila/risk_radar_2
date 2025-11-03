@@ -30,7 +30,7 @@ export class LocalStorageAdapter implements CustomStorage {
    * @param {string} key - The key for the storage entry.
    * @returns {unknown} - The value associated with the key, or `null` if not found.
    */
-  get(key: string) {
+  get(key: string): string | null {
     return storage.getItem(key);
   }
 }

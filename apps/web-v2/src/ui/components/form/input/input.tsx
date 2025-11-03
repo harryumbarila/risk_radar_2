@@ -19,7 +19,7 @@ export default function InputField(props: InputFieldProps) {
   return (
     <Field.Root required={isRequired} invalid={!!errors?.[name]}>
       {label ? (
-        <Field.Label>
+        <Field.Label htmlFor={name}>
           {label} {isRequired && <Field.RequiredIndicator />}
         </Field.Label>
       ) : null}

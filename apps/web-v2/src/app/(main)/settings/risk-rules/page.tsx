@@ -7,10 +7,14 @@ import { $riskApi } from '@/libs/shared/api/risk.api';
 
 import SettingRiskRule from '@/libs/domain/settings/risk-rule/risk-rule.page';
 
-export default function RiskRulePage(): React.JSX.Element {
+export const dynamic = 'force-dynamic';
+
+export default async function RiskRulePage(): Promise<React.JSX.Element> {
   const queryClient = getQueryClient();
 
-  queryClient.prefetchQuery($riskApi.queryOptions('get', '/v1/risk-rule'));
+  await queryClient.prefetchQuery(
+    $riskApi.queryOptions('get', '/v1/risk-rule')
+  );
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
