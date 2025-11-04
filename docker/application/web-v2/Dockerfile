@@ -86,7 +86,7 @@ COPY --chown=node:node --from=prod-deps /var/www/html/node_modules ./node_module
 # Copy workspace-level files needed for yarn commands
 COPY --chown=node:node --from=pruner /var/www/html/yarn.lock ./yarn.lock
 
-EXPOSE 3001
+EXPOSE 3005
 
 USER node
 
