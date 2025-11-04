@@ -25,11 +25,8 @@ const AttributionUrl: React.FC = () => {
   const { forResource } = permissions(user);
   const { findMatchingSourceNameForReferralPartner } = useSourceMatcher();
   const { data: leadSourcesData } = useLeadSources();
-  const {
-    generateToken,
-    isLoading: isGeneratingToken,
-    error: tokenError,
-  } = useGenerateAttributionToken();
+  const { generateToken, isLoading: isGeneratingToken } =
+    useGenerateAttributionToken();
 
   const methods = useForm<FormValues>({
     defaultValues: {
@@ -116,10 +113,15 @@ const AttributionUrl: React.FC = () => {
         type: 'success',
         bgColor: '#4CAF50',
       });
-    } catch (_error) {
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to generate attribution link';
+
       showNotification({
         title: 'Error',
-        message: tokenError || 'Failed to generate attribution link',
+        message: errorMessage,
         type: 'error',
         bgColor: '#FF0000',
       });
