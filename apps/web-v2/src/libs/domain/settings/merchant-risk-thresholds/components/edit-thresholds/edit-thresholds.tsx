@@ -5,28 +5,26 @@ import {
   Button,
   CloseButton,
   Drawer,
-  Field,
   Fieldset,
   Flex,
-  For,
-  Input,
-  NativeSelect,
   Portal,
   Stack,
 } from '@chakra-ui/react';
 import { MdCheck, MdOutlineArrowBack } from 'react-icons/md';
+import { FormProvider, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+import { useQueryClient } from '@tanstack/react-query';
+
+import { InputField } from '@/ui/components/form';
+import { $riskApi } from '@/libs/shared/api/risk.api';
+import { toaster } from '@/ui/components/common/atoms';
 
 import {
   EditThresholdsDrawerProps,
   merchantRiskThresholdsSchema,
   MerchantRiskThresholdsFormModel,
 } from './edit-thresholds.model';
-import { FormProvider, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { InputField } from '@/ui/components/form';
-import { $riskApi } from '@/libs/shared/api/risk.api';
-import { toaster } from '@/ui/components/common/atoms';
-import { useQueryClient } from '@tanstack/react-query';
 
 export default function EditThresholdsDrawer(
   props: React.PropsWithChildren<EditThresholdsDrawerProps>

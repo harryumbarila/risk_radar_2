@@ -11,7 +11,7 @@ import {
   Portal,
   createListCollection,
 } from '@chakra-ui/react';
-import { Check, Ban } from 'lucide-react';
+import { Ban } from 'lucide-react';
 import {
   MdOutlineArrowUpward,
   MdCheck,

@@ -1,0 +1,13 @@
+# Makefile style list of prerequisites
+
+packages/
+apps/
+db/
+configs/
+.prettierrc
+.prettierignore
+.lintstagedrc.cjs
+package.json
+.syncpackrc
+turbo.json
+yarn.lock
