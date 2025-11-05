@@ -46,7 +46,7 @@ async function bootstrap() {
     })
   );
 
-  if (config.iris.env === 'staging') {
+  if (config.node.env !== 'production') {
     const options = new DocumentBuilder()
       .setTitle('TalusPay Dashboard API')
       .setVersion('v1')
