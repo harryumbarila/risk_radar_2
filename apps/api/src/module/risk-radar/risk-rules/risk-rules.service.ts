@@ -171,10 +171,6 @@ export class RiskRulesService {
       this.riskRuleRepository.query(countQuery),
     ]);
 
-    console.log({
-      data,
-    });
-
     const structuredData = this.mapToRiskRuleHierarchy(data);
 
     const total = parseInt(countResult[0]?.count || '0', 10);
