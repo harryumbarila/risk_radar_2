@@ -20,6 +20,7 @@ import { DbTypeORMModule as FinanceDbTypeOrmModule } from '@/finance-db/connecti
 import { DbTypeORMModule as IrisDbTypeOrmModule } from '@/iris-db/connection/nestjs-module';
 // import { DbTypeORMModule as PayaTypeOrmModule } from '@/paya-db/connection/nestjs-module';
 import { DbTypeORMModule as SnapPccTypeOrmModule } from '@/snap-pcc-db/connection/nestjs-module';
+import { DbTypeORMModule as RiskRadarTypeOrmModule } from '@/risk-radar-db/connection/nestjs-module';
 
 import { AppController } from './app.controller';
 import { AttributionUrlModule } from './module/attribution-url/attribution-url.module';
@@ -34,6 +35,7 @@ import { AWSModule } from './shared/aws/aws.module';
 import { rootConfig } from './shared/config/root.config';
 import { EmailModule } from './shared/email/email.module';
 import { bullConfigAsync } from '@/api/shared/config/bull.config';
+import { RiskRulesModule } from './module/risk-radar/risk-rules/risk-rules.module';
 
 // Load dotenv only in development mode (DBs)
 // eslint-disable-next-line no-restricted-properties
@@ -56,6 +58,7 @@ if (process.env.NODE_ENV !== 'production') {
     EzEnrollPccTypeOrmModule,
     SnapPccTypeOrmModule,
     // PayaTypeOrmModule,
+    RiskRadarTypeOrmModule,
     LoggerModule.forRoot(loggerConfig),
     GlobalModule,
     AttributionUrlModule,
@@ -67,6 +70,7 @@ if (process.env.NODE_ENV !== 'production') {
     EmailModule,
     PartnerBanksModule,
     // PayaModule,
+    RiskRulesModule,
     NetSettlementsModule,
   ],
   controllers: [AppController],

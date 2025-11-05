@@ -1,0 +1,6 @@
+entity: ExampleEntity
+items:
+  example1:
+    name: '{{person.firstName}}'
+  example{2..5}:
+    name: '{{person.firstName}}'
