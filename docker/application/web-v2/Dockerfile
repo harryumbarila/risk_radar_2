@@ -80,6 +80,7 @@ RUN apk add --no-cache curl
 # Copy only necessary production files (not everything)
 COPY --chown=node:node --from=builder-web /var/www/html/apps/web-v2/.next /var/www/html/apps/web-v2/.next
 COPY --chown=node:node --from=builder-web /var/www/html/apps/web-v2/package.json /var/www/html/apps/web-v2/package.json
+COPY --chown=node:node --from=pruner /var/www/html/apps/web-v2/next.config.mjs /var/www/html/apps/web-v2/next.config.mjs
 COPY --chown=node:node --from=pruner /var/www/html/package.json ./package.json
 COPY --chown=node:node --from=prod-deps /var/www/html/node_modules ./node_modules
 
