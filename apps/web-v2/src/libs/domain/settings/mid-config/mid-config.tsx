@@ -43,7 +43,7 @@ export default function SettingsMidConfig(): React.JSX.Element {
     formState: { isValid },
   } = methods;
 
-  const { data, isLoading } = $riskApi.useQuery(
+  const { data, isLoading, isError } = $riskApi.useQuery(
     'get',
     '/v1/risk-rule/white-list-mid',
     {
@@ -137,6 +137,14 @@ export default function SettingsMidConfig(): React.JSX.Element {
             <MidCodeTable key={mid.id} mid={mid} />
           ))}
         </Flex>
+      ) : isError ? (
+        <Alert.Root status="error">
+          <Alert.Indicator />
+          <Alert.Content>
+            <Alert.Title>Error</Alert.Title>
+            <Alert.Description>Error found. Try again later.</Alert.Description>
+          </Alert.Content>
+        </Alert.Root>
       ) : submittedTerm && !isLoading ? (
         <Alert.Root status="info">
           <Alert.Indicator />

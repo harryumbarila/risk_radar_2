@@ -26,9 +26,7 @@ import {
   MerchantRiskThresholdsFormModel,
 } from './edit-thresholds.model';
 
-export default function EditThresholdsDrawer(
-  props: React.PropsWithChildren<EditThresholdsDrawerProps>
-) {
+function EditThresholdsForm(props: EditThresholdsDrawerProps) {
   const { threshold } = props;
 
   const queryClient = useQueryClient();
@@ -59,7 +57,6 @@ export default function EditThresholdsDrawer(
 
   const onSubmit = async (data: MerchantRiskThresholdsFormModel) => {
     try {
-      console.log({ data });
       await mutateAsync({
         body: {
           ...Object.entries(data).reduce((acc, [key, value]) => ({
@@ -86,6 +83,72 @@ export default function EditThresholdsDrawer(
       }
     }
   };
+  return (
+    <FormProvider {...methods}>
+      <Drawer.Body>
+        <Flex gap={4} direction="column" justifyContent="center">
+          <Fieldset.Root size="lg" justifyContent="center">
+            <Stack>
+              <Fieldset.Legend>Edit details</Fieldset.Legend>
+              <Fieldset.HelperText>
+                Please fill threshold details below.
+              </Fieldset.HelperText>
+            </Stack>
+
+            <Fieldset.Content>
+              <InputField
+                type="number"
+                name="monthlyVolume"
+                label="Monthly Volume"
+              />
+              <InputField
+                type="number"
+                name="declinePercentage"
+                label="Decline %"
+              />
+              <InputField type="number" name="highTicket" label="High Ticket" />
+              <InputField
+                type="number"
+                name="transactionCount"
+                label="Transaction Count"
+              />
+              <InputField
+                type="number"
+                name="keyedPercentage"
+                label="Keyed %"
+              />
+            </Fieldset.Content>
+          </Fieldset.Root>
+        </Flex>
+      </Drawer.Body>
+
+      <Drawer.Footer>
+        <Box display="flex" flexDirection="column" w="100%" gap={4}>
+          <Button
+            flexGrow={1}
+            loading={isSubmitting}
+            disabled={!isValid || isSubmitting}
+            onClick={handleSubmit(onSubmit)}
+          >
+            <MdCheck size={14} />
+            Update
+          </Button>
+          <Drawer.ActionTrigger asChild>
+            <Button variant="outline" flexGrow={1} disabled={isSubmitting}>
+              <MdOutlineArrowBack />
+              Back
+            </Button>
+          </Drawer.ActionTrigger>
+        </Box>
+      </Drawer.Footer>
+    </FormProvider>
+  );
+}
+
+export default function EditThresholdsDrawer(
+  props: React.PropsWithChildren<EditThresholdsDrawerProps>
+) {
+  const { threshold } = props;
 
   return (
     <Drawer.Root
@@ -97,82 +160,18 @@ export default function EditThresholdsDrawer(
     >
       <Drawer.Trigger asChild>{props.children}</Drawer.Trigger>
       <Portal>
-        <FormProvider {...methods}>
-          <Drawer.Backdrop />
-          <Drawer.Positioner padding="4" onClick={(e) => e.stopPropagation()}>
-            <Drawer.Content>
-              <Drawer.Header>
-                <Drawer.Title>Threshold Details</Drawer.Title>
-              </Drawer.Header>
-              <Drawer.Body>
-                <Flex gap={4} direction="column" justifyContent="center">
-                  <Fieldset.Root size="lg" justifyContent="center">
-                    <Stack>
-                      <Fieldset.Legend>Edit details</Fieldset.Legend>
-                      <Fieldset.HelperText>
-                        Please fill threshold details below.
-                      </Fieldset.HelperText>
-                    </Stack>
-
-                    <Fieldset.Content>
-                      <InputField
-                        type="number"
-                        name="monthlyVolume"
-                        label="Monthly Volume"
-                      />
-                      <InputField
-                        type="number"
-                        name="declinePercentage"
-                        label="Decline %"
-                      />
-                      <InputField
-                        type="number"
-                        name="highTicket"
-                        label="High Ticket"
-                      />
-                      <InputField
-                        type="number"
-                        name="transactionCount"
-                        label="Transaction Count"
-                      />
-                      <InputField
-                        type="number"
-                        name="keyedPercentage"
-                        label="Keyed %"
-                      />
-                    </Fieldset.Content>
-                  </Fieldset.Root>
-                </Flex>
-              </Drawer.Body>
-              <Drawer.Footer>
-                <Box display="flex" flexDirection="column" w="100%" gap={4}>
-                  <Button
-                    flexGrow={1}
-                    loading={isSubmitting}
-                    disabled={!isValid || isSubmitting}
-                    onClick={handleSubmit(onSubmit)}
-                  >
-                    <MdCheck size={14} />
-                    Update
-                  </Button>
-                  <Drawer.ActionTrigger asChild>
-                    <Button
-                      variant="outline"
-                      flexGrow={1}
-                      disabled={isSubmitting}
-                    >
-                      <MdOutlineArrowBack />
-                      Back
-                    </Button>
-                  </Drawer.ActionTrigger>
-                </Box>
-              </Drawer.Footer>
-              <Drawer.CloseTrigger asChild>
-                <CloseButton size="sm" />
-              </Drawer.CloseTrigger>
-            </Drawer.Content>
-          </Drawer.Positioner>
-        </FormProvider>
+        <Drawer.Backdrop />
+        <Drawer.Positioner padding="4" onClick={(e) => e.stopPropagation()}>
+          <Drawer.Content>
+            <Drawer.Header>
+              <Drawer.Title>Threshold Details</Drawer.Title>
+            </Drawer.Header>
+            <EditThresholdsForm threshold={threshold} />
+            <Drawer.CloseTrigger asChild>
+              <CloseButton size="sm" />
+            </Drawer.CloseTrigger>
+          </Drawer.Content>
+        </Drawer.Positioner>
       </Portal>
     </Drawer.Root>
   );

@@ -121,7 +121,7 @@ export default function SettingsMerchantRiskThresholds(): React.JSX.Element {
     formState: { isValid },
   } = methods;
 
-  const { data, isLoading } = $riskApi.useQuery(
+  const { data, isLoading, isError } = $riskApi.useQuery(
     'get',
     '/v1/risk-rule/merchant-risk-threshold',
     {
@@ -147,11 +147,21 @@ export default function SettingsMerchantRiskThresholds(): React.JSX.Element {
     }
   };
 
+  console.log({
+    isError,
+  });
+
   const createMCCCode = async () => {
     try {
       await mutateAsync({
         body: {
           mid: submittedTerm,
+          declinePercentage: 0,
+          monthlyVolume: 0,
+          highTicket: 0,
+          transactionCount: 0,
+          keyedPercentage: 0,
+          lastUpdatedBy: 'admin_user',
         },
       });
       await queryClient.invalidateQueries({
@@ -182,9 +192,6 @@ export default function SettingsMerchantRiskThresholds(): React.JSX.Element {
           </Flex>
           <Button
             size="sm"
-            bg="black"
-            color="white"
-            _hover={{ bg: 'gray.800' }}
             onClick={handleSubmit(handleSearch)}
             loading={isLoading}
             disabled={!isValid}
@@ -196,9 +203,6 @@ export default function SettingsMerchantRiskThresholds(): React.JSX.Element {
         {!data?.length && submittedTerm && !isLoading && (
           <Button
             size="sm"
-            bg="black"
-            color="white"
-            _hover={{ bg: 'gray.800' }}
             onClick={createMCCCode}
             loading={isPending}
             disabled={isPending}
@@ -223,6 +227,14 @@ export default function SettingsMerchantRiskThresholds(): React.JSX.Element {
             columns={columns}
           />
         </Flex>
+      ) : isError ? (
+        <Alert.Root status="error">
+          <Alert.Indicator />
+          <Alert.Content>
+            <Alert.Title>Error</Alert.Title>
+            <Alert.Description>Error found. Try again later.</Alert.Description>
+          </Alert.Content>
+        </Alert.Root>
       ) : submittedTerm && !isLoading ? (
         <Alert.Root status="info">
           <Alert.Indicator />

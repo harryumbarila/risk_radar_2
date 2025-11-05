@@ -58,7 +58,7 @@ export default function SettingsMCCConfig(): React.JSX.Element {
     }
   );
 
-  const { mutateAsync, isPending } = $riskApi.useMutation(
+  const { mutateAsync, isPending, isError } = $riskApi.useMutation(
     'post',
     '/v1/risk-rule/white-list-mcc'
   );
@@ -137,6 +137,14 @@ export default function SettingsMCCConfig(): React.JSX.Element {
             <MCCCodeTable key={mcc.id} mcc={mcc} />
           ))}
         </Flex>
+      ) : isError ? (
+        <Alert.Root status="error">
+          <Alert.Indicator />
+          <Alert.Content>
+            <Alert.Title>Error</Alert.Title>
+            <Alert.Description>Error found. Try again later.</Alert.Description>
+          </Alert.Content>
+        </Alert.Root>
       ) : submittedTerm && !isLoading ? (
         <Alert.Root status="info">
           <Alert.Indicator />
