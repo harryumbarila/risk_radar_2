@@ -26,6 +26,18 @@ import {
   ListRiskRuleParamValuesInput,
   ListRiskRuleParamValuesOutput,
 } from './dto/risk-rule-param-value.dto';
+import {
+  ListWhiteListMidsInput,
+  ListWhiteListMidsOutput,
+} from './dto/white-list-mid.dto';
+import {
+  ListWhiteListMccsInput,
+  ListWhiteListMccsOutput,
+} from './dto/white-list-mcc.dto';
+import {
+  ListMerchantRiskThresholdsInput,
+  ListMerchantRiskThresholdsOutput,
+} from './dto/merchant-risk-threshold.dto';
 
 @ApiTags('risk-rule')
 @Controller('v1/risk-rule')
@@ -71,14 +83,14 @@ export class RiskRulesController {
   @Get('white-list-mid')
   @Public()
   @ApiOkResponse({
-    description: 'Gets a list of white list mids.',
-    type: RiskRuleWhiteListMidEntity,
-    isArray: true,
+    description:
+      'Gets paginated list of white list mids with optional filtering.',
+    type: ListWhiteListMidsOutput,
   })
   async getWhiteListMids(
-    @Query('mid') mid: string
-  ): Promise<RiskRuleWhiteListMidEntity[]> {
-    return this.riskRuleService.getWhiteListMids(mid);
+    @Query() query: ListWhiteListMidsInput
+  ): Promise<ListWhiteListMidsOutput> {
+    return this.riskRuleService.getWhiteListMidsPaginated(query);
   }
 
   @Post('white-list-mcc')
@@ -96,14 +108,14 @@ export class RiskRulesController {
   @Get('white-list-mcc')
   @Public()
   @ApiOkResponse({
-    description: 'Gets a list of white list mccs.',
-    type: RiskRuleWhiteListMccEntity,
-    isArray: true,
+    description:
+      'Gets paginated list of white list mccs with optional filtering.',
+    type: ListWhiteListMccsOutput,
   })
   async getWhiteListMccs(
-    @Query('mcc') mcc: string
-  ): Promise<RiskRuleWhiteListMccEntity[]> {
-    return this.riskRuleService.getWhiteListMccs(mcc);
+    @Query() query: ListWhiteListMccsInput
+  ): Promise<ListWhiteListMccsOutput> {
+    return this.riskRuleService.getWhiteListMccsPaginated(query);
   }
 
   @Post('merchant-risk-threshold')
@@ -121,13 +133,14 @@ export class RiskRulesController {
   @Get('merchant-risk-threshold')
   @Public()
   @ApiOkResponse({
-    description: 'Gets a list of merchant risk thresholds.',
-    type: [MerchanRiskThresholdsEntity],
+    description:
+      'Gets paginated list of merchant risk thresholds with optional filtering.',
+    type: ListMerchantRiskThresholdsOutput,
   })
   async getMerchantRiskThresholds(
-    @Query('mid') mid: string
-  ): Promise<MerchanRiskThresholdsEntity[]> {
-    return this.riskRuleService.getMerchantRiskThresholds(mid);
+    @Query() query: ListMerchantRiskThresholdsInput
+  ): Promise<ListMerchantRiskThresholdsOutput> {
+    return this.riskRuleService.getMerchantRiskThresholdsPaginated(query);
   }
 
   @Get('param-values')

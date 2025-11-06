@@ -33,6 +33,18 @@ import {
   ListRiskRulesPaginationOutput,
   RiskRuleOutputDto,
 } from './dto/risk-rules.dto';
+import {
+  ListWhiteListMidsInput,
+  ListWhiteListMidsOutput,
+} from './dto/white-list-mid.dto';
+import {
+  ListWhiteListMccsInput,
+  ListWhiteListMccsOutput,
+} from './dto/white-list-mcc.dto';
+import {
+  ListMerchantRiskThresholdsInput,
+  ListMerchantRiskThresholdsOutput,
+} from './dto/merchant-risk-threshold.dto';
 
 export interface RiskRuleListItem {
   ruleTypeDefinition: string;
@@ -227,8 +239,45 @@ export class RiskRulesService {
   async getWhiteListMccs(mcc: string): Promise<RiskRuleWhiteListMccEntity[]> {
     return this.riskRuleWhiteListMccRepository
       .createQueryBuilder('mcc')
+      .select(['mcc.id', 'mcc.MCC', 'mcc.lastUpdatedDate', 'mcc.lastUpdatedBy'])
       .where('mcc.MCC LIKE :mcc', { mcc: `%${mcc}%` })
       .getMany();
+  }
+
+  async getWhiteListMccsPaginated(
+    input: ListWhiteListMccsInput
+  ): Promise<ListWhiteListMccsOutput> {
+    const { page = 1, limit = 50, mcc } = input;
+
+    const safeLimit = Math.min(Math.max(1, limit), 100);
+    const safePage = Math.max(1, page);
+
+    const qb = this.riskRuleWhiteListMccRepository
+      .createQueryBuilder('mcc')
+      .select([
+        'mcc.id',
+        'mcc.MCC',
+        'mcc.lastUpdatedDate',
+        'mcc.lastUpdatedBy',
+      ]);
+
+    if (mcc) {
+      qb.where('mcc.MCC LIKE :mcc', { mcc: `%${mcc}%` });
+    }
+
+    qb.orderBy('mcc.MCC', 'ASC')
+      .skip((safePage - 1) * safeLimit)
+      .take(safeLimit);
+
+    const [data, total] = await qb.getManyAndCount();
+
+    return {
+      data,
+      count: data.length,
+      total,
+      page: safePage,
+      pageCount: Math.ceil(total / safeLimit),
+    };
   }
 
   async getMerchantRiskThresholds(
@@ -238,6 +287,37 @@ export class RiskRulesService {
       .createQueryBuilder('merchantRiskThreshold')
       .where('merchantRiskThreshold.MId LIKE :mId', { mId: `%${mId}%` })
       .getMany();
+  }
+
+  async getMerchantRiskThresholdsPaginated(
+    input: ListMerchantRiskThresholdsInput
+  ): Promise<ListMerchantRiskThresholdsOutput> {
+    const { page = 1, limit = 50, mid } = input;
+
+    const safeLimit = Math.min(Math.max(1, limit), 100);
+    const safePage = Math.max(1, page);
+
+    const qb = this.merchantRiskThresholdsRepository.createQueryBuilder(
+      'merchantRiskThreshold'
+    );
+
+    if (mid) {
+      qb.where('merchantRiskThreshold.MId LIKE :mid', { mid: `%${mid}%` });
+    }
+
+    qb.orderBy('merchantRiskThreshold.MId', 'ASC')
+      .skip((safePage - 1) * safeLimit)
+      .take(safeLimit);
+
+    const [data, total] = await qb.getManyAndCount();
+
+    return {
+      data,
+      count: data.length,
+      total,
+      page: safePage,
+      pageCount: Math.ceil(total / safeLimit),
+    };
   }
 
   async createOrUpdateMerchantRiskThreshold(
@@ -411,8 +491,45 @@ export class RiskRulesService {
   async getWhiteListMids(mid: string): Promise<RiskRuleWhiteListMidEntity[]> {
     return this.riskRuleWhiteListMidRepository
       .createQueryBuilder('mid')
+      .select(['mid.id', 'mid.MId', 'mid.lastUpdatedDate', 'mid.lastUpdatedBy'])
       .where('mid.MId LIKE :mid', { mid: `%${mid}%` })
       .getMany();
+  }
+
+  async getWhiteListMidsPaginated(
+    input: ListWhiteListMidsInput
+  ): Promise<ListWhiteListMidsOutput> {
+    const { page = 1, limit = 50, mid } = input;
+
+    const safeLimit = Math.min(Math.max(1, limit), 100);
+    const safePage = Math.max(1, page);
+
+    const qb = this.riskRuleWhiteListMidRepository
+      .createQueryBuilder('mid')
+      .select([
+        'mid.id',
+        'mid.MId',
+        'mid.lastUpdatedDate',
+        'mid.lastUpdatedBy',
+      ]);
+
+    if (mid) {
+      qb.where('mid.MId LIKE :mid', { mid: `%${mid}%` });
+    }
+
+    qb.orderBy('mid.MId', 'ASC')
+      .skip((safePage - 1) * safeLimit)
+      .take(safeLimit);
+
+    const [data, total] = await qb.getManyAndCount();
+
+    return {
+      data,
+      count: data.length,
+      total,
+      page: safePage,
+      pageCount: Math.ceil(total / safeLimit),
+    };
   }
 
   async createOrUpdateWhiteListMid(
