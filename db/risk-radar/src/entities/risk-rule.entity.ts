@@ -7,11 +7,12 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { ApiProperty } from '@nestjs/swagger';
+
 import { RiskRuleParamValue } from './risk-rule-param-value.entity';
 import { RiskRuleParam } from './risk-rule-param.entity';
 import { RiskSource } from './tbl-source.entity';
 import { RiskRuleType } from './rule-type.entity';
-import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('tbl_risk_rules', { schema: 'dbo', database: 'RiskRadar' })
 export class RiskRule {

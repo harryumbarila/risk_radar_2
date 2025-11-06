@@ -27,69 +27,69 @@ export class RiskRuleWhiteListMccEntity {
   @Column({ name: 'MCC', type: 'varchar', length: 4, nullable: false })
   MCC: string;
 
-  @ApiProperty({ description: 'Flag for rule AH01.', example: false })
-  @Column({ name: 'AH01', type: 'bit', nullable: true })
-  AH01?: boolean;
+  @ApiProperty({ description: 'Flag for rule AH001.', example: false })
+  @Column({ name: 'AH001', type: 'bit', nullable: true })
+  AH001?: boolean;
 
-  @ApiProperty({ description: 'Flag for rule AH02.', example: false })
-  @Column({ name: 'AH02', type: 'bit', nullable: true })
-  AH02?: boolean;
+  @ApiProperty({ description: 'Flag for rule AH002.', example: false })
+  @Column({ name: 'AH002', type: 'bit', nullable: true })
+  AH002?: boolean;
 
-  @ApiProperty({ description: 'Flag for rule AH03.', example: false })
-  @Column({ name: 'AH03', type: 'bit', nullable: true })
-  AH03?: boolean;
+  @ApiProperty({ description: 'Flag for rule AH003.', example: false })
+  @Column({ name: 'AH003', type: 'bit', nullable: true })
+  AH003?: boolean;
 
-  @ApiProperty({ description: 'Flag for rule AH04.', example: false })
-  @Column({ name: 'AH04', type: 'bit', nullable: true })
-  AH04?: boolean;
+  @ApiProperty({ description: 'Flag for rule AH004.', example: false })
+  @Column({ name: 'AH004', type: 'bit', nullable: true })
+  AH004?: boolean;
 
-  @ApiProperty({ description: 'Flag for rule AH05.', example: false })
-  @Column({ name: 'AH05', type: 'bit', nullable: true })
-  AH05?: boolean;
+  @ApiProperty({ description: 'Flag for rule AH005.', example: false })
+  @Column({ name: 'AH005', type: 'bit', nullable: true })
+  AH005?: boolean;
 
-  @ApiProperty({ description: 'Flag for rule AH06.', example: false })
-  @Column({ name: 'AH06', type: 'bit', nullable: true })
-  AH06?: boolean;
+  @ApiProperty({ description: 'Flag for rule AH006.', example: false })
+  @Column({ name: 'AH006', type: 'bit', nullable: true })
+  AH006?: boolean;
 
-  @ApiProperty({ description: 'Flag for rule AH07.', example: false })
-  @Column({ name: 'AH07', type: 'bit', nullable: true })
-  AH07?: boolean;
+  @ApiProperty({ description: 'Flag for rule AH007.', example: false })
+  @Column({ name: 'AH007', type: 'bit', nullable: true })
+  AH007?: boolean;
 
-  @ApiProperty({ description: 'Flag for rule AH08.', example: false })
-  @Column({ name: 'AH08', type: 'bit', nullable: true })
-  AH08?: boolean;
+  @ApiProperty({ description: 'Flag for rule AH008.', example: false })
+  @Column({ name: 'AH008', type: 'bit', nullable: true })
+  AH008?: boolean;
 
-  @ApiProperty({ description: 'Flag for rule AH09.', example: false })
-  @Column({ name: 'AH09', type: 'bit', nullable: true })
-  AH09?: boolean;
+  @ApiProperty({ description: 'Flag for rule AH009.', example: false })
+  @Column({ name: 'AH009', type: 'bit', nullable: true })
+  AH009?: boolean;
 
-  @ApiProperty({ description: 'Flag for rule AH10.', example: false })
-  @Column({ name: 'AH10', type: 'bit', nullable: true })
-  AH10?: boolean;
+  @ApiProperty({ description: 'Flag for rule AH010.', example: false })
+  @Column({ name: 'AH010', type: 'bit', nullable: true })
+  AH010?: boolean;
 
-  @ApiProperty({ description: 'Flag for rule AH11.', example: false })
-  @Column({ name: 'AH11', type: 'bit', nullable: true })
-  AH11?: boolean;
+  @ApiProperty({ description: 'Flag for rule AH011.', example: false })
+  @Column({ name: 'AH011', type: 'bit', nullable: true })
+  AH011?: boolean;
 
-  @ApiProperty({ description: 'Flag for rule AH12.', example: false })
-  @Column({ name: 'AH12', type: 'bit', nullable: true })
-  AH12?: boolean;
+  @ApiProperty({ description: 'Flag for rule AH012.', example: false })
+  @Column({ name: 'AH012', type: 'bit', nullable: true })
+  AH012?: boolean;
 
-  @ApiProperty({ description: 'Flag for rule AH13.', example: false })
-  @Column({ name: 'AH13', type: 'bit', nullable: true })
-  AH13?: boolean;
+  @ApiProperty({ description: 'Flag for rule AH013.', example: false })
+  @Column({ name: 'AH013', type: 'bit', nullable: true })
+  AH013?: boolean;
 
-  @ApiProperty({ description: 'Flag for rule AH14.', example: false })
-  @Column({ name: 'AH14', type: 'bit', nullable: true })
-  AH14?: boolean;
+  @ApiProperty({ description: 'Flag for rule AH014.', example: false })
+  @Column({ name: 'AH014', type: 'bit', nullable: true })
+  AH014?: boolean;
 
-  @ApiProperty({ description: 'Flag for rule AH15.', example: false })
-  @Column({ name: 'AH15', type: 'bit', nullable: true })
-  AH15?: boolean;
+  @ApiProperty({ description: 'Flag for rule AH015.', example: false })
+  @Column({ name: 'AH015', type: 'bit', nullable: true })
+  AH015?: boolean;
 
-  @ApiProperty({ description: 'Flag for rule AH16.', example: false })
-  @Column({ name: 'AH16', type: 'bit', nullable: true })
-  AH16?: boolean;
+  @ApiProperty({ description: 'Flag for rule AH016.', example: false })
+  @Column({ name: 'AH016', type: 'bit', nullable: true })
+  AH016?: boolean;
 
   @ApiProperty({
     description: 'Date and time when this record was last updated.',
