@@ -3,11 +3,11 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
 import { Repository } from 'typeorm';
 
-import { RiskRuleWhiteListMccEntity } from '../entities/risk-rule_white_list_mcc.entity';
+import { RiskRuleWhiteListMidEntity } from '../entities';
 
 @Injectable()
-export class RiskRuleWhiteListMccRepository extends Repository<RiskRuleWhiteListMccEntity> {
+export class RiskRuleWhiteListMidRepository extends Repository<RiskRuleWhiteListMidEntity> {
   public constructor(@InjectDataSource('risk-radar') dataSource: DataSource) {
-    super(RiskRuleWhiteListMccEntity, dataSource.createEntityManager());
+    super(RiskRuleWhiteListMidEntity, dataSource.createEntityManager());
   }
 }

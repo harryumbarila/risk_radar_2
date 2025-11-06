@@ -1,36 +1,38 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 
-import {
-  ListRiskRulesPaginationInput,
-  ListRiskRulesPaginationOutput,
-  RiskRuleOutputDto,
-} from './dto/risk-rules.dto';
+import { Repository } from 'typeorm';
+
 import {
   RiskRuleRepository,
   RiskRuleWhiteListMidRepository,
   RiskRuleWhiteListMidRepositoryAuditLog,
   RiskRuleWhiteListMccRepository,
   RiskRuleWhiteListMccRepositoryAuditLog,
+  MerchantRiskThresholdsRepository,
+  MerchantRiskThresholdsAuditLogsRepository,
 } from '@/risk-radar-db/repositories';
-import { CreateRiskRuleParamValueDto } from './dto/create-risk-rule-param-value.dto';
 import {
   MerchanRiskThresholdsEntity,
   RiskRuleParam,
   RiskRuleParamValue,
   RiskRuleWhiteListMccEntity,
 } from '@/risk-radar-db/entities';
-import { RiskRuleWhiteListMidEntity } from '@/risk-radar-db/entities/risk-rule_white_list_mid.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { RiskRuleWhiteListMidEntity } from '@/risk-radar-db/entities';
+
+import { CreateRiskRuleParamValueDto } from './dto/create-risk-rule-param-value.dto';
 import { CreateOrUpdateWhiteListMidDto } from './dto/create-or-update-white-list-mids.dto';
 import { CreateOrUpdateWhiteListMccDto } from './dto/create-or-update-white-list-mcc.dto';
-import { MerchantRiskThresholdsRepository } from '@/risk-radar-db/repositories/merchant_risk_thresholds.repository';
-import { MerchantRiskThresholdsAuditLogsRepository } from '@/risk-radar-db/repositories/merchant_risk_thresholds_audit_logs.repository';
 import { CreateOrUpdateMerchantRiskThresholdDto } from './dto/create-or-update-merchant_risk_threshold.dto';
 import {
   ListRiskRuleParamValuesInput,
   ListRiskRuleParamValuesOutput,
 } from './dto/risk-rule-param-value.dto';
+import {
+  ListRiskRulesPaginationInput,
+  ListRiskRulesPaginationOutput,
+  RiskRuleOutputDto,
+} from './dto/risk-rules.dto';
 
 export interface RiskRuleListItem {
   ruleTypeDefinition: string;

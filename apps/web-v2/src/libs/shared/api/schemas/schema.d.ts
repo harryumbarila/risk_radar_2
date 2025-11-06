@@ -36,6 +36,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/attribution-url/generate-token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generate JWT token for attribution URL
+         * @description Generates a signed JWT token containing attribution data for creating attribution URLs
+         */
+        post: operations["GenerateAttributionToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/legacy_dashboard_proxy/kpi": {
         parameters: {
             query?: never;
@@ -934,6 +954,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/auto-hold-exception": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AutoHoldExceptionSummariesController_listRiskRules"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/net-settlement/summary/{mid}": {
         parameters: {
             query?: never;
@@ -1058,6 +1094,50 @@ export interface components {
              * @enum {string}
              */
             status: "UP" | "DOWN";
+        };
+        GenerateAttributionTokenDto: {
+            /**
+             * @description User ID for attribution
+             * @example 12345
+             */
+            user_id: string;
+            /**
+             * @description Channel ID for attribution
+             * @example 67890
+             */
+            channel_id: string;
+            /**
+             * @description Public key for attribution
+             * @example pb_test_...
+             */
+            pb_key: string;
+            /**
+             * @description RSL user ID for attribution
+             * @example 11111
+             */
+            rsl_user_id?: string;
+            /**
+             * @description Referral partner user ID for attribution
+             * @example 22222
+             */
+            referral_partner_user_id?: string;
+            /**
+             * @description Source ID for attribution
+             * @example 33333
+             */
+            source_id?: string;
+            /**
+             * @description Lead ID for attribution
+             * @example 44444
+             */
+            lead_id?: string;
+        };
+        GenerateAttributionTokenResponseDto: {
+            /**
+             * @description JWT token for attribution URL
+             * @example eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+             */
+            token: string;
         };
         HookMapper: {
             /** @description Request ID */
@@ -1608,85 +1688,85 @@ export interface components {
              */
             MId?: string;
             /**
-             * @description Indicates whether the rule AH01 is active for this MID.
+             * @description Indicates whether the rule AH001 is active for this MID.
              * @example false
              */
-            AH01?: boolean;
+            AH001?: boolean;
             /**
-             * @description Indicates whether the rule AH02 is active for this MID.
+             * @description Indicates whether the rule AH002 is active for this MID.
              * @example false
              */
-            AH02?: boolean;
+            AH002?: boolean;
             /**
-             * @description Indicates whether the rule AH03 is active for this MID.
+             * @description Indicates whether the rule AH003 is active for this MID.
              * @example false
              */
-            AH03?: boolean;
+            AH003?: boolean;
             /**
-             * @description Indicates whether the rule AH04 is active for this MID.
+             * @description Indicates whether the rule AH004 is active for this MID.
              * @example false
              */
-            AH04?: boolean;
+            AH004?: boolean;
             /**
-             * @description Indicates whether the rule AH05 is active for this MID.
+             * @description Indicates whether the rule AH005 is active for this MID.
              * @example false
              */
-            AH05?: boolean;
+            AH005?: boolean;
             /**
-             * @description Indicates whether the rule AH06 is active for this MID.
+             * @description Indicates whether the rule AH006 is active for this MID.
              * @example false
              */
-            AH06?: boolean;
+            AH006?: boolean;
             /**
-             * @description Indicates whether the rule AH07 is active for this MID.
+             * @description Indicates whether the rule AH007 is active for this MID.
              * @example false
              */
-            AH07?: boolean;
+            AH007?: boolean;
             /**
-             * @description Indicates whether the rule AH08 is active for this MID.
+             * @description Indicates whether the rule AH008 is active for this MID.
              * @example false
              */
-            AH08?: boolean;
+            AH008?: boolean;
             /**
-             * @description Indicates whether the rule AH09 is active for this MID.
+             * @description Indicates whether the rule AH009 is active for this MID.
              * @example false
              */
-            AH09?: boolean;
+            AH009?: boolean;
             /**
-             * @description Indicates whether the rule AH10 is active for this MID.
+             * @description Indicates whether the rule AH010 is active for this MID.
              * @example false
              */
-            AH10?: boolean;
+            AH010?: boolean;
             /**
-             * @description Indicates whether the rule AH11 is active for this MID.
+             * @description Indicates whether the rule AH011 is active for this MID.
              * @example false
              */
-            AH11?: boolean;
+            AH011?: boolean;
             /**
-             * @description Indicates whether the rule AH12 is active for this MID.
+             * @description Indicates whether the rule AH012 is active for this MID.
              * @example false
              */
-            AH12?: boolean;
+            AH012?: boolean;
             /**
-             * @description Indicates whether the rule AH13 is active for this MID.
+             * @description Indicates whether the rule AH013 is active for this MID.
              * @example false
              */
-            AH13?: boolean;
+            AH013?: boolean;
             /**
-             * @description Indicates whether the rule AH14 is active for this MID.
+             * @description Indicates whether the rule AH014 is active for this MID.
              * @example false
              */
-            AH14?: boolean;
+            AH014?: boolean;
             /**
-             * @description Indicates whether the rule AH15 is active for this MID.
+             * @description Indicates whether the rule AH015 is active for this MID.
              * @example false
              */
-            AH15?: boolean;
+            AH015?: boolean;
             /**
-             * @description Indicates whether the rule AH16 is active for this MID.
+             * @description Indicates whether the rule AH016 is active for this MID.
              * @example false
              */
-            AH16?: boolean;
+            AH016?: boolean;
             /**
              * @description User who last updated the record.
              * @example system_admin
@@ -1705,85 +1785,85 @@ export interface components {
              */
             MId: string;
             /**
-             * @description Indicates whether the rule AH01 is active for this MID.
+             * @description Indicates whether the rule AH001 is active for this MID.
              * @example false
              */
-            AH01: boolean;
+            AH001: boolean;
             /**
-             * @description Indicates whether the rule AH02 is active for this MID.
+             * @description Indicates whether the rule AH002 is active for this MID.
              * @example false
              */
-            AH02: boolean;
+            AH002: boolean;
             /**
-             * @description Indicates whether the rule AH03 is active for this MID.
+             * @description Indicates whether the rule AH003 is active for this MID.
              * @example false
              */
-            AH03: boolean;
+            AH003: boolean;
             /**
-             * @description Indicates whether the rule AH04 is active for this MID.
+             * @description Indicates whether the rule AH004 is active for this MID.
              * @example false
              */
-            AH04: boolean;
+            AH004: boolean;
             /**
-             * @description Indicates whether the rule AH05 is active for this MID.
+             * @description Indicates whether the rule AH005 is active for this MID.
              * @example false
              */
-            AH05: boolean;
+            AH005: boolean;
             /**
-             * @description Indicates whether the rule AH06 is active for this MID.
+             * @description Indicates whether the rule AH006 is active for this MID.
              * @example false
              */
-            AH06: boolean;
+            AH006: boolean;
             /**
-             * @description Indicates whether the rule AH07 is active for this MID.
+             * @description Indicates whether the rule AH007 is active for this MID.
              * @example false
              */
-            AH07: boolean;
+            AH007: boolean;
             /**
-             * @description Indicates whether the rule AH08 is active for this MID.
+             * @description Indicates whether the rule AH008 is active for this MID.
              * @example false
              */
-            AH08: boolean;
+            AH008: boolean;
             /**
-             * @description Indicates whether the rule AH09 is active for this MID.
+             * @description Indicates whether the rule AH009 is active for this MID.
              * @example false
              */
-            AH09: boolean;
+            AH009: boolean;
             /**
-             * @description Indicates whether the rule AH10 is active for this MID.
+             * @description Indicates whether the rule AH010 is active for this MID.
              * @example false
              */
-            AH10: boolean;
+            AH010: boolean;
             /**
-             * @description Indicates whether the rule AH11 is active for this MID.
+             * @description Indicates whether the rule AH011 is active for this MID.
              * @example false
              */
-            AH11: boolean;
+            AH011: boolean;
             /**
-             * @description Indicates whether the rule AH12 is active for this MID.
+             * @description Indicates whether the rule AH012 is active for this MID.
              * @example false
              */
-            AH12: boolean;
+            AH012: boolean;
             /**
-             * @description Indicates whether the rule AH13 is active for this MID.
+             * @description Indicates whether the rule AH013 is active for this MID.
              * @example false
              */
-            AH13: boolean;
+            AH013: boolean;
             /**
-             * @description Indicates whether the rule AH14 is active for this MID.
+             * @description Indicates whether the rule AH014 is active for this MID.
              * @example false
              */
-            AH14: boolean;
+            AH014: boolean;
             /**
-             * @description Indicates whether the rule AH15 is active for this MID.
+             * @description Indicates whether the rule AH015 is active for this MID.
              * @example false
              */
-            AH15: boolean;
+            AH015: boolean;
             /**
-             * @description Indicates whether the rule AH16 is active for this MID.
+             * @description Indicates whether the rule AH016 is active for this MID.
              * @example false
              */
-            AH16: boolean;
+            AH016: boolean;
             /**
              * Format: date-time
              * @description Date and time when the record was last updated.
@@ -1808,85 +1888,85 @@ export interface components {
              */
             MCC?: string;
             /**
-             * @description Flag for rule AH01.
+             * @description Flag for rule AH001.
              * @example false
              */
-            AH01?: boolean;
+            AH001?: boolean;
             /**
-             * @description Flag for rule AH02.
+             * @description Flag for rule AH002.
              * @example false
              */
-            AH02?: boolean;
+            AH002?: boolean;
             /**
-             * @description Flag for rule AH03.
+             * @description Flag for rule AH003.
              * @example false
              */
-            AH03?: boolean;
+            AH003?: boolean;
             /**
-             * @description Flag for rule AH04.
+             * @description Flag for rule AH004.
              * @example false
              */
-            AH04?: boolean;
+            AH004?: boolean;
             /**
-             * @description Flag for rule AH05.
+             * @description Flag for rule AH005.
              * @example false
              */
-            AH05?: boolean;
+            AH005?: boolean;
             /**
-             * @description Flag for rule AH06.
+             * @description Flag for rule AH006.
              * @example false
              */
-            AH06?: boolean;
+            AH006?: boolean;
             /**
-             * @description Flag for rule AH07.
+             * @description Flag for rule AH007.
              * @example false
              */
-            AH07?: boolean;
+            AH007?: boolean;
             /**
-             * @description Flag for rule AH08.
+             * @description Flag for rule AH008.
              * @example false
              */
-            AH08?: boolean;
+            AH008?: boolean;
             /**
-             * @description Flag for rule AH09.
+             * @description Flag for rule AH009.
              * @example false
              */
-            AH09?: boolean;
+            AH009?: boolean;
             /**
-             * @description Flag for rule AH10.
+             * @description Flag for rule AH010.
              * @example false
              */
-            AH10?: boolean;
+            AH010?: boolean;
             /**
-             * @description Flag for rule AH11.
+             * @description Flag for rule AH011.
              * @example false
              */
-            AH11?: boolean;
+            AH011?: boolean;
             /**
-             * @description Flag for rule AH12.
+             * @description Flag for rule AH012.
              * @example false
              */
-            AH12?: boolean;
+            AH012?: boolean;
             /**
-             * @description Flag for rule AH13.
+             * @description Flag for rule AH013.
              * @example false
              */
-            AH13?: boolean;
+            AH013?: boolean;
             /**
-             * @description Flag for rule AH14.
+             * @description Flag for rule AH014.
              * @example false
              */
-            AH14?: boolean;
+            AH014?: boolean;
             /**
-             * @description Flag for rule AH15.
+             * @description Flag for rule AH015.
              * @example false
              */
-            AH15?: boolean;
+            AH015?: boolean;
             /**
-             * @description Flag for rule AH16.
+             * @description Flag for rule AH016.
              * @example false
              */
-            AH16?: boolean;
+            AH016?: boolean;
             /**
              * @description Username or system identifier that last updated this record.
              * @example system_user
@@ -1905,85 +1985,85 @@ export interface components {
              */
             MCC: string;
             /**
-             * @description Flag for rule AH01.
+             * @description Flag for rule AH001.
              * @example false
              */
-            AH01: boolean;
+            AH001: boolean;
             /**
-             * @description Flag for rule AH02.
+             * @description Flag for rule AH002.
              * @example false
              */
-            AH02: boolean;
+            AH002: boolean;
             /**
-             * @description Flag for rule AH03.
+             * @description Flag for rule AH003.
              * @example false
              */
-            AH03: boolean;
+            AH003: boolean;
             /**
-             * @description Flag for rule AH04.
+             * @description Flag for rule AH004.
              * @example false
              */
-            AH04: boolean;
+            AH004: boolean;
             /**
-             * @description Flag for rule AH05.
+             * @description Flag for rule AH005.
              * @example false
              */
-            AH05: boolean;
+            AH005: boolean;
             /**
-             * @description Flag for rule AH06.
+             * @description Flag for rule AH006.
              * @example false
              */
-            AH06: boolean;
+            AH006: boolean;
             /**
-             * @description Flag for rule AH07.
+             * @description Flag for rule AH007.
              * @example false
              */
-            AH07: boolean;
+            AH007: boolean;
             /**
-             * @description Flag for rule AH08.
+             * @description Flag for rule AH008.
              * @example false
              */
-            AH08: boolean;
+            AH008: boolean;
             /**
-             * @description Flag for rule AH09.
+             * @description Flag for rule AH009.
              * @example false
              */
-            AH09: boolean;
+            AH009: boolean;
             /**
-             * @description Flag for rule AH10.
+             * @description Flag for rule AH010.
              * @example false
              */
-            AH10: boolean;
+            AH010: boolean;
             /**
-             * @description Flag for rule AH11.
+             * @description Flag for rule AH011.
              * @example false
              */
-            AH11: boolean;
+            AH011: boolean;
             /**
-             * @description Flag for rule AH12.
+             * @description Flag for rule AH012.
              * @example false
              */
-            AH12: boolean;
+            AH012: boolean;
             /**
-             * @description Flag for rule AH13.
+             * @description Flag for rule AH013.
              * @example false
              */
-            AH13: boolean;
+            AH013: boolean;
             /**
-             * @description Flag for rule AH14.
+             * @description Flag for rule AH014.
              * @example false
              */
-            AH14: boolean;
+            AH014: boolean;
             /**
-             * @description Flag for rule AH15.
+             * @description Flag for rule AH015.
              * @example false
              */
-            AH15: boolean;
+            AH015: boolean;
             /**
-             * @description Flag for rule AH16.
+             * @description Flag for rule AH016.
              * @example false
              */
-            AH16: boolean;
+            AH016: boolean;
             /**
              * Format: date-time
              * @description Date and time when this record was last updated.
@@ -2111,6 +2191,110 @@ export interface components {
             count: number;
             total: number;
             page: number;
+            pageCount: number;
+        };
+        AutoHoldExceptionSummaryOutputDto: {
+            /** @description Unique identifier of the record. */
+            id: number;
+            /** @description Associated risk source details. */
+            source: components["schemas"]["RiskSource"];
+            /**
+             * @description Data source identifier (batch, file, etc.)
+             * @example 20251106_001
+             */
+            dataSourceIdentifier: string;
+            /**
+             * @description Merchant ID associated with the record.
+             * @example MID123456
+             */
+            merchantId: string;
+            /**
+             * @description Next-day transaction indicator.
+             * @example Yes
+             */
+            NXDY: string | null;
+            /**
+             * @description Auto Hold flag AH01.
+             * @example Yes
+             */
+            AH01: string | null;
+            /**
+             * @description Auto Hold flag AH02.
+             * @example null
+             */
+            AH02: string | null;
+            /**
+             * @description Auto Hold flag AH03.
+             * @example Yes
+             */
+            AH03: string | null;
+            /**
+             * @description Auto Hold flag AH04.
+             * @example null
+             */
+            AH04: string | null;
+            /**
+             * @description Auto Hold flag AH05.
+             * @example Yes
+             */
+            AH05: string | null;
+            /**
+             * @description Auto Hold flag AH06.
+             * @example null
+             */
+            AH06: string | null;
+            /**
+             * @description Auto Hold flag AH07.
+             * @example Yes
+             */
+            AH07: string | null;
+            /**
+             * @description Auto Hold flag AH10.
+             * @example Yes
+             */
+            AH10: string | null;
+            /**
+             * @description Auto Hold flag AH11.
+             * @example null
+             */
+            AH11: string | null;
+            /**
+             * @description Auto Hold flag AH12.
+             * @example Yes
+             */
+            AH12: string | null;
+            /**
+             * @description Auto Hold flag AH14.
+             * @example Yes
+             */
+            AH14: string | null;
+            /**
+             * @description Auto Hold flag AH15.
+             * @example null
+             */
+            AH15: string | null;
+            /**
+             * @description Auto Hold flag AH16.
+             * @example Yes
+             */
+            AH16: string | null;
+            /**
+             * Format: date-time
+             * @description Record creation date.
+             * @example 2025-11-06T12:00:00.000Z
+             */
+            createdAt: string;
+        };
+        ListAutoHoldExceptionSummaryPaginationOutput: {
+            /** @description List of paginated auto-hold exception summary records. */
+            data: components["schemas"]["AutoHoldExceptionSummaryOutputDto"][];
+            /** @description Number of records returned in this page. */
+            count: number;
+            /** @description Total number of records available. */
+            total: number;
+            /** @description Current page number. */
+            page: number;
+            /** @description Total number of pages available. */
             pageCount: number;
         };
         HandleDiverAddDto: {
@@ -2244,6 +2428,51 @@ export interface operations {
                      */
                     "application/json": unknown;
                 };
+            };
+        };
+    };
+    GenerateAttributionToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenerateAttributionTokenDto"];
+            };
+        };
+        responses: {
+            /** @description JWT token generated successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenerateAttributionTokenResponseDto"];
+                };
+            };
+            /** @description Invalid request payload */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized - authentication required */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -3424,6 +3653,35 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ListRiskRuleParamValuesOutput"];
+                };
+            };
+        };
+    };
+    AutoHoldExceptionSummariesController_listRiskRules: {
+        parameters: {
+            query?: {
+                /** @description Page number (starts from 1). */
+                page?: number;
+                /** @description Number of records per page (limit). */
+                limit?: number;
+                /** @description Start date filter for createdAt (YYYY-MM-DD). */
+                startDate?: string;
+                /** @description End date filter for createdAt (YYYY-MM-DD). */
+                endDate?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated list of risk rules and their parameters. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListAutoHoldExceptionSummaryPaginationOutput"];
                 };
             };
         };

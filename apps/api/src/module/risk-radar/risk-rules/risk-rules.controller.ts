@@ -19,7 +19,7 @@ import {
 } from '@/risk-radar-db/entities';
 import { CreateRiskRuleParamValueDto } from './dto/create-risk-rule-param-value.dto';
 import { CreateOrUpdateWhiteListMidDto } from './dto/create-or-update-white-list-mids.dto';
-import { RiskRuleWhiteListMidEntity } from '@/risk-radar-db/entities/risk-rule_white_list_mid.entity';
+import { RiskRuleWhiteListMidEntity } from '@/risk-radar-db/entities';
 import { CreateOrUpdateWhiteListMccDto } from './dto/create-or-update-white-list-mcc.dto';
 import { CreateOrUpdateMerchantRiskThresholdDto } from './dto/create-or-update-merchant_risk_threshold.dto';
 import {

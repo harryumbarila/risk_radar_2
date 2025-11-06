@@ -1,22 +1,41 @@
 services:
-  # db:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   platform: linux/amd64
-  #   container_name: sql-server-db
-  #   ports:
-  #     - '1433:1433'
-  #   volumes:
-  #     - mssql_data:/var/opt/mssql
-  #   networks:
-  #     - denali-network
-  #   healthcheck:
-  #     test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "Denali123!" -Q "SELECT 1" || exit 1
-  #     interval: 10s
-  #     timeout: 3s
-  #     retries: 10
-  #     start_period: 10s
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.mssql.local
+    platform: linux/amd64
+    container_name: sql-server-db
+    ports:
+      - '1433:1433'
+    volumes:
+      - mssql_data:/var/opt/mssql
+    networks:
+      - denali-network
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "Denali123!" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+  postgres:
+    container_name: denali-postgres
+    image: 'postgres:15'
+    platform: linux/amd64
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=Denali123!
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - denali-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
   redis:
     container_name: denali-redisdb
     image: 'redis/redis-stack-server:latest'
@@ -24,9 +43,10 @@ services:
       - '6379:6379'
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
-# networks:
-#   denali-network:
-#     driver: bridge
+networks:
+  denali-network:
+    driver: bridge
 
-# volumes:
-#   mssql_data:
+volumes:
+  mssql_data:
+  postgres_data:

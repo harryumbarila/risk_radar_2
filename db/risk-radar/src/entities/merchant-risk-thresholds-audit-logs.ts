@@ -1,12 +1,10 @@
-import {
-  Column,
-  Entity,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('tbl_merchant_risk_thresholds_audit_log', { schema: 'dbo', database: 'RiskRadar' })
+@Entity('tbl_merchant_risk_thresholds_audit_log', {
+  schema: 'dbo',
+  database: 'RiskRadar',
+})
 export class MerchanRiskThresholdsAuditLogsEntity {
- 
   @PrimaryGeneratedColumn({ name: 'pk' })
   id: number;
 
@@ -28,9 +26,19 @@ export class MerchanRiskThresholdsAuditLogsEntity {
   @Column({ name: 'decline_percentage', type: 'int', nullable: true })
   declinePercentage?: number;
 
-  @Column({ name: 'last_updated_date', type: 'datetime', nullable: true, default: () => 'GETDATE()' })
+  @Column({
+    name: 'last_updated_date',
+    type: 'datetime',
+    nullable: true,
+    default: () => 'GETDATE()',
+  })
   lastUpdatedDate?: Date;
 
-  @Column({ name: 'last_updated_by', type: 'varchar', length: 25, nullable: true })
+  @Column({
+    name: 'last_updated_by',
+    type: 'varchar',
+    length: 25,
+    nullable: true,
+  })
   lastUpdatedBy?: string;
 }

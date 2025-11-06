@@ -10,6 +10,7 @@ import { AttributionFormContainer } from '@/components/attribution-url/attributi
 import { AttributionResult } from '@/components/attribution-url/attribution-result';
 import { DefaultLayout } from '@/components/layouts/default-layout';
 import { clientConfig } from '@/config/client';
+import { useGenerateAttributionToken } from '@/hooks/attribution-url/use-generate-attribution-token';
 import { useLeadBasicInfo } from '@/hooks/attribution-url/use-lead-basic-info';
 import { useLeadSources } from '@/hooks/attribution-url/use-lead-sources';
 import { useSourceMatcher } from '@/hooks/attribution-url/use-source-matcher';
@@ -24,6 +25,8 @@ const AttributionUrl: React.FC = () => {
   const { forResource } = permissions(user);
   const { findMatchingSourceNameForReferralPartner } = useSourceMatcher();
   const { data: leadSourcesData } = useLeadSources();
+  const { generateToken, isLoading: isGeneratingToken } =
+    useGenerateAttributionToken();
 
   const methods = useForm<FormValues>({
     defaultValues: {
@@ -46,8 +49,7 @@ const AttributionUrl: React.FC = () => {
   const { data: leadBasicInfoData, isLoading: isLeadBasicInfoLoading } =
     useLeadBasicInfo(debouncedLeadId);
 
-  const isValidLead =
-    leadBasicInfoData?.dbaName && leadBasicInfoData.contactPhone;
+  const isValidLead = leadBasicInfoData?.dbaName;
 
   const [generatedLink, setGeneratedLink] = React.useState('');
   const [selectedPartnerName, setSelectedPartnerName] =
@@ -85,7 +87,7 @@ const AttributionUrl: React.FC = () => {
     return attributionData;
   };
 
-  const onSubmit = (data: FormValues): void => {
+  const onSubmit = async (data: FormValues): Promise<void> => {
     // 1. Permission Validation
     if (!forResource('ATTRIBUTION_LINK').canWrite) {
       showNotification({
@@ -97,19 +99,33 @@ const AttributionUrl: React.FC = () => {
       return;
     }
 
-    // Convert to Base64 and generate link
-    const attributionData = createAttributionDataPayload(data);
-    const encodedData = btoa(JSON.stringify(attributionData));
+    try {
+      // Generate JWT token via backend API
+      const attributionData = createAttributionDataPayload(data);
+      const token = await generateToken(attributionData);
 
-    const link = `${clientConfig.merchant.app.url}/attr/${encodedData}`;
-    setGeneratedLink(link);
+      const link = `${clientConfig.merchant.app.url}/attr/${token}`;
+      setGeneratedLink(link);
 
-    showNotification({
-      title: 'Success',
-      message: 'Attribution link generated successfully',
-      type: 'success',
-      bgColor: '#4CAF50',
-    });
+      showNotification({
+        title: 'Success',
+        message: 'Attribution link generated successfully',
+        type: 'success',
+        bgColor: '#4CAF50',
+      });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to generate attribution link';
+
+      showNotification({
+        title: 'Error',
+        message: errorMessage,
+        type: 'error',
+        bgColor: '#FF0000',
+      });
+    }
   };
 
   const updateSelectedPartnerName = (partnerName: string): void => {
@@ -132,7 +148,7 @@ const AttributionUrl: React.FC = () => {
                 canWrite={forResource('ATTRIBUTION_LINK').canWrite}
                 updateSelectedPartnerName={updateSelectedPartnerName}
                 leadData={leadBasicInfoData}
-                isLoading={isLeadBasicInfoLoading}
+                isLoading={isLeadBasicInfoLoading || isGeneratingToken}
                 isDisabled={!isValidLead}
               />
               {generatedLink && (

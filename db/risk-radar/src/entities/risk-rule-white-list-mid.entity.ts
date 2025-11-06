@@ -29,112 +29,112 @@ export class RiskRuleWhiteListMidEntity {
     description: 'Indicates whether the rule AH001 is active for this MID.',
     example: false,
   })
-  @Column({ name: 'AH01', type: 'bit', default: false, nullable: false })
+  @Column({ name: 'AH001', type: 'bit', default: false, nullable: false })
   AH001: boolean;
 
   @ApiProperty({
     description: 'Indicates whether the rule AH002 is active for this MID.',
     example: false,
   })
-  @Column({ name: 'AH02', type: 'bit', default: false, nullable: false })
+  @Column({ name: 'AH002', type: 'bit', default: false, nullable: false })
   AH002: boolean;
 
   @ApiProperty({
     description: 'Indicates whether the rule AH003 is active for this MID.',
     example: false,
   })
-  @Column({ name: 'AH03', type: 'bit', default: false, nullable: false })
+  @Column({ name: 'AH003', type: 'bit', default: false, nullable: false })
   AH003: boolean;
 
   @ApiProperty({
     description: 'Indicates whether the rule AH004 is active for this MID.',
     example: false,
   })
-  @Column({ name: 'AH04', type: 'bit', default: false, nullable: false })
+  @Column({ name: 'AH004', type: 'bit', default: false, nullable: false })
   AH004: boolean;
 
   @ApiProperty({
     description: 'Indicates whether the rule AH005 is active for this MID.',
     example: false,
   })
-  @Column({ name: 'AH05', type: 'bit', default: false, nullable: false })
+  @Column({ name: 'AH005', type: 'bit', default: false, nullable: false })
   AH005: boolean;
 
   @ApiProperty({
     description: 'Indicates whether the rule AH006 is active for this MID.',
     example: false,
   })
-  @Column({ name: 'AH06', type: 'bit', default: false, nullable: false })
+  @Column({ name: 'AH006', type: 'bit', default: false, nullable: false })
   AH006: boolean;
 
   @ApiProperty({
     description: 'Indicates whether the rule AH007 is active for this MID.',
     example: false,
   })
-  @Column({ name: 'AH07', type: 'bit', default: false, nullable: false })
+  @Column({ name: 'AH007', type: 'bit', default: false, nullable: false })
   AH007: boolean;
 
   @ApiProperty({
     description: 'Indicates whether the rule AH008 is active for this MID.',
     example: false,
   })
-  @Column({ name: 'AH08', type: 'bit', default: false, nullable: false })
+  @Column({ name: 'AH008', type: 'bit', default: false, nullable: false })
   AH008: boolean;
 
   @ApiProperty({
     description: 'Indicates whether the rule AH009 is active for this MID.',
     example: false,
   })
-  @Column({ name: 'AH09', type: 'bit', default: false, nullable: false })
+  @Column({ name: 'AH009', type: 'bit', default: false, nullable: false })
   AH009: boolean;
 
   @ApiProperty({
     description: 'Indicates whether the rule AH010 is active for this MID.',
     example: false,
   })
-  @Column({ name: 'AH10', type: 'bit', default: false, nullable: false })
+  @Column({ name: 'AH010', type: 'bit', default: false, nullable: false })
   AH010: boolean;
 
   @ApiProperty({
     description: 'Indicates whether the rule AH011 is active for this MID.',
     example: false,
   })
-  @Column({ name: 'AH11', type: 'bit', default: false, nullable: false })
+  @Column({ name: 'AH011', type: 'bit', default: false, nullable: false })
   AH011: boolean;
 
   @ApiProperty({
     description: 'Indicates whether the rule AH012 is active for this MID.',
     example: false,
   })
-  @Column({ name: 'AH12', type: 'bit', default: false, nullable: false })
+  @Column({ name: 'AH012', type: 'bit', default: false, nullable: false })
   AH012: boolean;
 
   @ApiProperty({
     description: 'Indicates whether the rule AH013 is active for this MID.',
     example: false,
   })
-  @Column({ name: 'AH13', type: 'bit', default: false, nullable: false })
+  @Column({ name: 'AH013', type: 'bit', default: false, nullable: false })
   AH013: boolean;
 
   @ApiProperty({
     description: 'Indicates whether the rule AH014 is active for this MID.',
     example: false,
   })
-  @Column({ name: 'AH14', type: 'bit', default: false, nullable: false })
+  @Column({ name: 'AH014', type: 'bit', default: false, nullable: false })
   AH014: boolean;
 
   @ApiProperty({
     description: 'Indicates whether the rule AH015 is active for this MID.',
     example: false,
   })
-  @Column({ name: 'AH15', type: 'bit', default: false, nullable: false })
+  @Column({ name: 'AH015', type: 'bit', default: false, nullable: false })
   AH015: boolean;
 
   @ApiProperty({
     description: 'Indicates whether the rule AH016 is active for this MID.',
     example: false,
   })
-  @Column({ name: 'AH16', type: 'bit', default: false, nullable: false })
+  @Column({ name: 'AH016', type: 'bit', default: false, nullable: false })
   AH016: boolean;
 
   @ApiProperty({

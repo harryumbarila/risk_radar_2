@@ -38,11 +38,7 @@ export const AutoSelectField: React.FC<AutoSelectFieldProps> = ({
   }, [autoSelect, loading, options, value, onChange]);
 
   // Disable if: loading, explicitly disabled, or 0 or 1 options
-  const isDisabled =
-    disabled ||
-    loading ||
-    options.length === 0 ||
-    (autoSelect && options.length === 1);
+  const isDisabled = disabled || loading || options.length === 0;
   const hasOptions = options.length > 0;
 
   let selectOptions: React.ReactNode;

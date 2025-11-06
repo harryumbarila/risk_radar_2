@@ -23,6 +23,7 @@ import { DbTypeORMModule as SnapPccTypeOrmModule } from '@/snap-pcc-db/connectio
 import { DbTypeORMModule as RiskRadarTypeOrmModule } from '@/risk-radar-db/connection/nestjs-module';
 
 import { AppController } from './app.controller';
+import { AttributionUrlModule } from './module/attribution-url/attribution-url.module';
 import { ExampleMultiDbModule } from './module/example-multi-db/example-multi-db.module';
 import { IrisProxyModule } from './module/iris-proxy/iris-proxy.module';
 import { LegacyDashboardProxyModule } from './module/legacy-dashboard-proxy/legacy-dashboard-proxy.module';
@@ -61,6 +62,7 @@ if (process.env.NODE_ENV !== 'production') {
     RiskRadarTypeOrmModule,
     LoggerModule.forRoot(loggerConfig),
     GlobalModule,
+    AttributionUrlModule,
     LegacyDashboardProxyModule,
     IrisProxyModule,
     ExampleMultiDbModule,

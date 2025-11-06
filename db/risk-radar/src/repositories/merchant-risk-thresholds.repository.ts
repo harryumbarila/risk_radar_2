@@ -3,7 +3,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
 import { Repository } from 'typeorm';
 
-import { MerchanRiskThresholdsEntity } from '../entities/merchant_risk_thresholds';
+import { MerchanRiskThresholdsEntity } from '../entities/merchant-risk-thresholds';
 
 @Injectable()
 export class MerchantRiskThresholdsRepository extends Repository<MerchanRiskThresholdsEntity> {

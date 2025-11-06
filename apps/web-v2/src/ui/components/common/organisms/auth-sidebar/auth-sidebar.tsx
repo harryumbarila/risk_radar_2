@@ -14,7 +14,13 @@ import {
   useDisclosure,
   useBreakpointValue,
 } from '@chakra-ui/react';
-import { MdHome, MdBarChart, MdPerson, MdMenu } from 'react-icons/md';
+import {
+  MdHome,
+  MdBarChart,
+  MdPerson,
+  MdMenu,
+  MdAutorenew,
+} from 'react-icons/md';
 
 import { AuthSidebarMenuItem } from './auth-sidebar.model';
 import { usePathname } from 'next/navigation';
@@ -27,6 +33,7 @@ export default function AuthSidebar(): React.JSX.Element {
 
   const menuItems: AuthSidebarMenuItem[] = [
     { name: 'Dashboard', icon: MdHome, path: '/' },
+    { name: 'Auto Hold', icon: MdAutorenew, path: '/auto-hold' },
     { name: 'Settings', icon: MdBarChart, path: '/settings' },
   ];
 

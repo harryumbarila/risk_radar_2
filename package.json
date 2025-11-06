@@ -16,7 +16,7 @@
     "format": "prettier --write .",
     "lint": "turbo lint",
     "lint:fix": "turbo lint:fix",
-    "openapi-typescript": "npx openapi-typescript http://localhost:3001/api/swagger-yaml -o ./apps/web-v2/src/libs/shared/api/schemas/schema.d.ts",
+    "openapi-typescript": "openapi-typescript http://localhost:3001/api/swagger-yaml -o ./apps/web-v2/src/libs/shared/api/schemas/schema.d.ts",
     "prepare": "husky",
     "start:api": "turbo run start --filter=@denali/api",
     "start:web": "turbo run start --filter=@denali/web",

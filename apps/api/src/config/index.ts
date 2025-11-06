@@ -21,4 +21,7 @@ export const config = {
   legacyDashboard: {
     url: env.LEGACY_DASHBOARD_URL,
   },
+  attribution: {
+    signSecret: env.ATTRIBUTION_DATA_SIGN_SECRET,
+  },
 };

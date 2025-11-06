@@ -73,6 +73,9 @@ export default function ParamValuesHistory(
           ruleParamId: rule?.id,
         },
       },
+    },
+    {
+      enabled: !!rule?.id,
     }
   );
 

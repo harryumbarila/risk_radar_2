@@ -3,7 +3,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
 import { Repository } from 'typeorm';
 
-import { RiskRuleWhiteListMidAuditLogEntity } from '../entities/risk-rule_white_list_mid_audit_log.entity';
+import { RiskRuleWhiteListMidAuditLogEntity } from '../entities/risk-rule-white-list-mid-audit-log.entity';
 
 @Injectable()
 export class RiskRuleWhiteListMidRepositoryAuditLog extends Repository<RiskRuleWhiteListMidAuditLogEntity> {

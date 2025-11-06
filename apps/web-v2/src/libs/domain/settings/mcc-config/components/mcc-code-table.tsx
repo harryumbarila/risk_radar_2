@@ -21,22 +21,22 @@ import { toaster } from '@/ui/components/common/atoms';
 import CheckStatusBadge from './check-status-badge';
 
 type AHCode =
-  | 'AH01'
-  | 'AH02'
-  | 'AH03'
-  | 'AH04'
-  | 'AH05'
-  | 'AH06'
-  | 'AH07'
-  | 'AH08'
-  | 'AH09'
-  | 'AH10'
-  | 'AH11'
-  | 'AH12'
-  | 'AH13'
-  | 'AH14'
-  | 'AH15'
-  | 'AH16';
+  | 'AH001'
+  | 'AH002'
+  | 'AH003'
+  | 'AH004'
+  | 'AH005'
+  | 'AH006'
+  | 'AH007'
+  | 'AH008'
+  | 'AH009'
+  | 'AH010'
+  | 'AH011'
+  | 'AH012'
+  | 'AH013'
+  | 'AH014'
+  | 'AH015'
+  | 'AH016';
 
 interface MCCCodeTableProps {
   mcc: components['schemas']['RiskRuleWhiteListMccEntity'];
@@ -68,22 +68,22 @@ export default function MCCCodeTable(
   );
 
   const getAHCodes = (): AHCode[] => [
-    'AH01',
-    'AH02',
-    'AH03',
-    'AH04',
-    'AH05',
-    'AH06',
-    'AH07',
-    'AH08',
-    'AH09',
-    'AH10',
-    'AH11',
-    'AH12',
-    'AH13',
-    'AH14',
-    'AH15',
-    'AH16',
+    'AH001',
+    'AH002',
+    'AH003',
+    'AH004',
+    'AH005',
+    'AH006',
+    'AH007',
+    'AH008',
+    'AH009',
+    'AH010',
+    'AH011',
+    'AH012',
+    'AH013',
+    'AH014',
+    'AH015',
+    'AH016',
   ];
 
   const handleFormSubmit = async (
