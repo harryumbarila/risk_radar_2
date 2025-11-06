@@ -10,7 +10,11 @@ import {
   VStack,
 } from '@chakra-ui/react';
 
-import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
+import {
+  ColumnDef,
+  createColumnHelper,
+  PaginationState,
+} from '@tanstack/react-table';
 
 import { DataTable } from '@/ui/components/common/organisms/data-table';
 
@@ -20,6 +24,7 @@ import { $riskApi } from '@/libs/shared/api/risk.api';
 import { formatDate } from '@/libs/utils/formatter';
 
 import { ParamValuesHistoryProps } from './list-param-values.model';
+import React from 'react';
 
 const columnHelper =
   createColumnHelper<
@@ -59,10 +64,17 @@ const columns = [
   components['schemas']['RiskRuleParamValuePaginationOutputDto']
 >[];
 
+const initialItemsPerPage = 10;
+
 export default function ParamValuesHistory(
   props: ParamValuesHistoryProps
 ): React.JSX.Element {
   const { isOpen, onClose, rule } = props;
+  const [{ pageIndex, pageSize }, setPagination] =
+    React.useState<PaginationState>({
+      pageIndex: 0,
+      pageSize: initialItemsPerPage,
+    });
 
   const { data, isLoading } = $riskApi.useQuery(
     'get',
@@ -124,6 +136,8 @@ export default function ParamValuesHistory(
                       columns={columns}
                       isLoading={false}
                       enablePagination
+                      pagination={{ pageIndex, pageSize }}
+                      onSetPagination={setPagination}
                     />
                   )}
                 </VStack>

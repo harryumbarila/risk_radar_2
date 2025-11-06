@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsNumber, Min } from 'class-validator';
+import { IsOptional } from 'class-validator';
 
 import { PaginationInput, PaginationResponse } from '@/shared/common';
 import { RiskSource } from '@/risk-radar-db/entities';
@@ -34,95 +34,116 @@ export class AutoHoldExceptionSummaryOutputDto {
   NXDY: string | null;
 
   @ApiProperty({
-    description: 'Auto Hold flag AH01.',
+    description: 'Auto Hold flag AH001.',
     example: 'Yes',
     nullable: true,
   })
-  AH01: string | null;
+  AH001: string | null;
 
   @ApiProperty({
-    description: 'Auto Hold flag AH02.',
+    description: 'Auto Hold flag AH002.',
     example: null,
     nullable: true,
   })
-  AH02: string | null;
+  AH002: string | null;
 
   @ApiProperty({
-    description: 'Auto Hold flag AH03.',
+    description: 'Auto Hold flag AH003.',
     example: 'Yes',
     nullable: true,
   })
-  AH03: string | null;
+  AH003: string | null;
 
   @ApiProperty({
-    description: 'Auto Hold flag AH04.',
+    description: 'Auto Hold flag AH004.',
     example: null,
     nullable: true,
   })
-  AH04: string | null;
+  AH004: string | null;
 
   @ApiProperty({
-    description: 'Auto Hold flag AH05.',
+    description: 'Auto Hold flag AH005.',
     example: 'Yes',
     nullable: true,
   })
-  AH05: string | null;
+  AH005: string | null;
 
   @ApiProperty({
-    description: 'Auto Hold flag AH06.',
+    description: 'Auto Hold flag AH006.',
     example: null,
     nullable: true,
   })
-  AH06: string | null;
+  AH006: string | null;
 
   @ApiProperty({
-    description: 'Auto Hold flag AH07.',
+    description: 'Auto Hold flag AH007.',
     example: 'Yes',
     nullable: true,
   })
-  AH07: string | null;
+  AH007: string | null;
 
   @ApiProperty({
-    description: 'Auto Hold flag AH10.',
+    description: 'Auto Hold flag AH008.',
     example: 'Yes',
     nullable: true,
   })
-  AH10: string | null;
+  AH008: string | null;
 
   @ApiProperty({
-    description: 'Auto Hold flag AH11.',
+    description: 'Auto Hold flag AH009.',
+    example: 'Yes',
+    nullable: true,
+  })
+  AH009: string | null;
+
+  @ApiProperty({
+    description: 'Auto Hold flag AH010.',
+    example: 'Yes',
+    nullable: true,
+  })
+  AH010: string | null;
+
+  @ApiProperty({
+    description: 'Auto Hold flag AH011.',
+    example: 'Yes',
+    nullable: true,
+  })
+  AH011: string | null;
+
+  @ApiProperty({
+    description: 'Auto Hold flag AH012.',
+    example: 'Yes',
+    nullable: true,
+  })
+  AH012: string | null;
+
+  @ApiProperty({
+    description: 'Auto Hold flag AH013.',
     example: null,
     nullable: true,
   })
-  AH11: string | null;
+  AH013: string | null;
 
   @ApiProperty({
-    description: 'Auto Hold flag AH12.',
+    description: 'Auto Hold flag AH014.',
     example: 'Yes',
     nullable: true,
   })
-  AH12: string | null;
+  AH014: string | null;
 
   @ApiProperty({
-    description: 'Auto Hold flag AH14.',
-    example: 'Yes',
-    nullable: true,
-  })
-  AH14: string | null;
-
-  @ApiProperty({
-    description: 'Auto Hold flag AH15.',
+    description: 'Auto Hold flag AH015.',
     example: null,
     nullable: true,
   })
-  AH15: string | null;
+  AH015: string | null;
 
   @ApiProperty({
-    description: 'Auto Hold flag AH16.',
+    description: 'Auto Hold flag AH016.',
     example: 'Yes',
     nullable: true,
   })
-  AH16: string | null;
+  AH016: string | null;
 
   @ApiProperty({
     description: 'Record creation date.',

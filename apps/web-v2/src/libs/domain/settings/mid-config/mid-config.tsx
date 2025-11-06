@@ -115,7 +115,7 @@ export default function SettingsMidConfig(): React.JSX.Element {
             Search
           </Button>
         </FormProvider>
-        {!data?.length && submittedTerm && !isLoading && (
+        {!data?.data?.length && submittedTerm && !isLoading && (
           <Button
             size="sm"
             bg="black"
@@ -131,9 +131,9 @@ export default function SettingsMidConfig(): React.JSX.Element {
         )}
       </Flex>
 
-      {data && data.length > 0 ? (
+      {data && data?.data?.length > 0 ? (
         <Flex gap={2}>
-          {data.map((mid) => (
+          {data?.data.map((mid) => (
             <MidCodeTable key={mid.id} mid={mid} />
           ))}
         </Flex>

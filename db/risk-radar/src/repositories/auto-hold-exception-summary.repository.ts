@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
+
 import type { DataSource } from 'typeorm';
 import { Repository } from 'typeorm';
+
 import { subWeeks, startOfDay, endOfDay } from 'date-fns';
 
 import { AutoHoldExceptionSummary } from '../entities';
@@ -49,19 +51,22 @@ export class AutoHoldExceptionSummaryRepository extends Repository<AutoHoldExcep
       dataSourceIdentifier: a.dataSourceIdentifier,
       merchantId: a.merchantId,
       NXDY: a.isNextDay ? 'Yes' : null,
-      AH01: a.isAutoHold01 ? 'Yes' : null,
-      AH02: a.isAutoHold02 ? 'Yes' : null,
-      AH03: a.isAutoHold03 ? 'Yes' : null,
-      AH04: a.isAutoHold04 ? 'Yes' : null,
-      AH05: a.isAutoHold05 ? 'Yes' : null,
-      AH06: a.isAutoHold06 ? 'Yes' : null,
-      AH07: a.isAutoHold07 ? 'Yes' : null,
-      AH10: a.isAutoHold10 ? 'Yes' : null,
-      AH11: a.isAutoHold11 ? 'Yes' : null,
-      AH12: a.isAutoHold12 ? 'Yes' : null,
-      AH14: a.isAutoHold14 ? 'Yes' : null,
-      AH15: a.isAutoHold15 ? 'Yes' : null,
-      AH16: a.isAutoHold16 ? 'Yes' : null,
+      AH001: a.isAutoHold01 ? 'Yes' : null,
+      AH002: a.isAutoHold02 ? 'Yes' : null,
+      AH003: a.isAutoHold03 ? 'Yes' : null,
+      AH004: a.isAutoHold04 ? 'Yes' : null,
+      AH005: a.isAutoHold05 ? 'Yes' : null,
+      AH006: a.isAutoHold06 ? 'Yes' : null,
+      AH007: a.isAutoHold07 ? 'Yes' : null,
+      AH008: a.isAutoHold08 ? 'Yes' : null,
+      AH009: a.isAutoHold09 ? 'Yes' : null,
+      AH010: a.isAutoHold10 ? 'Yes' : null,
+      AH011: a.isAutoHold11 ? 'Yes' : null,
+      AH012: a.isAutoHold12 ? 'Yes' : null,
+      AH013: a.isAutoHold13 ? 'Yes' : null,
+      AH014: a.isAutoHold14 ? 'Yes' : null,
+      AH015: a.isAutoHold15 ? 'Yes' : null,
+      AH016: a.isAutoHold16 ? 'Yes' : null,
       createdAt: a.createdAt,
     }));
 

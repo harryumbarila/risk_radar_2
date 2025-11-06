@@ -31,6 +31,7 @@ export default function AddParamValueDialog(
   });
 
   const {
+    reset,
     formState: { isValid, isSubmitting },
     handleSubmit,
   } = methods;
@@ -47,8 +48,27 @@ export default function AddParamValueDialog(
           ruleParamId: Number(rule?.id),
         },
       });
-      await queryClient.invalidateQueries({
-        queryKey: ['get', '/v1/risk-rule'],
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ['get', '/v1/risk-rule'],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: [
+            'get',
+            '/v1/risk-rule/param-values',
+            {
+              params: {
+                query: {
+                  ruleParamId: rule?.id,
+                },
+              },
+            },
+          ],
+        }),
+      ]);
+      reset({
+        value: '0',
+        effectiveDate: '',
       });
       onClose();
     } catch (error) {

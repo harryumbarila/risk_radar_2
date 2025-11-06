@@ -1,5 +1,10 @@
 import { PaginationResponse } from '@/data/interfaces/api';
-import type { ColumnDef, PaginationState, Row } from '@tanstack/react-table';
+import type {
+  ColumnDef,
+  PaginationState,
+  Row,
+  OnChangeFn,
+} from '@tanstack/react-table';
 import { ComponentType } from 'react';
 
 export interface CollapsibleBodyProps<BaseModel> {
@@ -12,7 +17,8 @@ export type DataTableProps<BaseModel> = {
   data: PaginationResponse<BaseModel>; // Row Data
   columns: ColumnDef<BaseModel>[]; // Columns definitions
   onSelectRow?: (arg: BaseModel) => void; // On row selection
-  onSetPagination?: (arg: PaginationState) => void; // Pagination
+  pagination?: PaginationState;
+  onSetPagination?: OnChangeFn<PaginationState>;
   initialItemsPerPage?: number;
   enablePagination?: boolean;
   fontSize?: 'small' | 'medium' | 'large';

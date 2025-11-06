@@ -1876,6 +1876,18 @@ export interface components {
              */
             lastUpdatedBy?: string;
         };
+        ListWhiteListMidsOutput: {
+            /** @description White list MID records */
+            data: components["schemas"]["RiskRuleWhiteListMidEntity"][];
+            /** @description Number of records in current page */
+            count: number;
+            /** @description Total number of records */
+            total: number;
+            /** @description Current page number */
+            page: number;
+            /** @description Total number of pages */
+            pageCount: number;
+        };
         CreateOrUpdateWhiteListMccDto: {
             /**
              * @description Primary key identifier of the record.
@@ -2076,6 +2088,18 @@ export interface components {
              */
             lastUpdatedBy: string;
         };
+        ListWhiteListMccsOutput: {
+            /** @description White list MCC records */
+            data: components["schemas"]["RiskRuleWhiteListMccEntity"][];
+            /** @description Number of records in current page */
+            count: number;
+            /** @description Total number of records */
+            total: number;
+            /** @description Current page number */
+            page: number;
+            /** @description Total number of pages */
+            pageCount: number;
+        };
         CreateOrUpdateMerchantRiskThresholdDto: {
             /**
              * @description Primary key identifier of the merchant risk threshold record.
@@ -2166,6 +2190,18 @@ export interface components {
              */
             lastUpdatedBy?: string;
         };
+        ListMerchantRiskThresholdsOutput: {
+            /** @description Merchant risk threshold records */
+            data: components["schemas"]["MerchanRiskThresholdsEntity"][];
+            /** @description Number of records in current page */
+            count: number;
+            /** @description Total number of records */
+            total: number;
+            /** @description Current page number */
+            page: number;
+            /** @description Total number of pages */
+            pageCount: number;
+        };
         RiskRuleParamValuePaginationOutputDto: {
             /** @description Primary key identifier of the parameter value. */
             id: number;
@@ -2214,70 +2250,85 @@ export interface components {
              */
             NXDY: string | null;
             /**
-             * @description Auto Hold flag AH01.
+             * @description Auto Hold flag AH001.
              * @example Yes
              */
-            AH01: string | null;
+            AH001: string | null;
             /**
-             * @description Auto Hold flag AH02.
+             * @description Auto Hold flag AH002.
              * @example null
              */
-            AH02: string | null;
+            AH002: string | null;
             /**
-             * @description Auto Hold flag AH03.
+             * @description Auto Hold flag AH003.
              * @example Yes
              */
-            AH03: string | null;
+            AH003: string | null;
             /**
-             * @description Auto Hold flag AH04.
+             * @description Auto Hold flag AH004.
              * @example null
              */
-            AH04: string | null;
+            AH004: string | null;
             /**
-             * @description Auto Hold flag AH05.
+             * @description Auto Hold flag AH005.
              * @example Yes
              */
-            AH05: string | null;
+            AH005: string | null;
             /**
-             * @description Auto Hold flag AH06.
+             * @description Auto Hold flag AH006.
              * @example null
              */
-            AH06: string | null;
+            AH006: string | null;
             /**
-             * @description Auto Hold flag AH07.
+             * @description Auto Hold flag AH007.
              * @example Yes
              */
-            AH07: string | null;
+            AH007: string | null;
             /**
-             * @description Auto Hold flag AH10.
+             * @description Auto Hold flag AH008.
              * @example Yes
              */
-            AH10: string | null;
+            AH008: string | null;
             /**
-             * @description Auto Hold flag AH11.
+             * @description Auto Hold flag AH009.
+             * @example Yes
+             */
+            AH009: string | null;
+            /**
+             * @description Auto Hold flag AH010.
+             * @example Yes
+             */
+            AH010: string | null;
+            /**
+             * @description Auto Hold flag AH011.
+             * @example Yes
+             */
+            AH011: string | null;
+            /**
+             * @description Auto Hold flag AH012.
+             * @example Yes
+             */
+            AH012: string | null;
+            /**
+             * @description Auto Hold flag AH013.
              * @example null
              */
-            AH11: string | null;
+            AH013: string | null;
             /**
-             * @description Auto Hold flag AH12.
+             * @description Auto Hold flag AH014.
              * @example Yes
              */
-            AH12: string | null;
+            AH014: string | null;
             /**
-             * @description Auto Hold flag AH14.
-             * @example Yes
-             */
-            AH14: string | null;
-            /**
-             * @description Auto Hold flag AH15.
+             * @description Auto Hold flag AH015.
              * @example null
              */
-            AH15: string | null;
+            AH015: string | null;
             /**
-             * @description Auto Hold flag AH16.
+             * @description Auto Hold flag AH016.
              * @example Yes
              */
-            AH16: string | null;
+            AH016: string | null;
             /**
              * Format: date-time
              * @description Record creation date.
@@ -3494,8 +3545,13 @@ export interface operations {
     };
     RiskRulesController_getWhiteListMids: {
         parameters: {
-            query: {
-                mid: string;
+            query?: {
+                /** @description Filter by MID (partial match) */
+                mid?: string;
+                /** @description Page number */
+                page?: number;
+                /** @description Items per page */
+                limit?: number;
             };
             header?: never;
             path?: never;
@@ -3503,13 +3559,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Gets a list of white list mids. */
+            /** @description Gets paginated list of white list mids with optional filtering. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["RiskRuleWhiteListMidEntity"][];
+                    "application/json": components["schemas"]["ListWhiteListMidsOutput"];
                 };
             };
         };
@@ -3540,8 +3596,13 @@ export interface operations {
     };
     RiskRulesController_getWhiteListMccs: {
         parameters: {
-            query: {
-                mcc: string;
+            query?: {
+                /** @description Filter by MCC (partial match) */
+                mcc?: string;
+                /** @description Page number */
+                page?: number;
+                /** @description Items per page */
+                limit?: number;
             };
             header?: never;
             path?: never;
@@ -3549,13 +3610,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Gets a list of white list mccs. */
+            /** @description Gets paginated list of white list mccs with optional filtering. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["RiskRuleWhiteListMccEntity"][];
+                    "application/json": components["schemas"]["ListWhiteListMccsOutput"];
                 };
             };
         };
@@ -3586,8 +3647,13 @@ export interface operations {
     };
     RiskRulesController_getMerchantRiskThresholds: {
         parameters: {
-            query: {
-                mid: string;
+            query?: {
+                /** @description Filter by MID (partial match) */
+                mid?: string;
+                /** @description Page number */
+                page?: number;
+                /** @description Items per page */
+                limit?: number;
             };
             header?: never;
             path?: never;
@@ -3595,13 +3661,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Gets a list of merchant risk thresholds. */
+            /** @description Gets paginated list of merchant risk thresholds with optional filtering. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MerchanRiskThresholdsEntity"][];
+                    "application/json": components["schemas"]["ListMerchantRiskThresholdsOutput"];
                 };
             };
         };

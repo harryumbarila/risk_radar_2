@@ -13,7 +13,7 @@ export const buttonRecipe = defineRecipe({
   },
   variants: {
     variant: {
-      solid: { bg: 'brand.500', color: 'white', },
+      solid: { bg: 'brand.500', color: 'white' },
       outline: { borderWidth: '1px', borderColor: 'brand.500' },
     },
     size: {
@@ -40,8 +40,6 @@ const theme = defineConfig({
 });
 
 const config = mergeConfigs(defaultConfig, theme);
-const system = createSystem(config, {
-  disableLayers: true,
-});
+const system = createSystem(config);
 
 export default system;

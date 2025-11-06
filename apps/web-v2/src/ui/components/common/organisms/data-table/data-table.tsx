@@ -7,8 +7,9 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  PaginationState,
 } from '@tanstack/react-table';
-import type { PaginationState, SortingState } from '@tanstack/react-table';
+import type { SortingState } from '@tanstack/react-table';
 
 import { DataTableProps } from './data-table.model';
 import {
@@ -45,63 +46,39 @@ const DataTable = <Entry extends BaseModel>(
   const {
     columns,
     // onSelectRow,
+    pagination,
     onSetPagination,
-    initialItemsPerPage,
     data,
     CollapsibleBody,
     enablePagination,
   } = props;
 
-  const [{ pageIndex, pageSize }, setPagination] =
-    React.useState<PaginationState>({
-      pageIndex: 0,
-      pageSize: initialItemsPerPage || 50,
-    });
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
-  React.useEffect(() => {
-    // onSetPagination?.({ pageIndex, pageSize });
-    setPagination?.({ pageIndex, pageSize });
-  }, [pageIndex, pageSize, onSetPagination]);
-
-  const pagination = React.useMemo(
-    () => ({
-      pageIndex,
-      pageSize,
-    }),
-    [pageIndex, pageSize]
-  );
+  const effectivePagination: PaginationState = enablePagination
+    ? (pagination ?? { pageIndex: 0, pageSize: 10 })
+    : { pageIndex: 0, pageSize: data.data?.length || 10 };
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: data.data,
     columns,
-
-    // pageCount: data?.pageCount ?? -1,
+    pageCount: data?.pageCount ?? -1,
     state: {
       sorting,
-      pagination,
+      pagination: effectivePagination,
     },
     onSortingChange: setSorting,
-    onPaginationChange: setPagination,
+    onPaginationChange: onSetPagination,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    initialState: {
-      pagination: {
-        pageSize: initialItemsPerPage,
-      },
-    },
-    debugTable: true,
-    // TODO: Backend Pagination
-    // manualPagination: true,
-    // autoResetPageIndex: false,
+    debugTable: false,
+    manualPagination: enablePagination,
+    autoResetPageIndex: false,
   });
 
-  const [selectedValue, setSelectedValue] = React.useState<string[]>([
-    `${table.getState().pagination.pageSize}`,
-  ]);
   const pageCount = table.getPageCount();
 
   const pageSizeOptions = createListCollection({
@@ -192,34 +169,35 @@ const DataTable = <Entry extends BaseModel>(
           ))}
         </Table.Footer>
       </Table.Root>
-      {enablePagination ? (
+      {enablePagination && (
         <Flex
           as="nav"
           direction={{ base: 'column', md: 'row' }}
           justify="space-between"
           align={{ base: 'flex-start', md: 'center' }}
           px={2}
+          py={3}
           aria-label="Table navigation"
           gap={3}
         >
           <Text fontWeight="normal" color="gray.500">
+            Page{' '}
             <Text as="span" fontWeight="semibold" color="gray.900">
-              {table.getState().pagination.pageIndex + 1} of{' '}
-              {table.getPageCount().toLocaleString()}
+              {effectivePagination.pageIndex + 1} of{' '}
+              {pageCount.toLocaleString()}
             </Text>
           </Text>
 
           <Flex gap={5} align="center">
             <Flex align="center">
               <Text mr={2}>Entries per Page</Text>
-
               <Select.Root
                 collection={pageSizeOptions}
                 width="120px"
-                value={selectedValue}
+                value={[`${table.getState().pagination.pageSize}`]}
                 onValueChange={(e) => {
-                  setSelectedValue(e.value);
-                  table.setPageSize(Number(e.value[0]));
+                  const size = Number(e.value[0]);
+                  onSetPagination?.({ ...effectivePagination, pageSize: size });
                 }}
               >
                 <Select.HiddenSelect />
@@ -248,18 +226,21 @@ const DataTable = <Entry extends BaseModel>(
             </Flex>
 
             <Pagination.Root
-              count={table.getPageCount()}
+              count={pageCount}
               pageSize={1}
-              page={pageIndex + 1}
-              onPageChange={(details) => {
-                table.setPageIndex(details.page - 1);
-              }}
+              page={effectivePagination.pageIndex + 1}
+              onPageChange={(details) =>
+                onSetPagination?.({
+                  ...effectivePagination,
+                  pageIndex: details.page - 1,
+                })
+              }
             >
               <ButtonGroup size="sm" variant="ghost">
                 <Pagination.PrevTrigger asChild>
                   <IconButton
                     aria-label="Previous page"
-                    disabled={pageIndex === 0}
+                    disabled={effectivePagination.pageIndex === 0}
                   >
                     <MdArrowLeft />
                   </IconButton>
@@ -267,20 +248,29 @@ const DataTable = <Entry extends BaseModel>(
 
                 <Pagination.Items
                   render={(page) => (
-                    <IconButton
+                    <Pagination.Item
+                      type="page"
                       key={page.value}
-                      aria-label={`Page ${page.value}`}
-                      variant={page.value ? 'outline' : 'ghost'}
-                      onClick={() => table.setPageIndex(page.value - 1)}
+                      value={page.value}
                     >
-                      {page.value}
-                    </IconButton>
+                      <IconButton
+                        aria-label={`Page ${page.value}`}
+                        variant={
+                          effectivePagination.pageIndex + 1 === page.value
+                            ? 'solid'
+                            : 'ghost'
+                        }
+                      >
+                        {page.value}
+                      </IconButton>
+                    </Pagination.Item>
                   )}
                 />
+
                 <Pagination.NextTrigger asChild>
                   <IconButton
                     aria-label="Next page"
-                    disabled={pageIndex >= pageCount - 1}
+                    disabled={effectivePagination.pageIndex >= pageCount - 1}
                   >
                     <MdArrowRight />
                   </IconButton>
@@ -289,7 +279,7 @@ const DataTable = <Entry extends BaseModel>(
             </Pagination.Root>
           </Flex>
         </Flex>
-      ) : null}
+      )}
     </Table.ScrollArea>
   );
 };

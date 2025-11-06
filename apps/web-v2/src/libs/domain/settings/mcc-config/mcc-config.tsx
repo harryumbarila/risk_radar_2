@@ -115,7 +115,7 @@ export default function SettingsMCCConfig(): React.JSX.Element {
             Search
           </Button>
         </FormProvider>
-        {!data?.length && submittedTerm && !isLoading && (
+        {!data?.data?.length && submittedTerm && !isLoading && (
           <Button
             size="sm"
             bg="black"
@@ -131,9 +131,9 @@ export default function SettingsMCCConfig(): React.JSX.Element {
         )}
       </Flex>
 
-      {data && data.length > 0 ? (
+      {data && data.data?.length > 0 ? (
         <Flex gap={2}>
-          {data.map((mcc) => (
+          {data?.data.map((mcc) => (
             <MCCCodeTable key={mcc.id} mcc={mcc} />
           ))}
         </Flex>

@@ -2,10 +2,14 @@
 import React from 'react';
 
 import { Alert, Button, Flex, Heading, HStack } from '@chakra-ui/react';
-import { MdAddCircle, MdOutlineRemoveRedEye, MdSearch } from 'react-icons/md';
+import { MdAddCircle, MdEdit, MdSearch } from 'react-icons/md';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
+import {
+  ColumnDef,
+  createColumnHelper,
+  PaginationState,
+} from '@tanstack/react-table';
 
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -94,8 +98,8 @@ const columns = [
             colorScheme="gray"
             onClick={(e) => e.stopPropagation()}
           >
-            <MdOutlineRemoveRedEye />
-            View
+            <MdEdit />
+            Edit
           </Button>
         </EditThresholdsDrawer>
       </HStack>
@@ -103,8 +107,15 @@ const columns = [
   }),
 ] as ColumnDef<components['schemas']['MerchanRiskThresholdsEntity']>[];
 
+const initialItemsPerPage = 50;
+
 export default function SettingsMerchantRiskThresholds(): React.JSX.Element {
   const [submittedTerm, setSubmittedTerm] = React.useState('');
+  const [{ pageIndex, pageSize }, setPagination] =
+    React.useState<PaginationState>({
+      pageIndex: 0,
+      pageSize: initialItemsPerPage,
+    });
 
   const queryClient = useQueryClient();
 
@@ -128,11 +139,14 @@ export default function SettingsMerchantRiskThresholds(): React.JSX.Element {
       params: {
         query: {
           mid: submittedTerm,
+          page: pageIndex + 1,
+          limit: pageSize,
         },
       },
     },
     {
       enabled: Boolean(submittedTerm),
+      keepPreviousData: true, // ✅ prevents flicker between pages
     }
   );
 
@@ -146,10 +160,6 @@ export default function SettingsMerchantRiskThresholds(): React.JSX.Element {
       setSubmittedTerm(data.value.trim());
     }
   };
-
-  console.log({
-    isError,
-  });
 
   const createMCCCode = async () => {
     try {
@@ -200,7 +210,7 @@ export default function SettingsMerchantRiskThresholds(): React.JSX.Element {
             Search
           </Button>
         </FormProvider>
-        {!data?.length && submittedTerm && !isLoading && (
+        {!data?.data?.length && submittedTerm && !isLoading && (
           <Button
             size="sm"
             onClick={createMCCCode}
@@ -213,18 +223,16 @@ export default function SettingsMerchantRiskThresholds(): React.JSX.Element {
         )}
       </Flex>
 
-      {data && data.length > 0 ? (
+      {data && data?.data.length > 0 ? (
         <Flex gap={2} w="full">
           <DataTable
             isLoading={false}
-            data={{
-              data,
-              count: data.length,
-              total: data.length,
-              page: 1,
-              pageCount: data.length,
-            }}
+            data={data}
             columns={columns}
+            enablePagination
+            pagination={{ pageIndex, pageSize }}
+            onSetPagination={setPagination}
+            initialItemsPerPage={initialItemsPerPage}
           />
         </Flex>
       ) : isError ? (
