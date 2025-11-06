@@ -36,6 +36,7 @@ import { rootConfig } from './shared/config/root.config';
 import { EmailModule } from './shared/email/email.module';
 import { bullConfigAsync } from '@/api/shared/config/bull.config';
 import { RiskRulesModule } from './module/risk-radar/risk-rules/risk-rules.module';
+import { AutoHoldExceptionSummariesModule } from './module/risk-radar/auto-hold-exception/auto-hold-exception.module';
 
 // Load dotenv only in development mode (DBs)
 // eslint-disable-next-line no-restricted-properties
@@ -71,6 +72,7 @@ if (process.env.NODE_ENV !== 'production') {
     PartnerBanksModule,
     // PayaModule,
     RiskRulesModule,
+    AutoHoldExceptionSummariesModule,
     NetSettlementsModule,
   ],
   controllers: [AppController],

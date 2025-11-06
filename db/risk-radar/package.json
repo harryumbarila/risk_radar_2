@@ -34,7 +34,7 @@
   "main": "./src/index.ts",
   "private": true,
   "scripts": {
-    "db:fixtures": "fixtures-ts-node-commonjs --dataSource=./src/connection/cli-data-source.ts load ./fixtures --sync --require=@denali/connector-db",
+    "db:fixtures": "fixtures-ts-node-commonjs --dataSource=./src/connection/cli-data-source.ts load ./fixtures --sync --require=@denali/risk-radar-db",
     "db:generate": "dotenv -e ../apps/api/.env -- npm run typeorm -- migration:generate -o -d ./src/connection/cli-data-source.ts",
     "db:migrate": "dotenv -e ../apps/api/.env -- npm run typeorm -- migration:run -d ./src/connection/cli-data-source.ts",
     "db:revert": "dotenv -e ../apps/api/.env -- npm run typeorm -- migration:revert -d ./src/connection/cli-data-source.ts",

@@ -9,3 +9,4 @@ export * from './risk-rule-white-list-mcc.entity';
 export * from './risk-rule-white-list-mcc-audit-log.entity';
 export * from './merchant-risk-thresholds';
 export * from './merchant-risk-thresholds-audit-logs';
+export * from './auto-hold-exception-summary.entity';

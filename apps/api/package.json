@@ -8,6 +8,8 @@
     "@aws-sdk/client-ses": "^3.917.0",
     "@aws-sdk/client-sesv2": "^3.917.0",
     "@aws-sdk/s3-request-presigner": "^3.917.0",
+    "@datafas/crud": "^5.3.6",
+    "@datafas/crud-typeorm": "^5.3.6",
     "@denali/connector-db": "*",
     "@denali/crescent-view-db": "*",
     "@denali/data-warehouse-db": "*",

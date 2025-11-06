@@ -5,3 +5,4 @@ export * from './risk-rule-white-list-mcc.repository';
 export * from './risk-rule-white-list-mcc-audit-log.repository';
 export * from './merchant-risk-thresholds.repository';
 export * from './merchant-risk-thresholds-audit-logs.repository';
+export * from './auto-hold-exception-summary.repository';

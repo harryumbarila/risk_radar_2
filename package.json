@@ -8,6 +8,7 @@
     "db/*"
   ],
   "scripts": {
+    "add:component": "npx hygen component new",
     "build": "turbo build",
     "commit": "git-cz",
     "dev": "turbo dev",
@@ -15,6 +16,7 @@
     "format": "prettier --write .",
     "lint": "turbo lint",
     "lint:fix": "turbo lint:fix",
+    "openapi-typescript": "openapi-typescript http://localhost:3001/api/swagger-yaml -o ./apps/web-v2/src/libs/shared/api/schemas/schema.d.ts",
     "prepare": "husky",
     "start:api": "turbo run start --filter=@denali/api",
     "start:web": "turbo run start --filter=@denali/web",
@@ -39,10 +41,12 @@
     "cross-env": "^10.1.0",
     "cz-git": "^1.12.0",
     "dotenv-cli": "^10.0.0",
+    "enquirer": "^2.4.1",
     "git-cz": "^4.9.0",
     "husky": "^9.1.7",
     "jscodeshift": "^17.3.0",
     "lint-staged": "^16.2.6",
+    "openapi-typescript": "^7.10.1",
     "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
     "syncpack": "^13.0.4",
