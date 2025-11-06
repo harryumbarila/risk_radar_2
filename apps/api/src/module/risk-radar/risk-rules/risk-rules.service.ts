@@ -239,7 +239,6 @@ export class RiskRulesService {
   async getWhiteListMccs(mcc: string): Promise<RiskRuleWhiteListMccEntity[]> {
     return this.riskRuleWhiteListMccRepository
       .createQueryBuilder('mcc')
-      .select(['mcc.id', 'mcc.MCC', 'mcc.lastUpdatedDate', 'mcc.lastUpdatedBy'])
       .where('mcc.MCC LIKE :mcc', { mcc: `%${mcc}%` })
       .getMany();
   }
@@ -252,14 +251,7 @@ export class RiskRulesService {
     const safeLimit = Math.min(Math.max(1, limit), 100);
     const safePage = Math.max(1, page);
 
-    const qb = this.riskRuleWhiteListMccRepository
-      .createQueryBuilder('mcc')
-      .select([
-        'mcc.id',
-        'mcc.MCC',
-        'mcc.lastUpdatedDate',
-        'mcc.lastUpdatedBy',
-      ]);
+    const qb = this.riskRuleWhiteListMccRepository.createQueryBuilder('mcc');
 
     if (mcc) {
       qb.where('mcc.MCC LIKE :mcc', { mcc: `%${mcc}%` });
@@ -491,7 +483,6 @@ export class RiskRulesService {
   async getWhiteListMids(mid: string): Promise<RiskRuleWhiteListMidEntity[]> {
     return this.riskRuleWhiteListMidRepository
       .createQueryBuilder('mid')
-      .select(['mid.id', 'mid.MId', 'mid.lastUpdatedDate', 'mid.lastUpdatedBy'])
       .where('mid.MId LIKE :mid', { mid: `%${mid}%` })
       .getMany();
   }
@@ -504,14 +495,7 @@ export class RiskRulesService {
     const safeLimit = Math.min(Math.max(1, limit), 100);
     const safePage = Math.max(1, page);
 
-    const qb = this.riskRuleWhiteListMidRepository
-      .createQueryBuilder('mid')
-      .select([
-        'mid.id',
-        'mid.MId',
-        'mid.lastUpdatedDate',
-        'mid.lastUpdatedBy',
-      ]);
+    const qb = this.riskRuleWhiteListMidRepository.createQueryBuilder('mid');
 
     if (mid) {
       qb.where('mid.MId LIKE :mid', { mid: `%${mid}%` });
