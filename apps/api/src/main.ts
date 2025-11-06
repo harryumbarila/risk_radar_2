@@ -46,42 +46,42 @@ async function bootstrap() {
     })
   );
 
-  // if (config.node.env !== 'production') {
-  const options = new DocumentBuilder()
-    .setTitle('TalusPay Dashboard API')
-    .setVersion('v1')
-    .addBearerAuth(
-      {
-        type: 'http',
-        description: 'Current frontegg session token - using JWT',
-      },
-      'session-token'
-    )
-    // Local setup
-    .addServer('http://localhost:3001', 'Local environment endpoint')
-    .addServer(
-      'https://dashboard-api.taluspay-staging.com',
-      'Staging environment endpoint'
-    )
-    .addServer(
-      'https://dashboard-api.taluspay.com',
-      'Production environment endpoint'
-    )
-    .build();
+  if (config.node.env !== 'production') {
+    const options = new DocumentBuilder()
+      .setTitle('TalusPay Dashboard API')
+      .setVersion('v1')
+      .addBearerAuth(
+        {
+          type: 'http',
+          description: 'Current frontegg session token - using JWT',
+        },
+        'session-token'
+      )
+      // Local setup
+      .addServer('http://localhost:3001', 'Local environment endpoint')
+      .addServer(
+        'https://dashboard-api.taluspay-staging.com',
+        'Staging environment endpoint'
+      )
+      .addServer(
+        'https://dashboard-api.taluspay.com',
+        'Production environment endpoint'
+      )
+      .build();
 
-  const document = SwaggerModule.createDocument(app, options);
+    const document = SwaggerModule.createDocument(app, options);
 
-  // Add x-logo extension
-  document.info['x-logo'] = {
-    url: 'https://apply.taluspay.com/assets/company-logo.svg', // URL of your logo image
-    href: 'https://taluspay.com',
-  };
+    // Add x-logo extension
+    document.info['x-logo'] = {
+      url: 'https://apply.taluspay.com/assets/company-logo.svg', // URL of your logo image
+      href: 'https://taluspay.com',
+    };
 
-  // Save the Swagger document as JSON
-  writeFileSync('./swagger.json', JSON.stringify(document));
+    // Save the Swagger document as JSON
+    writeFileSync('./swagger.json', JSON.stringify(document));
 
-  SwaggerModule.setup('api/swagger', app, document);
-  // }
+    SwaggerModule.setup('api/swagger', app, document);
+  }
 
   await app.listen(config.app.port, '0.0.0.0');
 }
