@@ -4,7 +4,6 @@ import {
   ListAutoHoldExceptionSummaryPaginationInput,
   ListAutoHoldExceptionSummaryPaginationOutput,
 } from './dto/list-auto-hold-exception.dto';
-import { AutoHoldStatsDto } from './dto/auto-hold-stats.dto';
 
 @Injectable()
 export class AutoHoldExceptionSummariesService {
@@ -32,9 +31,5 @@ export class AutoHoldExceptionSummariesService {
       page: data.page,
       pageCount: data.pageCount,
     };
-  }
-
-  async getAutoHoldStats(): Promise<AutoHoldStatsDto> {
-    return this.autoHoldExceptionSummaryRepository.getAutoHoldStats();
   }
 }
