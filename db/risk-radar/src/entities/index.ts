@@ -10,3 +10,6 @@ export * from './risk-rule-white-list-mcc-audit-log.entity';
 export * from './merchant-risk-thresholds';
 export * from './merchant-risk-thresholds-audit-logs';
 export * from './auto-hold-exception-summary.entity';
+export * from './adf-auto-hold-file-processed.entity';
+export * from './adf-auth-data.entity';
+export * from './dft-auto-hold-file-processed.entity';
