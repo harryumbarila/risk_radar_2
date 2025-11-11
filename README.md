@@ -1,4 +1,4 @@
-# Risk Radar V2 - Web Application
+# Risk Radar 2.0
 
 A modern Next.js application for risk management and transaction monitoring.
 
