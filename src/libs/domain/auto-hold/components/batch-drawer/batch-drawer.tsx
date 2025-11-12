@@ -62,16 +62,24 @@ function generateBatchData(batch: MerchantTransaction[]): {
   });
 
   // Get time window
-  const dates = batch.map((tx) => new Date(tx.createdAt));
-  const startDate = new Date(Math.min(...dates.map((d) => d.getTime())));
-  const endDate = new Date(Math.max(...dates.map((d) => d.getTime())));
+  const dates = batch
+    .map((tx) => {
+      const dateStr = tx.createdAt || tx.date;
+      return dateStr ? new Date(dateStr) : null;
+    })
+    .filter((d): d is Date => d !== null);
+  const startDate = dates.length > 0 ? new Date(Math.min(...dates.map((d) => d.getTime()))) : new Date();
+  const endDate = dates.length > 0 ? new Date(Math.max(...dates.map((d) => d.getTime()))) : new Date();
 
   // Generate hourly distribution
   const hourlyCounts: Record<number, number> = {};
   batch.forEach((tx) => {
-    const date = new Date(tx.createdAt);
-    const hour = date.getHours();
-    hourlyCounts[hour] = (hourlyCounts[hour] || 0) + 1;
+    const dateStr = tx.createdAt || tx.date;
+    if (dateStr) {
+      const date = new Date(dateStr);
+      const hour = date.getHours();
+      hourlyCounts[hour] = (hourlyCounts[hour] || 0) + 1;
+    }
   });
   const hourlyData: HourlyTransactionData[] = Array.from({ length: 24 }, (_, i) => ({
     hour: i,
