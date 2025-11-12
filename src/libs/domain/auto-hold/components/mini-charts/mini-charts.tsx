@@ -117,7 +117,7 @@ export default function MiniCharts({ hourlyData, exceptionData }: MiniChartsProp
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value: number, name: string, props: any) => {
+                  formatter={(value: number, name: string) => {
                     const total = exceptionData.reduce((sum, item) => sum + item.value, 0);
                     const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
                     return [`${value} (${percentage}%)`, name];

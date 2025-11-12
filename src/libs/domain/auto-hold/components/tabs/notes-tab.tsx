@@ -65,7 +65,7 @@ export default function NotesTab({ merchantId }: NotesTabProps) {
     const note: Note = {
       id: Date.now().toString(),
       note: newNote,
-      dateCreated: new Date().toISOString().split('T')[0],
+      dateCreated: new Date().toISOString().substring(0, 10),
       createdBy: 'Current User', // In real app, get from auth context
       pushToIris: false,
     };
