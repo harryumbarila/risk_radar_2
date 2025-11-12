@@ -195,7 +195,7 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
   return (
     <Drawer.Root
       placement="end"
-      size={{ base: 'full', md: 'xl', lg: '2xl' }}
+      size={{ base: 'full', md: 'xl', lg: 'xl' }}
     >
       {trigger && <Drawer.Trigger asChild>{trigger}</Drawer.Trigger>}
       <Portal>
