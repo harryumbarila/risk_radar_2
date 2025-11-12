@@ -223,7 +223,7 @@ export default function ManagerQueueView({ allBatches }: ManagerQueueViewProps) 
                 Reviewed
               </Text>
               <Badge colorPalette="green" variant="solid" px={3} py={1}>
-                {chartData[0].value}
+                {chartData[0]?.value ?? 0}
               </Badge>
             </HStack>
             <HStack justify="space-between">
@@ -231,7 +231,7 @@ export default function ManagerQueueView({ allBatches }: ManagerQueueViewProps) 
                 In Progress
               </Text>
               <Badge colorPalette="yellow" variant="solid" px={3} py={1}>
-                {chartData[1].value}
+                {chartData[1]?.value ?? 0}
               </Badge>
             </HStack>
             <HStack justify="space-between">
@@ -239,7 +239,7 @@ export default function ManagerQueueView({ allBatches }: ManagerQueueViewProps) 
                 Unreviewed
               </Text>
               <Badge colorPalette="gray" variant="solid" px={3} py={1}>
-                {chartData[2].value}
+                {chartData[2]?.value ?? 0}
               </Badge>
             </HStack>
           </VStack>
