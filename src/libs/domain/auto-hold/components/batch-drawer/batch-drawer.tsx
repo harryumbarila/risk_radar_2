@@ -24,7 +24,6 @@ import { Check, Ban, ArrowLeft } from 'lucide-react';
 import { Button } from '@chakra-ui/react';
 import ContactTab from '../tabs/contact-tab';
 import ChargebacksTab from '../tabs/chargebacks-tab';
-import NetSettlementTab from '../tabs/net-settlement-tab';
 import MatchTab from '../tabs/match-tab';
 import VolumeTab from '../tabs/volume-tab';
 import NotesTab from '../tabs/notes-tab';
@@ -137,9 +136,6 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
 
   // Get merchant info from first transaction
   const merchantInfo = batch[0];
-  const avgScore = Math.round(
-    batch.reduce((sum, tx) => sum + tx.score, 0) / batch.length
-  );
   const status = merchantInfo?.status || 'Unreviewed';
 
   // Mock notes count
@@ -153,9 +149,7 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
           { label: `Transactions (${batch.length})`, value: 'transactions' },
           { label: 'Contact', value: 'contact' },
           { label: 'Chargebacks', value: 'chargebacks' },
-          { label: 'Net Settlement', value: 'net-settlement' },
           { label: 'Match', value: 'match' },
-          { label: 'Volume', value: 'volume' },
           { label: `Notes (${notesCount})`, value: 'notes' },
         ],
       }),
@@ -239,21 +233,6 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
                 <HStack gap={4} flexWrap="wrap">
                   <HStack gap={2}>
                     <Text fontSize="xs" color="gray.600" textTransform="uppercase">
-                      Score:
-                    </Text>
-                    <Badge
-                      colorPalette={
-                        avgScore >= 80 ? 'red' : avgScore >= 50 ? 'yellow' : 'green'
-                      }
-                      variant="solid"
-                      px={3}
-                      py={1}
-                    >
-                      {avgScore}
-                    </Badge>
-                  </HStack>
-                  <HStack gap={2}>
-                    <Text fontSize="xs" color="gray.600" textTransform="uppercase">
                       Processor:
                     </Text>
                     <Text fontSize="sm" fontWeight="semibold" color="gray.900">
@@ -296,6 +275,18 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
                 {/* Mini Charts */}
                 <MiniCharts hourlyData={hourlyData} exceptionData={exceptionData} />
 
+                {/* Volume Tab - Fixed below charts */}
+                <Box
+                  bg="white"
+                  p={6}
+                  borderRadius="xl"
+                  boxShadow="0 2px 8px rgba(0,0,0,0.05)"
+                  borderWidth="1px"
+                  borderColor="gray.200"
+                >
+                  <VolumeTab merchantId={merchantInfo?.mid || ''} />
+                </Box>
+
                 {/* Tabs */}
                 <Box
                   bg="white"
@@ -330,11 +321,7 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
                       </Tabs.Trigger>
                       <Tabs.Trigger value="contact">Contact</Tabs.Trigger>
                       <Tabs.Trigger value="chargebacks">Chargebacks</Tabs.Trigger>
-                      <Tabs.Trigger value="net-settlement">
-                        Net Settlement
-                      </Tabs.Trigger>
                       <Tabs.Trigger value="match">Match</Tabs.Trigger>
-                      <Tabs.Trigger value="volume">Volume</Tabs.Trigger>
                       <Tabs.Trigger value="notes">
                         <HStack gap={2}>
                           <Text>Notes</Text>
@@ -398,16 +385,8 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
                       <ChargebacksTab merchantId={merchantInfo?.mid || ''} />
                     </Tabs.Content>
 
-                    <Tabs.Content value="net-settlement" pt={4}>
-                      <NetSettlementTab merchantId={merchantInfo?.mid || ''} />
-                    </Tabs.Content>
-
                     <Tabs.Content value="match" pt={4}>
                       <MatchTab merchantId={merchantInfo?.mid || ''} />
-                    </Tabs.Content>
-
-                    <Tabs.Content value="volume" pt={4}>
-                      <VolumeTab merchantId={merchantInfo?.mid || ''} />
                     </Tabs.Content>
 
                     <Tabs.Content value="notes" pt={4}>

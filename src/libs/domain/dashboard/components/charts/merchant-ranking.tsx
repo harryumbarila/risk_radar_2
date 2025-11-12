@@ -14,7 +14,7 @@ function MerchantRanking({ alerts, onMerchantClick }: MerchantRankingProps) {
   const merchantData = React.useMemo(() => {
     const merchantMap = new Map<
       string,
-      { name: string; scoreSum: number; count: number; lastAlert: Date }
+      { name: string; count: number; lastAlert: Date }
     >();
 
     alerts.forEach((alert) => {
@@ -23,12 +23,10 @@ function MerchantRanking({ alerts, onMerchantClick }: MerchantRankingProps) {
       if (!existing) {
         merchantMap.set(alert.merchantId, {
           name: alert.merchantName,
-          scoreSum: alert.score,
           count: 1,
           lastAlert: alertDate,
         });
       } else {
-        existing.scoreSum += alert.score;
         existing.count++;
         if (alertDate > existing.lastAlert) {
           existing.lastAlert = alertDate;
@@ -40,11 +38,10 @@ function MerchantRanking({ alerts, onMerchantClick }: MerchantRankingProps) {
       .map(([merchantId, data]) => ({
         merchantId,
         name: data.name,
-        avgScore: data.scoreSum / data.count,
         incidentCount: data.count,
         lastAlert: data.lastAlert,
       }))
-      .sort((a, b) => b.avgScore - a.avgScore)
+      .sort((a, b) => b.incidentCount - a.incidentCount)
       .slice(0, 10);
   }, [alerts]);
 
@@ -52,9 +49,9 @@ function MerchantRanking({ alerts, onMerchantClick }: MerchantRankingProps) {
     return <EmptyState title="No merchant data available" />;
   }
 
-  const getRiskColor = (score: number) => {
-    if (score >= 90) return 'red';
-    if (score >= 70) return 'orange';
+  const getRiskColor = (incidentCount: number) => {
+    if (incidentCount >= 10) return 'red';
+    if (incidentCount >= 5) return 'orange';
     return 'green';
   };
 
@@ -130,14 +127,14 @@ function MerchantRanking({ alerts, onMerchantClick }: MerchantRankingProps) {
                 </VStack>
                 
                 <Badge
-                  colorPalette={getRiskColor(merchant.avgScore)}
+                  colorPalette={getRiskColor(merchant.incidentCount)}
                   variant="subtle"
                   px={3}
                   py={1}
                   borderRadius="md"
                   fontWeight="semibold"
                 >
-                  Score: {Math.round(merchant.avgScore)}
+                  {merchant.incidentCount} incidents
                 </Badge>
                 
                 <Text fontSize="xs" color="gray.500" w="100px">

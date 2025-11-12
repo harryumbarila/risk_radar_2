@@ -1,5 +1,5 @@
 import { MerchantTransaction } from '@/data/interfaces/transaction';
-import { riskColor, statusColor } from '@/libs/utils/utils';
+import { statusColor } from '@/libs/utils/utils';
 import {
   Button,
   CloseButton,
@@ -98,16 +98,6 @@ export default function ExceptionDrawer(
                 <Box>
                   <Flex gap={1} direction="column">
                     <Flex gap={4}>
-                      <VStack>
-                        <Badge
-                          size="lg"
-                          colorPalette={riskColor(tx.score)}
-                          borderRadius="full"
-                          p={4}
-                        >
-                          {tx.score}
-                        </Badge>
-                      </VStack>
                       <VStack
                         justifyContent="flex-start"
                         gap={1}

@@ -39,12 +39,6 @@ export const formatCurrency = (
   }).format(Number(value));
 };
 
-export const formatScore = (value: unknown): string => {
-  const numValue = Number(value);
-  if (value === undefined || numValue === 0) return DEFAULT_ZERO_VALUE;
-  return numValue.toFixed(0);
-};
-
 export const formatBoolean = (value: unknown): string => {
   return value === 'Yes' ? DEFAULT_YES_VALUE : DEFAULT_NO_VALUE;
 };

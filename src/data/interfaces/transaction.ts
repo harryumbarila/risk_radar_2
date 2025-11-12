@@ -2,7 +2,6 @@ import { BaseModel } from "./api";
 
 export interface MerchantTransaction extends BaseModel {
   id: string;
-  score: number;
   merchant: string;
   amount: string;
   exception: string;

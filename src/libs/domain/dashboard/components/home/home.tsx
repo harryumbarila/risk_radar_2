@@ -48,19 +48,39 @@ export default function Home() {
 
     // Date range filter
     const now = new Date();
-    let startDate: Date;
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
     if (filters.dateRange === 'custom') {
       if (filters.customStartDate && filters.customEndDate) {
-        startDate = new Date(filters.customStartDate);
+        const startDate = new Date(filters.customStartDate);
+        startDate.setHours(0, 0, 0, 0);
         const endDate = new Date(filters.customEndDate);
+        endDate.setHours(23, 59, 59, 999);
         filtered = filtered.filter(
-          (a) => new Date(a.date) >= startDate && new Date(a.date) <= endDate
+          (a) => {
+            const alertDate = new Date(a.date);
+            return alertDate >= startDate && alertDate <= endDate;
+          }
         );
       }
     } else {
       const days = parseInt(filters.dateRange);
-      startDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
-      filtered = filtered.filter((a) => new Date(a.date) >= startDate);
+      if (!isNaN(days) && days > 0) {
+        // Calculate start date: today minus (days-1) to include today in the range
+        // For "Last 7 days": today (0) + 6 previous days = 7 days total
+        const startDate = new Date(today);
+        startDate.setDate(today.getDate() - (days - 1));
+        startDate.setHours(0, 0, 0, 0);
+        
+        // End date: end of today
+        const endDate = new Date(today);
+        endDate.setHours(23, 59, 59, 999);
+        
+        filtered = filtered.filter((a) => {
+          const alertDate = new Date(a.date);
+          return alertDate >= startDate && alertDate <= endDate;
+        });
+      }
     }
 
     // Risk level filter
@@ -178,7 +198,7 @@ export default function Home() {
 
   return (
     <Box>
-      <VStack align="stretch" gap={8}>
+      <VStack align="stretch" gap={6}>
         {/* Header with CTAs */}
         <HStack justify="flex-end" align="center">
           <HStack gap={3}>
@@ -249,7 +269,7 @@ export default function Home() {
         </SimpleGrid>
 
         {/* Separator */}
-        <Box borderTop="1px" borderColor="gray.200" mt={8} pt={8} />
+        <Box borderTop="1px" borderColor="gray.200" mt={2} pt={4} />
 
         {/* Charts Row 1: Trend and Top Rules */}
         <SimpleGrid columns={{ base: 1, lg: 2 }} gap={6} role="region" aria-label="Risk Analysis Charts">

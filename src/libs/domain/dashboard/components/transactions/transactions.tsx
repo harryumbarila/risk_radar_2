@@ -20,7 +20,7 @@ import {
 } from 'react-icons/md';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
-import { riskColor, statusColor } from '@/libs/utils/utils';
+import { statusColor } from '@/libs/utils/utils';
 import { DataTable } from '@/ui/components/common/organisms/data-table';
 import { CollapsibleBodyProps } from '@/ui/components/common/organisms/data-table/data-table.model';
 import BatchDrawer from '@/libs/domain/auto-hold/components/batch-drawer/batch-drawer';
@@ -83,26 +83,6 @@ function CollapsibleContent(props: CollapsibleBodyProps<MerchantTransaction>) {
           </Text>
           <Text fontWeight="bold">GTS Inc.</Text>
         </VStack>
-
-        <VStack align="start" gap={1}>
-          <Text fontWeight="normal" color="gray.500">
-            Risk Score
-          </Text>
-          <HStack>
-            <Badge
-              colorPalette="red"
-              borderRadius="full"
-              px={2}
-              py={1}
-              fontSize="sm"
-            >
-              85
-            </Badge>
-            <Text color="red.500" fontWeight="bold">
-              High Risk
-            </Text>
-          </HStack>
-        </VStack>
       </SimpleGrid>
 
       {/* Risk Assessment */}
@@ -137,7 +117,6 @@ export default function CustomTable() {
   const transactions: MerchantTransaction[] = [
     {
       id: '1',
-      score: 85,
       merchant: 'Global Tech Solutions',
       amount: '$12,500.00',
       exception: 'High-risk country, Unusual amount',
@@ -150,7 +129,6 @@ export default function CustomTable() {
     },
     {
       id: '2',
-      score: 65,
       merchant: 'Oceanview Logistics',
       amount: '$8,750.50',
       exception: 'New merchant, Pattern match anomaly',
@@ -163,7 +141,6 @@ export default function CustomTable() {
     },
     {
       id: '3',
-      score: 35,
       merchant: 'Sunshine Pharmacy',
       amount: '$456.78',
       exception: 'Frequency anomaly',
@@ -176,7 +153,6 @@ export default function CustomTable() {
     },
     {
       id: '4',
-      score: 92,
       merchant: 'Digital Assets Exchange',
       amount: '$25,000.00',
       exception: 'High-risk merchant category, ...',
@@ -189,7 +165,6 @@ export default function CustomTable() {
     },
     {
       id: '5',
-      score: 15,
       merchant: 'City Supermarket',
       amount: '$125.45',
       exception: 'Manual review flag',
@@ -202,7 +177,6 @@ export default function CustomTable() {
     },
     {
       id: '6',
-      score: 78,
       merchant: 'QuickWire Transfers',
       amount: '$3,500.00',
       exception: 'High-risk country, Pattern match',
@@ -215,7 +189,6 @@ export default function CustomTable() {
     },
     {
       id: '7',
-      score: 45,
       merchant: 'Business Equipment Pro',
       amount: '$6,789.99',
       exception: 'Unusual amount for merchant',
@@ -228,7 +201,6 @@ export default function CustomTable() {
     },
     {
       id: '8',
-      score: 88,
       merchant: 'Luxury Boutique',
       amount: '$15,750.00',
       exception: 'Unusual amount, New merchant',
@@ -241,7 +213,6 @@ export default function CustomTable() {
     },
     {
       id: '9',
-      score: 25,
       merchant: 'Downtown Hotel',
       amount: '$1,250.00',
       exception: 'Frequency anomaly',
@@ -254,7 +225,6 @@ export default function CustomTable() {
     },
     {
       id: '10',
-      score: 72,
       merchant: 'Global Shipping Co',
       amount: '$4,325.50',
       exception: 'High-risk country, Pattern match',
@@ -269,20 +239,6 @@ export default function CustomTable() {
 
   // Define columns inside the component to access transactions
   const columns = React.useMemo(() => [
-    columnHelper.accessor('score', {
-      header: () => 'Score',
-      cell: (info) => (
-        <Badge
-          colorPalette={riskColor(info.getValue())}
-          borderRadius="full"
-          px={2}
-          py={1}
-        >
-          {info.getValue()}
-        </Badge>
-      ),
-      enableSorting: true,
-    }),
     columnHelper.accessor('merchant', {
       header: () => 'Merchant',
       enableSorting: true,
@@ -378,7 +334,6 @@ export default function CustomTable() {
       {/* <Table.Root size="sm" variant="outline">
         <Table.Header>
           <Table.Row>
-            <Table.ColumnHeader>Score</Table.ColumnHeader>
             <Table.ColumnHeader>Merchant</Table.ColumnHeader>
             <Table.ColumnHeader>Amount</Table.ColumnHeader>
             <Table.ColumnHeader>Exception</Table.ColumnHeader>

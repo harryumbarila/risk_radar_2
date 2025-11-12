@@ -180,13 +180,12 @@ export default function FilterBar({
               value={[filters.dateRange || '7']}
               onValueChange={(e) => {
                 const value = (e.value[0] || '7') as FilterState['dateRange'];
-                updateFilter('dateRange', value);
+                const newFilters = { ...filters, dateRange: value };
                 if (value !== 'custom') {
-                  const newFilters = { ...filters };
                   delete newFilters.customStartDate;
                   delete newFilters.customEndDate;
-                  onFiltersChange(newFilters);
                 }
+                onFiltersChange(newFilters);
               }}
               size="sm"
               width="150px"

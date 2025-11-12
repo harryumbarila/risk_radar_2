@@ -10,7 +10,6 @@ export interface MockAlert {
   ruleId: string; // AH001..AH016 | GEO | VOL | MOTO...
   risk: RiskLevel;
   source: Source;
-  score: number; // 0-100
 }
 
 export interface MockKpis {
@@ -126,37 +125,31 @@ export function generateMockAlerts(count: number = 2500): MockAlert[] {
 
   const merchantCount = Math.min(400, Math.floor(count / 6));
 
-  // Generate alerts for the last 30 days, ensuring good distribution in last 7 days
+  // Generate alerts for the last 30 days with clear distribution
+  // Strategy: 
+  // - Last 7 days: 40% of alerts (most recent activity)
+  // - Days 8-14: 30% of alerts (medium activity)
+  // - Days 15-30: 30% of alerts (older activity)
+  // This ensures visible differences when filtering by date range
   for (let i = 0; i < count; i++) {
-    // Random date within last 30 days, but ensure we have data for today and last 7 days
     let daysAgo: number;
-    if (i < 100) {
-      // First 100 alerts: distribute across last 7 days
-      if (i < 20) {
-        daysAgo = 0; // Today
-      } else if (i < 40) {
-        daysAgo = 1; // Yesterday
-      } else if (i < 60) {
-        daysAgo = 2; // 2 days ago
-      } else if (i < 75) {
-        daysAgo = 3; // 3 days ago
-      } else if (i < 85) {
-        daysAgo = 4; // 4 days ago
-      } else if (i < 92) {
-        daysAgo = 5; // 5 days ago
-      } else {
-        daysAgo = 6; // 6 days ago
-      }
+    const rand = random.next();
+    
+    if (rand < 0.4) {
+      // 40% in last 7 days (0-6 days ago) - most recent
+      daysAgo = Math.floor(random.next() * 7);
+    } else if (rand < 0.7) {
+      // 30% in days 8-14 (7-13 days ago) - medium
+      daysAgo = 7 + Math.floor(random.next() * 7);
     } else {
-      // Remaining alerts: random across 30 days
-      daysAgo = Math.floor(random.next() * 30);
+      // 30% in days 15-30 (14-29 days ago) - older
+      daysAgo = 14 + Math.floor(random.next() * 16);
     }
     
     const date = new Date(today.getTime() - daysAgo * 24 * 60 * 60 * 1000);
-    // For today's alerts, use current hour or random hour
-    const hour = daysAgo === 0 
-      ? Math.min(Math.floor(now.getHours() * random.next()), 23) 
-      : Math.floor(random.next() * 24);
+    // Set time to a random hour within the day
+    const hour = Math.floor(random.next() * 24);
+    date.setHours(hour, Math.floor(random.next() * 60), Math.floor(random.next() * 60), 0);
 
     const merchantIndex = Math.floor(random.next() * merchantCount);
     const merchantId = generateMerchantId(merchantIndex);
@@ -168,16 +161,6 @@ export function generateMockAlerts(count: number = 2500): MockAlert[] {
     const risk = pickWeighted(risks, riskWeights, random);
     const source = pickWeighted(sources, sourceWeights, random);
 
-    // Score based on risk level
-    let score: number;
-    if (risk === 'high') {
-      score = 70 + Math.floor(random.next() * 30); // 70-100
-    } else if (risk === 'medium') {
-      score = 40 + Math.floor(random.next() * 30); // 40-70
-    } else {
-      score = Math.floor(random.next() * 40); // 0-40
-    }
-
     alerts.push({
       id: `alert-${i + 1}`,
       date: date.toISOString(),
@@ -187,7 +170,6 @@ export function generateMockAlerts(count: number = 2500): MockAlert[] {
       ruleId,
       risk,
       source,
-      score,
     });
   }
 
@@ -212,15 +194,6 @@ export function generateMockAlerts(count: number = 2500): MockAlert[] {
       const risk: RiskLevel = riskBias < 0.3 ? 'high' : riskBias < 0.7 ? 'medium' : 'low';
       const source = pickWeighted(sources, sourceWeights, random);
 
-      let score: number;
-      if (risk === 'high') {
-        score = 70 + Math.floor(random.next() * 30);
-      } else if (risk === 'medium') {
-        score = 40 + Math.floor(random.next() * 30);
-      } else {
-        score = Math.floor(random.next() * 40);
-      }
-
       alerts.push({
         id: `alert-today-${i + 1}`,
         date: today.toISOString(),
@@ -230,7 +203,6 @@ export function generateMockAlerts(count: number = 2500): MockAlert[] {
         ruleId,
         risk,
         source,
-        score,
       });
     }
   }

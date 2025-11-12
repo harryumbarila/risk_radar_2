@@ -8,7 +8,6 @@ interface MatchedMerchant {
   merchantName: string;
   taxId: string;
   status: string;
-  riskScore: number;
 }
 
 interface MatchTabProps {
@@ -24,21 +23,18 @@ export default function MatchTab({ merchantId, taxId = '12-3456789' }: MatchTabP
       merchantName: 'Global Tech Solutions',
       taxId: '12-3456789',
       status: 'Active',
-      riskScore: 85,
     },
     {
       merchantId: 'MID789012',
       merchantName: 'Tech Global Inc',
       taxId: '12-3456789',
       status: 'Active',
-      riskScore: 72,
     },
     {
       merchantId: 'MID345678',
       merchantName: 'Solutions Global Tech',
       taxId: '12-3456789',
       status: 'Suspended',
-      riskScore: 95,
     },
   ];
 
@@ -81,7 +77,6 @@ export default function MatchTab({ merchantId, taxId = '12-3456789' }: MatchTabP
                 <Table.ColumnHeader>Merchant Name</Table.ColumnHeader>
                 <Table.ColumnHeader>Tax ID</Table.ColumnHeader>
                 <Table.ColumnHeader>Status</Table.ColumnHeader>
-                <Table.ColumnHeader>Risk Score</Table.ColumnHeader>
               </Table.Row>
             </Table.Header>
             <Table.Body>
@@ -102,20 +97,6 @@ export default function MatchTab({ merchantId, taxId = '12-3456789' }: MatchTabP
                       variant="subtle"
                     >
                       {merchant.status}
-                    </Badge>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <Badge
-                      colorPalette={
-                        merchant.riskScore >= 80
-                          ? 'red'
-                          : merchant.riskScore >= 50
-                          ? 'yellow'
-                          : 'green'
-                      }
-                      variant="solid"
-                    >
-                      {merchant.riskScore}
                     </Badge>
                   </Table.Cell>
                 </Table.Row>

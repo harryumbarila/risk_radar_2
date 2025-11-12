@@ -16,7 +16,6 @@ export default function AutoHoldBoardPage() {
     const mockTransactions: MerchantTransaction[] = [
       {
         id: '1',
-        score: 85,
         merchant: 'Global Tech Solutions',
         amount: '$12,500.00',
         exception: 'High-risk country, Unusual amount',
@@ -29,7 +28,6 @@ export default function AutoHoldBoardPage() {
       },
       {
         id: '2',
-        score: 65,
         merchant: 'Oceanview Logistics',
         amount: '$8,750.50',
         exception: 'New merchant, Pattern match anomaly',
@@ -42,7 +40,6 @@ export default function AutoHoldBoardPage() {
       },
       {
         id: '3',
-        score: 35,
         merchant: 'Sunshine Pharmacy',
         amount: '$456.78',
         exception: 'Frequency anomaly',
