@@ -350,21 +350,25 @@ export default function FilterBar({
               <Portal>
                 <Select.Positioner>
                   <Select.Content>
-                    {ruleCollection.items.map((item) => (
-                      <Select.Item item={item} key={item.value}>
-                        <HStack justify="space-between" w="full">
-                          <VStack align="start" gap={0}>
-                            <Text fontSize="sm">{item.label}</Text>
-                            {item.description && item.value !== 'all' && (
-                              <Text fontSize="xs" color="gray.500">
-                                {item.description}
-                              </Text>
-                            )}
-                          </VStack>
-                          <Select.ItemIndicator />
-                        </HStack>
-                      </Select.Item>
-                    ))}
+                    {ruleCollection.items.map((item) => {
+                      const hasDescription = 'description' in item && item.value !== 'all';
+                      const description = hasDescription ? (item as { description: string }).description : undefined;
+                      return (
+                        <Select.Item item={item} key={item.value}>
+                          <HStack justify="space-between" w="full">
+                            <VStack align="start" gap={0}>
+                              <Text fontSize="sm">{item.label}</Text>
+                              {description && (
+                                <Text fontSize="xs" color="gray.500">
+                                  {description}
+                                </Text>
+                              )}
+                            </VStack>
+                            <Select.ItemIndicator />
+                          </HStack>
+                        </Select.Item>
+                      );
+                    })}
                   </Select.Content>
                 </Select.Positioner>
               </Portal>
