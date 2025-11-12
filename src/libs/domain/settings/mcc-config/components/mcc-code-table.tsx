@@ -59,7 +59,6 @@ export default function MCCCodeTable(
 
   const user = 'system_user';
 
-  // eslint-disable-next-line react-hooks/incompatible-library
   const values = watch();
 
   const { mutateAsync } = $riskApi.useMutation(
