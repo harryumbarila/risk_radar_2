@@ -1,6 +1,7 @@
 import { defineConfig, globalIgnores } from 'eslint/config';
 import typescriptParser from '@typescript-eslint/parser';
 import typescriptPlugin from '@typescript-eslint/eslint-plugin';
+import reactHooksPlugin from 'eslint-plugin-react-hooks';
 
 const eslintConfig = defineConfig([
   // Override default ignores of eslint-config-next.
@@ -28,6 +29,9 @@ const eslintConfig = defineConfig([
   // React Hooks configuration
   {
     files: ['**/*.tsx', '**/*.jsx'],
+    plugins: {
+      'react-hooks': reactHooksPlugin,
+    },
     rules: {
       'react-hooks/exhaustive-deps': 'warn',
       'react-hooks/rules-of-hooks': 'error',
