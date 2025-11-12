@@ -23,20 +23,28 @@ A modern Next.js application for risk management and transaction monitoring.
 ### Prerequisites
 
 - Node.js 22.12.0 or higher
-- Yarn package manager
+- npm, yarn, or pnpm package manager
 
 ### Installation
 
 ```bash
 # Install dependencies
+npm install
+# or
 yarn install
+# or
+pnpm install
 ```
 
 ### Development
 
 ```bash
 # Start development server on port 3006
+npm run dev
+# or
 yarn dev
+# or
+pnpm dev
 ```
 
 The application will be available at `http://localhost:3006`
@@ -45,9 +53,13 @@ The application will be available at `http://localhost:3006`
 
 ```bash
 # Build for production
+npm run build
+# or
 yarn build
 
 # Start production server on port 3005
+npm run start
+# or
 yarn start
 ```
 
@@ -55,12 +67,18 @@ yarn start
 
 ```bash
 # Run linter
+npm run lint
+# or
 yarn lint
 
 # Fix linting issues
+npm run lint:fix
+# or
 yarn lint:fix
 
 # Type checking
+npm run check-types
+# or
 yarn check-types
 ```
 
