@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
-import { Box, VStack, HStack, Text } from '@chakra-ui/react';
+import { Box, VStack, HStack, Text, Tooltip, Portal } from '@chakra-ui/react';
+import { Info } from 'lucide-react';
 
 interface KpiCardProps {
   label: string;
@@ -8,6 +9,7 @@ interface KpiCardProps {
   change?: number; // Percentage change
   color?: string;
   icon?: React.ReactNode;
+  tooltip?: string; // Tooltip description
 }
 
 export default function KpiCard({
@@ -16,6 +18,7 @@ export default function KpiCard({
   change,
   color = 'blue',
   icon,
+  tooltip,
 }: KpiCardProps) {
   // Determine change color: green if positive, red if negative, gray if zero
   const changeColor = 
@@ -59,9 +62,46 @@ export default function KpiCard({
               {icon}
             </Box>
           )}
-          <Text fontSize="xs" color="gray.600" fontWeight="medium" textTransform="uppercase" letterSpacing="wider">
-            {label}
-          </Text>
+          <HStack gap={1} align="center">
+            <Text fontSize="xs" color="gray.600" fontWeight="medium" textTransform="uppercase" letterSpacing="wider">
+              {label}
+            </Text>
+            {tooltip && (
+              <Tooltip.Root>
+                <Tooltip.Trigger asChild>
+                  <Box
+                    as="span"
+                    color="gray.400"
+                    _hover={{ color: 'gray.600' }}
+                    cursor="help"
+                    display="inline-flex"
+                    alignItems="center"
+                    aria-label="More information"
+                  >
+                    <Info size={14} />
+                  </Box>
+                </Tooltip.Trigger>
+                <Portal>
+                  <Tooltip.Positioner>
+                    <Tooltip.Content
+                      maxW="250px"
+                      zIndex={1100}
+                      bg="gray.900"
+                      color="white"
+                      px={3}
+                      py={2}
+                      borderRadius="md"
+                      fontSize="sm"
+                      boxShadow="lg"
+                    >
+                      <Tooltip.Arrow />
+                      {tooltip}
+                    </Tooltip.Content>
+                  </Tooltip.Positioner>
+                </Portal>
+              </Tooltip.Root>
+            )}
+          </HStack>
           {typeof value === 'number' ? (
             <Text fontSize="2xl" fontWeight="bold" color="gray.900">
               {value.toLocaleString()}

@@ -226,6 +226,7 @@ export default function Home() {
             change={kpis.weeklyChangePct}
             color="red"
             icon={<User size={24} />}
+            tooltip="Number of unique merchants that have triggered risk alerts today. This metric helps identify merchants requiring immediate attention."
           />
           <KpiCard
             label="Transactions in Auto Hold (today)"
@@ -233,6 +234,7 @@ export default function Home() {
             change={kpis.weeklyChangePct}
             color="orange"
             icon={<AlertTriangle size={24} />}
+            tooltip="Total number of transactions that have been automatically placed on hold today due to risk rules. These require manual review."
           />
           <KpiCard
             label="Weekly Alert Change %"
@@ -240,6 +242,7 @@ export default function Home() {
             change={kpis.weeklyChangePct}
             color="blue"
             icon={<TrendingUp size={24} />}
+            tooltip="Percentage change in total alerts compared to the previous week. Positive values indicate an increase, negative values indicate a decrease."
           />
           <KpiCard
             label="Top Triggered Rule"
@@ -253,18 +256,21 @@ export default function Home() {
             }
             color="purple"
             icon={<ShoppingCart size={24} />}
+            tooltip="The risk rule that has been triggered most frequently. Hover over the rule code to see its full name."
           />
           <KpiCard
             label="Avg Resolution Time"
             value={`${kpis.avgResolutionHours.toFixed(1)}h`}
             color="teal"
             icon={<Clock size={24} />}
+            tooltip="Average time taken to review and resolve alerts, measured in hours. Lower values indicate faster response times."
           />
           <KpiCard
             label="Chargebacks (last 30 days)"
             value={kpis.chargebacks30d}
             color="red"
             icon={<DollarSign size={24} />}
+            tooltip="Total number of chargebacks received in the last 30 days. Chargebacks represent disputed transactions that require investigation."
           />
         </SimpleGrid>
 

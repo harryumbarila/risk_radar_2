@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
-import { Box, VStack, Text, HStack, Button, Badge, Tooltip } from '@chakra-ui/react';
-import { ArrowUpRight } from 'lucide-react';
+import { Box, VStack, Text, HStack, Button, Badge, Tooltip, Portal } from '@chakra-ui/react';
+import { ArrowUpRight, Info } from 'lucide-react';
 import type { MockAlert } from '../../utils/mockData';
 import EmptyState from '../empty-state/empty-state';
 
@@ -76,9 +76,44 @@ function MerchantRanking({ alerts, onMerchantClick }: MerchantRankingProps) {
       aria-label="Critical Merchants Ranking"
     >
       <VStack align="stretch" gap={4}>
-        <Text fontSize="lg" fontWeight="bold">
-          Critical Merchants Ranking
-        </Text>
+        <HStack gap={2} align="center">
+          <Text fontSize="lg" fontWeight="bold">
+            Critical Merchants Ranking
+          </Text>
+          <Tooltip.Root>
+            <Tooltip.Trigger asChild>
+              <Box
+                as="span"
+                color="gray.400"
+                _hover={{ color: 'gray.600' }}
+                cursor="help"
+                display="inline-flex"
+                alignItems="center"
+                aria-label="Chart information"
+              >
+                <Info size={16} />
+              </Box>
+            </Tooltip.Trigger>
+            <Portal>
+              <Tooltip.Positioner>
+                <Tooltip.Content
+                  maxW="300px"
+                  zIndex={1100}
+                  bg="gray.900"
+                  color="white"
+                  px={3}
+                  py={2}
+                  borderRadius="md"
+                  fontSize="sm"
+                  boxShadow="lg"
+                >
+                  <Tooltip.Arrow />
+                  Lists the top 10 merchants ranked by number of incidents. Merchants with more incidents require priority attention. Click the arrow icon to view details in Auto Hold.
+                </Tooltip.Content>
+              </Tooltip.Positioner>
+            </Portal>
+          </Tooltip.Root>
+        </HStack>
         <VStack align="stretch" gap={2}>
           {merchantData.map((merchant, index) => (
             <HStack

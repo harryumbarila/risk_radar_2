@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
-import { Box, VStack, Text, HStack } from '@chakra-ui/react';
+import { Box, VStack, Text, HStack, Tooltip, Portal } from '@chakra-ui/react';
+import { Info } from 'lucide-react';
 import {
   BarChart,
   Bar,
@@ -78,9 +79,44 @@ export default function TopRulesChart({ alerts, onRuleClick }: TopRulesChartProp
       aria-label="Top 10 Most Triggered Rules Chart"
     >
       <VStack align="stretch" gap={4}>
-        <Text fontSize="lg" fontWeight="bold">
-          Top 10 Most Triggered Rules
-        </Text>
+        <HStack gap={2} align="center">
+          <Text fontSize="lg" fontWeight="bold">
+            Top 10 Most Triggered Rules
+          </Text>
+          <Tooltip.Root>
+            <Tooltip.Trigger asChild>
+              <Box
+                as="span"
+                color="gray.400"
+                _hover={{ color: 'gray.600' }}
+                cursor="help"
+                display="inline-flex"
+                alignItems="center"
+                aria-label="Chart information"
+              >
+                <Info size={16} />
+              </Box>
+            </Tooltip.Trigger>
+            <Portal>
+              <Tooltip.Positioner>
+                <Tooltip.Content
+                  maxW="300px"
+                  zIndex={1100}
+                  bg="gray.900"
+                  color="white"
+                  px={3}
+                  py={2}
+                  borderRadius="md"
+                  fontSize="sm"
+                  boxShadow="lg"
+                >
+                  <Tooltip.Arrow />
+                  Displays the 10 risk rules that have been triggered most frequently. Click on a bar to filter the dashboard by that rule.
+                </Tooltip.Content>
+              </Tooltip.Positioner>
+            </Portal>
+          </Tooltip.Root>
+        </HStack>
         <Box height="400px" width="100%" position="relative">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart

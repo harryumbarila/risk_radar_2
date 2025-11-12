@@ -1,13 +1,14 @@
 'use client';
 import React from 'react';
-import { Box, VStack, Text, HStack } from '@chakra-ui/react';
+import { Box, VStack, Text, HStack, Tooltip, Portal } from '@chakra-ui/react';
+import { Info } from 'lucide-react';
 import {
   AreaChart,
   Area,
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
+  Tooltip as RechartsTooltip,
   ResponsiveContainer,
   Legend,
 } from 'recharts';
@@ -101,9 +102,44 @@ export default function TrendChart({ alerts, onWeekClick }: TrendChartProps) {
       aria-label="Weekly Risk Trend Chart"
     >
       <VStack align="stretch" gap={4}>
-        <Text fontSize="lg" fontWeight="bold">
-          Weekly Risk Trend
-        </Text>
+        <HStack gap={2} align="center">
+          <Text fontSize="lg" fontWeight="bold">
+            Weekly Risk Trend
+          </Text>
+          <Tooltip.Root>
+            <Tooltip.Trigger asChild>
+              <Box
+                as="span"
+                color="gray.400"
+                _hover={{ color: 'gray.600' }}
+                cursor="help"
+                display="inline-flex"
+                alignItems="center"
+                aria-label="Chart information"
+              >
+                <Info size={16} />
+              </Box>
+            </Tooltip.Trigger>
+            <Portal>
+              <Tooltip.Positioner>
+                <Tooltip.Content
+                  maxW="300px"
+                  zIndex={1100}
+                  bg="gray.900"
+                  color="white"
+                  px={3}
+                  py={2}
+                  borderRadius="md"
+                  fontSize="sm"
+                  boxShadow="lg"
+                >
+                  <Tooltip.Arrow />
+                  Shows the distribution of alerts by risk level (High, Medium, Low) over the last 12 weeks. Click on a week to filter the dashboard.
+                </Tooltip.Content>
+              </Tooltip.Positioner>
+            </Portal>
+          </Tooltip.Root>
+        </HStack>
         <Box height="300px" width="100%">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
@@ -121,7 +157,7 @@ export default function TrendChart({ alerts, onWeekClick }: TrendChartProps) {
               <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
               <XAxis dataKey="week" tick={{ fontSize: 12 }} />
               <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip content={<CustomTooltip />} />
+              <RechartsTooltip content={<CustomTooltip />} />
               <Legend />
               {/* Order: Low (bottom), Medium (middle), High (top) */}
               <Area

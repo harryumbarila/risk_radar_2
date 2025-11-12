@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
-import { Box, VStack, Text, HStack } from '@chakra-ui/react';
+import { Box, VStack, Text, HStack, Tooltip, Portal } from '@chakra-ui/react';
+import { Info } from 'lucide-react';
 import type { MockAlert } from '../../utils/mockData';
 import EmptyState from '../empty-state/empty-state';
 
@@ -57,9 +58,44 @@ export default function HeatmapChart({ alerts, onCellClick }: HeatmapChartProps)
       aria-label="Day-Hour Alert Heatmap"
     >
       <VStack align="stretch" gap={4}>
-        <Text fontSize="lg" fontWeight="bold">
-          Day-Hour Alert Heatmap
-        </Text>
+        <HStack gap={2} align="center">
+          <Text fontSize="lg" fontWeight="bold">
+            Day-Hour Alert Heatmap
+          </Text>
+          <Tooltip.Root>
+            <Tooltip.Trigger asChild>
+              <Box
+                as="span"
+                color="gray.400"
+                _hover={{ color: 'gray.600' }}
+                cursor="help"
+                display="inline-flex"
+                alignItems="center"
+                aria-label="Chart information"
+              >
+                <Info size={16} />
+              </Box>
+            </Tooltip.Trigger>
+            <Portal>
+              <Tooltip.Positioner>
+                <Tooltip.Content
+                  maxW="300px"
+                  zIndex={1100}
+                  bg="gray.900"
+                  color="white"
+                  px={3}
+                  py={2}
+                  borderRadius="md"
+                  fontSize="sm"
+                  boxShadow="lg"
+                >
+                  <Tooltip.Arrow />
+                  Visualizes alert frequency by day of week and hour. Darker cells indicate more alerts. Hover over a cell to see details. Click to filter by that time period.
+                </Tooltip.Content>
+              </Tooltip.Positioner>
+            </Portal>
+          </Tooltip.Root>
+        </HStack>
         <Box overflowX="auto">
           <Box minW="800px">
             <HStack gap={1} mb={2}>

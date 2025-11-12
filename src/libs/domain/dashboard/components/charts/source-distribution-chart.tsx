@@ -1,13 +1,14 @@
 'use client';
 import React from 'react';
-import { Box, VStack, Text } from '@chakra-ui/react';
+import { Box, VStack, Text, HStack, Tooltip, Portal } from '@chakra-ui/react';
+import { Info } from 'lucide-react';
 import {
   BarChart,
   Bar,
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
+  Tooltip as RechartsTooltip,
   ResponsiveContainer,
   Legend,
   Cell,
@@ -66,9 +67,44 @@ export default function SourceDistributionChart({
       aria-label="Distribution by Source/Processor Chart"
     >
       <VStack align="stretch" gap={4}>
-        <Text fontSize="lg" fontWeight="bold">
-          Distribution by Source/Processor
-        </Text>
+        <HStack gap={2} align="center">
+          <Text fontSize="lg" fontWeight="bold">
+            Distribution by Source/Processor
+          </Text>
+          <Tooltip.Root>
+            <Tooltip.Trigger asChild>
+              <Box
+                as="span"
+                color="gray.400"
+                _hover={{ color: 'gray.600' }}
+                cursor="help"
+                display="inline-flex"
+                alignItems="center"
+                aria-label="Chart information"
+              >
+                <Info size={16} />
+              </Box>
+            </Tooltip.Trigger>
+            <Portal>
+              <Tooltip.Positioner>
+                <Tooltip.Content
+                  maxW="300px"
+                  zIndex={1100}
+                  bg="gray.900"
+                  color="white"
+                  px={3}
+                  py={2}
+                  borderRadius="md"
+                  fontSize="sm"
+                  boxShadow="lg"
+                >
+                  <Tooltip.Arrow />
+                  Shows the number of alerts by payment processor (TSYS, Fluidpay, Paya, Other). The percentage indicates the proportion of total alerts. Click on a bar to filter by processor.
+                </Tooltip.Content>
+              </Tooltip.Positioner>
+            </Portal>
+          </Tooltip.Root>
+        </HStack>
         <Box height="300px" width="100%">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
@@ -86,7 +122,7 @@ export default function SourceDistributionChart({
               <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
               <XAxis dataKey="source" tick={{ fontSize: 12 }} />
               <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip
+              <RechartsTooltip
                 formatter={(value: number, name: string, props: any) => [
                   `${value} (${props.payload.percentage}%)`,
                   'Alerts',
