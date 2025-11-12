@@ -24,6 +24,7 @@ export interface ExceptionTypeData {
   name: string;
   value: number;
   color: string;
+  [key: string]: string | number;
 }
 
 interface MiniChartsProps {
@@ -103,7 +104,7 @@ export default function MiniCharts({ hourlyData, exceptionData }: MiniChartsProp
                   cy="50%"
                   labelLine={true}
                   label={({ name, percent }) =>
-                    `${name}: ${(percent * 100).toFixed(0)}%`
+                    `${name}: ${((percent || 0) * 100).toFixed(0)}%`
                   }
                   outerRadius={80}
                   fill="#8884d8"
@@ -116,10 +117,11 @@ export default function MiniCharts({ hourlyData, exceptionData }: MiniChartsProp
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value: number, name: string, props: any) => [
-                    `${value} (${((value / props.payload.total) * 100).toFixed(1)}%)`,
-                    name,
-                  ]}
+                  formatter={(value: number, name: string, props: any) => {
+                    const total = exceptionData.reduce((sum, item) => sum + item.value, 0);
+                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
+                    return [`${value} (${percentage}%)`, name];
+                  }}
                 />
                 <Legend />
               </PieChart>
