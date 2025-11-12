@@ -89,7 +89,8 @@ function pickWeighted<T>(items: T[], weights: number[], random: SeededRandom): T
   const total = weights.reduce((sum, w) => sum + w, 0);
   let rand = random.next() * total;
   for (let i = 0; i < items.length; i++) {
-    rand -= weights[i];
+    const weight = weights[i] ?? 0;
+    rand -= weight;
     if (rand <= 0) return items[i];
   }
   return items[items.length - 1];
