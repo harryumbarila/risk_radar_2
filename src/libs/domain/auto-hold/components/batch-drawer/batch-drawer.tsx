@@ -454,9 +454,8 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
                   <Button
                     colorPalette="blue"
                     onClick={handleMarkAsReviewed}
-                    isLoading={isLoading}
+                    loading={isLoading}
                     disabled={isLoading}
-                    loadingText="Processing..."
                     aria-label="Mark as Reviewed"
                   >
                     <Check size={16} />
