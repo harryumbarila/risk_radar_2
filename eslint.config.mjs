@@ -1,10 +1,8 @@
 import { defineConfig, globalIgnores } from 'eslint/config';
-import nextConfig from 'eslint-config-next';
 import typescriptParser from '@typescript-eslint/parser';
 import typescriptPlugin from '@typescript-eslint/eslint-plugin';
 
 const eslintConfig = defineConfig([
-  ...nextConfig,
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:
