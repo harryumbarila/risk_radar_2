@@ -53,9 +53,8 @@ export default function ActionFooter({
         <Button
           colorPalette="blue"
           onClick={onMarkAsReviewed}
-          isLoading={isLoading}
+          loading={isLoading}
           disabled={isDisabled}
-          loadingText="Processing..."
           aria-label="Mark as Reviewed"
         >
           <Check size={16} />
