@@ -108,8 +108,8 @@ export default function TrendChart({ alerts, onWeekClick }: TrendChartProps) {
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
               data={weekData}
-              onClick={(data) => {
-                if (data && data.activePayload && onWeekClick) {
+              onClick={(data: any) => {
+                if (data && 'activePayload' in data && data.activePayload && onWeekClick) {
                   const weekNum = data.activePayload[0]?.payload?.weekNum;
                   if (weekNum !== undefined) {
                     onWeekClick(weekNum);
