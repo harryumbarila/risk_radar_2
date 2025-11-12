@@ -86,8 +86,8 @@ export default function TopRulesChart({ alerts, onRuleClick }: TopRulesChartProp
             <BarChart
               data={ruleData}
               layout="vertical"
-              onClick={(data) => {
-                if (data && data.activePayload && onRuleClick) {
+              onClick={(data: any) => {
+                if (data && 'activePayload' in data && data.activePayload && onRuleClick) {
                   const ruleId = data.activePayload[0]?.payload?.ruleId;
                   if (ruleId) {
                     onRuleClick(ruleId);
