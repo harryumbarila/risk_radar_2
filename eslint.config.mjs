@@ -2,6 +2,7 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 import nextVitals from 'eslint-config-next/core-web-vitals';
 import nextTs from 'eslint-config-next/typescript';
 import typescriptParser from '@typescript-eslint/parser';
+import typescriptPlugin from '@typescript-eslint/eslint-plugin';
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -39,6 +40,9 @@ const eslintConfig = defineConfig([
   },
   {
     files: ['**/*.ts', '**/*.tsx'],
+    plugins: {
+      '@typescript-eslint': typescriptPlugin,
+    },
     languageOptions: {
       parser: typescriptParser,
       parserOptions: {
