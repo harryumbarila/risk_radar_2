@@ -15,6 +15,10 @@ const nextConfig = {
   },
   // Trailing slash for GitHub Pages
   ...(isGithubPages && { trailingSlash: true }),
+  // Skip API routes and middleware for static export
+  ...(output === 'export' && {
+    distDir: 'out',
+  }),
 };
 
 export default nextConfig;
