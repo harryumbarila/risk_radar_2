@@ -136,11 +136,11 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
   );
 
   // Get merchant info from first transaction
-  const merchantInfo = batch[0] || {};
+  const merchantInfo = batch[0];
   const avgScore = Math.round(
     batch.reduce((sum, tx) => sum + tx.score, 0) / batch.length
   );
-  const status = merchantInfo.status || 'Unreviewed';
+  const status = merchantInfo?.status || 'Unreviewed';
 
   // Mock notes count
   const notesCount = 3;
@@ -226,7 +226,7 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
                 <HStack justify="space-between" align="center">
                   <VStack align="start" gap={1}>
                     <Drawer.Title fontSize="xl" fontWeight="bold">
-                      {merchantInfo.merchant || 'Batch Details'}
+                      {merchantInfo?.merchant || 'Batch Details'}
                     </Drawer.Title>
                     <Text fontSize="sm" color="gray.600">
                       {batch.length} transactions in this batch
@@ -257,7 +257,7 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
                       Processor:
                     </Text>
                     <Text fontSize="sm" fontWeight="semibold" color="gray.900">
-                      {merchantInfo.processor || 'N/A'}
+                      {merchantInfo?.processor || 'N/A'}
                     </Text>
                   </HStack>
                   <HStack gap={2}>
@@ -389,29 +389,29 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
 
                     <Tabs.Content value="contact" pt={4}>
                       <ContactTab
-                        merchantId={merchantInfo.mid || ''}
-                        merchantName={merchantInfo.merchant || ''}
+                        merchantId={merchantInfo?.mid || ''}
+                        merchantName={merchantInfo?.merchant || ''}
                       />
                     </Tabs.Content>
 
                     <Tabs.Content value="chargebacks" pt={4}>
-                      <ChargebacksTab merchantId={merchantInfo.mid || ''} />
+                      <ChargebacksTab merchantId={merchantInfo?.mid || ''} />
                     </Tabs.Content>
 
                     <Tabs.Content value="net-settlement" pt={4}>
-                      <NetSettlementTab merchantId={merchantInfo.mid || ''} />
+                      <NetSettlementTab merchantId={merchantInfo?.mid || ''} />
                     </Tabs.Content>
 
                     <Tabs.Content value="match" pt={4}>
-                      <MatchTab merchantId={merchantInfo.mid || ''} />
+                      <MatchTab merchantId={merchantInfo?.mid || ''} />
                     </Tabs.Content>
 
                     <Tabs.Content value="volume" pt={4}>
-                      <VolumeTab merchantId={merchantInfo.mid || ''} />
+                      <VolumeTab merchantId={merchantInfo?.mid || ''} />
                     </Tabs.Content>
 
                     <Tabs.Content value="notes" pt={4}>
-                      <NotesTab merchantId={merchantInfo.mid || ''} />
+                      <NotesTab merchantId={merchantInfo?.mid || ''} />
                     </Tabs.Content>
                   </Tabs.Root>
                 </Box>
