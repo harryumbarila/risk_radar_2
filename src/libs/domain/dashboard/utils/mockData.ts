@@ -91,9 +91,16 @@ function pickWeighted<T>(items: T[], weights: number[], random: SeededRandom): T
   for (let i = 0; i < items.length; i++) {
     const weight = weights[i] ?? 0;
     rand -= weight;
-    if (rand <= 0) return items[i];
+    if (rand <= 0) {
+      const item = items[i];
+      if (item !== undefined) return item;
+    }
   }
-  return items[items.length - 1];
+  const lastItem = items[items.length - 1];
+  if (lastItem === undefined) {
+    throw new Error('Items array is empty');
+  }
+  return lastItem;
 }
 
 export function generateMockAlerts(count: number = 2500): MockAlert[] {
