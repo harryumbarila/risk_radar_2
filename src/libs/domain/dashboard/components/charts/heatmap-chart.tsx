@@ -21,7 +21,9 @@ export default function HeatmapChart({ alerts, onCellClick }: HeatmapChartProps)
       const date = new Date(alert.date);
       const day = date.getDay();
       const hour = alert.hour;
-      data[day][hour]++;
+      if (data[day] && hour >= 0 && hour < 24) {
+        data[day][hour]++;
+      }
     });
 
     const maxCount = Math.max(...data.flat());
