@@ -21,9 +21,11 @@ export default function HeatmapChart({ alerts, onCellClick }: HeatmapChartProps)
       const date = new Date(alert.date);
       const day = date.getDay();
       const hour = alert.hour;
-      const dayData = data[day];
-      if (dayData && hour >= 0 && hour < 24) {
-        dayData[hour]++;
+      if (day >= 0 && day < 7 && hour >= 0 && hour < 24) {
+        const dayData = data[day];
+        if (dayData) {
+          dayData[hour] = (dayData[hour] ?? 0) + 1;
+        }
       }
     });
 
