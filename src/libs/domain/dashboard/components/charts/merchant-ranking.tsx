@@ -1,0 +1,175 @@
+'use client';
+import React from 'react';
+import { Box, VStack, Text, HStack, Button, Badge, Tooltip } from '@chakra-ui/react';
+import { ArrowUpRight } from 'lucide-react';
+import type { MockAlert } from '../../utils/mockData';
+import EmptyState from '../empty-state/empty-state';
+
+interface MerchantRankingProps {
+  alerts: MockAlert[];
+  onMerchantClick?: (merchantId: string) => void;
+}
+
+function MerchantRanking({ alerts, onMerchantClick }: MerchantRankingProps) {
+  const merchantData = React.useMemo(() => {
+    const merchantMap = new Map<
+      string,
+      { name: string; scoreSum: number; count: number; lastAlert: Date }
+    >();
+
+    alerts.forEach((alert) => {
+      const existing = merchantMap.get(alert.merchantId);
+      const alertDate = new Date(alert.date);
+      if (!existing) {
+        merchantMap.set(alert.merchantId, {
+          name: alert.merchantName,
+          scoreSum: alert.score,
+          count: 1,
+          lastAlert: alertDate,
+        });
+      } else {
+        existing.scoreSum += alert.score;
+        existing.count++;
+        if (alertDate > existing.lastAlert) {
+          existing.lastAlert = alertDate;
+        }
+      }
+    });
+
+    return Array.from(merchantMap.entries())
+      .map(([merchantId, data]) => ({
+        merchantId,
+        name: data.name,
+        avgScore: data.scoreSum / data.count,
+        incidentCount: data.count,
+        lastAlert: data.lastAlert,
+      }))
+      .sort((a, b) => b.avgScore - a.avgScore)
+      .slice(0, 10);
+  }, [alerts]);
+
+  if (merchantData.length === 0) {
+    return <EmptyState title="No merchant data available" />;
+  }
+
+  const getRiskColor = (score: number) => {
+    if (score >= 90) return 'red';
+    if (score >= 70) return 'orange';
+    return 'green';
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((word) => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  return (
+    <Box 
+      bg="white" 
+      p={6} 
+      borderRadius="xl" 
+      boxShadow="0 2px 8px rgba(0,0,0,0.05)"
+      borderWidth="1px"
+      borderColor="gray.200"
+      role="region"
+      aria-label="Critical Merchants Ranking"
+    >
+      <VStack align="stretch" gap={4}>
+        <Text fontSize="lg" fontWeight="bold">
+          Critical Merchants Ranking
+        </Text>
+        <VStack align="stretch" gap={2}>
+          {merchantData.map((merchant, index) => (
+            <HStack
+              key={merchant.merchantId}
+              justify="space-between"
+              p={4}
+              borderRadius="lg"
+              bg="gray.50"
+              _hover={{ 
+                bg: 'gray.100',
+                boxShadow: 'sm',
+                transform: 'translateY(-1px)',
+              }}
+              transition="all 0.15s ease"
+              cursor="pointer"
+            >
+              <HStack gap={4} flex={1}>
+                {/* Avatar with initials */}
+                <Box
+                  w="32px"
+                  h="32px"
+                  borderRadius="full"
+                  bg="gray.400"
+                  color="white"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  fontSize="xs"
+                  fontWeight="bold"
+                  flexShrink={0}
+                >
+                  {getInitials(merchant.name)}
+                </Box>
+                
+                <Text fontSize="sm" fontWeight="bold" color="gray.500" w="24px">
+                  #{index + 1}
+                </Text>
+                
+                <VStack align="start" gap={0} flex={1}>
+                  <Text fontSize="sm" fontWeight="semibold" color="gray.900">
+                    {merchant.name}
+                  </Text>
+                  <Text fontSize="xs" color="gray.500">
+                    {merchant.merchantId} • {merchant.incidentCount} incidents
+                  </Text>
+                </VStack>
+                
+                <Badge
+                  colorPalette={getRiskColor(merchant.avgScore)}
+                  variant="subtle"
+                  px={3}
+                  py={1}
+                  borderRadius="md"
+                  fontWeight="semibold"
+                >
+                  Score: {Math.round(merchant.avgScore)}
+                </Badge>
+                
+                <Text fontSize="xs" color="gray.500" w="100px">
+                  Last: {merchant.lastAlert.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                </Text>
+              </HStack>
+              
+              <Tooltip.Root>
+                <Tooltip.Trigger asChild>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => onMerchantClick?.(merchant.merchantId)}
+                    aria-label={`Open ${merchant.name} in Auto Hold`}
+                    _hover={{ bg: 'blue.50', borderColor: 'blue.300' }}
+                  >
+                    <ArrowUpRight size={14} />
+                  </Button>
+                </Tooltip.Trigger>
+                <Tooltip.Positioner>
+                  <Tooltip.Content>
+                    <Tooltip.Arrow />
+                    Open in Auto Hold
+                  </Tooltip.Content>
+                </Tooltip.Positioner>
+              </Tooltip.Root>
+            </HStack>
+          ))}
+        </VStack>
+      </VStack>
+    </Box>
+  );
+}
+
+export default MerchantRanking;
