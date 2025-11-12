@@ -149,7 +149,6 @@ export default function FilterBar({
       boxShadow="0 2px 8px rgba(0,0,0,0.05)"
       borderRadius="xl"
       borderWidth="1px"
-      borderColor="gray.200"
     >
       <VStack align="stretch" gap={4}>
         <Flex justify="space-between" align="center">
