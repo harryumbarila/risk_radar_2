@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev -p 3006",
     "build": "next build",
-    "build:static": "node scripts/prepare-static-build.js prepare && NEXT_PUBLIC_BASE_PATH=/risk_radar_2.0 next build && node scripts/prepare-static-build.js restore",
+    "build:static": "node scripts/prepare-static-build.js prepare && next build && node scripts/prepare-static-build.js restore",
     "start": "next start -p 3005",
     "lint": "eslint --ext .ts,.tsx --max-warnings=0 .",
     "lint:fix": "eslint --ext .ts,.tsx --max-warnings=0 --fix .",
