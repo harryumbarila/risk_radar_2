@@ -73,8 +73,8 @@ export default function SourceDistributionChart({
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={sourceData}
-              onClick={(data) => {
-                if (data && data.activePayload && onSourceClick) {
+              onClick={(data: any) => {
+                if (data && 'activePayload' in data && data.activePayload && onSourceClick) {
                   const source = data.activePayload[0]?.payload?.source as Source;
                   if (source) {
                     onSourceClick(source);
