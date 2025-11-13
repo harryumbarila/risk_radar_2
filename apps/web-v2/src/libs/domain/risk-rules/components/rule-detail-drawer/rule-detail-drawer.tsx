@@ -45,7 +45,7 @@ function formatDate(dateString: string): string {
   });
 }
 
-export default function RuleDetailDrawer(): React.JSX.Element {
+export default function RuleDetailDrawer(): React.JSX.Element | null {
   const { selectedRule, isDrawerOpen, closeDrawer, updateRule, deleteRule, isLoading } = useRules();
   const [activeTab, setActiveTab] = React.useState('overview');
   const [formData, setFormData] = React.useState<Record<string, any> | null>(null);

@@ -34,7 +34,7 @@ function getRiskLevelColor(riskLevel: string): string {
   }
 }
 
-export default function WhitelistManagerDrawer(): React.JSX.Element {
+export default function WhitelistManagerDrawer(): React.JSX.Element | null {
   const { isDrawerOpen, closeDrawer, currentMID } = useWhitelistStore();
   const [activeTab, setActiveTab] = React.useState('overview');
 
