@@ -153,7 +153,7 @@ export default function RuleTable(): React.JSX.Element {
                   <Button
                     colorPalette={ruleToToggle?.status ? 'red' : 'blue'}
                     onClick={handleConfirmToggle}
-                    isLoading={isLoading}
+                    loading={isLoading}
                     loadingText={ruleToToggle?.status ? 'Deactivating...' : 'Activating...'}
                   >
                     {ruleToToggle?.status ? 'Deactivate' : 'Activate'}
