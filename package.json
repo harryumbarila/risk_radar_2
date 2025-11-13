@@ -58,6 +58,7 @@
   "packageManager": "yarn@1.22.22",
   "resolutions": {
     "cookie": "^1.0.2",
-    "tmp": "^0.2.5"
+    "tmp": "^0.2.5",
+    "cosmiconfig-typescript-loader": "6.1.0"
   }
 }
