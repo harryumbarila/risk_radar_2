@@ -232,8 +232,7 @@ export default function RulesWikiDrawer({
                           fontSize="sm"
                           color="gray.700"
                           lineHeight="1.5"
-                          noOfLines={3}
-                          css={{
+                          style={{
                             display: '-webkit-box',
                             WebkitLineClamp: 3,
                             WebkitBoxOrient: 'vertical',
