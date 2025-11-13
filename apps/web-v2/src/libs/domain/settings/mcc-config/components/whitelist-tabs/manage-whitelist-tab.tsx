@@ -14,6 +14,7 @@ import {
   Skeleton,
   Portal,
   Dialog,
+  createListCollection,
 } from '@chakra-ui/react';
 import { Search } from 'lucide-react';
 import { useWhitelistStore } from '../useWhitelistStore';
@@ -48,6 +49,47 @@ export default function ManageWhitelistTab(): React.JSX.Element | null {
   const [typeFilter, setTypeFilter] = React.useState('all');
   const [severityFilter, setSeverityFilter] = React.useState('all');
   const [sourceFilter, setSourceFilter] = React.useState('all');
+
+  // Create collections for Select components
+  const typeCollection = React.useMemo(
+    () =>
+      createListCollection({
+        items: [
+          { label: 'All Types', value: 'all' },
+          { label: 'Auto Hold', value: 'Auto Hold' },
+          { label: 'Alert', value: 'Alert' },
+          { label: 'Monitoring', value: 'Monitoring' },
+        ],
+      }),
+    [],
+  );
+
+  const severityCollection = React.useMemo(
+    () =>
+      createListCollection({
+        items: [
+          { label: 'All Severities', value: 'all' },
+          { label: 'Critical', value: 'Critical' },
+          { label: 'Moderate', value: 'Moderate' },
+          { label: 'Info', value: 'Info' },
+        ],
+      }),
+    [],
+  );
+
+  const sourceCollection = React.useMemo(
+    () =>
+      createListCollection({
+        items: [
+          { label: 'All Sources', value: 'all' },
+          { label: 'TSYS', value: 'TSYS' },
+          { label: 'Fluidpay', value: 'Fluidpay' },
+          { label: 'Paya', value: 'Paya' },
+          { label: 'Internal', value: 'Internal' },
+        ],
+      }),
+    [],
+  );
   const [isSaveConfirmOpen, setIsSaveConfirmOpen] = React.useState(false);
 
   const rules = riskRulesData as unknown as RiskRule[];
@@ -157,6 +199,7 @@ export default function ManageWhitelistTab(): React.JSX.Element | null {
 
           {/* Type Filter */}
           <Select.Root
+            collection={typeCollection}
             value={[typeFilter]}
             onValueChange={(e) => setTypeFilter(e.value[0] || 'all')}
             size="md"
@@ -171,16 +214,18 @@ export default function ManageWhitelistTab(): React.JSX.Element | null {
             </Select.IndicatorGroup>
             <Select.Positioner>
               <Select.Content>
-                <Select.Item item={{ label: 'All Types', value: 'all' }}>All Types</Select.Item>
-                <Select.Item item={{ label: 'Auto Hold', value: 'Auto Hold' }}>Auto Hold</Select.Item>
-                <Select.Item item={{ label: 'Alert', value: 'Alert' }}>Alert</Select.Item>
-                <Select.Item item={{ label: 'Monitoring', value: 'Monitoring' }}>Monitoring</Select.Item>
+                {typeCollection.items.map((item) => (
+                  <Select.Item key={item.value} item={item}>
+                    {item.label}
+                  </Select.Item>
+                ))}
               </Select.Content>
             </Select.Positioner>
           </Select.Root>
 
           {/* Severity Filter */}
           <Select.Root
+            collection={severityCollection}
             value={[severityFilter]}
             onValueChange={(e) => setSeverityFilter(e.value[0] || 'all')}
             size="md"
@@ -195,16 +240,18 @@ export default function ManageWhitelistTab(): React.JSX.Element | null {
             </Select.IndicatorGroup>
             <Select.Positioner>
               <Select.Content>
-                <Select.Item item={{ label: 'All Severities', value: 'all' }}>All Severities</Select.Item>
-                <Select.Item item={{ label: 'Critical', value: 'Critical' }}>Critical</Select.Item>
-                <Select.Item item={{ label: 'Moderate', value: 'Moderate' }}>Moderate</Select.Item>
-                <Select.Item item={{ label: 'Info', value: 'Info' }}>Info</Select.Item>
+                {severityCollection.items.map((item) => (
+                  <Select.Item key={item.value} item={item}>
+                    {item.label}
+                  </Select.Item>
+                ))}
               </Select.Content>
             </Select.Positioner>
           </Select.Root>
 
           {/* Source Filter */}
           <Select.Root
+            collection={sourceCollection}
             value={[sourceFilter]}
             onValueChange={(e) => setSourceFilter(e.value[0] || 'all')}
             size="md"
@@ -219,11 +266,11 @@ export default function ManageWhitelistTab(): React.JSX.Element | null {
             </Select.IndicatorGroup>
             <Select.Positioner>
               <Select.Content>
-                <Select.Item item={{ label: 'All Sources', value: 'all' }}>All Sources</Select.Item>
-                <Select.Item item={{ label: 'TSYS', value: 'TSYS' }}>TSYS</Select.Item>
-                <Select.Item item={{ label: 'Fluidpay', value: 'Fluidpay' }}>Fluidpay</Select.Item>
-                <Select.Item item={{ label: 'Paya', value: 'Paya' }}>Paya</Select.Item>
-                <Select.Item item={{ label: 'Internal', value: 'Internal' }}>Internal</Select.Item>
+                {sourceCollection.items.map((item) => (
+                  <Select.Item key={item.value} item={item}>
+                    {item.label}
+                  </Select.Item>
+                ))}
               </Select.Content>
             </Select.Positioner>
           </Select.Root>
