@@ -67,7 +67,16 @@ export default function RuleCard({ rule, onView, onToggle }: RuleCardProps): Rea
             <Text fontSize="md" fontWeight="semibold" color="gray.900">
               {rule.name}
             </Text>
-            <Text fontSize="xs" color="gray.500" noOfLines={2}>
+            <Text
+              fontSize="xs"
+              color="gray.500"
+              style={{
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              }}
+            >
               {rule.description}
             </Text>
           </VStack>

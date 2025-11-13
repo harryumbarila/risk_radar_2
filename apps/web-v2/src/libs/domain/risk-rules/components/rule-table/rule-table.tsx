@@ -217,7 +217,16 @@ export default function RuleTable(): React.JSX.Element {
                   <Text fontSize="sm" fontWeight="semibold" color="gray.900">
                     {rule.name}
                   </Text>
-                  <Text fontSize="xs" color="gray.500" noOfLines={1}>
+                  <Text
+                    fontSize="xs"
+                    color="gray.500"
+                    style={{
+                      display: '-webkit-box',
+                      WebkitLineClamp: 1,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                    }}
+                  >
                     {rule.description}
                   </Text>
                 </VStack>
