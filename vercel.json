@@ -1,7 +1,7 @@
 {
   "buildCommand": "cd apps/web-v2 && yarn build",
   "outputDirectory": "apps/web-v2/.next",
-  "installCommand": "yarn install --force",
+  "installCommand": "yarn install --ignore-integrity",
   "framework": "nextjs"
 }
 
