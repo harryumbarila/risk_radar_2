@@ -385,7 +385,7 @@ export default function ManageWhitelistTab(): React.JSX.Element | null {
           <Button
             colorPalette="blue"
             onClick={handleSaveClick}
-            isLoading={isLoading}
+            loading={isLoading}
             disabled={isLoading}
           >
             Save
