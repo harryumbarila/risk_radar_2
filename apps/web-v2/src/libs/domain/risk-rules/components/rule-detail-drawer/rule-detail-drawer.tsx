@@ -70,7 +70,7 @@ export default function RuleDetailDrawer(): React.JSX.Element {
       await updateRule(selectedRule.id, {
         ...selectedRule,
         parameters: formData,
-        last_updated: new Date().toISOString().split('T')[0],
+        last_updated: new Date().toISOString().substring(0, 10),
       });
       toaster.create({
         title: 'Rule updated successfully',

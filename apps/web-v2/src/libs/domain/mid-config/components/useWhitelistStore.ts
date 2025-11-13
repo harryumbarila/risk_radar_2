@@ -153,7 +153,7 @@ export function WhitelistProvider({ children }: { children: React.ReactNode }): 
           setCurrentMID({
             ...currentMID,
             thresholds,
-            last_updated: new Date().toISOString().split('T')[0],
+            last_updated: new Date().toISOString().substring(0, 10),
             last_updated_by: 'Current User',
           });
           setTempThresholds(thresholds);
@@ -189,7 +189,7 @@ export function WhitelistProvider({ children }: { children: React.ReactNode }): 
           setCurrentMID({
             ...currentMID,
             whitelist: excludedRules,
-            last_updated: new Date().toISOString().split('T')[0],
+            last_updated: new Date().toISOString().substring(0, 10),
           });
         }
 

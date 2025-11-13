@@ -111,7 +111,7 @@ export function WhitelistProvider({ children }: { children: React.ReactNode }): 
           setCurrentMCC({
             ...currentMCC,
             whitelist: excludedRules,
-            last_updated: new Date().toISOString().split('T')[0],
+            last_updated: new Date().toISOString().substring(0, 10),
           });
         }
 
