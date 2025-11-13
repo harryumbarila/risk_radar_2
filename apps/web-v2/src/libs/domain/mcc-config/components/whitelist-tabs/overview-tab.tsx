@@ -188,7 +188,7 @@ export default function OverviewTab(): React.JSX.Element | null {
                     </Badge>
                   </Table.Cell>
                   <Table.Cell>
-                    <HStack gap={2} align="center">
+                    <HStack gap={2} align="center" group>
                       {isExcluded ? (
                         <>
                           <Badge
@@ -203,7 +203,6 @@ export default function OverviewTab(): React.JSX.Element | null {
                             _groupHover={{
                               opacity: 0.8,
                             }}
-                            group
                           >
                             Excluded
                           </Badge>
@@ -291,7 +290,6 @@ export default function OverviewTab(): React.JSX.Element | null {
                             _groupHover={{
                               opacity: 0.8,
                             }}
-                            group
                           >
                             Active
                           </Badge>
