@@ -188,8 +188,9 @@ export default function OverviewTab(): React.JSX.Element | null {
                     </Badge>
                   </Table.Cell>
                   <Table.Cell>
-                    <HStack gap={2} align="center" group>
-                      {isExcluded ? (
+                    <Box group>
+                      <HStack gap={2} align="center">
+                        {isExcluded ? (
                         <>
                           <Badge
                             variant="subtle"
@@ -331,7 +332,8 @@ export default function OverviewTab(): React.JSX.Element | null {
                           </Tooltip.Root>
                         </>
                       )}
-                    </HStack>
+                      </HStack>
+                    </Box>
                   </Table.Cell>
                 </Table.Row>
               );
