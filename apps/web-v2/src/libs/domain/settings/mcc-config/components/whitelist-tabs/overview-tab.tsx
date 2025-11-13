@@ -5,6 +5,7 @@ import {
   Box,
   Table,
   VStack,
+  HStack,
   Text,
   Badge,
   Tooltip,
