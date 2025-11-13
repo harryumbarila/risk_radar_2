@@ -486,7 +486,7 @@ export default function RuleDetailDrawer(): React.JSX.Element | null {
                 <Button
                   colorPalette="blue"
                   onClick={handleSaveConfirm}
-                  isLoading={isLoading}
+                  loading={isLoading}
                   loadingText="Saving..."
                 >
                   Save Changes
@@ -520,7 +520,7 @@ export default function RuleDetailDrawer(): React.JSX.Element | null {
                 <Button
                   colorPalette="red"
                   onClick={handleDeleteConfirm}
-                  isLoading={isLoading}
+                  loading={isLoading}
                   loadingText="Deleting..."
                 >
                   Delete
