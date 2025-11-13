@@ -547,7 +547,7 @@ export default function RiskThresholdsTab(): React.JSX.Element | null {
           <Button
             colorPalette="blue"
             onClick={handleSaveClick}
-            isLoading={isLoading}
+            loading={isLoading}
             disabled={isLoading || !hasThresholdChanges || hasValidationErrors}
           >
             Save Changes
@@ -581,7 +581,7 @@ export default function RiskThresholdsTab(): React.JSX.Element | null {
                 <Button
                   colorPalette="blue"
                   onClick={handleSaveConfirm}
-                  isLoading={isLoading}
+                  loading={isLoading}
                   loadingText="Saving..."
                 >
                   Save Changes
