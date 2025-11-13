@@ -67,10 +67,9 @@ export default function OverviewTab(): React.JSX.Element | null {
   const handleToggleConfirm = () => {
     if (ruleToToggle) {
       toggleRuleExclusion(ruleToToggle.id);
-      toaster.create({
+      toaster.success({
         title: ruleToToggle.willExclude ? 'Rule excluded' : 'Rule activated',
         description: `${ruleToToggle.name} has been ${ruleToToggle.willExclude ? 'excluded' : 'activated'} for MCC ${currentMCC.mcc}.`,
-        status: 'success',
         duration: 3000,
       });
       setIsToggleConfirmOpen(false);

@@ -69,10 +69,9 @@ export default function RuleTable(): React.JSX.Element {
 
     const wasActive = ruleToToggle.status;
     await toggleRuleStatus(ruleToToggle.id);
-    toaster.create({
+    toaster.success({
       title: wasActive ? 'Rule deactivated' : 'Rule activated',
       description: `${ruleToToggle.name} has been ${wasActive ? 'deactivated' : 'activated'}.`,
-      status: 'success',
       duration: 3000,
     });
     setIsConfirmOpen(false);

@@ -96,18 +96,16 @@ export default function ManageWhitelistTab(): React.JSX.Element | null {
 
     try {
       await saveWhitelist(currentMCC.mcc, Array.from(tempExcludedRules));
-      toaster.create({
+      toaster.success({
         title: 'Whitelist updated successfully',
         description: `Whitelist for MCC ${currentMCC.mcc} has been updated.`,
-        status: 'success',
         duration: 3000,
       });
       setIsSaveConfirmOpen(false);
     } catch (error) {
-      toaster.create({
+      toaster.error({
         title: 'Error updating whitelist',
         description: 'Failed to update the whitelist. Please try again.',
-        status: 'error',
       });
       setIsSaveConfirmOpen(false);
     }

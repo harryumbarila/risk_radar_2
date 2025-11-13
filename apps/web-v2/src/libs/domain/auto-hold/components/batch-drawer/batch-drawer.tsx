@@ -161,17 +161,15 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
     try {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      toaster.create({
+      toaster.success({
         title: 'Batch marked as reviewed',
         description: `${batch.length} transactions have been marked as reviewed.`,
-        type: 'success',
       });
       // Drawer will close via Drawer.ActionTrigger or manually
     } catch (error) {
-      toaster.create({
+      toaster.error({
         title: 'Error',
         description: 'Failed to mark batch as reviewed.',
-        type: 'error',
       });
     } finally {
       setIsLoading(false);
@@ -182,7 +180,6 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
       toaster.create({
         title: 'Case diverted',
         description: 'This batch has been diverted for further review.',
-        type: 'info',
       });
   };
 

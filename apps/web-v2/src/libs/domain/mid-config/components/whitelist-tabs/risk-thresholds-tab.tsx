@@ -108,10 +108,9 @@ export default function RiskThresholdsTab(): React.JSX.Element | null {
     // Validate all fields
     const hasErrors = Object.keys(fieldErrors).length > 0;
     if (hasErrors) {
-      toaster.create({
+      toaster.error({
         title: 'Validation Error',
         description: 'Please fix the errors before saving.',
-        status: 'error',
         duration: 3000,
       });
       return;
@@ -130,18 +129,16 @@ export default function RiskThresholdsTab(): React.JSX.Element | null {
         getFieldChanged(key as keyof RiskThresholds)
       ).length;
 
-      toaster.create({
+      toaster.success({
         title: 'Thresholds updated successfully',
         description: `Thresholds updated for MID ${currentMID.mid} — ${changedFields} ${changedFields === 1 ? 'field' : 'fields'} modified.`,
-        status: 'success',
         duration: 4000,
       });
       setIsSaveConfirmOpen(false);
     } catch (error) {
-      toaster.create({
+      toaster.error({
         title: 'Error updating thresholds',
         description: 'Failed to update the thresholds. Please try again.',
-        status: 'error',
       });
       setIsSaveConfirmOpen(false);
     }

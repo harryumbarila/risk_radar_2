@@ -100,19 +100,17 @@ export default function ManageWhitelistTab(): React.JSX.Element | null {
     try {
       await saveWhitelist(currentMID.mid, Array.from(tempExcludedRules));
       const excludedCount = tempExcludedRules.size;
-      toaster.create({
+      toaster.success({
         title: 'Whitelist updated successfully',
         description: `Whitelist updated for MID ${currentMID.mid} — ${excludedCount} ${excludedCount === 1 ? 'rule' : 'rules'} excluded.`,
-        status: 'success',
         duration: 4000,
       });
       setIsSaveConfirmOpen(false);
       closeDrawer();
     } catch (error) {
-      toaster.create({
+      toaster.error({
         title: 'Error updating whitelist',
         description: 'Failed to update the whitelist. Please try again.',
-        status: 'error',
       });
       setIsSaveConfirmOpen(false);
     }

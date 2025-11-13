@@ -72,19 +72,17 @@ export default function RuleDetailDrawer(): React.JSX.Element | null {
         parameters: formData,
         last_updated: new Date().toISOString().substring(0, 10),
       });
-      toaster.create({
+      toaster.success({
         title: 'Rule updated successfully',
         description: `${selectedRule.name} has been updated.`,
-        status: 'success',
         duration: 3000,
       });
       setIsSaveConfirmOpen(false);
       closeDrawer();
     } catch (error) {
-      toaster.create({
+      toaster.error({
         title: 'Error updating rule',
         description: 'Failed to update the rule. Please try again.',
-        status: 'error',
       });
       setIsSaveConfirmOpen(false);
     }
@@ -103,19 +101,17 @@ export default function RuleDetailDrawer(): React.JSX.Element | null {
 
     try {
       await deleteRule(selectedRule.id);
-      toaster.create({
+      toaster.success({
         title: 'Rule deleted',
         description: `${selectedRule.name} has been deleted.`,
-        status: 'success',
         duration: 3000,
       });
       setIsDeleteConfirmOpen(false);
       closeDrawer();
     } catch (error) {
-      toaster.create({
+      toaster.error({
         title: 'Error deleting rule',
         description: 'Failed to delete the rule. Please try again.',
-        status: 'error',
       });
       setIsDeleteConfirmOpen(false);
     }
