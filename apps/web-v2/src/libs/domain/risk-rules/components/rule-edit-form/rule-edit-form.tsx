@@ -21,10 +21,10 @@ interface RuleEditFormProps {
 }
 
 export default function RuleEditForm({
-  rule,
+  rule: _rule,
   formData,
   onFormDataChange,
-}: RuleEditFormProps): React.JSX.Element {
+}: RuleEditFormProps): React.JSX.Element | null {
   const handleChange = (key: string, value: any) => {
     if (!formData) return;
     onFormDataChange({

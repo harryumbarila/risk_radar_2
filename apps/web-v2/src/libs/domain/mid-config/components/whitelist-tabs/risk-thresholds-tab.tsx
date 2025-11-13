@@ -40,7 +40,7 @@ function parseCurrency(value: string): number {
   return parseFloat(value.replace(/[^0-9.-]+/g, '')) || 0;
 }
 
-export default function RiskThresholdsTab(): React.JSX.Element {
+export default function RiskThresholdsTab(): React.JSX.Element | null {
   const {
     currentMID,
     tempThresholds,

@@ -34,7 +34,7 @@ function getSeverityColor(severity: string): string {
   }
 }
 
-export default function ManageWhitelistTab(): React.JSX.Element {
+export default function ManageWhitelistTab(): React.JSX.Element | null {
   const {
     currentMID,
     tempExcludedRules,

@@ -38,7 +38,7 @@ function getUserInitials(user: string): string {
     .slice(0, 2);
 }
 
-export default function AuditLogTab(): React.JSX.Element {
+export default function AuditLogTab(): React.JSX.Element | null {
   const { currentMCC, auditLogs } = useWhitelistStore();
 
   if (!currentMCC) return null;

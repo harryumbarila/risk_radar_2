@@ -28,7 +28,7 @@ function getSeverityColor(severity: string): string {
   }
 }
 
-export default function OverviewTab(): React.JSX.Element {
+export default function OverviewTab(): React.JSX.Element | null {
   const { currentMCC } = useWhitelistStore();
   const rules = riskRulesData as unknown as RiskRule[];
 

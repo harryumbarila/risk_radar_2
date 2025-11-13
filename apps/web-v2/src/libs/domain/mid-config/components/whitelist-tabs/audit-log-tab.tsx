@@ -49,7 +49,7 @@ function getActionIcon(action: string): string {
   return '⚪';
 }
 
-export default function AuditLogTab(): React.JSX.Element {
+export default function AuditLogTab(): React.JSX.Element | null {
   const { currentMID, auditLogs } = useWhitelistStore();
   const [showAll, setShowAll] = React.useState(false);
 

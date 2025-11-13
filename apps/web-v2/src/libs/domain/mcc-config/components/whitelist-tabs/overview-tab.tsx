@@ -42,7 +42,7 @@ function formatDate(dateString: string): string {
   });
 }
 
-export default function OverviewTab(): React.JSX.Element {
+export default function OverviewTab(): React.JSX.Element | null {
   const { currentMCC, toggleRuleExclusion, tempExcludedRules } = useWhitelistStore();
   const rules = riskRulesData as unknown as RiskRule[];
   const [isToggleConfirmOpen, setIsToggleConfirmOpen] = React.useState(false);
