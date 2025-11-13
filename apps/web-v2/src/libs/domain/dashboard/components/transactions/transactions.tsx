@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 import {
   Badge,
   Box,
@@ -19,96 +20,12 @@ import {
 } from 'react-icons/md';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
-import { riskColor, statusColor } from '@/libs/utils/utils';
+import { statusColor } from '@/libs/utils/utils';
 import { DataTable } from '@/ui/components/common/organisms/data-table';
 import { CollapsibleBodyProps } from '@/ui/components/common/organisms/data-table/data-table.model';
-import ExceptionDrawer from './drawer';
+import BatchDrawer from '@/libs/domain/auto-hold/components/batch-drawer/batch-drawer';
 
 const columnHelper = createColumnHelper<MerchantTransaction>();
-
-const columns = [
-  columnHelper.accessor('score', {
-    header: () => 'Score',
-    cell: (info) => (
-      <Badge
-        colorPalette={riskColor(info.getValue())}
-        borderRadius="full"
-        px={2}
-        py={1}
-      >
-        {info.getValue()}
-      </Badge>
-    ),
-    enableSorting: true,
-  }),
-  columnHelper.accessor('merchant', {
-    header: () => 'Merchant',
-    enableSorting: true,
-  }),
-  columnHelper.accessor('amount', {
-    header: () => 'Amount',
-    enableSorting: true,
-  }),
-  columnHelper.accessor('exception', {
-    header: () => 'Exception',
-    enableSorting: true,
-  }),
-  columnHelper.accessor('processor', {
-    header: () => 'Processor',
-    enableSorting: true,
-  }),
-  columnHelper.accessor('mid', {
-    header: () => 'MID',
-    enableSorting: true,
-  }),
-  columnHelper.accessor('date', {
-    header: () => 'Date',
-    enableSorting: true,
-  }),
-  columnHelper.accessor('status', {
-    header: () => 'Status',
-    cell: (info) => (
-      <Badge
-        colorPalette={statusColor[info.getValue()]}
-        variant="subtle"
-        px={3}
-        py={1}
-        borderRadius="md"
-      >
-        {info.getValue()}
-      </Badge>
-    ),
-
-    enableSorting: true,
-  }),
-  columnHelper.display({
-    id: 'actions',
-    header: () => 'Actions',
-    cell: (props) => (
-      <HStack justify="center" gap={2}>
-        <ExceptionDrawer tx={props.row.original}>
-          <Button
-            size="sm"
-            variant="outline"
-            colorScheme="gray"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <MdOutlineRemoveRedEye />
-            View
-          </Button>
-        </ExceptionDrawer>
-        <Button size="sm" bg="black" color="white" _hover={{ bg: 'gray.800' }}>
-          <MdCheck size={14} />
-          Review
-        </Button>
-        <Button size="sm" colorPalette="red">
-          <Ban size={14} />
-          Divert
-        </Button>
-      </HStack>
-    ),
-  }),
-] as ColumnDef<MerchantTransaction>[];
 
 function CollapsibleContent(props: CollapsibleBodyProps<MerchantTransaction>) {
   return (
@@ -166,26 +83,6 @@ function CollapsibleContent(props: CollapsibleBodyProps<MerchantTransaction>) {
           </Text>
           <Text fontWeight="bold">GTS Inc.</Text>
         </VStack>
-
-        <VStack align="start" gap={1}>
-          <Text fontWeight="normal" color="gray.500">
-            Risk Score
-          </Text>
-          <HStack>
-            <Badge
-              colorPalette="red"
-              borderRadius="full"
-              px={2}
-              py={1}
-              fontSize="sm"
-            >
-              85
-            </Badge>
-            <Text color="red.500" fontWeight="bold">
-              High Risk
-            </Text>
-          </HStack>
-        </VStack>
       </SimpleGrid>
 
       {/* Risk Assessment */}
@@ -220,7 +117,6 @@ export default function CustomTable() {
   const transactions: MerchantTransaction[] = [
     {
       id: '1',
-      score: 85,
       merchant: 'Global Tech Solutions',
       amount: '$12,500.00',
       exception: 'High-risk country, Unusual amount',
@@ -228,12 +124,11 @@ export default function CustomTable() {
       mid: '8675309001',
       date: 'Apr 8, 9:15 AM',
       status: 'Unreviewed',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: '2025-04-08T09:15:00.000Z',
+      updatedAt: '2025-04-08T09:15:00.000Z',
     },
     {
       id: '2',
-      score: 65,
       merchant: 'Oceanview Logistics',
       amount: '$8,750.50',
       exception: 'New merchant, Pattern match anomaly',
@@ -241,12 +136,11 @@ export default function CustomTable() {
       mid: '8675309002',
       date: 'Apr 8, 10:23 AM',
       status: 'In Progress',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: '2025-04-08T10:23:00.000Z',
+      updatedAt: '2025-04-08T10:23:00.000Z',
     },
     {
       id: '3',
-      score: 35,
       merchant: 'Sunshine Pharmacy',
       amount: '$456.78',
       exception: 'Frequency anomaly',
@@ -254,12 +148,11 @@ export default function CustomTable() {
       mid: '8675309003',
       date: 'Apr 8, 11:05 AM',
       status: 'Unreviewed',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: '2025-04-08T11:05:00.000Z',
+      updatedAt: '2025-04-08T11:05:00.000Z',
     },
     {
       id: '4',
-      score: 92,
       merchant: 'Digital Assets Exchange',
       amount: '$25,000.00',
       exception: 'High-risk merchant category, ...',
@@ -267,12 +160,11 @@ export default function CustomTable() {
       mid: '8675309004',
       date: 'Apr 8, 8:45 AM',
       status: 'Unreviewed',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: '2025-04-08T08:45:00.000Z',
+      updatedAt: '2025-04-08T08:45:00.000Z',
     },
     {
       id: '5',
-      score: 15,
       merchant: 'City Supermarket',
       amount: '$125.45',
       exception: 'Manual review flag',
@@ -280,12 +172,11 @@ export default function CustomTable() {
       mid: '8675309005',
       date: 'Apr 8, 2:30 PM',
       status: 'Reviewed',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: '2025-04-08T14:30:00.000Z',
+      updatedAt: '2025-04-08T14:30:00.000Z',
     },
     {
       id: '6',
-      score: 78,
       merchant: 'QuickWire Transfers',
       amount: '$3,500.00',
       exception: 'High-risk country, Pattern match',
@@ -293,12 +184,11 @@ export default function CustomTable() {
       mid: '8675309006',
       date: 'Apr 8, 12:15 PM',
       status: 'Unreviewed',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: '2025-04-08T12:15:00.000Z',
+      updatedAt: '2025-04-08T12:15:00.000Z',
     },
     {
       id: '7',
-      score: 45,
       merchant: 'Business Equipment Pro',
       amount: '$6,789.99',
       exception: 'Unusual amount for merchant',
@@ -306,12 +196,11 @@ export default function CustomTable() {
       mid: '8675309007',
       date: 'Apr 8, 9:50 AM',
       status: 'In Progress',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: '2025-04-08T09:50:00.000Z',
+      updatedAt: '2025-04-08T09:50:00.000Z',
     },
     {
       id: '8',
-      score: 88,
       merchant: 'Luxury Boutique',
       amount: '$15,750.00',
       exception: 'Unusual amount, New merchant',
@@ -319,12 +208,11 @@ export default function CustomTable() {
       mid: '8675309008',
       date: 'Apr 8, 1:20 PM',
       status: 'Unreviewed',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: '2025-04-08T13:20:00.000Z',
+      updatedAt: '2025-04-08T13:20:00.000Z',
     },
     {
       id: '9',
-      score: 25,
       merchant: 'Downtown Hotel',
       amount: '$1,250.00',
       exception: 'Frequency anomaly',
@@ -332,12 +220,11 @@ export default function CustomTable() {
       mid: '8675309009',
       date: 'Apr 8, 3:10 PM',
       status: 'Reviewed',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: '2025-04-08T15:10:00.000Z',
+      updatedAt: '2025-04-08T15:10:00.000Z',
     },
     {
       id: '10',
-      score: 72,
       merchant: 'Global Shipping Co',
       amount: '$4,325.50',
       exception: 'High-risk country, Pattern match',
@@ -345,10 +232,83 @@ export default function CustomTable() {
       mid: '8675309010',
       date: 'Apr 8, 10:45 AM',
       status: 'Unreviewed',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: '2025-04-08T10:45:00.000Z',
+      updatedAt: '2025-04-08T10:45:00.000Z',
     },
   ];
+
+  // Define columns inside the component to access transactions
+  const columns = React.useMemo(() => [
+    columnHelper.accessor('merchant', {
+      header: () => 'Merchant',
+      enableSorting: true,
+    }),
+    columnHelper.accessor('amount', {
+      header: () => 'Amount',
+      enableSorting: true,
+    }),
+    columnHelper.accessor('exception', {
+      header: () => 'Exception',
+      enableSorting: true,
+    }),
+    columnHelper.accessor('processor', {
+      header: () => 'Processor',
+      enableSorting: true,
+    }),
+    columnHelper.accessor('mid', {
+      header: () => 'MID',
+      enableSorting: true,
+    }),
+    columnHelper.accessor('date', {
+      header: () => 'Date',
+      enableSorting: true,
+    }),
+    columnHelper.accessor('status', {
+      header: () => 'Status',
+      cell: (info) => (
+        <Badge
+          colorPalette={statusColor[info.getValue()]}
+          variant="subtle"
+          px={3}
+          py={1}
+          borderRadius="md"
+        >
+          {info.getValue()}
+        </Badge>
+      ),
+      enableSorting: true,
+    }),
+    columnHelper.display({
+      id: 'actions',
+      header: () => 'Actions',
+      cell: (props) => {
+        // Group transactions by batch (using merchant + date as batch identifier)
+        const batchId = `${props.row.original.merchant}-${props.row.original.date}`;
+        const batchTransactions = transactions.filter(
+          (tx) => `${tx.merchant}-${tx.date}` === batchId
+        );
+
+        return (
+          <HStack justify="center" gap={2}>
+            <BatchDrawer
+              batch={batchTransactions}
+              trigger={
+                <Button
+                  size="sm"
+                  variant="outline"
+                  colorScheme="gray"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <MdOutlineRemoveRedEye />
+                  View Batch
+                </Button>
+              }
+            />
+          </HStack>
+        );
+      },
+    }),
+  ] as ColumnDef<MerchantTransaction>[], [transactions]);
 
   const frameworks = createListCollection({
     items: [
@@ -374,7 +334,6 @@ export default function CustomTable() {
       {/* <Table.Root size="sm" variant="outline">
         <Table.Header>
           <Table.Row>
-            <Table.ColumnHeader>Score</Table.ColumnHeader>
             <Table.ColumnHeader>Merchant</Table.ColumnHeader>
             <Table.ColumnHeader>Amount</Table.ColumnHeader>
             <Table.ColumnHeader>Exception</Table.ColumnHeader>

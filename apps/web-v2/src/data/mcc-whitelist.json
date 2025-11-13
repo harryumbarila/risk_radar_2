@@ -1,0 +1,43 @@
+[
+  {
+    "mcc": "1234",
+    "description": "Restaurants",
+    "processor": "TSYS",
+    "risk_level": "High",
+    "whitelist": ["R001", "R004"],
+    "last_updated": "2025-11-11"
+  },
+  {
+    "mcc": "5411",
+    "description": "Grocery Stores, Supermarkets",
+    "processor": "Fluidpay",
+    "risk_level": "Medium",
+    "whitelist": ["R002"],
+    "last_updated": "2025-11-10"
+  },
+  {
+    "mcc": "5812",
+    "description": "Eating Places, Restaurants",
+    "processor": "Paya",
+    "risk_level": "Low",
+    "whitelist": [],
+    "last_updated": "2025-11-09"
+  },
+  {
+    "mcc": "5999",
+    "description": "Miscellaneous and Specialty Retail Stores",
+    "processor": "TSYS",
+    "risk_level": "High",
+    "whitelist": ["R001", "R003", "R006"],
+    "last_updated": "2025-11-11"
+  },
+  {
+    "mcc": "5541",
+    "description": "Service Stations (with or without ancillary services)",
+    "processor": "Internal",
+    "risk_level": "Medium",
+    "whitelist": ["R005"],
+    "last_updated": "2025-11-08"
+  }
+]
+

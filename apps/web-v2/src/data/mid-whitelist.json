@@ -1,0 +1,105 @@
+[
+  {
+    "mid": "8675309001",
+    "merchant": "Global Tech Solutions",
+    "processor": "TSYS",
+    "risk_level": "High",
+    "whitelist": ["R001", "R004"],
+    "thresholds": {
+      "monthly_volume": 50000,
+      "decline_percent": 12,
+      "high_ticket": 2000,
+      "transaction_count": 1000,
+      "keyed_percent": 15
+    },
+    "inherit_from_mcc": false,
+    "last_updated": "2025-11-12",
+    "last_updated_by": "Admin User"
+  },
+  {
+    "mid": "1234567890",
+    "merchant": "Premium Retail Corp",
+    "processor": "Fluidpay",
+    "risk_level": "Medium",
+    "whitelist": ["R002"],
+    "thresholds": {
+      "monthly_volume": 30000,
+      "decline_percent": 8,
+      "high_ticket": 1500,
+      "transaction_count": 800,
+      "keyed_percent": 10
+    },
+    "inherit_from_mcc": true,
+    "last_updated": "2025-11-11",
+    "last_updated_by": "Risk Analyst"
+  },
+  {
+    "mid": "9876543210",
+    "merchant": "Secure Payment Systems",
+    "processor": "Paya",
+    "risk_level": "Low",
+    "whitelist": [],
+    "thresholds": {
+      "monthly_volume": 20000,
+      "decline_percent": 5,
+      "high_ticket": 1000,
+      "transaction_count": 500,
+      "keyed_percent": 8
+    },
+    "inherit_from_mcc": false,
+    "last_updated": "2025-11-10",
+    "last_updated_by": "System"
+  },
+  {
+    "mid": "5551234567",
+    "merchant": "Digital Commerce Inc",
+    "processor": "TSYS",
+    "risk_level": "High",
+    "whitelist": ["R001", "R003", "R006"],
+    "thresholds": {
+      "monthly_volume": 75000,
+      "decline_percent": 15,
+      "high_ticket": 3000,
+      "transaction_count": 1500,
+      "keyed_percent": 20
+    },
+    "inherit_from_mcc": false,
+    "last_updated": "2025-11-12",
+    "last_updated_by": "Admin User"
+  },
+  {
+    "mid": "4445556666",
+    "merchant": "Enterprise Services LLC",
+    "processor": "Internal",
+    "risk_level": "Medium",
+    "whitelist": ["R005"],
+    "thresholds": {
+      "monthly_volume": 40000,
+      "decline_percent": 10,
+      "high_ticket": 1800,
+      "transaction_count": 900,
+      "keyed_percent": 12
+    },
+    "inherit_from_mcc": true,
+    "last_updated": "2025-11-09",
+    "last_updated_by": "Risk Analyst"
+  },
+  {
+    "mid": "3332221111",
+    "merchant": "Merchant Solutions Group",
+    "processor": "Fluidpay",
+    "risk_level": "Low",
+    "whitelist": ["R007"],
+    "thresholds": {
+      "monthly_volume": 25000,
+      "decline_percent": 6,
+      "high_ticket": 1200,
+      "transaction_count": 600,
+      "keyed_percent": 9
+    },
+    "inherit_from_mcc": false,
+    "last_updated": "2025-11-08",
+    "last_updated_by": "System"
+  }
+]
+

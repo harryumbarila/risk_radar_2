@@ -1,11 +1,9 @@
 import { defineConfig, globalIgnores } from 'eslint/config';
-import nextVitals from 'eslint-config-next/core-web-vitals';
-import nextTs from 'eslint-config-next/typescript';
 import typescriptParser from '@typescript-eslint/parser';
+import typescriptPlugin from '@typescript-eslint/eslint-plugin';
+import reactHooksPlugin from 'eslint-plugin-react-hooks';
 
 const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:
@@ -31,6 +29,9 @@ const eslintConfig = defineConfig([
   // React Hooks configuration
   {
     files: ['**/*.tsx', '**/*.jsx'],
+    plugins: {
+      'react-hooks': reactHooksPlugin,
+    },
     rules: {
       'react-hooks/exhaustive-deps': 'warn',
       'react-hooks/rules-of-hooks': 'error',
@@ -39,6 +40,9 @@ const eslintConfig = defineConfig([
   },
   {
     files: ['**/*.ts', '**/*.tsx'],
+    plugins: {
+      '@typescript-eslint': typescriptPlugin,
+    },
     languageOptions: {
       parser: typescriptParser,
       parserOptions: {

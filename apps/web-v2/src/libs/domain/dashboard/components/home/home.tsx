@@ -1,411 +1,302 @@
 'use client';
 import React from 'react';
-import { Box, VStack, SimpleGrid, Grid, HStack, Text } from '@chakra-ui/react';
+import { Box, VStack, SimpleGrid, HStack, Button, Skeleton, Text } from '@chakra-ui/react';
+import { useRouter } from 'next/navigation';
 import {
-  MdAttachMoney,
-  MdPerson,
-  MdPersonAdd,
-  MdShoppingCart,
-} from 'react-icons/md';
-import {
-  CustomAreaChart,
-  CustomBarChart,
-  CustomDonutChart,
-  CustomSparkline,
-  StatCard,
-} from '@/ui/components/common/atoms';
-import CustomTable from '../transactions/transactions';
+  User,
+  AlertTriangle,
+  TrendingUp,
+  ShoppingCart,
+  Clock,
+  DollarSign,
+} from 'lucide-react';
+import FilterBar, { type FilterState } from '../filter-bar/filter-bar';
+import KpiCard from '../kpi-card/kpi-card';
+import TrendChart from '../charts/trend-chart';
+import TopRulesChart from '../charts/top-rules-chart';
+import SourceDistributionChart from '../charts/source-distribution-chart';
+import HeatmapChart from '../charts/heatmap-chart';
+import MerchantRanking from '../charts/merchant-ranking';
+import RuleLabel from '../rule-label/rule-label';
+import { generateMockAlerts, calculateKpis, type MockAlert, type Source } from '../../utils/mockData';
 
 export default function Home() {
-  const projects = [
-    {
-      name: 'Purity UI Version',
-      members: 5,
-      budget: '$14,000',
-      completion: 60,
-      color: '#805AD5',
-    },
-    {
-      name: 'Add Progress Track',
-      members: 2,
-      budget: '$3,000',
-      completion: 10,
-      color: '#3182CE',
-    },
-    {
-      name: 'Fix Platform Errors',
-      members: 1,
-      budget: '$0',
-      completion: 100,
-      color: '#E53E3E',
-    },
-  ];
+  const router = useRouter();
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [allAlerts, setAllAlerts] = React.useState<MockAlert[]>([]);
+  const [filters, setFilters] = React.useState<FilterState>({
+    dateRange: '7',
+    riskLevel: 'all',
+    source: 'all',
+    ruleId: 'all',
+  });
 
-  const orders = [
-    {
-      title: '$2400, Design changes',
-      time: '22 DEC 7:20 PM',
-      icon: '🔔',
-      color: '#22C55E',
-    },
-    {
-      title: 'New order #4219423',
-      time: '21 DEC 11:21 PM',
-      icon: '🛒',
-      color: '#EAB308',
-    },
-    {
-      title: 'Server Payments for April',
-      time: '21 DEC 9:28 PM',
-      icon: '🛒',
-      color: '#3B82F6',
-    },
-  ];
+  // Generate mock data on mount
+  React.useEffect(() => {
+    setIsLoading(true);
+    // Simulate loading
+    setTimeout(() => {
+      const alerts = generateMockAlerts(2500);
+      setAllAlerts(alerts);
+      setIsLoading(false);
+    }, 500);
+  }, []);
+
+  // Filter alerts based on current filters
+  const filteredAlerts = React.useMemo(() => {
+    let filtered = [...allAlerts];
+
+    // Date range filter
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    if (filters.dateRange === 'custom') {
+      if (filters.customStartDate && filters.customEndDate) {
+        const startDate = new Date(filters.customStartDate);
+        startDate.setHours(0, 0, 0, 0);
+        const endDate = new Date(filters.customEndDate);
+        endDate.setHours(23, 59, 59, 999);
+        filtered = filtered.filter(
+          (a) => {
+            const alertDate = new Date(a.date);
+            return alertDate >= startDate && alertDate <= endDate;
+          }
+        );
+      }
+    } else {
+      const days = parseInt(filters.dateRange);
+      if (!isNaN(days) && days > 0) {
+        // Calculate start date: today minus (days-1) to include today in the range
+        // For "Last 7 days": today (0) + 6 previous days = 7 days total
+        const startDate = new Date(today);
+        startDate.setDate(today.getDate() - (days - 1));
+        startDate.setHours(0, 0, 0, 0);
+        
+        // End date: end of today
+        const endDate = new Date(today);
+        endDate.setHours(23, 59, 59, 999);
+        
+        filtered = filtered.filter((a) => {
+          const alertDate = new Date(a.date);
+          return alertDate >= startDate && alertDate <= endDate;
+        });
+      }
+    }
+
+    // Risk level filter
+    if (filters.riskLevel !== 'all') {
+      filtered = filtered.filter((a) => a.risk === filters.riskLevel);
+    }
+
+    // Source filter
+    if (filters.source !== 'all') {
+      filtered = filtered.filter((a) => a.source === filters.source);
+    }
+
+    // Rule filter
+    if (filters.ruleId !== 'all') {
+      filtered = filtered.filter((a) => a.ruleId === filters.ruleId);
+    }
+
+    // Week filter (from chart click)
+    if (filters.week !== undefined) {
+      const weekStart = new Date(now);
+      weekStart.setDate(now.getDate() - now.getDay() - filters.week * 7);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 7);
+      filtered = filtered.filter(
+        (a) => {
+          const alertDate = new Date(a.date);
+          return alertDate >= weekStart && alertDate < weekEnd;
+        }
+      );
+    }
+
+    // Hour range filter (from heatmap click)
+    if (filters.hourRange) {
+      filtered = filtered.filter(
+        (a) => {
+          const alertDate = new Date(a.date);
+          return alertDate.getDay() === filters.hourRange!.day && a.hour === filters.hourRange!.hour;
+        }
+      );
+    }
+
+    return filtered;
+  }, [allAlerts, filters]);
+
+  // Calculate KPIs
+  const kpis = React.useMemo(() => {
+    if (filteredAlerts.length === 0) {
+      return {
+        merchantsAtRiskToday: 0,
+        autoHoldToday: 0,
+        weeklyChangePct: 0,
+        topRule: { ruleId: 'AH001', count: 0 },
+        avgResolutionHours: 0,
+        chargebacks30d: 0,
+      };
+    }
+    return calculateKpis(filteredAlerts);
+  }, [filteredAlerts]);
+
+  // Get available rules for filter
+  const availableRules = React.useMemo(() => {
+    const rules = new Set(allAlerts.map((a) => a.ruleId));
+    return Array.from(rules).sort();
+  }, [allAlerts]);
+
+
+  const handleWeekClick = (week: number) => {
+    setFilters((prev) => ({ ...prev, week }));
+  };
+
+  const handleRuleClick = (ruleId: string) => {
+    setFilters((prev) => ({ ...prev, ruleId }));
+  };
+
+  const handleSourceClick = (source: Source) => {
+    setFilters((prev) => ({ ...prev, source }));
+  };
+
+  const handleHeatmapClick = (day: number, hour: number) => {
+    setFilters((prev) => ({ ...prev, hourRange: { day, hour } }));
+  };
+
+  const handleMerchantClick = (merchantId: string) => {
+    // Navigate to auto-hold with merchant filter
+    router.push(`/auto-hold?merchantId=${merchantId}`);
+  };
+
+  const handleViewAutoHold = () => {
+    // Build query params from filters
+    const params = new URLSearchParams();
+    if (filters.riskLevel !== 'all') params.set('risk', filters.riskLevel);
+    if (filters.source !== 'all') params.set('source', filters.source);
+    if (filters.ruleId !== 'all') params.set('rule', filters.ruleId);
+    router.push(`/auto-hold?${params.toString()}`);
+  };
+
+  const handleManageRules = () => {
+    router.push('/risk-rules');
+  };
+
+  if (isLoading) {
+    return (
+      <Box>
+        <VStack gap={6} align="stretch">
+          <Skeleton height="200px" />
+          <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap={6}>
+            {Array(6).fill(0).map((_, i) => (
+              <Skeleton key={i} height="150px" />
+            ))}
+          </SimpleGrid>
+        </VStack>
+      </Box>
+    );
+  }
 
   return (
     <Box>
-      <VStack gap={6} align="stretch">
-        {/* Stats Row */}
-        <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} gap={6}>
-          <StatCard
-            label="Today's Money"
-            value="$53,000"
-            change="+55%"
-            icon={<MdAttachMoney size={24} color="white" />}
+      <VStack align="stretch" gap={6}>
+        {/* Header with CTAs */}
+        <HStack justify="flex-end" align="center">
+          <HStack gap={3}>
+            <Button colorPalette="blue" onClick={handleViewAutoHold}>
+              View Auto Hold Cases
+            </Button>
+            <Button variant="outline" onClick={handleManageRules}>
+              Manage Rules
+            </Button>
+          </HStack>
+        </HStack>
+
+        {/* Filter Bar */}
+        <FilterBar
+          filters={filters}
+          onFiltersChange={setFilters}
+          availableRules={availableRules}
+        />
+
+        {/* KPI Cards */}
+        <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap={6} role="region" aria-label="Key Performance Indicators">
+          <KpiCard
+            label="Merchants at Risk (today)"
+            value={kpis.merchantsAtRiskToday}
+            change={kpis.weeklyChangePct}
+            color="red"
+            icon={<User size={24} />}
+            tooltip="Number of unique merchants that have triggered risk alerts today. This metric helps identify merchants requiring immediate attention."
           />
-          <StatCard
-            label="Today's Users"
-            value="2,300"
-            change="+5%"
-            icon={<MdPerson size={24} color="white" />}
+          <KpiCard
+            label="Transactions in Auto Hold (today)"
+            value={kpis.autoHoldToday}
+            change={kpis.weeklyChangePct}
+            color="orange"
+            icon={<AlertTriangle size={24} />}
+            tooltip="Total number of transactions that have been automatically placed on hold today due to risk rules. These require manual review."
           />
-          <StatCard
-            label="New Clients"
-            value="+3,020"
-            change="+14%"
-            icon={<MdPersonAdd size={24} color="white" />}
+          <KpiCard
+            label="Weekly Alert Change %"
+            value={`${kpis.weeklyChangePct >= 0 ? '+' : ''}${kpis.weeklyChangePct.toFixed(1)}%`}
+            change={kpis.weeklyChangePct}
+            color="blue"
+            icon={<TrendingUp size={24} />}
+            tooltip="Percentage change in total alerts compared to the previous week. Positive values indicate an increase, negative values indicate a decrease."
           />
-          <StatCard
-            label="Total Sales"
-            value="$173,000"
-            change="+8%"
-            icon={<MdShoppingCart size={24} color="white" />}
+          <KpiCard
+            label="Top Triggered Rule"
+            value={
+              <HStack gap={2} align="center">
+                <RuleLabel ruleId={kpis.topRule.ruleId} fontSize="2xl" fontWeight="bold" />
+                <Text fontSize="2xl" fontWeight="bold" color="gray.900">
+                  ({kpis.topRule.count})
+                </Text>
+              </HStack>
+            }
+            color="purple"
+            icon={<ShoppingCart size={24} />}
+            tooltip="The risk rule that has been triggered most frequently. Hover over the rule code to see its full name."
+          />
+          <KpiCard
+            label="Avg Resolution Time"
+            value={`${kpis.avgResolutionHours.toFixed(1)}h`}
+            color="teal"
+            icon={<Clock size={24} />}
+            tooltip="Average time taken to review and resolve alerts, measured in hours. Lower values indicate faster response times."
+          />
+          <KpiCard
+            label="Chargebacks (last 30 days)"
+            value={kpis.chargebacks30d}
+            color="red"
+            icon={<DollarSign size={24} />}
+            tooltip="Total number of chargebacks received in the last 30 days. Chargebacks represent disputed transactions that require investigation."
           />
         </SimpleGrid>
 
-        {/* Featured Cards Row */}
-        <SimpleGrid columns={{ base: 1, lg: 2 }} gap={6}>
-          {/* Chakra Card */}
-          <Box bg="white" p={6} borderRadius="xl" boxShadow="sm">
-            <VStack align="start" gap={3}>
-              <Text fontSize="xs" color="gray.500" fontWeight="medium">
-                title
-              </Text>
-              <Text fontSize="xl" fontWeight="bold">
-                UI Dashboard
-              </Text>
-              <Text fontSize="sm" color="gray.600">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                Tempora nihil distinctio ea.
-              </Text>
-              <SimpleGrid columns={2} gap={2}>
-                <CustomSparkline
-                  data={[
-                    { date: '2023-01', value: 145.43 },
-                    { date: '2023-02', value: -151.73 },
-                    { date: '2023-03', value: 157.65 },
-                    { date: '2023-04', value: 169.68 },
-                    { date: '2023-05', value: 173.75 },
-                    { date: '2023-06', value: 186.68 },
-                    { date: '2023-07', value: 181.99 },
-                    { date: '2023-08', value: 189.46 },
-                  ]}
-                />
-                <CustomSparkline
-                  data={[
-                    { date: '2023-01', value: 145.43 },
-                    { date: '2023-02', value: 151.73 },
-                    { date: '2023-03', value: 157.65 },
-                    { date: '2023-04', value: 169.68 },
-                    { date: '2023-05', value: 173.75 },
-                    { date: '2023-06', value: 186.68 },
-                    { date: '2023-07', value: 181.99 },
-                    { date: '2023-08', value: -189.46 },
-                  ]}
-                />
-                <CustomSparkline
-                  data={[
-                    { date: '2023-01', value: -145.43 },
-                    { date: '2023-02', value: 151.73 },
-                    { date: '2023-03', value: -157.65 },
-                    { date: '2023-04', value: 169.68 },
-                    { date: '2023-05', value: 173.75 },
-                    { date: '2023-06', value: 186.68 },
-                    { date: '2023-07', value: -181.99 },
-                    { date: '2023-08', value: 189.46 },
-                  ]}
-                />
-                <CustomSparkline
-                  data={[
-                    { date: '2023-01', value: 145.43 },
-                    { date: '2023-02', value: 151.73 },
-                    { date: '2023-03', value: 157.65 },
-                    { date: '2023-04', value: 169.68 },
-                    { date: '2023-05', value: 173.75 },
-                    { date: '2023-06', value: 186.68 },
-                    { date: '2023-07', value: 181.99 },
-                    { date: '2023-08', value: 189.46 },
-                  ]}
-                />
+        {/* Separator */}
+        <Box borderTop="1px" borderColor="gray.200" mt={2} pt={4} />
+
+        {/* Charts Row 1: Trend and Top Rules */}
+        <SimpleGrid columns={{ base: 1, lg: 2 }} gap={6} role="region" aria-label="Risk Analysis Charts">
+          <TrendChart alerts={filteredAlerts} onWeekClick={handleWeekClick} />
+          <TopRulesChart alerts={filteredAlerts} onRuleClick={handleRuleClick} />
               </SimpleGrid>
-            </VStack>
-          </Box>
 
-          {/* Work Card */}
-          <Box
-            bg="white"
-            p={6}
-            borderRadius="xl"
-            boxShadow="sm"
-            position="relative"
-            overflow="hidden"
-            h="430px"
-          >
-            <Text fontSize="xl" fontWeight="bold">
-              UI Dashboard
-            </Text>
-            <CustomAreaChart />
-          </Box>
+        {/* Charts Row 2: Source Distribution and Heatmap */}
+        <SimpleGrid columns={{ base: 1, lg: 2 }} gap={6}>
+          <SourceDistributionChart
+            alerts={filteredAlerts}
+            onSourceClick={handleSourceClick}
+          />
+          <HeatmapChart alerts={filteredAlerts} onCellClick={handleHeatmapClick} />
         </SimpleGrid>
 
-        {/* Charts Row */}
-        <Grid templateColumns={{ base: '1fr', lg: '1fr 1.5fr' }} gap={6}>
-          {/* Active Users */}
-          <Box bg="white" p={6} borderRadius="xl" boxShadow="sm">
-            <VStack align="start" gap={4} mb={4}>
-              <Text fontSize="sm" fontWeight="bold">
-                Active Users
-              </Text>
-              <CustomDonutChart />
-              <HStack>
-                <Text fontSize="sm" fontWeight="bold" color="green.500">
-                  +23%
-                </Text>
-                <Text fontSize="sm" color="gray.500">
-                  than last week
-                </Text>
-              </HStack>
-            </VStack>
-            {/* <BarChart /> */}
-
-            {/* Metrics */}
-            <SimpleGrid columns={4} gap={4} mt={6}>
-              <VStack align="start" gap={1}>
-                <HStack gap={2}>
-                  <Box w="8px" h="8px" bg="brand.400" borderRadius="full" />
-                  <Text fontSize="xs" color="gray.500">
-                    Users
-                  </Text>
-                </HStack>
-                <Text fontWeight="bold">32,984</Text>
-              </VStack>
-              <VStack align="start" gap={1}>
-                <HStack gap={2}>
-                  <Box w="8px" h="8px" bg="#2C7A7B" borderRadius="full" />
-                  <Text fontSize="xs" color="gray.500">
-                    Clicks
-                  </Text>
-                </HStack>
-                <Text fontWeight="bold">2.42m</Text>
-              </VStack>
-              <VStack align="start" gap={1}>
-                <HStack gap={2}>
-                  <Box w="8px" h="8px" bg="#319795" borderRadius="full" />
-                  <Text fontSize="xs" color="gray.500">
-                    Sales
-                  </Text>
-                </HStack>
-                <Text fontWeight="bold">2,400$</Text>
-              </VStack>
-              <VStack align="start" gap={1}>
-                <HStack gap={2}>
-                  <Box w="8px" h="8px" bg="#38B2AC" borderRadius="full" />
-                  <Text fontSize="xs" color="gray.500">
-                    Items
-                  </Text>
-                </HStack>
-                <Text fontWeight="bold">320</Text>
-              </VStack>
-            </SimpleGrid>
-          </Box>
-
-          {/* Sales Overview */}
-          <Box bg="white" p={6} borderRadius="xl" boxShadow="sm">
-            <VStack align="start" gap={4} mb={4}>
-              <Text fontSize="sm" fontWeight="bold">
-                Sales Overview
-              </Text>
-              <CustomBarChart />
-              <HStack>
-                <Text fontSize="sm" fontWeight="bold" color="green.500">
-                  5% more
-                </Text>
-                <Text fontSize="sm" color="gray.500">
-                  in 2021
-                </Text>
-              </HStack>
-            </VStack>
-            {/* <LineChart /> */}
-          </Box>
-        </Grid>
-
-        {/* Projects and Orders Row */}
-        <Grid templateColumns={{ base: '1fr', lg: '1.5fr 1fr' }} gap={6}>
-          {/* Projects Table */}
-          <Box bg="white" p={6} borderRadius="xl" boxShadow="sm">
-            <VStack align="start" gap={4} mb={6}>
-              <Text fontSize="sm" fontWeight="bold">
-                Projects
-              </Text>
-              <HStack>
-                <Box w="8px" h="8px" bg="brand.400" borderRadius="full" />
-                <Text fontSize="xs" fontWeight="bold" color="gray.500">
-                  30 done
-                </Text>
-                <Text fontSize="xs" color="gray.400">
-                  this month
-                </Text>
-              </HStack>
-            </VStack>
-
-            <VStack align="stretch" gap={4}>
-              {/* Table Header */}
-              <Grid
-                templateColumns="2fr 1fr 1fr 1fr"
-                gap={4}
-                pb={2}
-                borderBottom="1px"
-                borderColor="gray.100"
-              >
-                <Text fontSize="xs" fontWeight="bold" color="gray.500">
-                  COMPANIES
-                </Text>
-                <Text fontSize="xs" fontWeight="bold" color="gray.500">
-                  MEMBERS
-                </Text>
-                <Text fontSize="xs" fontWeight="bold" color="gray.500">
-                  BUDGET
-                </Text>
-                <Text fontSize="xs" fontWeight="bold" color="gray.500">
-                  COMPLETION
-                </Text>
-              </Grid>
-
-              {/* Table Rows */}
-              {projects.map((project, idx) => (
-                <Grid
-                  key={idx}
-                  templateColumns="2fr 1fr 1fr 1fr"
-                  gap={4}
-                  alignItems="center"
-                >
-                  <HStack gap={2}>
-                    <Box
-                      w="30px"
-                      h="30px"
-                      bg={project.color}
-                      borderRadius="md"
-                    />
-                    <Text fontSize="sm" fontWeight="medium">
-                      {project.name}
-                    </Text>
-                  </HStack>
-                  <HStack gap={-2}>
-                    {[...Array(Math.min(project.members, 3))].map((_, i) => (
-                      <Box
-                        key={i}
-                        w="32px"
-                        h="32px"
-                        borderRadius="full"
-                        bg="gray.300"
-                        border="2px solid white"
-                      />
-                    ))}
-                  </HStack>
-                  <Text fontSize="sm" fontWeight="bold">
-                    {project.budget}
-                  </Text>
-                  <VStack align="start" gap={1}>
-                    <Text fontSize="xs" color="brand.400" fontWeight="bold">
-                      {project.completion}%
-                    </Text>
-                    <Box
-                      w="full"
-                      bg="gray.200"
-                      h="6px"
-                      borderRadius="full"
-                      overflow="hidden"
-                    >
-                      <Box
-                        w={`${project.completion}%`}
-                        h="full"
-                        bg="brand.400"
-                        transition="width 0.3s"
-                      />
-                    </Box>
-                  </VStack>
-                </Grid>
-              ))}
-            </VStack>
-          </Box>
-
-          {/* Orders Overview */}
-          <Box bg="white" p={6} borderRadius="xl" boxShadow="sm">
-            <VStack align="start" gap={4} mb={6}>
-              <Text fontSize="sm" fontWeight="bold">
-                Orders Overview
-              </Text>
-              <HStack>
-                <Text fontSize="sm" fontWeight="bold" color="brand.400">
-                  +30%
-                </Text>
-                <Text fontSize="sm" color="gray.500">
-                  this month
-                </Text>
-              </HStack>
-            </VStack>
-
-            <VStack align="stretch" gap={6}>
-              {orders.map((order, idx) => (
-                <HStack key={idx} gap={4} align="start">
-                  <Box
-                    bg={order.color}
-                    w="35px"
-                    h="35px"
-                    borderRadius="lg"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    fontSize="lg"
-                  >
-                    {order.icon}
-                  </Box>
-                  <VStack align="start" gap={0} flex={1}>
-                    <Text fontSize="sm" fontWeight="bold">
-                      {order.title}
-                    </Text>
-                    <Text fontSize="xs" color="gray.500">
-                      {order.time}
-                    </Text>
-                  </VStack>
-                </HStack>
-              ))}
-            </VStack>
-          </Box>
-        </Grid>
-        <Box bg="white" p={6} borderRadius="xl" boxShadow="sm">
-          <CustomTable />
-        </Box>
+        {/* Merchant Ranking */}
+        <MerchantRanking
+          alerts={filteredAlerts}
+          onMerchantClick={handleMerchantClick}
+        />
       </VStack>
     </Box>
   );

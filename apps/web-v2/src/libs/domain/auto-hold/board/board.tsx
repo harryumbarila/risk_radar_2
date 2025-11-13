@@ -1,224 +1,104 @@
 'use client';
 import React from 'react';
-
-import {
-  Flex,
-  Heading,
-  Alert,
-  Text,
-  Stack,
-  SimpleGrid,
-  Card,
-  Button,
-  Box,
-} from '@chakra-ui/react';
-import { Chart, useChart } from '@chakra-ui/charts';
-import {
-  BarChart,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Bar,
-  Tooltip,
-  Legend,
-} from 'recharts';
-
-import { PaginationState } from '@tanstack/react-table';
-
-import { FormProvider, useForm } from 'react-hook-form';
-
-import { Toaster } from '@/ui/components/common/atoms';
-import { DataTable } from '@/ui/components/common/organisms/data-table';
-import { InputField } from '@/ui/components/form';
-
-import { $riskApi } from '@/libs/shared/api/risk.api';
-
-import { columnsBoards } from './board.model';
-
-const initialItemsPerPage = 50;
+import { Box, HStack, Button, Tabs, Text } from '@chakra-ui/react';
+import { UserCog, List } from 'lucide-react';
+import CustomTable from '@/libs/domain/dashboard/components/transactions/transactions';
+import ManagerQueueView from '../components/manager-queue-view/manager-queue-view';
+import { MerchantTransaction } from '@/data/interfaces/transaction';
 
 export default function AutoHoldBoardPage() {
-  const { data, isLoading, isError } = $riskApi.useSuspenseQuery(
-    'get',
-    '/v1/auto-hold-exception'
-  );
-  const methods = useForm();
-
-  const [{ pageIndex, pageSize }, setPagination] =
-    React.useState<PaginationState>({
-      pageIndex: 0,
-      pageSize: initialItemsPerPage,
+  const [viewMode, setViewMode] = React.useState<'analyst' | 'manager'>('analyst');
+  
+  // Mock: Group transactions into batches for manager view
+  // In real app, this would come from API or be shared state
+  const allBatches: MerchantTransaction[][] = React.useMemo(() => {
+    // Mock transactions grouped by batch (merchant + date)
+    const mockTransactions: MerchantTransaction[] = [
+      {
+        id: '1',
+        merchant: 'Global Tech Solutions',
+        amount: '$12,500.00',
+        exception: 'High-risk country, Unusual amount',
+        processor: 'TSYS',
+        mid: '8675309001',
+        date: 'Apr 8, 9:15 AM',
+        status: 'Unreviewed',
+        createdAt: '2025-04-08T09:15:00.000Z',
+        updatedAt: '2025-04-08T09:15:00.000Z',
+      },
+      {
+        id: '2',
+        merchant: 'Oceanview Logistics',
+        amount: '$8,750.50',
+        exception: 'New merchant, Pattern match anomaly',
+        processor: 'Fiserv',
+        mid: '8675309002',
+        date: 'Apr 8, 10:23 AM',
+        status: 'In Progress',
+        createdAt: '2025-04-08T10:23:00.000Z',
+        updatedAt: '2025-04-08T10:23:00.000Z',
+      },
+      {
+        id: '3',
+        merchant: 'Sunshine Pharmacy',
+        amount: '$456.78',
+        exception: 'Frequency anomaly',
+        processor: 'Worldpay',
+        mid: '8675309003',
+        date: 'Apr 8, 11:05 AM',
+        status: 'Unreviewed',
+        createdAt: '2025-04-08T11:05:00.000Z',
+        updatedAt: '2025-04-08T11:05:00.000Z',
+      },
+    ];
+    
+    // Group by merchant + date to create batches
+    const batchMap = new Map<string, MerchantTransaction[]>();
+    mockTransactions.forEach((tx) => {
+      const batchId = `${tx.merchant}-${tx.date}`;
+      if (!batchMap.has(batchId)) {
+        batchMap.set(batchId, []);
+      }
+      batchMap.get(batchId)!.push(tx);
     });
-
-  const chart = useChart({
-    data: [
-      { sales: 63000, month: 'June' },
-      { sales: 72000, month: 'July' },
-      { sales: 85000, month: 'August' },
-      { sales: 79000, month: 'September' },
-      { sales: 90000, month: 'October' },
-      { sales: 95000, month: 'November' },
-      { sales: 88000, month: 'December' },
-    ],
-    series: [{ name: 'sales', color: 'teal.solid' }],
-  });
+    
+    return Array.from(batchMap.values());
+  }, []);
 
   return (
-    <Flex flexDirection="column" gap={4}>
-      <Heading size="lg" color="brand.700">
-        Risk Auto Hold Summary
-      </Heading>
+    <Box>
+      <Box bg="white" p={6} borderRadius="xl" boxShadow="sm">
+        <Tabs.Root
+          value={viewMode}
+          onValueChange={(e) => setViewMode(e.value as 'analyst' | 'manager')}
+        >
+          <HStack justify="space-between" mb={6}>
+            <Tabs.List>
+              <Tabs.Trigger value="analyst">
+                <HStack gap={2}>
+                  <List size={16} />
+                  <Text>Analyst View</Text>
+                </HStack>
+              </Tabs.Trigger>
+              <Tabs.Trigger value="manager">
+                <HStack gap={2}>
+                  <UserCog size={16} />
+                  <Text>Manager Queue</Text>
+                </HStack>
+              </Tabs.Trigger>
+              <Tabs.Indicator />
+            </Tabs.List>
+          </HStack>
 
-      <Card.Root>
-        <Card.Body className="pt-6">
-          <SimpleGrid
-            columns={{
-              base: 1,
-              md: 3,
-            }}
-            gap={4}
-          >
-            <FormProvider {...methods}>
-              <Box>
-                <InputField type="date" label="Report From" name="startDate" />
-              </Box>
-              <Box>
-                <InputField type="date" label="Report To" name="endDate" />
-              </Box>
-              <Flex justifyContent="flex-end" alignItems="flex-end">
-                <Button type="button">Generate Report</Button>
-              </Flex>
-            </FormProvider>
-          </SimpleGrid>
-        </Card.Body>
-      </Card.Root>
+          <Tabs.Content value="analyst">
+            <CustomTable />
+          </Tabs.Content>
 
-      <SimpleGrid columns={{ base: 1, md: 2 }}>
-        <Stack>
-          <Text fontWeight="bold">
-            TSYS auth data auto hold rules effectiveness for Merchant count 4663
-          </Text>
-          <Chart.Root maxH="sm" chart={chart}>
-            <BarChart data={chart.data}>
-              <CartesianGrid
-                stroke={chart.color('border.muted')}
-                vertical={false}
-              />
-              <XAxis
-                axisLine={false}
-                tickLine={false}
-                dataKey={chart.key('month')}
-                tickFormatter={(value) => value.slice(0, 3)}
-              />
-              <YAxis
-                axisLine={false}
-                tickLine={false}
-                tickFormatter={chart.formatNumber({
-                  style: 'currency',
-                  currency: 'USD',
-                  notation: 'compact',
-                })}
-              />
-              <Tooltip
-                cursor={{ fill: chart.color('bg.muted') }}
-                animationDuration={0}
-                content={<Chart.Tooltip />}
-              />
-              <Legend
-                layout="vertical"
-                align="right"
-                verticalAlign="top"
-                wrapperStyle={{ paddingLeft: 30 }}
-                content={<Chart.Legend orientation="vertical" />}
-              />
-              {chart.series.map((item) => (
-                <Bar
-                  isAnimationActive={false}
-                  key={item.name}
-                  dataKey={chart.key(item.name)}
-                  fill={chart.color(item.color)}
-                />
-              ))}
-            </BarChart>
-          </Chart.Root>
-        </Stack>
-        <Stack>
-          <Text fontWeight="bold">
-            TSYS capture auto hold rules effectiveness for Merchant count 4663
-          </Text>
-          <Chart.Root maxH="sm" chart={chart}>
-            <BarChart data={chart.data}>
-              <CartesianGrid
-                stroke={chart.color('border.muted')}
-                vertical={false}
-              />
-              <XAxis
-                axisLine={false}
-                tickLine={false}
-                dataKey={chart.key('month')}
-                tickFormatter={(value) => value.slice(0, 3)}
-              />
-              <YAxis
-                axisLine={false}
-                tickLine={false}
-                tickFormatter={chart.formatNumber({
-                  style: 'currency',
-                  currency: 'USD',
-                  notation: 'compact',
-                })}
-              />
-              <Tooltip
-                cursor={{ fill: chart.color('bg.muted') }}
-                animationDuration={0}
-                content={<Chart.Tooltip />}
-              />
-              <Legend
-                layout="vertical"
-                align="right"
-                verticalAlign="top"
-                wrapperStyle={{ paddingLeft: 30 }}
-                content={<Chart.Legend orientation="vertical" />}
-              />
-              {chart.series.map((item) => (
-                <Bar
-                  isAnimationActive={false}
-                  key={item.name}
-                  dataKey={chart.key(item.name)}
-                  fill={chart.color(item.color)}
-                />
-              ))}
-            </BarChart>
-          </Chart.Root>
-        </Stack>
-      </SimpleGrid>
-      <Flex>
-        {data && data?.data.length > 0 ? (
-          <Flex gap={2} w="full">
-            <DataTable
-              isLoading={isLoading}
-              data={data}
-              columns={columnsBoards}
-              enablePagination
-              pagination={{ pageIndex, pageSize }}
-              onSetPagination={setPagination}
-              initialItemsPerPage={initialItemsPerPage}
-            />
-          </Flex>
-        ) : (
-          isError && (
-            <Alert.Root status="error">
-              <Alert.Indicator />
-              <Alert.Content>
-                <Alert.Title>Error</Alert.Title>
-                <Alert.Description>
-                  Error found. Try again later.
-                </Alert.Description>
-              </Alert.Content>
-            </Alert.Root>
-          )
-        )}
-        <Toaster />
-      </Flex>
-    </Flex>
+          <Tabs.Content value="manager">
+            <ManagerQueueView allBatches={allBatches} />
+          </Tabs.Content>
+        </Tabs.Root>
+      </Box>
+    </Box>
   );
 }

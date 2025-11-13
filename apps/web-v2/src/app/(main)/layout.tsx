@@ -1,21 +1,38 @@
+'use client';
 import React from 'react';
 
 import { AuthHeader, AuthSidebar } from '@/ui/components';
+import { SidebarProvider, useSidebar } from '@/ui/components/common/organisms/auth-sidebar/sidebar-context';
 import { Box } from '@chakra-ui/react';
+
+function MainContent({ children }: { children: React.ReactNode }) {
+  const { isCollapsed } = useSidebar();
+  const sidebarWidth = isCollapsed ? '80px' : '260px';
+
+  return (
+    <Box 
+      ml={{ base: 0, md: sidebarWidth }} 
+      pt="90px"
+      px={6}
+      pb={6}
+      transition="margin-left 0.3s ease"
+    >
+      {children}
+    </Box>
+  );
+}
 
 interface MainLayoutProps {
   children: React.ReactNode;
 }
 export default function MainLayout(props: MainLayoutProps): React.JSX.Element {
   return (
-    <Box bg="gray.subtle" minH="100vh">
-      <AuthHeader />
-      <AuthSidebar />
-      <Box ml={{ base: 0, md: '260px' }} p={10} mt={50}>
-        <Box bg="white" borderRadius="xl" boxShadow="md" p={4}>
-          {props.children}
-        </Box>
+    <SidebarProvider>
+      <Box bg="gray.subtle" minH="100vh">
+        <AuthHeader />
+        <AuthSidebar />
+        <MainContent>{props.children}</MainContent>
       </Box>
-    </Box>
+    </SidebarProvider>
   );
 }

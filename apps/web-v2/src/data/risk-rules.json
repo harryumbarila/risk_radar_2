@@ -1,0 +1,139 @@
+[
+  {
+    "id": "R001",
+    "name": "High Volume Spike",
+    "type": "Auto Hold",
+    "source": "TSYS",
+    "severity": "Critical",
+    "status": true,
+    "last_updated": "2025-11-08",
+    "description": "Detects unusual spikes in transaction volume that may indicate fraudulent activity or system anomalies.",
+    "created_by": "System",
+    "last_execution": "2025-11-10T14:30:00Z",
+    "parameters": {
+      "threshold": 0.8,
+      "window": "24h",
+      "min_transactions": 100
+    }
+  },
+  {
+    "id": "R002",
+    "name": "Foreign Card Activity",
+    "type": "Alert",
+    "source": "Fluidpay",
+    "severity": "Moderate",
+    "status": false,
+    "last_updated": "2025-11-07",
+    "description": "Monitors transactions from foreign cards and flags suspicious patterns based on geographic anomalies.",
+    "created_by": "Harry",
+    "last_execution": "2025-11-09T10:15:00Z",
+    "parameters": {
+      "threshold": 0.6,
+      "country_list": ["MX", "BR"],
+      "max_daily_attempts": 5
+    }
+  },
+  {
+    "id": "R003",
+    "name": "Rapid Sequential Transactions",
+    "type": "Auto Hold",
+    "source": "TSYS",
+    "severity": "Critical",
+    "status": true,
+    "last_updated": "2025-11-09",
+    "description": "Identifies multiple transactions from the same card within a short time window.",
+    "created_by": "System",
+    "last_execution": "2025-11-10T16:45:00Z",
+    "parameters": {
+      "threshold": 0.9,
+      "time_window": "5m",
+      "max_transactions": 3
+    }
+  },
+  {
+    "id": "R004",
+    "name": "Unusual Merchant Pattern",
+    "type": "Monitoring",
+    "source": "Internal",
+    "severity": "Info",
+    "status": true,
+    "last_updated": "2025-11-06",
+    "description": "Tracks merchant behavior patterns and flags deviations from normal operations.",
+    "created_by": "Admin",
+    "last_execution": "2025-11-10T12:00:00Z",
+    "parameters": {
+      "threshold": 0.5,
+      "lookback_days": 30,
+      "deviation_factor": 2.5
+    }
+  },
+  {
+    "id": "R005",
+    "name": "High Value Transaction",
+    "type": "Alert",
+    "source": "Paya",
+    "severity": "Moderate",
+    "status": true,
+    "last_updated": "2025-11-05",
+    "description": "Alerts on transactions exceeding predefined value thresholds.",
+    "created_by": "System",
+    "last_execution": "2025-11-10T08:20:00Z",
+    "parameters": {
+      "threshold": 0.7,
+      "max_amount": 10000,
+      "currency": "USD"
+    }
+  },
+  {
+    "id": "R006",
+    "name": "Card Velocity Check",
+    "type": "Auto Hold",
+    "source": "TSYS",
+    "severity": "Critical",
+    "status": true,
+    "last_updated": "2025-11-10",
+    "description": "Monitors the frequency of card usage across different merchants and locations.",
+    "created_by": "System",
+    "last_execution": "2025-11-10T18:00:00Z",
+    "parameters": {
+      "threshold": 0.85,
+      "max_merchants": 5,
+      "time_window": "1h"
+    }
+  },
+  {
+    "id": "R007",
+    "name": "AVS Mismatch",
+    "type": "Alert",
+    "source": "Fluidpay",
+    "severity": "Moderate",
+    "status": true,
+    "last_updated": "2025-11-08",
+    "description": "Flags transactions where Address Verification System results indicate potential fraud.",
+    "created_by": "System",
+    "last_execution": "2025-11-10T11:30:00Z",
+    "parameters": {
+      "threshold": 0.65,
+      "avs_codes": ["N", "Z"],
+      "require_match": false
+    }
+  },
+  {
+    "id": "R008",
+    "name": "Geographic Anomaly",
+    "type": "Monitoring",
+    "source": "Internal",
+    "severity": "Info",
+    "status": false,
+    "last_updated": "2025-11-04",
+    "description": "Detects transactions from locations that are geographically impossible given previous activity.",
+    "created_by": "Admin",
+    "last_execution": "2025-11-09T15:00:00Z",
+    "parameters": {
+      "threshold": 0.4,
+      "max_distance_km": 1000,
+      "time_window": "2h"
+    }
+  }
+]
+

@@ -21,8 +21,8 @@ export default function RootLayout({
   //   keepSessionAlive: true, // Uncomment this in order to maintain the session alive
   // };
   return (
-    <html lang="en">
-      <body suppressHydrationWarning={true}>
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning>
         {/* <FronteggAppProvider authOptions={authOptions}> */}
         <ThemeProvider>
           <ReactQueryProvider>{children}</ReactQueryProvider>

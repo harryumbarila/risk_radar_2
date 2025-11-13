@@ -49,6 +49,7 @@ export const ColorModeButton = React.forwardRef<
         aria-label="Toggle color mode"
         size="sm"
         ref={ref}
+        suppressHydrationWarning
         {...props}
         css={{
           _icon: {

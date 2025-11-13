@@ -1,12 +1,19 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "@denali/typescript-config/nextjs.json",
   "compilerOptions": {
     "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
     "skipLibCheck": true,
-    "noUncheckedIndexedAccess": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
     "plugins": [
       {
         "name": "next"
@@ -20,13 +27,14 @@
       "data/*": ["./src/data/*"],
       "libs/*": ["./src/libs/*"],
       "types/*": ["./src/types/*"]
-    }
+    },
+    "forceConsistentCasingInFileNames": true,
+    "noUncheckedIndexedAccess": true
   },
   "include": [
+    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "next-env.d.ts",
-    "next.config.mjs",
     ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules"]

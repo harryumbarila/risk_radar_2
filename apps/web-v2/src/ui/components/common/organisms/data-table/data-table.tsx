@@ -59,7 +59,6 @@ const DataTable = <Entry extends BaseModel>(
     ? (pagination ?? { pageIndex: 0, pageSize: 10 })
     : { pageIndex: 0, pageSize: data.data?.length || 10 };
 
-  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: data.data,
     columns,
@@ -252,6 +251,7 @@ const DataTable = <Entry extends BaseModel>(
                       type="page"
                       key={page.value}
                       value={page.value}
+                      asChild
                     >
                       <IconButton
                         aria-label={`Page ${page.value}`}

@@ -21,6 +21,7 @@ function BreadCrumbMenuItem({ label, items }: CustomBreadcrumbMenuItemProps) {
               display="inline-flex"
               alignItems="center"
               gap={1}
+              suppressHydrationWarning
             >
               {label}
               <LuChevronDown />
@@ -45,7 +46,9 @@ function BreadCrumbMenuItem({ label, items }: CustomBreadcrumbMenuItemProps) {
           </Portal>
         </Menu.Root>
       ) : (
-        <Breadcrumb.Link as="button">{label}</Breadcrumb.Link>
+        <Breadcrumb.Link as="button" suppressHydrationWarning>
+          {label}
+        </Breadcrumb.Link>
       )}
     </Breadcrumb.Item>
   );
