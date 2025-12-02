@@ -802,7 +802,8 @@ export default function CustomTable({ filters }: CustomTableProps) {
         </Text>
       ),
       cell: (info) => {
-        const rules = info.row.original.autoHoldRuleApplied || [];
+        // Count based on AH Rule Applied (not Auto Hold Rule Applied)
+        const rules = info.row.original.ahRuleApplied || [];
         const count = rules.length;
         return (
           <Box py={0.5} display="flex" alignItems="center">
