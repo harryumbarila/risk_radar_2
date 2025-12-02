@@ -1,5 +1,5 @@
 // Utility functions for TSYS charts
-import type { FilterState } from '../../filter-bar/filter-bar';
+import type { FilterState } from '../filter-bar/filter-bar';
 
 // Generate 40+ rule IDs for testing
 export const RULE_IDS = Array.from({ length: 45 }, (_, i) => {
