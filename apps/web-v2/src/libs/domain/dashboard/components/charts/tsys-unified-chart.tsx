@@ -263,9 +263,6 @@ export default function TSYSUnifiedChart({ dateRange }: TSYSUnifiedChartProps) {
                 </Portal>
               </Tooltip.Root>
             </HStack>
-            <Text fontSize="sm" color="gray.600">
-              Rule participation across payment stages over time
-            </Text>
           </VStack>
           <Text fontSize="xs" color="gray.500">
             Last Updated: {new Date().toLocaleString('en-US', { 
@@ -346,6 +343,10 @@ export default function TSYSUnifiedChart({ dateRange }: TSYSUnifiedChartProps) {
             </Select.Root>
           </Box>
         </HStack>
+
+        <Text fontSize="sm" color="gray.600">
+          Rule participation across payment stages over time
+        </Text>
 
         {/* Chart */}
         <Box height="400px" width="100%">

@@ -12,7 +12,6 @@ import {
 } from 'lucide-react';
 import FilterBar, { type FilterState } from '../filter-bar/filter-bar';
 import KpiCard from '../kpi-card/kpi-card';
-import TrendChart from '../charts/trend-chart';
 import TopRulesChart from '../charts/top-rules-chart';
 import SourceDistributionChart from '../charts/source-distribution-chart';
 import HeatmapChart from '../charts/heatmap-chart';
@@ -150,10 +149,6 @@ export default function Home() {
     return Array.from(rules).sort();
   }, [allAlerts]);
 
-
-  const handleWeekClick = (week: number) => {
-    setFilters((prev) => ({ ...prev, week }));
-  };
 
   const handleRuleClick = (ruleId: string) => {
     setFilters((prev) => ({ ...prev, ruleId: [ruleId] }));
@@ -295,11 +290,10 @@ export default function Home() {
         {/* Separator */}
         <Box borderTop="1px" borderColor="gray.200" mt={2} pt={4} />
 
-        {/* Charts Row 1: Trend and Top Rules */}
-        <SimpleGrid columns={{ base: 1, lg: 2 }} gap={6} role="region" aria-label="Risk Analysis Charts">
-          <TrendChart alerts={filteredAlerts} onWeekClick={handleWeekClick} />
+        {/* Charts Row 1: Top Rules */}
+        <SimpleGrid columns={{ base: 1, lg: 1 }} gap={6} role="region" aria-label="Risk Analysis Charts">
           <TopRulesChart alerts={filteredAlerts} onRuleClick={handleRuleClick} />
-              </SimpleGrid>
+        </SimpleGrid>
 
         {/* Charts Row 2: Source Distribution and Heatmap */}
         <SimpleGrid columns={{ base: 1, lg: 2 }} gap={6}>
