@@ -3,40 +3,24 @@ import React from 'react';
 import { Box, VStack, Text, HStack, Tooltip, Portal } from '@chakra-ui/react';
 import { Info } from 'lucide-react';
 import {
-  AreaChart,
-  Area,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
+  Legend,
+  Cell,
 } from 'recharts';
-
-// Mock data for TSYS Settled Data
-const generateMockSettledData = () => {
-  const days = [];
-  const today = new Date();
-  let cumulative = 50000;
-  for (let i = 13; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(today.getDate() - i);
-    const daily = Math.floor(Math.random() * 20000) + 30000;
-    cumulative += daily;
-    days.push({
-      date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      settled: cumulative,
-      daily: daily,
-    });
-  }
-  return days;
-};
+import { generateRuleParticipationData, RULE_IDS, RULE_COLORS, calculatePercentage } from './chart-utils';
 
 export default function TSYSSettledChart() {
-  const data = React.useMemo(() => generateMockSettledData(), []);
+  const data = React.useMemo(() => generateRuleParticipationData(14, 1500), []);
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
-      const data = payload[0].payload;
+      const total = payload.reduce((sum: number, item: any) => sum + (item.value || 0), 0);
       return (
         <Box
           bg="white"
@@ -45,19 +29,46 @@ export default function TSYSSettledChart() {
           boxShadow="lg"
           borderWidth="1px"
           borderColor="gray.200"
+          minW="200px"
         >
           <Text fontSize="sm" fontWeight="bold" mb={2}>
-            {data.date}
+            {label}
           </Text>
-          <VStack align="stretch" gap={1}>
-            <HStack justify="space-between" gap={4}>
-              <Text fontSize="xs" color="gray.600">Cumulative Settled:</Text>
-              <Text fontSize="xs" fontWeight="semibold">${data.settled.toLocaleString()}</Text>
-            </HStack>
-            <HStack justify="space-between" gap={4}>
-              <Text fontSize="xs" color="purple.600">Daily Settled:</Text>
-              <Text fontSize="xs" fontWeight="semibold">${data.daily.toLocaleString()}</Text>
-            </HStack>
+          <VStack align="stretch" gap={1.5}>
+            {payload.map((item: any, index: number) => {
+              const percentage = calculatePercentage(item.value, total);
+              return (
+                <HStack key={index} justify="space-between" gap={4}>
+                  <HStack gap={2}>
+                    <Box
+                      w="12px"
+                      h="12px"
+                      borderRadius="sm"
+                      bg={item.color}
+                      borderWidth="1px"
+                      borderColor="gray.300"
+                    />
+                    <Text fontSize="xs" color="gray.700" fontWeight="medium">
+                      {item.dataKey}:
+                    </Text>
+                  </HStack>
+                  <VStack align="end" gap={0}>
+                    <Text fontSize="xs" fontWeight="semibold">
+                      {item.value.toLocaleString()}
+                    </Text>
+                    <Text fontSize="xs" color="gray.500">
+                      {percentage}%
+                    </Text>
+                  </VStack>
+                </HStack>
+              );
+            })}
+            <Box pt={1} borderTopWidth="1px" borderColor="gray.200" mt={1}>
+              <HStack justify="space-between">
+                <Text fontSize="xs" fontWeight="bold" color="gray.700">Total:</Text>
+                <Text fontSize="xs" fontWeight="bold">{total.toLocaleString()}</Text>
+              </HStack>
+            </Box>
           </VStack>
         </Box>
       );
@@ -111,45 +122,86 @@ export default function TSYSSettledChart() {
                       boxShadow="lg"
                     >
                       <Tooltip.Arrow />
-                      Cumulative settlement amounts from TSYS processor showing total settled funds over the last 14 days.
+                      Distribution of rule participation over time for TSYS settled transactions.
                     </Tooltip.Content>
                   </Tooltip.Positioner>
                 </Portal>
               </Tooltip.Root>
             </HStack>
             <Text fontSize="sm" color="gray.600">
-              Cumulative settlement trends
+              Distribution of rule participation over time
             </Text>
           </VStack>
         </HStack>
-        <Box height="250px" width="100%">
+        <Box height="300px" width="100%">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+            <BarChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" vertical={false} />
               <XAxis 
                 dataKey="date" 
                 tick={{ fontSize: 11, fill: '#6b7280' }}
                 axisLine={{ stroke: '#e5e7eb' }}
+                tickLine={{ stroke: '#e5e7eb' }}
               />
               <YAxis 
                 tick={{ fontSize: 11, fill: '#6b7280' }}
                 axisLine={{ stroke: '#e5e7eb' }}
+                tickLine={{ stroke: '#e5e7eb' }}
+                label={{ value: 'Count', angle: -90, position: 'insideLeft', fontSize: 11, fill: '#6b7280' }}
               />
               <RechartsTooltip content={<CustomTooltip />} />
-              <Area
-                type="monotone"
-                dataKey="settled"
-                stroke="#8b5cf6"
-                fill="#8b5cf6"
-                fillOpacity={0.3}
-                strokeWidth={2}
-                animationDuration={300}
+              <Legend 
+                wrapperStyle={{ paddingTop: '20px' }}
+                iconType="square"
+                iconSize={12}
+                align="right"
+                verticalAlign="top"
+                content={({ payload }) => (
+                  <Box display="flex" flexWrap="wrap" gap={2} justifyContent="flex-end" px={2}>
+                    {payload?.map((entry, index) => (
+                      <HStack key={index} gap={1.5}>
+                        <Box
+                          w="12px"
+                          h="12px"
+                          borderRadius="sm"
+                          bg={entry.color}
+                          borderWidth="1px"
+                          borderColor="gray.300"
+                        />
+                        <Text fontSize="xs" color="gray.600">
+                          {entry.value}
+                        </Text>
+                      </HStack>
+                    ))}
+                  </Box>
+                )}
               />
-            </AreaChart>
+              {RULE_IDS.map((ruleId) => (
+                <Bar
+                  key={ruleId}
+                  dataKey={ruleId}
+                  stackId="rules"
+                  fill={RULE_COLORS[ruleId]}
+                  radius={ruleId === RULE_IDS[RULE_IDS.length - 1] ? [4, 4, 0, 0] : [0, 0, 0, 0]}
+                  stroke={RULE_COLORS[ruleId]}
+                  strokeWidth={0}
+                  animationDuration={400}
+                >
+                  {data.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${ruleId}-${index}`}
+                      style={{ 
+                        outline: 'none',
+                        transition: 'opacity 0.2s',
+                      }}
+                    />
+                  ))}
+                </Bar>
+              ))}
+            </BarChart>
           </ResponsiveContainer>
         </Box>
       </VStack>
     </Box>
   );
 }
-

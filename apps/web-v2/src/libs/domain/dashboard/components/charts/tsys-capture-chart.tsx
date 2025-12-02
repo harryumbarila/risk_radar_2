@@ -10,30 +10,17 @@ import {
   CartesianGrid,
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
+  Legend,
   Cell,
 } from 'recharts';
-
-// Mock data for TSYS Capture Data
-const generateMockCaptureData = () => {
-  const days = [];
-  const today = new Date();
-  for (let i = 13; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(today.getDate() - i);
-    days.push({
-      date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      captured: Math.floor(Math.random() * 3000) + 8000,
-    });
-  }
-  return days;
-};
+import { generateRuleParticipationData, RULE_IDS, RULE_COLORS, calculatePercentage } from './chart-utils';
 
 export default function TSYSCaptureChart() {
-  const data = React.useMemo(() => generateMockCaptureData(), []);
+  const data = React.useMemo(() => generateRuleParticipationData(14, 1000), []);
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
-      const data = payload[0].payload;
+      const total = payload.reduce((sum: number, item: any) => sum + (item.value || 0), 0);
       return (
         <Box
           bg="white"
@@ -42,13 +29,47 @@ export default function TSYSCaptureChart() {
           boxShadow="lg"
           borderWidth="1px"
           borderColor="gray.200"
+          minW="200px"
         >
-          <Text fontSize="sm" fontWeight="bold" mb={1}>
-            {data.date}
+          <Text fontSize="sm" fontWeight="bold" mb={2}>
+            {label}
           </Text>
-          <Text fontSize="xs" color="gray.600">
-            Captured: {data.captured.toLocaleString()}
-          </Text>
+          <VStack align="stretch" gap={1.5}>
+            {payload.map((item: any, index: number) => {
+              const percentage = calculatePercentage(item.value, total);
+              return (
+                <HStack key={index} justify="space-between" gap={4}>
+                  <HStack gap={2}>
+                    <Box
+                      w="12px"
+                      h="12px"
+                      borderRadius="sm"
+                      bg={item.color}
+                      borderWidth="1px"
+                      borderColor="gray.300"
+                    />
+                    <Text fontSize="xs" color="gray.700" fontWeight="medium">
+                      {item.dataKey}:
+                    </Text>
+                  </HStack>
+                  <VStack align="end" gap={0}>
+                    <Text fontSize="xs" fontWeight="semibold">
+                      {item.value.toLocaleString()}
+                    </Text>
+                    <Text fontSize="xs" color="gray.500">
+                      {percentage}%
+                    </Text>
+                  </VStack>
+                </HStack>
+              );
+            })}
+            <Box pt={1} borderTopWidth="1px" borderColor="gray.200" mt={1}>
+              <HStack justify="space-between">
+                <Text fontSize="xs" fontWeight="bold" color="gray.700">Total:</Text>
+                <Text fontSize="xs" fontWeight="bold">{total.toLocaleString()}</Text>
+              </HStack>
+            </Box>
+          </VStack>
         </Box>
       );
     }
@@ -101,41 +122,82 @@ export default function TSYSCaptureChart() {
                       boxShadow="lg"
                     >
                       <Tooltip.Arrow />
-                      Daily capture transaction volumes from TSYS processor showing captured amounts over the last 14 days.
+                      Distribution of rule participation over time for TSYS capture transactions.
                     </Tooltip.Content>
                   </Tooltip.Positioner>
                 </Portal>
               </Tooltip.Root>
             </HStack>
             <Text fontSize="sm" color="gray.600">
-              Daily captured transaction volumes
+              Distribution of rule participation over time
             </Text>
           </VStack>
         </HStack>
-        <Box height="250px" width="100%">
+        <Box height="300px" width="100%">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+            <BarChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" vertical={false} />
               <XAxis 
                 dataKey="date" 
                 tick={{ fontSize: 11, fill: '#6b7280' }}
                 axisLine={{ stroke: '#e5e7eb' }}
+                tickLine={{ stroke: '#e5e7eb' }}
               />
               <YAxis 
                 tick={{ fontSize: 11, fill: '#6b7280' }}
                 axisLine={{ stroke: '#e5e7eb' }}
+                tickLine={{ stroke: '#e5e7eb' }}
+                label={{ value: 'Count', angle: -90, position: 'insideLeft', fontSize: 11, fill: '#6b7280' }}
               />
               <RechartsTooltip content={<CustomTooltip />} />
-              <Bar
-                dataKey="captured"
-                fill="#10b981"
-                radius={[4, 4, 0, 0]}
-                animationDuration={400}
-              >
-                {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} />
-                ))}
-              </Bar>
+              <Legend 
+                wrapperStyle={{ paddingTop: '20px' }}
+                iconType="square"
+                iconSize={12}
+                align="right"
+                verticalAlign="top"
+                content={({ payload }) => (
+                  <Box display="flex" flexWrap="wrap" gap={2} justifyContent="flex-end" px={2}>
+                    {payload?.map((entry, index) => (
+                      <HStack key={index} gap={1.5}>
+                        <Box
+                          w="12px"
+                          h="12px"
+                          borderRadius="sm"
+                          bg={entry.color}
+                          borderWidth="1px"
+                          borderColor="gray.300"
+                        />
+                        <Text fontSize="xs" color="gray.600">
+                          {entry.value}
+                        </Text>
+                      </HStack>
+                    ))}
+                  </Box>
+                )}
+              />
+              {RULE_IDS.map((ruleId) => (
+                <Bar
+                  key={ruleId}
+                  dataKey={ruleId}
+                  stackId="rules"
+                  fill={RULE_COLORS[ruleId]}
+                  radius={ruleId === RULE_IDS[RULE_IDS.length - 1] ? [4, 4, 0, 0] : [0, 0, 0, 0]}
+                  stroke={RULE_COLORS[ruleId]}
+                  strokeWidth={0}
+                  animationDuration={400}
+                >
+                  {data.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${ruleId}-${index}`}
+                      style={{ 
+                        outline: 'none',
+                        transition: 'opacity 0.2s',
+                      }}
+                    />
+                  ))}
+                </Bar>
+              ))}
             </BarChart>
           </ResponsiveContainer>
         </Box>
@@ -143,4 +205,3 @@ export default function TSYSCaptureChart() {
     </Box>
   );
 }
-
