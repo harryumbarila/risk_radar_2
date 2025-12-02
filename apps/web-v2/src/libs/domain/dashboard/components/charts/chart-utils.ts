@@ -90,17 +90,15 @@ const generateColorScale = (count: number): string[] => {
 };
 
 // Subtle, consistent color palette for rules (non-saturated)
-export const RULE_COLORS: Record<string, string> = {
-  ...Object.fromEntries(
-    RULE_IDS.map((ruleId, index) => {
-      if (index < 5) {
-        return [ruleId, TOP_5_COLORS[index]];
-      }
-      const scaleColors = generateColorScale(RULE_IDS.length - 5);
-      return [ruleId, scaleColors[index - 5]];
-    })
-  ),
-};
+export const RULE_COLORS: Record<string, string> = Object.fromEntries(
+  RULE_IDS.map((ruleId, index) => {
+    if (index < 5) {
+      return [ruleId, TOP_5_COLORS[index]];
+    }
+    const scaleColors = generateColorScale(RULE_IDS.length - 5);
+    return [ruleId, scaleColors[index - 5]];
+  })
+) as Record<string, string>;
 
 // Calculate number of days from date range filter
 export const getDaysFromDateRange = (filters: FilterState): number => {
