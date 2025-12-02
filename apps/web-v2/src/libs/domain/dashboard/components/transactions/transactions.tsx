@@ -145,25 +145,19 @@ function OriginPartnerCell({
   );
 }
 
-// Helper: Funding Info Cell Component (refined)
-function FundingInfoCell({ 
-  nextDayFunding, 
-  netDivertBalance 
+// Helper: Next Day Funding Cell Component
+function NextDayFundingCell({ 
+  nextDayFunding 
 }: { 
   nextDayFunding?: string;
-  netDivertBalance?: string;
 }) {
+  // Convert "Yes" to "NDF", "No" stays as "No"
+  const displayValue = nextDayFunding === 'Yes' ? 'NDF' : (nextDayFunding === 'No' ? 'No' : '—');
+  
   return (
-    <VStack align="start" gap={0}>
-      <Text fontSize="sm" fontWeight="semibold">
-        {nextDayFunding || '—'}
-      </Text>
-      {netDivertBalance && (
-        <Text fontSize="xs" color="gray.500" mt={0.5}>
-          {netDivertBalance}
-        </Text>
-      )}
-    </VStack>
+    <Text fontSize="sm" fontWeight="semibold">
+      {displayValue}
+    </Text>
   );
 }
 
@@ -418,6 +412,7 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       ahRuleApplied: ['AH001', 'AH002', 'AH003', 'AH004'],
       autoHoldRuleApplied: ['AH001'],
       createdBatchTrigger: 'Daily Batch',
+      createdBatchDate: getDateInLast7Days(1),
     } as MerchantTransaction & { ruleId?: string },
     {
       id: '2',
@@ -445,6 +440,7 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       ahRuleApplied: ['AH002'],
       autoHoldRuleApplied: ['AH002', 'AH003'],
       createdBatchTrigger: 'Manual',
+      createdBatchDate: getDateInLast7Days(0),
     } as MerchantTransaction & { ruleId?: string },
     {
       id: '3',
@@ -472,6 +468,7 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       ahRuleApplied: ['AH003', 'AH004'],
       autoHoldRuleApplied: ['AH003'],
       createdBatchTrigger: 'Daily Batch',
+      createdBatchDate: getDateInLast7Days(1),
     } as MerchantTransaction & { ruleId?: string },
     {
       id: '4',
@@ -498,6 +495,7 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       ahRuleApplied: ['AH004', 'AH005'],
       autoHoldRuleApplied: ['AH004'],
       createdBatchTrigger: 'Weekly Batch',
+      createdBatchDate: getDateInLast7Days(1),
     } as MerchantTransaction & { ruleId?: string },
     {
       id: '5',
@@ -525,6 +523,7 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       ahRuleApplied: ['AH005'],
       autoHoldRuleApplied: ['AH005'],
       createdBatchTrigger: 'Daily Batch',
+      createdBatchDate: getDateInLast7Days(2),
     } as MerchantTransaction & { ruleId?: string },
   ];
 };
@@ -718,27 +717,36 @@ export default function CustomTable({ filters }: CustomTableProps) {
       ),
       cell: (info) => {
         const value = info.getValue();
+        const netDivertBalance = info.row.original.netDivertBalance;
+        const isFlagged = value === true;
+        
         return (
-          <Box display="flex" justifyContent="center" alignItems="center" py={0.5} minH="20px">
-            <BooleanIcon value={value === true} label="Divert Enabled" />
-          </Box>
+          <VStack align="center" gap={0.5} py={0.5} minH="20px">
+            <Box display="flex" justifyContent="center" alignItems="center">
+              <BooleanIcon value={isFlagged} label="Divert Enabled" />
+            </Box>
+            {isFlagged && netDivertBalance && (
+              <Text fontSize="xs" color="gray.600" fontWeight="medium">
+                {netDivertBalance}
+              </Text>
+            )}
+          </VStack>
         );
       },
       enableSorting: true,
       meta: { align: 'center' },
     }),
     columnHelper.display({
-      id: 'fundingInfo',
+      id: 'nextDayFunding',
       header: () => (
         <Text fontSize="xs" fontWeight="semibold" color="gray.600">
-          Funding Info
+          Next Day Funding
         </Text>
       ),
       cell: (info) => (
         <Box py={0.5}>
-          <FundingInfoCell
+          <NextDayFundingCell
             nextDayFunding={info.row.original.nextDayFunding}
-            netDivertBalance={info.row.original.netDivertBalance}
           />
         </Box>
       ),
@@ -787,30 +795,56 @@ export default function CustomTable({ filters }: CustomTableProps) {
       meta: { align: 'left' },
     }),
     columnHelper.display({
-      id: 'autoHoldRuleApplied',
+      id: 'autoHoldCount',
       header: () => (
         <Text fontSize="xs" fontWeight="semibold" color="gray.600">
-          Auto Hold Rule Applied
+          Auto Hold Count
         </Text>
       ),
-      cell: (info) => (
-        <Box py={0.5} display="flex" alignItems="center">
-          <RuleChips rules={info.row.original.autoHoldRuleApplied} maxVisible={3} />
-        </Box>
-      ),
+      cell: (info) => {
+        const rules = info.row.original.autoHoldRuleApplied || [];
+        const count = rules.length;
+        return (
+          <Box py={0.5} display="flex" alignItems="center">
+            <Text fontSize="sm" fontWeight="medium" color="gray.700">
+              {count > 0 ? count : '—'}
+            </Text>
+          </Box>
+        );
+      },
       meta: { align: 'left' },
     }),
-    columnHelper.accessor('createdBatchTrigger', {
+    columnHelper.accessor('createdBatchDate', {
       header: () => (
         <Text fontSize="xs" fontWeight="semibold" color="gray.600">
-          Created Batch Trigger
+          Created Batch Date
         </Text>
       ),
-      cell: (info) => (
-        <Box py={0.5}>
-          <BatchTriggerTag value={info.getValue()} />
-        </Box>
-      ),
+      cell: (info) => {
+        const dateValue = info.getValue();
+        if (!dateValue) return <Text fontSize="sm" color="gray.400">—</Text>;
+        
+        // Format date if it's a string
+        let formattedDate = dateValue;
+        try {
+          const date = new Date(dateValue);
+          if (!isNaN(date.getTime())) {
+            formattedDate = date.toLocaleDateString('en-US', { 
+              month: 'short', 
+              day: 'numeric', 
+              year: 'numeric' 
+            });
+          }
+        } catch (e) {
+          // If parsing fails, use the original value
+        }
+        
+        return (
+          <Text fontSize="sm" py={0.5}>
+            {formattedDate}
+          </Text>
+        );
+      },
       enableSorting: true,
       meta: { align: 'left' },
     }),

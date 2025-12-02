@@ -26,4 +26,5 @@ export interface MerchantTransaction extends BaseModel {
   ahRuleApplied?: string[];
   autoHoldRuleApplied?: string[];
   createdBatchTrigger?: string;
+  createdBatchDate?: string; // Date string for batch creation date
 }
