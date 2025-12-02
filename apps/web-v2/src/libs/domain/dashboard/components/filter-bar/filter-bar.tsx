@@ -338,7 +338,7 @@ export default function FilterBar({
                   <Text fontSize="sm" lineClamp={1}>
                     {selectedRules.length === 0
                       ? 'All Rules'
-                      : selectedRules.length === 1
+                      : selectedRules.length === 1 && selectedRules[0]
                       ? getRuleName(selectedRules[0])
                       : `${selectedRules.length} rules selected`}
                   </Text>
