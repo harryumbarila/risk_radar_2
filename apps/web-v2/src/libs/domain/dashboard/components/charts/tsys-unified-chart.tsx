@@ -196,7 +196,8 @@ export default function TSYSUnifiedChart({
       return 1.0; // Full opacity for top 5
     }
     
-    return showAllRules ? 0.5 : 1.0; // 50% for non-top-5 when showing all
+    // For non-top-5 rules, use 50% opacity when there are many rules (10+)
+    return filteredRuleIds.length > 10 ? 0.5 : 1.0;
   };
 
   // Get stroke width
@@ -207,7 +208,8 @@ export default function TSYSUnifiedChart({
     if (isTop5) {
       return 1.5;
     }
-    return showAllRules ? 1 : 1.5;
+    // For non-top-5 rules, use thinner stroke when there are many rules (10+)
+    return filteredRuleIds.length > 10 ? 1 : 1.5;
   };
 
   const handleRuleHover = (ruleId: string | null) => {
