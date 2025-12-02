@@ -33,11 +33,18 @@ export default function Home() {
     });
   }, []);
 
-  const [filters, setFilters] = React.useState<FilterState>({
-    dateRange: '7',
-    processor: 'all',
-    source: 'all',
-    ruleId: availableRules, // All rules selected by default
+  const [filters, setFilters] = React.useState<FilterState>(() => {
+    // Initialize with all rules selected
+    const allRuleIds = Array.from({ length: 45 }, (_, i) => {
+      const num = i + 1;
+      return `AH${num.toString().padStart(3, '0')}`;
+    });
+    return {
+      dateRange: '7',
+      processor: 'all',
+      source: 'all',
+      ruleId: allRuleIds, // All rules selected by default
+    };
   });
 
   // Generate mock data on mount
