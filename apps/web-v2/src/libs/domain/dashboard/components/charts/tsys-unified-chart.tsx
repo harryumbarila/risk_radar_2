@@ -15,7 +15,7 @@ import {
   Legend,
   ReferenceLine,
 } from 'recharts';
-import type { FilterState } from '../../filter-bar/filter-bar';
+import type { FilterState } from '../filter-bar/filter-bar';
 import {
   generateRuleParticipationData,
   RULE_IDS,
