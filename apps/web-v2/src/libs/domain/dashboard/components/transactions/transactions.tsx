@@ -122,7 +122,7 @@ function OriginPartnerCell({
   const secondaryValue = reseller || referralPartner || solutionConsultant;
   
   return (
-    <VStack align="start" gap={0} spacing={0}>
+    <VStack align="start" gap={0}>
       <Text fontSize="sm" fontWeight="semibold">
         {channel || '—'}
       </Text>
@@ -154,7 +154,7 @@ function FundingInfoCell({
   netDivertBalance?: string;
 }) {
   return (
-    <VStack align="start" gap={0} spacing={0}>
+    <VStack align="start" gap={0}>
       <Text fontSize="sm" fontWeight="semibold">
         {nextDayFunding || '—'}
       </Text>
