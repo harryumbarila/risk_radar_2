@@ -38,6 +38,7 @@ interface TSYSUnifiedChartProps {
   dateRange?: FilterState;
   paymentStage?: PaymentStage;
   ruleStageParticipation?: RuleStageParticipation;
+  selectedRuleIds?: string[]; // Rules selected from FilterBar
 }
 
 // Define which rules apply to which stages
@@ -79,39 +80,43 @@ const PAYMENT_STAGE_BASE_COUNTS: Record<PaymentStage, number> = {
 export default function TSYSUnifiedChart({ 
   dateRange, 
   paymentStage = 'Authorization',
-  ruleStageParticipation = 'all'
+  ruleStageParticipation = 'all',
+  selectedRuleIds = []
 }: TSYSUnifiedChartProps) {
-  const [showAllRules, setShowAllRules] = React.useState(false);
   const [chartType, setChartType] = React.useState<'stacked-area' | 'heatmap'>('stacked-area');
   const [focusedRule, setFocusedRule] = React.useState<string | null>(null);
-  const [selectedRules, setSelectedRules] = React.useState<Set<string>>(new Set());
   const [legendSearch, setLegendSearch] = React.useState('');
-  const [visibleRules, setVisibleRules] = React.useState<Set<string>>(new Set());
   
   const days = React.useMemo(() => dateRange ? getDaysFromDateRange(dateRange) : 14, [dateRange]);
   const dateGrouping = React.useMemo(() => getDateGrouping(days), [days]);
   const smoothingWindow = React.useMemo(() => getSmoothingWindow(days), [days]);
   
-  // Determine which rules to show based on Rule Stage Participation filter
+  // Use rules from FilterBar (selectedRuleIds), filtered by Rule Stage Participation
   const filteredRuleIds = React.useMemo(() => {
-    if (ruleStageParticipation === 'all') return RULE_IDS;
+    // Start with rules selected in FilterBar
+    let rules = selectedRuleIds.length > 0 ? selectedRuleIds : RULE_IDS;
     
-    return RULE_IDS.filter((ruleId) => {
-      const stages = RULE_STAGE_MAP[ruleId] || [];
-      switch (ruleStageParticipation) {
-        case 'auth-only':
-          return stages.length === 1 && stages.includes('Authorization');
-        case 'multi-stage':
-          return stages.length > 1;
-        case 'settlement-only':
-          return stages.length === 1 && stages.includes('Settlement');
-        case 'ach-only':
-          return stages.length === 1 && stages.includes('ACH Returns');
-        default:
-          return true;
-      }
-    });
-  }, [ruleStageParticipation]);
+    // Apply Rule Stage Participation filter
+    if (ruleStageParticipation !== 'all') {
+      rules = rules.filter((ruleId) => {
+        const stages = RULE_STAGE_MAP[ruleId] || [];
+        switch (ruleStageParticipation) {
+          case 'auth-only':
+            return stages.length === 1 && stages.includes('Authorization');
+          case 'multi-stage':
+            return stages.length > 1;
+          case 'settlement-only':
+            return stages.length === 1 && stages.includes('Settlement');
+          case 'ach-only':
+            return stages.length === 1 && stages.includes('ACH Returns');
+          default:
+            return true;
+        }
+      });
+    }
+    
+    return rules;
+  }, [selectedRuleIds, ruleStageParticipation]);
 
   const rawData = React.useMemo(() => {
     const baseCount = PAYMENT_STAGE_BASE_COUNTS[paymentStage];
@@ -128,29 +133,23 @@ export default function TSYSUnifiedChart({
     return processedData;
   }, [rawData, smoothingWindow]);
 
-  // Calculate top 5 rules
+  // Calculate top 5 rules for visual emphasis
   const top5Rules = React.useMemo(() => {
     return getTopRules(data, filteredRuleIds, 5);
   }, [data, filteredRuleIds]);
 
-  // Determine which rules to display
+  // Display all filtered rules (controlled by FilterBar)
   const displayRules = React.useMemo(() => {
-    if (showAllRules) {
-      return filteredRuleIds;
-    }
-    return top5Rules;
-  }, [showAllRules, filteredRuleIds, top5Rules]);
+    return filteredRuleIds;
+  }, [filteredRuleIds]);
 
-  // Update visible rules
-  React.useEffect(() => {
+  // Visible rules: all displayRules, unless focused
+  const visibleRules = React.useMemo(() => {
     if (focusedRule) {
-      setVisibleRules(new Set([focusedRule]));
-    } else if (selectedRules.size > 0) {
-      setVisibleRules(selectedRules);
-    } else {
-      setVisibleRules(new Set(displayRules));
+      return new Set([focusedRule]);
     }
-  }, [focusedRule, selectedRules, displayRules]);
+    return new Set(displayRules);
+  }, [focusedRule, displayRules]);
 
   // Filter rules by search
   const filteredDisplayRules = React.useMemo(() => {
@@ -211,19 +210,6 @@ export default function TSYSUnifiedChart({
     return showAllRules ? 1 : 1.5;
   };
 
-  const toggleRule = (ruleId: string) => {
-    if (selectedRules.has(ruleId)) {
-      setSelectedRules((prev) => {
-        const next = new Set(prev);
-        next.delete(ruleId);
-        return next;
-      });
-    } else {
-      setSelectedRules((prev) => new Set([...prev, ruleId]));
-    }
-    setFocusedRule(null);
-  };
-
   const handleRuleHover = (ruleId: string | null) => {
     setFocusedRule(ruleId);
   };
@@ -233,7 +219,6 @@ export default function TSYSUnifiedChart({
       setFocusedRule(null);
     } else {
       setFocusedRule(ruleId);
-      setSelectedRules(new Set());
     }
   };
 
@@ -648,19 +633,6 @@ export default function TSYSUnifiedChart({
           )}
         </Box>
 
-        {/* Show all rules link */}
-        {!showAllRules && filteredRuleIds.length > 5 && (
-          <HStack justify="center">
-            <Button
-              variant="link"
-              size="sm"
-              colorPalette="blue"
-              onClick={() => setShowAllRules(true)}
-            >
-              Show all rules ({filteredRuleIds.length})
-            </Button>
-          </HStack>
-        )}
 
         {/* Responsive Legend */}
         <Box>
@@ -700,7 +672,6 @@ export default function TSYSUnifiedChart({
                   {filteredDisplayRules.map((ruleId) => {
                     const isTop5 = top5Rules.includes(ruleId);
                     const isVisible = visibleRules.has(ruleId);
-                    const isSelected = selectedRules.has(ruleId);
                     const isFocused = focusedRule === ruleId;
                     const opacity = getRuleOpacity(ruleId, isTop5);
                     const color = getRuleColor(ruleId, isTop5);
@@ -711,25 +682,15 @@ export default function TSYSUnifiedChart({
                         gap={2}
                         p={2}
                         borderRadius="md"
-                        bg={isFocused ? 'blue.50' : isSelected ? 'gray.50' : 'transparent'}
+                        bg={isFocused ? 'blue.50' : 'transparent'}
                         borderWidth={isFocused ? '2px' : '1px'}
-                        borderColor={isFocused ? 'blue.300' : isSelected ? 'gray.300' : 'transparent'}
+                        borderColor={isFocused ? 'blue.300' : 'transparent'}
                         cursor="pointer"
                         onClick={() => handleRuleClick(ruleId)}
                         onMouseEnter={() => handleRuleHover(ruleId)}
                         onMouseLeave={() => handleRuleHover(null)}
                         transition="all 0.2s"
                       >
-                        <Checkbox.Root
-                          checked={isSelected || isVisible}
-                          onCheckedChange={() => toggleRule(ruleId)}
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Checkbox.HiddenInput />
-                          <Checkbox.Control>
-                            <Checkbox.Indicator />
-                          </Checkbox.Control>
-                        </Checkbox.Root>
                         <Box
                           w="16px"
                           h="16px"
@@ -794,6 +755,7 @@ export default function TSYSUnifiedChart({
                           {filteredDisplayRules.map((ruleId) => {
                             const isTop5 = top5Rules.includes(ruleId);
                             const isVisible = visibleRules.has(ruleId);
+                            const isFocused = focusedRule === ruleId;
                             const color = getRuleColor(ruleId, isTop5);
                             
                             return (
@@ -801,14 +763,13 @@ export default function TSYSUnifiedChart({
                                 key={ruleId}
                                 gap={2}
                                 cursor="pointer"
-                                onClick={() => toggleRule(ruleId)}
+                                onClick={() => handleRuleClick(ruleId)}
+                                onMouseEnter={() => handleRuleHover(ruleId)}
+                                onMouseLeave={() => handleRuleHover(null)}
+                                p={1}
+                                borderRadius="sm"
+                                bg={isFocused ? 'blue.50' : 'transparent'}
                               >
-                                <Checkbox.Root checked={isVisible}>
-                                  <Checkbox.HiddenInput />
-                                  <Checkbox.Control>
-                                    <Checkbox.Indicator />
-                                  </Checkbox.Control>
-                                </Checkbox.Root>
                                 <Box
                                   w="12px"
                                   h="12px"

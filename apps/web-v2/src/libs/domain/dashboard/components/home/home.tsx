@@ -24,11 +24,20 @@ export default function Home() {
   const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(true);
   const [allAlerts, setAllAlerts] = React.useState<MockAlert[]>([]);
+  // Generate 40+ mock rules for filter
+  const availableRules = React.useMemo(() => {
+    // Generate 45 rule IDs: AH001 to AH045
+    return Array.from({ length: 45 }, (_, i) => {
+      const num = i + 1;
+      return `AH${num.toString().padStart(3, '0')}`;
+    });
+  }, []);
+
   const [filters, setFilters] = React.useState<FilterState>({
     dateRange: '7',
     processor: 'all',
     source: 'all',
-    ruleId: 'all' as 'all' | string[],
+    ruleId: availableRules, // All rules selected by default
   });
 
   // Generate mock data on mount
@@ -143,13 +152,6 @@ export default function Home() {
     return calculateKpis(filteredAlerts);
   }, [filteredAlerts]);
 
-  // Get available rules for filter
-  const availableRules = React.useMemo(() => {
-    const rules = new Set(allAlerts.map((a) => a.ruleId));
-    return Array.from(rules).sort();
-  }, [allAlerts]);
-
-
   const handleRuleClick = (ruleId: string) => {
     setFilters((prev) => ({ ...prev, ruleId: [ruleId] }));
   };
@@ -233,6 +235,7 @@ export default function Home() {
           dateRange={filters} 
           paymentStage={filters.paymentStage}
           ruleStageParticipation={filters.ruleStageParticipation}
+          selectedRuleIds={Array.isArray(filters.ruleId) ? filters.ruleId : (filters.ruleId === 'all' ? [] : [filters.ruleId])}
         />
 
         {/* KPI Cards */}
