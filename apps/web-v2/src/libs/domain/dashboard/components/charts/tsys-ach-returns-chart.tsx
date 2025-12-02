@@ -226,7 +226,7 @@ export default function TSYSACHReturnsChart({ dateRange }: TSYSACHReturnsChartPr
             <HStack gap={2}>
               <Checkbox.Root
                 checked={showPercent}
-                onCheckedChange={(e) => setShowPercent(e.checked ?? false)}
+                onCheckedChange={(e) => setShowPercent(e.checked === true)}
               >
                 <Checkbox.HiddenInput />
                 <Checkbox.Control>
