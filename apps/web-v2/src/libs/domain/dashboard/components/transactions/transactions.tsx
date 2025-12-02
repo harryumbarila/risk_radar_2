@@ -844,27 +844,26 @@ export default function CustomTable({ filters }: CustomTableProps) {
       </VStack>
 
       {/* Table with custom styling */}
-      <Box
-        sx={{
-          // Row hover effect
-          '& [data-part="table-row"]': {
-            _hover: {
-              bg: 'gray.50',
-              cursor: 'pointer',
-            },
-            transition: 'background-color 0.15s ease',
-          },
-          // Header separators
-          '& [data-part="column-header"]:not(:last-child)': {
-            borderRightWidth: '1px',
-            borderRightColor: 'gray.200',
-          },
-          // Reduce cell padding for compact rows
-          '& [data-part="cell"]': {
-            py: 0.5,
-          },
-        }}
-      >
+      <Box position="relative">
+        <style>
+          {`
+            [data-part="table-row"] {
+              transition: background-color 0.15s ease;
+            }
+            [data-part="table-row"]:hover {
+              background-color: var(--chakra-colors-gray-50);
+              cursor: pointer;
+            }
+            [data-part="column-header"]:not(:last-child) {
+              border-right-width: 1px;
+              border-right-color: var(--chakra-colors-gray-200);
+            }
+            [data-part="cell"] {
+              padding-top: 0.125rem;
+              padding-bottom: 0.125rem;
+            }
+          `}
+        </style>
         <DataTable
           data={{
             data: transactions,
