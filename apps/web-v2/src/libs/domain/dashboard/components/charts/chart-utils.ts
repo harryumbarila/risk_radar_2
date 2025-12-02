@@ -3,6 +3,17 @@
 // Rule IDs that appear in the charts
 export const RULE_IDS = ['AH001', 'AH002', 'AH003', 'AH004', 'AH005', 'AH006', 'AH007'];
 
+// Short descriptions for rules (for chart display)
+export const RULE_DESCRIPTIONS: Record<string, string> = {
+  AH001: 'High Amount',
+  AH002: 'Rapid Volume',
+  AH003: 'Unusual Pattern',
+  AH004: 'Geo Risk',
+  AH005: 'Card Verify Fail',
+  AH006: 'Velocity Exceeded',
+  AH007: 'Merchant Risk',
+};
+
 // Subtle, consistent color palette for rules (non-saturated)
 export const RULE_COLORS: Record<string, string> = {
   AH001: '#93c5fd', // Light blue

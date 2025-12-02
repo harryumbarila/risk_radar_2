@@ -13,7 +13,7 @@ import {
   Legend,
   Cell,
 } from 'recharts';
-import { generateRuleParticipationData, RULE_IDS, RULE_COLORS, calculatePercentage } from './chart-utils';
+import { generateRuleParticipationData, RULE_IDS, RULE_COLORS, RULE_DESCRIPTIONS, calculatePercentage } from './chart-utils';
 
 export default function TSYSCaptureChart() {
   const data = React.useMemo(() => generateRuleParticipationData(14, 1000), []);
@@ -49,7 +49,7 @@ export default function TSYSCaptureChart() {
                       borderColor="gray.300"
                     />
                     <Text fontSize="xs" color="gray.700" fontWeight="medium">
-                      {item.dataKey}:
+                      {RULE_DESCRIPTIONS[item.dataKey] || item.dataKey}:
                     </Text>
                   </HStack>
                   <VStack align="end" gap={0}>
@@ -169,7 +169,7 @@ export default function TSYSCaptureChart() {
                           borderColor="gray.300"
                         />
                         <Text fontSize="xs" color="gray.600">
-                          {entry.value}
+                          {RULE_DESCRIPTIONS[entry.value as string] || entry.value}
                         </Text>
                       </HStack>
                     ))}
