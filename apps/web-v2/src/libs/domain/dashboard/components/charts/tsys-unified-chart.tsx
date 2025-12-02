@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
-import { Box, VStack, Text, HStack, Tooltip, Portal, Select, createListCollection } from '@chakra-ui/react';
-import { Info } from 'lucide-react';
+import { Box, VStack, Text, HStack, Tooltip, Portal, Select, createListCollection, Badge, Button, Checkbox } from '@chakra-ui/react';
+import { Info, X } from 'lucide-react';
 import {
   AreaChart,
   Area,
@@ -13,7 +13,7 @@ import {
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
   Legend,
-  Cell,
+  ReferenceLine,
 } from 'recharts';
 import type { FilterState } from '../../filter-bar/filter-bar';
 import {
@@ -33,6 +33,7 @@ import {
 
 export type PaymentStage = 'Authorization' | 'Capture' | 'Settlement' | 'ACH Returns';
 export type RuleStageParticipation = 'all' | 'auth-only' | 'multi-stage' | 'settlement-only' | 'ach-only';
+export type TopContributorsFilter = 'all' | 'top5' | 'top10' | 'payment-stage-only';
 
 interface TSYSUnifiedChartProps {
   dateRange?: FilterState;
@@ -77,14 +78,29 @@ const PAYMENT_STAGE_BASE_COUNTS: Record<PaymentStage, number> = {
   'ACH Returns': 800,
 };
 
+// Color scale for heatmap (6-7 intensity levels)
+const HEATMAP_COLORS = [
+  '#e0f2fe', // Very light blue
+  '#bae6fd', // Light blue
+  '#7dd3fc', // Medium light blue
+  '#38bdf8', // Medium blue
+  '#0ea5e9', // Medium dark blue
+  '#0284c7', // Dark blue
+  '#0369a1', // Very dark blue
+];
+
 export default function TSYSUnifiedChart({ 
   dateRange, 
   paymentStage = 'Authorization',
   ruleStageParticipation = 'all',
   selectedRuleIds = []
 }: TSYSUnifiedChartProps) {
-  const [chartType, setChartType] = React.useState<'stacked-area' | 'heatmap'>('stacked-area');
+  const [manualChartType, setManualChartType] = React.useState<'stacked-area' | 'heatmap' | null>(null);
   const [focusedRule, setFocusedRule] = React.useState<string | null>(null);
+  const [focusMode, setFocusMode] = React.useState<'off' | 'single' | 'subset'>('off');
+  const [focusedSubset, setFocusedSubset] = React.useState<Set<string>>(new Set());
+  const [topContributorsFilter, setTopContributorsFilter] = React.useState<TopContributorsFilter>('all');
+  const [expandedOthers, setExpandedOthers] = React.useState(false);
   
   const days = React.useMemo(() => dateRange ? getDaysFromDateRange(dateRange) : 14, [dateRange]);
   const dateGrouping = React.useMemo(() => getDateGrouping(days), [days]);
@@ -132,84 +148,136 @@ export default function TSYSUnifiedChart({
     return processedData;
   }, [rawData, smoothingWindow]);
 
-  // Calculate top 5 rules for visual emphasis
+  // Calculate top rules
   const top5Rules = React.useMemo(() => {
     return getTopRules(data, filteredRuleIds, 5);
   }, [data, filteredRuleIds]);
 
-  // Display all filtered rules (controlled by FilterBar)
-  const displayRules = React.useMemo(() => {
-    return filteredRuleIds;
-  }, [filteredRuleIds]);
+  const top10Rules = React.useMemo(() => {
+    return getTopRules(data, filteredRuleIds, 10);
+  }, [data, filteredRuleIds]);
 
-  // Visible rules: all displayRules, unless focused
+  // Apply Top Contributors filter
+  const contributorFilteredRules = React.useMemo(() => {
+    switch (topContributorsFilter) {
+      case 'top5':
+        return top5Rules;
+      case 'top10':
+        return top10Rules;
+      case 'payment-stage-only':
+        return filteredRuleIds.filter((ruleId) => {
+          const stages = RULE_STAGE_MAP[ruleId] || [];
+          return stages.includes(paymentStage);
+        });
+      default:
+        return filteredRuleIds;
+    }
+  }, [topContributorsFilter, top5Rules, top10Rules, filteredRuleIds, paymentStage]);
+
+  // Determine chart type: auto-switch to heatmap if 12+ rules
+  const effectiveChartType = React.useMemo(() => {
+    if (manualChartType) return manualChartType;
+    if (contributorFilteredRules.length >= 12) return 'heatmap';
+    return 'stacked-area';
+  }, [manualChartType, contributorFilteredRules.length]);
+
+  // For 20+ rules, collapse to Top 5 + Others
+  const shouldCollapseToTop5 = contributorFilteredRules.length >= 20;
+  const displayRules = React.useMemo(() => {
+    if (shouldCollapseToTop5 && !expandedOthers) {
+      return top5Rules;
+    }
+    return contributorFilteredRules;
+  }, [shouldCollapseToTop5, expandedOthers, top5Rules, contributorFilteredRules]);
+
+  const otherRules = React.useMemo(() => {
+    if (shouldCollapseToTop5) {
+      return contributorFilteredRules.filter((r) => !top5Rules.includes(r));
+    }
+    return [];
+  }, [shouldCollapseToTop5, contributorFilteredRules, top5Rules]);
+
+  // Visible rules: based on focus mode
   const visibleRules = React.useMemo(() => {
-    if (focusedRule) {
+    if (focusMode === 'single' && focusedRule) {
       return new Set([focusedRule]);
     }
+    if (focusMode === 'subset' && focusedSubset.size > 0) {
+      return focusedSubset;
+    }
     return new Set(displayRules);
-  }, [focusedRule, displayRules]);
+  }, [focusMode, focusedRule, focusedSubset, displayRules]);
 
+  // Empty state check
+  const hasNoRules = filteredRuleIds.length === 0 || displayRules.length === 0;
 
-  // Get rule color with opacity based on focus/selection
+  // Get rule color
   const getRuleColor = (ruleId: string, isTop5: boolean): string => {
-    const baseColor = RULE_COLORS[ruleId] || '#94a3b8';
-    
-    if (focusedRule === ruleId) {
-      return baseColor; // Full opacity for focused
-    }
-    
-    if (focusedRule && focusedRule !== ruleId) {
-      return baseColor; // Will be set to 15% opacity via fillOpacity
-    }
-    
-    if (isTop5) {
-      return baseColor; // Full opacity for top 5
-    }
-    
-    // Desaturate non-top-5 rules
-    return baseColor;
+    return RULE_COLORS[ruleId] || '#94a3b8';
   };
 
   // Get rule opacity
   const getRuleOpacity = (ruleId: string, isTop5: boolean): number => {
-    if (focusedRule === ruleId) {
-      return 1.0; // Full opacity for focused
+    if (focusMode === 'single' && focusedRule === ruleId) {
+      return 1.0;
     }
-    
-    if (focusedRule && focusedRule !== ruleId) {
-      return 0.15; // Fade others when focused
+    if (focusMode === 'single' && focusedRule && focusedRule !== ruleId) {
+      return 0.15;
     }
-    
+    if (focusMode === 'subset' && focusedSubset.has(ruleId)) {
+      return 1.0;
+    }
+    if (focusMode === 'subset' && focusedSubset.size > 0 && !focusedSubset.has(ruleId)) {
+      return 0.15;
+    }
     if (isTop5) {
-      return 1.0; // Full opacity for top 5
+      return 1.0;
     }
-    
-    // For non-top-5 rules, use 50% opacity when there are many rules (10+)
-    return filteredRuleIds.length > 10 ? 0.5 : 1.0;
+    return contributorFilteredRules.length > 10 ? 0.5 : 1.0;
   };
 
   // Get stroke width
   const getStrokeWidth = (ruleId: string, isTop5: boolean): number => {
-    if (focusedRule === ruleId) {
+    if (focusMode === 'single' && focusedRule === ruleId) {
       return 2.5;
     }
     if (isTop5) {
       return 1.5;
     }
-    // For non-top-5 rules, use thinner stroke when there are many rules (10+)
-    return filteredRuleIds.length > 10 ? 1 : 1.5;
+    return contributorFilteredRules.length > 10 ? 1 : 1.5;
+  };
+
+  // Get heatmap color intensity
+  const getHeatmapColor = (value: number, maxValue: number): string => {
+    if (maxValue === 0) return HEATMAP_COLORS[0];
+    const ratio = value / maxValue;
+    const index = Math.min(Math.floor(ratio * (HEATMAP_COLORS.length - 1)), HEATMAP_COLORS.length - 1);
+    return HEATMAP_COLORS[index];
   };
 
   const handleRuleHover = (ruleId: string | null) => {
-    setFocusedRule(ruleId);
+    if (focusMode === 'off') {
+      setFocusedRule(ruleId);
+    }
   };
 
   const handleRuleClick = (ruleId: string) => {
-    if (focusedRule === ruleId) {
-      setFocusedRule(null);
-    } else {
-      setFocusedRule(ruleId);
+    if (focusMode === 'subset') {
+      setFocusedSubset((prev) => {
+        const next = new Set(prev);
+        if (next.has(ruleId)) {
+          next.delete(ruleId);
+        } else {
+          next.add(ruleId);
+        }
+        return next;
+      });
+    } else if (focusMode === 'single') {
+      if (focusedRule === ruleId) {
+        setFocusedRule(null);
+      } else {
+        setFocusedRule(ruleId);
+      }
     }
   };
 
@@ -248,9 +316,7 @@ export default function TSYSUnifiedChart({
               const percentage = calculatePercentage(item.value, total);
               const ruleId = item.dataKey;
               const isTop5 = top5Rules.includes(ruleId);
-              // Mock historical average (in real app, this would come from backend)
-              const historicalAvg = isTop5 ? percentage * 0.9 : percentage * 1.1;
-              const change = percentage - historicalAvg;
+              const stages = RULE_STAGE_MAP[ruleId] || [];
               
               return (
                 <VStack key={index} align="stretch" gap={0.5}>
@@ -282,11 +348,9 @@ export default function TSYSUnifiedChart({
                       </Text>
                     </VStack>
                   </HStack>
-                  {focusedRule === ruleId && (
-                    <Text fontSize="xs" color={change >= 0 ? 'green.600' : 'red.600'}>
-                      {change >= 0 ? '+' : ''}{change.toFixed(1)}% vs historical avg
-                    </Text>
-                  )}
+                  <Text fontSize="xs" color="gray.500">
+                    Payment Stage: {stages.join(', ') || 'N/A'}
+                  </Text>
                 </VStack>
               );
             })}
@@ -314,6 +378,37 @@ export default function TSYSUnifiedChart({
     ],
   });
 
+  const topContributorsCollection = createListCollection({
+    items: [
+      { label: 'All Rules', value: 'all' },
+      { label: 'Top 5', value: 'top5' },
+      { label: 'Top 10', value: 'top10' },
+      { label: 'Payment Stage Only', value: 'payment-stage-only' },
+    ],
+  });
+
+  // Empty state
+  if (hasNoRules) {
+    return (
+      <Box 
+        bg="white" 
+        p={6} 
+        borderRadius="xl" 
+        boxShadow="0 2px 8px rgba(0,0,0,0.05)"
+        borderWidth="1px"
+        borderColor="gray.200"
+      >
+        <VStack align="center" justify="center" minH="400px" gap={4}>
+          <Text fontSize="lg" color="gray.500" fontWeight="medium">
+            No rule activity for this combination of filters.
+          </Text>
+          <Text fontSize="sm" color="gray.400">
+            Try adjusting your filter selections to see rule participation data.
+          </Text>
+        </VStack>
+      </Box>
+    );
+  }
 
   return (
     <Box 
@@ -374,8 +469,8 @@ export default function TSYSUnifiedChart({
                 Chart Type
               </Text>
               <Select.Root
-                value={[chartType]}
-                onValueChange={(e) => setChartType(e.value[0] as 'stacked-area' | 'heatmap')}
+                value={[effectiveChartType]}
+                onValueChange={(e) => setManualChartType(e.value[0] as 'stacked-area' | 'heatmap')}
                 collection={chartTypeCollection}
                 size="sm"
               >
@@ -417,15 +512,170 @@ export default function TSYSUnifiedChart({
           Rule participation across payment stages over time
         </Text>
 
+        {/* Auto-switch banner */}
+        {effectiveChartType === 'heatmap' && contributorFilteredRules.length >= 12 && !manualChartType && (
+          <Box
+            bg="blue.50"
+            borderWidth="1px"
+            borderColor="blue.200"
+            borderRadius="md"
+            p={3}
+          >
+            <HStack justify="space-between" align="center">
+              <Text fontSize="sm" color="blue.700">
+                Heatmap mode activated to improve readability with large rule sets.
+              </Text>
+              <Button
+                size="xs"
+                variant="ghost"
+                onClick={() => setManualChartType('stacked-area')}
+              >
+                <X size={14} />
+              </Button>
+            </HStack>
+          </Box>
+        )}
+
+        {/* Controls */}
+        <HStack gap={4} flexWrap="wrap">
+          <Box minW="150px">
+            <Text fontSize="xs" fontWeight="semibold" color="gray.600" mb={1}>
+              Top Contributors
+            </Text>
+            <Select.Root
+              value={[topContributorsFilter]}
+              onValueChange={(e) => setTopContributorsFilter(e.value[0] as TopContributorsFilter)}
+              collection={topContributorsCollection}
+              size="sm"
+            >
+              <Select.HiddenSelect />
+              <Select.Control>
+                <Select.Trigger>
+                  <Select.ValueText />
+                </Select.Trigger>
+                <Select.IndicatorGroup>
+                  <Select.Indicator />
+                </Select.IndicatorGroup>
+              </Select.Control>
+              <Portal>
+                <Select.Positioner>
+                  <Select.Content>
+                    {topContributorsCollection.items.map((item) => (
+                      <Select.Item key={item.value} item={item}>
+                        {item.label}
+                        <Select.ItemIndicator />
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select.Positioner>
+              </Portal>
+            </Select.Root>
+          </Box>
+
+          <Box minW="150px">
+            <Text fontSize="xs" fontWeight="semibold" color="gray.600" mb={1}>
+              Focus Mode
+            </Text>
+            <Select.Root
+              value={[focusMode]}
+              onValueChange={(e) => {
+                const mode = e.value[0] as 'off' | 'single' | 'subset';
+                setFocusMode(mode);
+                if (mode === 'off') {
+                  setFocusedRule(null);
+                  setFocusedSubset(new Set());
+                }
+              }}
+              collection={createListCollection({
+                items: [
+                  { label: 'Off', value: 'off' },
+                  { label: 'Single Rule', value: 'single' },
+                  { label: 'Selected Subset', value: 'subset' },
+                ],
+              })}
+              size="sm"
+            >
+              <Select.HiddenSelect />
+              <Select.Control>
+                <Select.Trigger>
+                  <Select.ValueText />
+                </Select.Trigger>
+                <Select.IndicatorGroup>
+                  <Select.Indicator />
+                </Select.IndicatorGroup>
+              </Select.Control>
+              <Portal>
+                <Select.Positioner>
+                  <Select.Content>
+                    <Select.Item item={{ label: 'Off', value: 'off' }}>
+                      Off
+                      <Select.ItemIndicator />
+                    </Select.Item>
+                    <Select.Item item={{ label: 'Single Rule', value: 'single' }}>
+                      Single Rule
+                      <Select.ItemIndicator />
+                    </Select.Item>
+                    <Select.Item item={{ label: 'Selected Subset', value: 'subset' }}>
+                      Selected Subset
+                      <Select.ItemIndicator />
+                    </Select.Item>
+                  </Select.Content>
+                </Select.Positioner>
+              </Portal>
+            </Select.Root>
+          </Box>
+
+          {/* Focus subset chips */}
+          {focusMode === 'subset' && (
+            <Box flex={1}>
+              <Text fontSize="xs" fontWeight="semibold" color="gray.600" mb={1}>
+                Selected Rules
+              </Text>
+              <HStack gap={2} flexWrap="wrap">
+                {Array.from(focusedSubset).map((ruleId) => (
+                  <Badge
+                    key={ruleId}
+                    colorPalette="blue"
+                    variant="subtle"
+                    px={2}
+                    py={1}
+                    borderRadius="md"
+                    cursor="pointer"
+                    onClick={() => handleRuleClick(ruleId)}
+                  >
+                    {RULE_DESCRIPTIONS[ruleId] || ruleId}
+                    <Button
+                      size="xs"
+                      variant="ghost"
+                      ml={1}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRuleClick(ruleId);
+                      }}
+                    >
+                      <X size={12} />
+                    </Button>
+                  </Badge>
+                ))}
+                {focusedSubset.size === 0 && (
+                  <Text fontSize="xs" color="gray.400">
+                    Click rules in chart to add to subset
+                  </Text>
+                )}
+              </HStack>
+            </Box>
+          )}
+        </HStack>
+
         {/* Chart */}
         <Box height="400px" width="100%">
-          {chartType === 'heatmap' ? (
+          {effectiveChartType === 'heatmap' ? (
             <Box height="100%" width="100%" overflowX="auto">
               <Box minW="600px">
                 <VStack align="stretch" gap={2}>
                   {/* X-axis labels */}
                   <HStack gap={1} ml="120px">
-                    {data.slice(0, Math.min(20, data.length)).map((item, index) => (
+                    {data.slice(0, Math.min(30, data.length)).map((item, index) => (
                       <Box
                         key={index}
                         w="40px"
@@ -449,6 +699,7 @@ export default function TSYSUnifiedChart({
                         
                         // Calculate max value for this rule across all dates
                         const maxValue = Math.max(...data.map((item) => item[ruleId] || 0));
+                        const stages = RULE_STAGE_MAP[ruleId] || [];
                         
                         return (
                           <HStack key={ruleId} gap={1} align="center">
@@ -471,28 +722,12 @@ export default function TSYSUnifiedChart({
                             </Box>
                             
                             {/* Heatmap cells */}
-                            {data.slice(0, Math.min(20, data.length)).map((item, dateIndex) => {
+                            {data.slice(0, Math.min(30, data.length)).map((item, dateIndex) => {
                               const value = item[ruleId] || 0;
-                              const intensity = maxValue > 0 ? value / maxValue : 0;
-                              const opacity = Math.max(0.2, Math.min(1, intensity));
-                              const color = getRuleColor(ruleId, isTop5);
-                              
-                              // Convert color to rgba for opacity
-                              const rgbMatch = color.match(/\d+/g);
-                              let bgColor = color;
-                              if (rgbMatch && rgbMatch.length >= 3) {
-                                bgColor = `rgba(${rgbMatch[0]}, ${rgbMatch[1]}, ${rgbMatch[2]}, ${opacity})`;
-                              } else if (color.startsWith('#')) {
-                                // Convert hex to rgba
-                                const r = parseInt(color.slice(1, 3), 16);
-                                const g = parseInt(color.slice(3, 5), 16);
-                                const b = parseInt(color.slice(5, 7), 16);
-                                bgColor = `rgba(${r}, ${g}, ${b}, ${opacity})`;
-                              } else {
-                                bgColor = color;
-                              }
-                              
-                              const percentage = item.total > 0 ? calculatePercentage(value, item.total) : 0;
+                              const total = item.total || 1;
+                              const percentage = calculatePercentage(value, total);
+                              const bgColor = getHeatmapColor(value, maxValue);
+                              const stages = RULE_STAGE_MAP[ruleId] || [];
                               
                               return (
                                 <Tooltip.Root key={dateIndex}>
@@ -524,8 +759,10 @@ export default function TSYSUnifiedChart({
                                         <VStack align="start" gap={1}>
                                           <Text fontWeight="bold">{item.date}</Text>
                                           <Text>{RULE_DESCRIPTIONS[ruleId] || ruleId}</Text>
+                                          <Text fontSize="xs">{ruleId}</Text>
                                           <Text fontSize="xs">Count: {value.toLocaleString()}</Text>
-                                          <Text fontSize="xs">Participation: {percentage}%</Text>
+                                          <Text fontSize="xs">Share: {percentage}%</Text>
+                                          <Text fontSize="xs">Payment Stage: {stages.join(', ') || 'N/A'}</Text>
                                         </VStack>
                                       </Tooltip.Content>
                                     </Tooltip.Positioner>
@@ -544,85 +781,107 @@ export default function TSYSUnifiedChart({
           ) : (
             <ResponsiveContainer width="100%" height="100%">
               {useLineChart ? (
-              <LineChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: xAxisConfig.angle !== 0 ? 40 : 5 }}>
-                {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" vertical={false} />}
-                <XAxis 
-                  dataKey="date" 
-                  {...xAxisConfig}
-                />
-                <YAxis 
-                  tick={{ fontSize: 11, fill: '#6b7280' }}
-                  axisLine={{ stroke: '#e5e7eb' }}
-                  tickLine={{ stroke: '#e5e7eb' }}
-                  label={{ value: 'Count', angle: -90, position: 'insideLeft', fontSize: 11, fill: '#6b7280' }}
-                />
-                <RechartsTooltip content={<CustomTooltip />} />
-                <Legend 
-                  wrapperStyle={{ display: 'none' }}
-                />
-                {displayRules.map((ruleId) => {
-                  if (!visibleRules.has(ruleId)) return null;
-                  const isTop5 = top5Rules.includes(ruleId);
-                  const opacity = getRuleOpacity(ruleId, isTop5);
-                  const color = getRuleColor(ruleId, isTop5);
-                  
-                  return (
-                    <Line
-                      key={ruleId}
-                      type="monotone"
-                      dataKey={ruleId}
-                      stroke={color}
-                      strokeWidth={getStrokeWidth(ruleId, isTop5)}
-                      strokeOpacity={opacity}
-                      dot={{ fill: color, r: 3, opacity }}
-                      activeDot={{ r: 5 }}
-                      animationDuration={400}
-                    />
-                  );
-                })}
-              </LineChart>
-            ) : (
-              <AreaChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: xAxisConfig.angle !== 0 ? 40 : 5 }}>
-                {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" vertical={false} />}
-                <XAxis 
-                  dataKey="date" 
-                  {...xAxisConfig}
-                />
-                <YAxis 
-                  tick={{ fontSize: 11, fill: '#6b7280' }}
-                  axisLine={{ stroke: '#e5e7eb' }}
-                  tickLine={{ stroke: '#e5e7eb' }}
-                  label={{ value: 'Count', angle: -90, position: 'insideLeft', fontSize: 11, fill: '#6b7280' }}
-                />
-                <RechartsTooltip content={<CustomTooltip />} />
-                <Legend 
-                  wrapperStyle={{ display: 'none' }}
-                />
-                {displayRules.map((ruleId) => {
-                  if (!visibleRules.has(ruleId)) return null;
-                  const isTop5 = top5Rules.includes(ruleId);
-                  const opacity = getRuleOpacity(ruleId, isTop5);
-                  const color = getRuleColor(ruleId, isTop5);
-                  
-                  return (
-                    <Area
-                      key={ruleId}
-                      type={dateGrouping === 'weekly' || dateGrouping === 'monthly' ? 'monotone' : 'linear'}
-                      dataKey={ruleId}
-                      stackId="rules"
-                      fill={color}
-                      stroke={color}
-                      strokeWidth={getStrokeWidth(ruleId, isTop5)}
-                      fillOpacity={opacity}
-                      animationDuration={400}
-                    />
-                  );
-                })}
-              </AreaChart>
+                <LineChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: xAxisConfig.angle !== 0 ? 40 : 5 }}>
+                  {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" vertical={false} />}
+                  <XAxis 
+                    dataKey="date" 
+                    {...xAxisConfig}
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 11, fill: '#6b7280' }}
+                    axisLine={{ stroke: '#e5e7eb' }}
+                    tickLine={{ stroke: '#e5e7eb' }}
+                    label={{ value: 'Count', angle: -90, position: 'insideLeft', fontSize: 11, fill: '#6b7280' }}
+                  />
+                  <RechartsTooltip content={<CustomTooltip />} />
+                  <Legend 
+                    wrapperStyle={{ display: 'none' }}
+                  />
+                  {displayRules.map((ruleId) => {
+                    if (!visibleRules.has(ruleId)) return null;
+                    const isTop5 = top5Rules.includes(ruleId);
+                    const opacity = getRuleOpacity(ruleId, isTop5);
+                    const color = getRuleColor(ruleId, isTop5);
+                    
+                    return (
+                      <Line
+                        key={ruleId}
+                        type="monotone"
+                        dataKey={ruleId}
+                        stroke={color}
+                        strokeWidth={getStrokeWidth(ruleId, isTop5)}
+                        strokeOpacity={opacity}
+                        dot={{ fill: color, r: 3, opacity }}
+                        activeDot={{ r: 5 }}
+                        animationDuration={400}
+                      />
+                    );
+                  })}
+                </LineChart>
+              ) : (
+                <AreaChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: xAxisConfig.angle !== 0 ? 40 : 5 }}>
+                  {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" vertical={false} />}
+                  <XAxis 
+                    dataKey="date" 
+                    {...xAxisConfig}
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 11, fill: '#6b7280' }}
+                    axisLine={{ stroke: '#e5e7eb' }}
+                    tickLine={{ stroke: '#e5e7eb' }}
+                    label={{ value: 'Count', angle: -90, position: 'insideLeft', fontSize: 11, fill: '#6b7280' }}
+                  />
+                  <RechartsTooltip content={<CustomTooltip />} />
+                  <Legend 
+                    wrapperStyle={{ display: 'none' }}
+                  />
+                  {displayRules.map((ruleId) => {
+                    if (!visibleRules.has(ruleId)) return null;
+                    const isTop5 = top5Rules.includes(ruleId);
+                    const opacity = getRuleOpacity(ruleId, isTop5);
+                    const color = getRuleColor(ruleId, isTop5);
+                    
+                    return (
+                      <Area
+                        key={ruleId}
+                        type={dateGrouping === 'weekly' || dateGrouping === 'monthly' ? 'monotone' : 'linear'}
+                        dataKey={ruleId}
+                        stackId="rules"
+                        fill={color}
+                        stroke={color}
+                        strokeWidth={getStrokeWidth(ruleId, isTop5)}
+                        fillOpacity={opacity}
+                        animationDuration={400}
+                      />
+                    );
+                  })}
+                </AreaChart>
               )}
             </ResponsiveContainer>
           )}
         </Box>
+
+        {/* Top 5 + Others collapse */}
+        {shouldCollapseToTop5 && !expandedOthers && otherRules.length > 0 && (
+          <Box
+            borderWidth="1px"
+            borderColor="gray.200"
+            borderRadius="md"
+            p={3}
+            cursor="pointer"
+            onClick={() => setExpandedOthers(true)}
+            _hover={{ bg: 'gray.50' }}
+          >
+            <HStack justify="space-between">
+              <Text fontSize="sm" fontWeight="medium" color="gray.700">
+                Other rules ({otherRules.length})
+              </Text>
+              <Text fontSize="xs" color="gray.500">
+                Click to expand
+              </Text>
+            </HStack>
+          </Box>
+        )}
       </VStack>
     </Box>
   );
