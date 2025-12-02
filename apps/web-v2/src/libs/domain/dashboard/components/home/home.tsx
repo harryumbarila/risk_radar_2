@@ -159,7 +159,7 @@ export default function Home() {
   };
 
   const handleRuleClick = (ruleId: string) => {
-    setFilters((prev) => ({ ...prev, ruleId }));
+    setFilters((prev) => ({ ...prev, ruleId: [ruleId] }));
   };
 
   const handleSourceClick = (source: Source) => {
