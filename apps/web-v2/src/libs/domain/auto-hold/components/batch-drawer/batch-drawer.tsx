@@ -28,6 +28,8 @@ import MatchTab from '../tabs/match-tab';
 import VolumeTab from '../tabs/volume-tab';
 import NotesTab from '../tabs/notes-tab';
 import TransactionsTab from '../tabs/transactions-tab';
+import UnderwritingTab from '../tabs/underwriting-tab';
+import NetSettlementTab from '../tabs/net-settlement-tab';
 
 interface BatchDrawerProps {
   batch: MerchantTransaction[];
@@ -150,6 +152,8 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
           { label: 'Contact', value: 'contact' },
           { label: 'Chargebacks', value: 'chargebacks' },
           { label: 'Match', value: 'match' },
+          { label: 'Underwriting', value: 'underwriting' },
+          { label: 'Net Settlement', value: 'net-settlement' },
           { label: `Notes (${notesCount})`, value: 'notes' },
         ],
       }),
@@ -319,6 +323,8 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
                       <Tabs.Trigger value="contact">Contact</Tabs.Trigger>
                       <Tabs.Trigger value="chargebacks">Chargebacks</Tabs.Trigger>
                       <Tabs.Trigger value="match">Match</Tabs.Trigger>
+                      <Tabs.Trigger value="underwriting">Underwriting</Tabs.Trigger>
+                      <Tabs.Trigger value="net-settlement">Net Settlement</Tabs.Trigger>
                       <Tabs.Trigger value="notes">
                         <HStack gap={2}>
                           <Text>Notes</Text>
@@ -384,6 +390,14 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
 
                     <Tabs.Content value="match" pt={4}>
                       <MatchTab merchantId={merchantInfo?.mid || ''} />
+                    </Tabs.Content>
+
+                    <Tabs.Content value="underwriting" pt={4}>
+                      <UnderwritingTab merchantId={merchantInfo?.mid || ''} />
+                    </Tabs.Content>
+
+                    <Tabs.Content value="net-settlement" pt={4}>
+                      <NetSettlementTab merchantId={merchantInfo?.mid || ''} />
                     </Tabs.Content>
 
                     <Tabs.Content value="notes" pt={4}>
