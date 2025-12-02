@@ -181,14 +181,14 @@ export default function TSYSUnifiedChart({
     return 'stacked-area';
   }, [manualChartType, contributorFilteredRules.length]);
 
-  // For 20+ rules, collapse to Top 5 + Others
-  const shouldCollapseToTop5 = contributorFilteredRules.length >= 20;
+  // For 20+ rules, collapse to Top 5 + Others (only for stacked-area, not heatmap)
+  const shouldCollapseToTop5 = contributorFilteredRules.length >= 20 && effectiveChartType === 'stacked-area';
   const displayRules = React.useMemo(() => {
     if (shouldCollapseToTop5 && !expandedOthers) {
       return top5Rules;
     }
     return contributorFilteredRules;
-  }, [shouldCollapseToTop5, expandedOthers, top5Rules, contributorFilteredRules]);
+  }, [shouldCollapseToTop5, expandedOthers, top5Rules, contributorFilteredRules, effectiveChartType]);
 
   const otherRules = React.useMemo(() => {
     if (shouldCollapseToTop5) {
@@ -675,7 +675,7 @@ export default function TSYSUnifiedChart({
                 <VStack align="stretch" gap={2}>
                   {/* X-axis labels */}
                   <HStack gap={1} ml="120px">
-                    {data.slice(0, Math.min(30, data.length)).map((item, index) => (
+                    {data.map((item, index) => (
                       <Box
                         key={index}
                         w="40px"
@@ -692,7 +692,7 @@ export default function TSYSUnifiedChart({
                   {/* Heatmap cells */}
                   <Box overflowY="auto" maxH="350px">
                     <VStack align="stretch" gap={1}>
-                      {displayRules.slice(0, 30).map((ruleId) => {
+                      {displayRules.map((ruleId) => {
                         const isTop5 = top5Rules.includes(ruleId);
                         const isVisible = visibleRules.has(ruleId);
                         if (!isVisible) return null;
@@ -722,7 +722,7 @@ export default function TSYSUnifiedChart({
                             </Box>
                             
                             {/* Heatmap cells */}
-                            {data.slice(0, Math.min(30, data.length)).map((item, dateIndex) => {
+                            {data.map((item, dateIndex) => {
                               const value = item[ruleId] || 0;
                               const total = item.total || 1;
                               const percentage = calculatePercentage(value, total);
