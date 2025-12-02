@@ -3,8 +3,8 @@ import React from 'react';
 import { Box, VStack, Text, HStack, Tooltip, Portal } from '@chakra-ui/react';
 import { Info } from 'lucide-react';
 import {
-  AreaChart,
-  Area,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -13,51 +13,44 @@ import {
   Legend,
 } from 'recharts';
 import type { MockAlert } from '../../utils/mockData';
-import EmptyState from '../empty-state/empty-state';
 
 interface TrendChartProps {
   alerts: MockAlert[];
   onWeekClick?: (week: number) => void;
 }
 
-export default function TrendChart({ alerts, onWeekClick }: TrendChartProps) {
-  // Group alerts by week and risk level
-  const weekData = React.useMemo(() => {
-    const weeks = new Map<number, { high: number; medium: number; low: number }>();
+// Generate mock data for daily authorization volumes and auto hold counts
+const generateDailyData = () => {
+  const data = [];
+  const today = new Date();
+  
+  // Generate data for the last 14 days
+  for (let i = 13; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
     
-    alerts.forEach((alert) => {
-      const date = new Date(alert.date);
-      const weekStart = new Date(date);
-      weekStart.setDate(date.getDate() - date.getDay()); // Start of week (Sunday)
-      const weekNum = Math.floor((Date.now() - weekStart.getTime()) / (7 * 24 * 60 * 60 * 1000));
-      
-      if (!weeks.has(weekNum)) {
-        weeks.set(weekNum, { high: 0, medium: 0, low: 0 });
-      }
-      const week = weeks.get(weekNum)!;
-      week[alert.risk]++;
+    // Authorization volumes: high values with fluctuations (10,000-15,500)
+    const authVolume = Math.floor(Math.random() * 5500) + 10000;
+    
+    // Auto hold counts: consistently low (200-600)
+    const autoHold = Math.floor(Math.random() * 400) + 200;
+    
+    data.push({
+      date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      dateValue: date.toISOString().split('T')[0],
+      authVolume,
+      autoHold,
     });
-
-    return Array.from(weeks.entries())
-      .map(([week, data]) => ({
-        week: `Week ${week}`,
-        weekNum: week,
-        High: data.high,
-        Medium: data.medium,
-        Low: data.low,
-        Total: data.high + data.medium + data.low,
-      }))
-      .sort((a, b) => a.weekNum - b.weekNum)
-      .slice(-12); // Last 12 weeks
-  }, [alerts]);
-
-  if (weekData.length === 0) {
-    return <EmptyState title="No trend data available" />;
   }
+  
+  return data;
+};
+
+export default function TrendChart({ alerts, onWeekClick }: TrendChartProps) {
+  const dailyData = React.useMemo(() => generateDailyData(), []);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
-      const data = payload[0].payload;
       return (
         <Box
           bg="white"
@@ -71,18 +64,16 @@ export default function TrendChart({ alerts, onWeekClick }: TrendChartProps) {
             {label}
           </Text>
           <VStack align="stretch" gap={1}>
-            <HStack justify="space-between" gap={4}>
-              <Text fontSize="xs" color="red.600">High:</Text>
-              <Text fontSize="xs" fontWeight="semibold">{data.High}</Text>
-            </HStack>
-            <HStack justify="space-between" gap={4}>
-              <Text fontSize="xs" color="orange.600">Medium:</Text>
-              <Text fontSize="xs" fontWeight="semibold">{data.Medium}</Text>
-            </HStack>
-            <HStack justify="space-between" gap={4}>
-              <Text fontSize="xs" color="green.600">Low:</Text>
-              <Text fontSize="xs" fontWeight="semibold">{data.Low}</Text>
-            </HStack>
+            {payload.map((item: any, index: number) => (
+              <HStack key={index} justify="space-between" gap={4}>
+                <Text fontSize="xs" color={item.color}>
+                  {item.name}:
+                </Text>
+                <Text fontSize="xs" fontWeight="semibold">
+                  {item.value.toLocaleString()}
+                </Text>
+              </HStack>
+            ))}
           </VStack>
         </Box>
       );
@@ -99,102 +90,100 @@ export default function TrendChart({ alerts, onWeekClick }: TrendChartProps) {
       borderWidth="1px"
       borderColor="gray.200"
       role="region"
-      aria-label="Weekly Risk Trend Chart"
+      aria-label="Daily Authorization and Auto Hold Trend Chart"
     >
-      <VStack align="stretch" gap={4}>
-        <HStack gap={2} align="center">
-          <Text fontSize="lg" fontWeight="bold">
-            Weekly Risk Trend
-          </Text>
-          <Tooltip.Root>
-            <Tooltip.Trigger asChild>
-              <Box
-                as="span"
-                color="gray.400"
-                _hover={{ color: 'gray.600' }}
-                cursor="help"
-                display="inline-flex"
-                alignItems="center"
-                aria-label="Chart information"
-              >
-                <Info size={16} />
-              </Box>
-            </Tooltip.Trigger>
-            <Portal>
-              <Tooltip.Positioner>
-                <Tooltip.Content
-                  maxW="300px"
-                  zIndex={1100}
-                  bg="gray.900"
-                  color="white"
-                  px={3}
-                  py={2}
-                  borderRadius="md"
-                  fontSize="sm"
-                  boxShadow="lg"
-                >
-                  <Tooltip.Arrow />
-                  Shows the distribution of alerts by risk level (High, Medium, Low) over the last 12 weeks. Click on a week to filter the dashboard.
-                </Tooltip.Content>
-              </Tooltip.Positioner>
-            </Portal>
-          </Tooltip.Root>
+      <VStack align="stretch" gap={3}>
+        <HStack justify="space-between" align="flex-start">
+          <VStack align="start" gap={1}>
+            <HStack gap={2} align="center">
+              <Text fontSize="lg" fontWeight="bold">
+                Daily Authorization and Auto Hold Trend
+              </Text>
+              <Tooltip.Root>
+                <Tooltip.Trigger asChild>
+                  <Box
+                    as="span"
+                    color="gray.400"
+                    _hover={{ color: 'gray.600' }}
+                    cursor="help"
+                    display="inline-flex"
+                    alignItems="center"
+                    aria-label="Chart information"
+                  >
+                    <Info size={16} />
+                  </Box>
+                </Tooltip.Trigger>
+                <Portal>
+                  <Tooltip.Positioner>
+                    <Tooltip.Content
+                      maxW="300px"
+                      zIndex={1100}
+                      bg="gray.900"
+                      color="white"
+                      px={3}
+                      py={2}
+                      borderRadius="md"
+                      fontSize="sm"
+                      boxShadow="lg"
+                    >
+                      <Tooltip.Arrow />
+                      Daily authorization volumes and auto hold counts over the last 14 days. Shows the relationship between total authorizations and auto hold transactions.
+                    </Tooltip.Content>
+                  </Tooltip.Positioner>
+                </Portal>
+              </Tooltip.Root>
+            </HStack>
+            <Text fontSize="sm" color="gray.600">
+              Daily authorization volumes and auto hold counts
+            </Text>
+          </VStack>
         </HStack>
         <Box height="300px" width="100%">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart
-              data={weekData}
-              onClick={(data: any) => {
-                if (data && 'activePayload' in data && data.activePayload && onWeekClick) {
-                  const weekNum = data.activePayload[0]?.payload?.weekNum;
-                  if (weekNum !== undefined) {
-                    onWeekClick(weekNum);
-                  }
-                }
-              }}
-              style={{ cursor: onWeekClick ? 'pointer' : 'default' }}
-            >
+            <LineChart data={dailyData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-              <XAxis dataKey="week" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
+              <XAxis 
+                dataKey="date" 
+                tick={{ fontSize: 11, fill: '#6b7280' }}
+                axisLine={{ stroke: '#e5e7eb' }}
+                tickLine={{ stroke: '#e5e7eb' }}
+              />
+              <YAxis 
+                domain={[0, 16000]}
+                tick={{ fontSize: 11, fill: '#6b7280' }}
+                axisLine={{ stroke: '#e5e7eb' }}
+                tickLine={{ stroke: '#e5e7eb' }}
+              />
               <RechartsTooltip content={<CustomTooltip />} />
-              <Legend />
-              {/* Order: Low (bottom), Medium (middle), High (top) */}
-              <Area
-                type="monotone"
-                dataKey="Low"
-                stackId="1"
-                stroke="#10b981"
-                fill="#10b981"
-                fillOpacity={0.6}
-                animationDuration={300}
-                animationEasing="ease-out"
+              <Legend 
+                wrapperStyle={{ paddingTop: '20px' }}
+                iconType="line"
+                iconSize={12}
               />
-              <Area
+              <Line
                 type="monotone"
-                dataKey="Medium"
-                stackId="1"
-                stroke="#f59e0b"
-                fill="#f59e0b"
-                fillOpacity={0.6}
+                dataKey="authVolume"
+                name="Daily authorization volumes"
+                stroke="#3b82f6"
+                strokeWidth={2}
+                dot={{ fill: '#3b82f6', r: 3 }}
+                activeDot={{ r: 5 }}
                 animationDuration={300}
-                animationEasing="ease-out"
               />
-              <Area
+              <Line
                 type="monotone"
-                dataKey="High"
-                stackId="1"
+                dataKey="autoHold"
+                name="Auto hold counts"
                 stroke="#ef4444"
-                fill="#ef4444"
-                fillOpacity={0.6}
+                strokeWidth={2}
+                dot={{ fill: '#ef4444', r: 3 }}
+                activeDot={{ r: 5 }}
                 animationDuration={300}
-                animationEasing="ease-out"
               />
-            </AreaChart>
+            </LineChart>
           </ResponsiveContainer>
         </Box>
       </VStack>
     </Box>
   );
 }
-
