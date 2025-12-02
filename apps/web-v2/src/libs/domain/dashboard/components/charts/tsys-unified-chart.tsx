@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
-import { Box, VStack, Text, HStack, Tooltip, Portal, Popover, Button, Select, Input, createListCollection, Checkbox } from '@chakra-ui/react';
-import { Info, ChevronDown, Search } from 'lucide-react';
+import { Box, VStack, Text, HStack, Tooltip, Portal, Select, createListCollection } from '@chakra-ui/react';
+import { Info } from 'lucide-react';
 import {
   AreaChart,
   Area,
@@ -85,7 +85,6 @@ export default function TSYSUnifiedChart({
 }: TSYSUnifiedChartProps) {
   const [chartType, setChartType] = React.useState<'stacked-area' | 'heatmap'>('stacked-area');
   const [focusedRule, setFocusedRule] = React.useState<string | null>(null);
-  const [legendSearch, setLegendSearch] = React.useState('');
   
   const days = React.useMemo(() => dateRange ? getDaysFromDateRange(dateRange) : 14, [dateRange]);
   const dateGrouping = React.useMemo(() => getDateGrouping(days), [days]);
@@ -151,16 +150,6 @@ export default function TSYSUnifiedChart({
     return new Set(displayRules);
   }, [focusedRule, displayRules]);
 
-  // Filter rules by search
-  const filteredDisplayRules = React.useMemo(() => {
-    if (!legendSearch) return displayRules;
-    const searchLower = legendSearch.toLowerCase();
-    return displayRules.filter((ruleId) => {
-      const description = RULE_DESCRIPTIONS[ruleId] || ruleId;
-      return ruleId.toLowerCase().includes(searchLower) || 
-             description.toLowerCase().includes(searchLower);
-    });
-  }, [displayRules, legendSearch]);
 
   // Get rule color with opacity based on focus/selection
   const getRuleColor = (ruleId: string, isTop5: boolean): string => {
@@ -633,167 +622,6 @@ export default function TSYSUnifiedChart({
               )}
             </ResponsiveContainer>
           )}
-        </Box>
-
-
-        {/* Responsive Legend */}
-        <Box>
-          {/* Desktop/Tablet: Legend below chart */}
-          <Box display={{ base: 'none', md: 'block' }}>
-            <VStack align="stretch" gap={3}>
-              {/* Search bar */}
-              <Box position="relative">
-                <Input
-                  placeholder="Search rules..."
-                  size="sm"
-                  value={legendSearch}
-                  onChange={(e) => setLegendSearch(e.target.value)}
-                  pl={8}
-                />
-                <Box
-                  position="absolute"
-                  left={2}
-                  top="50%"
-                  transform="translateY(-50%)"
-                  color="gray.400"
-                >
-                  <Search size={16} />
-                </Box>
-              </Box>
-              
-              {/* Scrollable legend */}
-              <Box
-                maxH="200px"
-                overflowY="auto"
-                borderWidth="1px"
-                borderColor="gray.200"
-                borderRadius="md"
-                p={3}
-              >
-                <VStack align="stretch" gap={2}>
-                  {filteredDisplayRules.map((ruleId) => {
-                    const isTop5 = top5Rules.includes(ruleId);
-                    const isVisible = visibleRules.has(ruleId);
-                    const isFocused = focusedRule === ruleId;
-                    const opacity = getRuleOpacity(ruleId, isTop5);
-                    const color = getRuleColor(ruleId, isTop5);
-                    
-                    return (
-                      <HStack
-                        key={ruleId}
-                        gap={2}
-                        p={2}
-                        borderRadius="md"
-                        bg={isFocused ? 'blue.50' : 'transparent'}
-                        borderWidth={isFocused ? '2px' : '1px'}
-                        borderColor={isFocused ? 'blue.300' : 'transparent'}
-                        cursor="pointer"
-                        onClick={() => handleRuleClick(ruleId)}
-                        onMouseEnter={() => handleRuleHover(ruleId)}
-                        onMouseLeave={() => handleRuleHover(null)}
-                        transition="all 0.2s"
-                      >
-                        <Box
-                          w="16px"
-                          h="16px"
-                          borderRadius="sm"
-                          bg={color}
-                          borderWidth="1px"
-                          borderColor="gray.300"
-                          opacity={opacity}
-                        />
-                        <VStack align="start" gap={0} flex={1}>
-                          <Text fontSize="xs" fontWeight={isTop5 ? 'semibold' : 'normal'} color="gray.700">
-                            {RULE_DESCRIPTIONS[ruleId] || ruleId}
-                          </Text>
-                          <Text fontSize="xs" color="gray.500">
-                            {ruleId}
-                          </Text>
-                        </VStack>
-                        {isTop5 && (
-                          <Text fontSize="xs" color="blue.600" fontWeight="semibold">
-                            Top 5
-                          </Text>
-                        )}
-                      </HStack>
-                    );
-                  })}
-                </VStack>
-              </Box>
-            </VStack>
-          </Box>
-
-          {/* Mobile: Legend dropdown */}
-          <Box display={{ base: 'block', md: 'none' }}>
-            <Popover.Root positioning={{ placement: 'bottom-start' }}>
-              <Popover.Trigger asChild>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  width="100%"
-                  justifyContent="space-between"
-                >
-                  <Text fontSize="sm">
-                    {visibleRules.size === filteredRuleIds.length 
-                      ? 'All rules visible' 
-                      : `${visibleRules.size} of ${filteredRuleIds.length} rules visible`}
-                  </Text>
-                  <ChevronDown size={16} />
-                </Button>
-              </Popover.Trigger>
-              <Portal>
-                <Popover.Positioner>
-                  <Popover.Content maxW="300px" maxH="400px">
-                    <Popover.Arrow />
-                    <VStack align="stretch" gap={2} p={3}>
-                      <Input
-                        placeholder="Search rules..."
-                        size="sm"
-                        value={legendSearch}
-                        onChange={(e) => setLegendSearch(e.target.value)}
-                      />
-                      <Box overflowY="auto" maxH="300px">
-                        <VStack align="stretch" gap={2}>
-                          {filteredDisplayRules.map((ruleId) => {
-                            const isTop5 = top5Rules.includes(ruleId);
-                            const isVisible = visibleRules.has(ruleId);
-                            const isFocused = focusedRule === ruleId;
-                            const color = getRuleColor(ruleId, isTop5);
-                            
-                            return (
-                              <HStack
-                                key={ruleId}
-                                gap={2}
-                                cursor="pointer"
-                                onClick={() => handleRuleClick(ruleId)}
-                                onMouseEnter={() => handleRuleHover(ruleId)}
-                                onMouseLeave={() => handleRuleHover(null)}
-                                p={1}
-                                borderRadius="sm"
-                                bg={isFocused ? 'blue.50' : 'transparent'}
-                              >
-                                <Box
-                                  w="12px"
-                                  h="12px"
-                                  borderRadius="sm"
-                                  bg={color}
-                                  borderWidth="1px"
-                                  borderColor="gray.300"
-                                />
-                                <Text fontSize="xs" color="gray.600">
-                                  {RULE_DESCRIPTIONS[ruleId] || ruleId}
-                                </Text>
-                              </HStack>
-                            );
-                          })}
-                        </VStack>
-                      </Box>
-                    </VStack>
-                  </Popover.Content>
-                </Popover.Positioner>
-              </Portal>
-            </Popover.Root>
-          </Box>
         </Box>
       </VStack>
     </Box>
