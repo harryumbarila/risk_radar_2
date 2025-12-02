@@ -66,11 +66,6 @@ function BooleanIcon({
             color="green.600"
             width="16px"
             height="16px"
-            sx={{
-              '& svg': {
-                color: 'currentColor',
-              },
-            }}
           >
             <Check size={14} strokeWidth={2.5} style={{ color: 'currentColor' }} />
           </Box>
@@ -106,11 +101,6 @@ function BooleanIcon({
       color="gray.300"
       width="16px"
       height="16px"
-      sx={{
-        '& svg': {
-          color: 'currentColor',
-        },
-      }}
     >
       <Circle size={12} strokeWidth={2} fill="none" style={{ color: 'currentColor' }} />
     </Box>
