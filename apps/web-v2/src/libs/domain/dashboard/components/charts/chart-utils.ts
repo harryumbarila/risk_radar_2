@@ -72,7 +72,13 @@ export const formatWeeklyDate = (startDate: Date, endDate: Date): string => {
 };
 
 // Format date for monthly grouping
-export const formatMonthlyDate = (date: Date): string => {
+export const formatMonthlyDate = (date: Date, shortFormat: boolean = false): string => {
+  if (shortFormat) {
+    // Format: "Aug '25"
+    const month = date.toLocaleDateString('en-US', { month: 'short' });
+    const year = date.getFullYear().toString().slice(-2);
+    return `${month} '${year}`;
+  }
   return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 };
 
@@ -169,11 +175,12 @@ export const generateRuleParticipationData = (
   } else {
     // Monthly aggregation
     const months = Math.ceil(days / 30);
+    const useShortFormat = days > 180; // Use short format for > 6 months
     for (let i = months - 1; i >= 0; i--) {
       const monthStart = new Date(today.getFullYear(), today.getMonth() - i, 1);
       const monthEnd = new Date(today.getFullYear(), today.getMonth() - i + 1, 0);
       const monthData: Record<string, any> = {
-        date: formatMonthlyDate(monthStart),
+        date: formatMonthlyDate(monthStart, useShortFormat),
         dateValue: monthStart.toISOString().split('T')[0],
         dateObj: monthStart,
         dateRange: { start: monthStart, end: monthEnd },

@@ -18,10 +18,7 @@ import SourceDistributionChart from '../charts/source-distribution-chart';
 import HeatmapChart from '../charts/heatmap-chart';
 import MerchantRanking from '../charts/merchant-ranking';
 import RuleLabel from '../rule-label/rule-label';
-import TSYSAuthChart from '../charts/tsys-auth-chart';
-import TSYSCaptureChart from '../charts/tsys-capture-chart';
-import TSYSSettledChart from '../charts/tsys-settled-chart';
-import TSYSACHReturnsChart from '../charts/tsys-ach-returns-chart';
+import TSYSUnifiedChart from '../charts/tsys-unified-chart';
 import { generateMockAlerts, calculateKpis, type MockAlert, type Source } from '../../utils/mockData';
 
 export default function Home() {
@@ -237,29 +234,7 @@ export default function Home() {
         />
 
         {/* TSYS Performance Overview Section */}
-        <Box role="region" aria-label="TSYS Performance Overview">
-          <VStack align="stretch" gap={4}>
-            <HStack justify="space-between" align="center">
-              <Text fontSize="xl" fontWeight="bold">
-                TSYS Performance Overview
-              </Text>
-              <Text fontSize="xs" color="gray.500">
-                Last Updated: {new Date().toLocaleString('en-US', { 
-                  month: 'short', 
-                  day: 'numeric', 
-                  hour: '2-digit', 
-                  minute: '2-digit' 
-                })}
-              </Text>
-            </HStack>
-            <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
-              <TSYSAuthChart dateRange={filters} />
-              <TSYSCaptureChart dateRange={filters} />
-              <TSYSSettledChart dateRange={filters} />
-              <TSYSACHReturnsChart dateRange={filters} />
-            </SimpleGrid>
-          </VStack>
-        </Box>
+        <TSYSUnifiedChart dateRange={filters} />
 
         {/* KPI Cards */}
         <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap={6} role="region" aria-label="Key Performance Indicators">
