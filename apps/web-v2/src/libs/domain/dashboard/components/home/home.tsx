@@ -14,7 +14,6 @@ import FilterBar, { type FilterState } from '../filter-bar/filter-bar';
 import KpiCard from '../kpi-card/kpi-card';
 import TopRulesChart from '../charts/top-rules-chart';
 import SourceDistributionChart from '../charts/source-distribution-chart';
-import HeatmapChart from '../charts/heatmap-chart';
 import MerchantRanking from '../charts/merchant-ranking';
 import RuleLabel from '../rule-label/rule-label';
 import TSYSUnifiedChart from '../charts/tsys-unified-chart';
@@ -131,16 +130,6 @@ export default function Home() {
       );
     }
 
-    // Hour range filter (from heatmap click)
-    if (filters.hourRange) {
-      filtered = filtered.filter(
-        (a) => {
-          const alertDate = new Date(a.date);
-          return alertDate.getDay() === filters.hourRange!.day && a.hour === filters.hourRange!.hour;
-        }
-      );
-    }
-
     return filtered;
   }, [allAlerts, filters]);
 
@@ -175,9 +164,6 @@ export default function Home() {
     setFilters((prev) => ({ ...prev, processor: processorMap[source] || 'all' }));
   };
 
-  const handleHeatmapClick = (day: number, hour: number) => {
-    setFilters((prev) => ({ ...prev, hourRange: { day, hour } }));
-  };
 
   const handleMerchantClick = (merchantId: string) => {
     // Navigate to auto-hold with merchant filter
@@ -313,13 +299,12 @@ export default function Home() {
           <TopRulesChart alerts={filteredAlerts} onRuleClick={handleRuleClick} />
         </SimpleGrid>
 
-        {/* Charts Row 2: Source Distribution and Heatmap */}
-        <SimpleGrid columns={{ base: 1, lg: 2 }} gap={6}>
+        {/* Charts Row 2: Source Distribution */}
+        <SimpleGrid columns={{ base: 1, lg: 1 }} gap={6}>
           <SourceDistributionChart
             alerts={filteredAlerts}
             onSourceClick={handleSourceClick}
           />
-          <HeatmapChart alerts={filteredAlerts} onCellClick={handleHeatmapClick} />
         </SimpleGrid>
 
         {/* Merchant Ranking */}
