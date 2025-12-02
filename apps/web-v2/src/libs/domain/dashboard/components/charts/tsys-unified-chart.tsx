@@ -170,8 +170,18 @@ export default function TSYSUnifiedChart({
     }
   }, [topContributorsFilter, top5Rules, top10Rules, filteredRuleIds]);
 
-  // Update main filter when Top Contributors changes
+  // Track previous topContributorsFilter to only update when it actually changes
+  const prevTopContributorsFilterRef = React.useRef<TopContributorsFilter>(topContributorsFilter);
+  
+  // Update main filter when Top Contributors changes (only when filter value changes, not when dependencies recalculate)
   React.useEffect(() => {
+    // Only update if topContributorsFilter actually changed (user interaction)
+    if (prevTopContributorsFilterRef.current === topContributorsFilter) {
+      return;
+    }
+    
+    prevTopContributorsFilterRef.current = topContributorsFilter;
+    
     if (onRuleIdsChange) {
       let rulesToSelect: string[] = [];
       switch (topContributorsFilter) {
@@ -185,11 +195,18 @@ export default function TSYSUnifiedChart({
           rulesToSelect = availableRuleIds.length > 0 ? availableRuleIds : filteredRuleIds;
           break;
       }
-      if (rulesToSelect.length > 0) {
+      
+      // Only update if rules are different from current selection to avoid loops
+      const currentRules = Array.isArray(selectedRuleIds) ? selectedRuleIds : [];
+      const rulesAreDifferent = 
+        rulesToSelect.length !== currentRules.length ||
+        !rulesToSelect.every(rule => currentRules.includes(rule));
+      
+      if (rulesToSelect.length > 0 && rulesAreDifferent) {
         onRuleIdsChange(rulesToSelect);
       }
     }
-  }, [topContributorsFilter, top5Rules, top10Rules, availableRuleIds, filteredRuleIds, onRuleIdsChange]);
+  }, [topContributorsFilter, top5Rules, top10Rules, availableRuleIds, filteredRuleIds, onRuleIdsChange, selectedRuleIds]);
 
   // Determine chart type: auto-switch to heatmap if 12+ rules
   const effectiveChartType = React.useMemo(() => {
