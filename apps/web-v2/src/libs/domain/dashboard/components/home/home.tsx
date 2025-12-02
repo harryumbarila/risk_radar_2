@@ -163,7 +163,15 @@ export default function Home() {
   };
 
   const handleSourceClick = (source: Source) => {
-    setFilters((prev) => ({ ...prev, source }));
+    // SourceDistributionChart shows processors, so filter by processor
+    // Map Source to processor filter values
+    const processorMap: Record<Source, 'TSYS' | 'FSP' | 'all'> = {
+      TSYS: 'TSYS',
+      Fluidpay: 'FSP',
+      Paya: 'FSP',
+      Other: 'all',
+    };
+    setFilters((prev) => ({ ...prev, processor: processorMap[source] || 'all' }));
   };
 
   const handleHeatmapClick = (day: number, hour: number) => {
@@ -178,7 +186,7 @@ export default function Home() {
   const handleViewAutoHold = () => {
     // Build query params from filters
     const params = new URLSearchParams();
-    if (filters.riskLevel !== 'all') params.set('risk', filters.riskLevel);
+    if (filters.processor !== 'all') params.set('processor', filters.processor);
     if (filters.source !== 'all') params.set('source', filters.source);
     if (filters.ruleId !== 'all') {
       const ruleIds = Array.isArray(filters.ruleId) ? filters.ruleId : [filters.ruleId];
