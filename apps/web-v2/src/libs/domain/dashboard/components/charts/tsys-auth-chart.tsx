@@ -25,7 +25,11 @@ import {
   getDaysFromDateRange,
   getChartType,
   getAggregationLevel,
+  getDateGrouping,
   getXAxisConfig,
+  getSmoothingWindow,
+  applySmoothing,
+  formatWeeklyDate,
 } from './chart-utils';
 
 interface TSYSAuthChartProps {
@@ -36,15 +40,26 @@ export default function TSYSAuthChart({ dateRange }: TSYSAuthChartProps) {
   const days = React.useMemo(() => dateRange ? getDaysFromDateRange(dateRange) : 14, [dateRange]);
   const chartType = React.useMemo(() => getChartType(days), [days]);
   const aggregation = React.useMemo(() => getAggregationLevel(days), [days]);
+  const dateGrouping = React.useMemo(() => getDateGrouping(days), [days]);
+  const smoothingWindow = React.useMemo(() => getSmoothingWindow(days), [days]);
   const [visibleRules, setVisibleRules] = React.useState<Set<string>>(new Set(RULE_IDS));
   const [showPercent, setShowPercent] = React.useState(false);
   
+  const rawData = React.useMemo(() => {
+    return generateRuleParticipationData(days, 1200, dateGrouping);
+  }, [days, dateGrouping]);
+
   const data = React.useMemo(() => {
-    const rawData = generateRuleParticipationData(days, 1200, aggregation);
+    let processedData = [...rawData];
     
-    // If showing percentage, convert to percentages
+    // Apply smoothing if needed (visual only)
+    if (smoothingWindow > 0) {
+      processedData = applySmoothing(processedData, smoothingWindow);
+    }
+    
+    // Convert to percentage if needed
     if (showPercent && chartType === 'area') {
-      return rawData.map((item) => {
+      return processedData.map((item) => {
         const total = item.total;
         const percentItem: Record<string, any> = { ...item };
         RULE_IDS.forEach((ruleId) => {
@@ -55,8 +70,8 @@ export default function TSYSAuthChart({ dateRange }: TSYSAuthChartProps) {
       });
     }
     
-    return rawData;
-  }, [days, aggregation, chartType, showPercent]);
+    return processedData;
+  }, [rawData, smoothingWindow, chartType, showPercent]);
 
   const toggleRule = (ruleId: string) => {
     setVisibleRules((prev) => {
@@ -74,6 +89,19 @@ export default function TSYSAuthChart({ dateRange }: TSYSAuthChartProps) {
     if (active && payload && payload.length) {
       const visiblePayload = payload.filter((item: any) => visibleRules.has(item.dataKey));
       const total = visiblePayload.reduce((sum: number, item: any) => sum + (item.value || 0), 0);
+      const dataItem = payload[0]?.payload;
+      
+      // Format tooltip header based on grouping
+      let tooltipHeader = label;
+      if (dateGrouping === 'weekly' && dataItem?.dateRange) {
+        const start = dataItem.dateRange.start;
+        const end = dataItem.dateRange.end;
+        tooltipHeader = `${formatWeeklyDate(start, end)} (Weekly Summary)`;
+      } else if (dateGrouping === 'monthly' && dataItem?.dateRange) {
+        const start = dataItem.dateRange.start;
+        const end = dataItem.dateRange.end;
+        tooltipHeader = `${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}–${end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} (Monthly Summary)`;
+      }
       
       return (
         <Box
@@ -86,7 +114,7 @@ export default function TSYSAuthChart({ dateRange }: TSYSAuthChartProps) {
           minW="200px"
         >
           <Text fontSize="sm" fontWeight="bold" mb={2}>
-            {label}
+            {tooltipHeader}
           </Text>
           <VStack align="stretch" gap={1.5}>
             {visiblePayload.map((item: any, index: number) => {
@@ -138,7 +166,9 @@ export default function TSYSAuthChart({ dateRange }: TSYSAuthChartProps) {
     return null;
   };
 
-  const xAxisConfig = getXAxisConfig(data.length);
+
+  const xAxisConfig = getXAxisConfig(data.length, dateGrouping);
+  const showGridlines = data.length <= 30; // Hide gridlines if too dense
 
   return (
     <Box 
@@ -214,16 +244,11 @@ export default function TSYSAuthChart({ dateRange }: TSYSAuthChartProps) {
         <Box height="300px" width="100%">
           <ResponsiveContainer width="100%" height="100%">
             {chartType === 'bar' ? (
-              <BarChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: xAxisConfig.angle !== 0 ? 40 : 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" vertical={false} />
+              <BarChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+                {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" vertical={false} />}
                 <XAxis 
                   dataKey="date" 
-                  tick={{ fontSize: 11, fill: '#6b7280' }}
-                  axisLine={{ stroke: '#e5e7eb' }}
-                  tickLine={{ stroke: '#e5e7eb' }}
-                  angle={xAxisConfig.angle}
-                  textAnchor={xAxisConfig.angle < 0 ? 'end' : 'middle'}
-                  interval={xAxisConfig.interval}
+                  {...xAxisConfig}
                 />
                 <YAxis 
                   tick={{ fontSize: 11, fill: '#6b7280' }}
@@ -296,16 +321,11 @@ export default function TSYSAuthChart({ dateRange }: TSYSAuthChartProps) {
                 })}
               </BarChart>
             ) : (
-              <AreaChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: xAxisConfig.angle !== 0 ? 40 : 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" vertical={false} />
+              <AreaChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+                {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" vertical={false} />}
                 <XAxis 
                   dataKey="date" 
-                  tick={{ fontSize: 11, fill: '#6b7280' }}
-                  axisLine={{ stroke: '#e5e7eb' }}
-                  tickLine={{ stroke: '#e5e7eb' }}
-                  angle={xAxisConfig.angle}
-                  textAnchor={xAxisConfig.angle < 0 ? 'end' : 'middle'}
-                  interval={xAxisConfig.interval}
+                  {...xAxisConfig}
                 />
                 <YAxis 
                   domain={showPercent ? [0, 100] : [0, 'auto']}
