@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
-import { Box, VStack, Text, HStack, Tooltip, Portal, Popover, Button } from '@chakra-ui/react';
-import { Info, ChevronDown } from 'lucide-react';
+import { Box, VStack, Text, HStack, Tooltip, Portal, Popover, Button, Select, Input, createListCollection, Checkbox } from '@chakra-ui/react';
+import { Info, ChevronDown, Search } from 'lucide-react';
 import {
   AreaChart,
   Area,
@@ -13,6 +13,7 @@ import {
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
   Legend,
+  Cell,
 } from 'recharts';
 import type { FilterState } from '../../filter-bar/filter-bar';
 import {
@@ -27,6 +28,7 @@ import {
   getSmoothingWindow,
   applySmoothing,
   formatWeeklyDate,
+  getTopRules,
 } from './chart-utils';
 
 export type PaymentStage = 'Authorization' | 'Capture' | 'Settlement' | 'ACH Returns';
@@ -40,13 +42,31 @@ interface TSYSUnifiedChartProps {
 
 // Define which rules apply to which stages
 const RULE_STAGE_MAP: Record<string, PaymentStage[]> = {
-  AH001: ['Authorization', 'Capture'], // Multi-stage
-  AH002: ['Authorization'], // Auth-only
-  AH003: ['Authorization', 'Capture', 'Settlement'], // Multi-stage
-  AH004: ['Authorization', 'Capture'], // Multi-stage
-  AH005: ['Authorization'], // Auth-only
-  AH006: ['Settlement'], // Settlement-only
-  AH007: ['ACH Returns'], // ACH-only
+  AH001: ['Authorization', 'Capture'],
+  AH002: ['Authorization'],
+  AH003: ['Authorization', 'Capture', 'Settlement'],
+  AH004: ['Authorization', 'Capture'],
+  AH005: ['Authorization'],
+  AH006: ['Settlement'],
+  AH007: ['ACH Returns'],
+  // Generate mappings for remaining rules
+  ...Object.fromEntries(
+    Array.from({ length: 38 }, (_, i) => {
+      const num = i + 8;
+      const ruleId = `AH${num.toString().padStart(3, '0')}`;
+      const stages = [
+        ['Authorization'],
+        ['Capture'],
+        ['Settlement'],
+        ['ACH Returns'],
+        ['Authorization', 'Capture'],
+        ['Authorization', 'Settlement'],
+        ['Capture', 'Settlement'],
+        ['Authorization', 'Capture', 'Settlement'],
+      ];
+      return [ruleId, stages[i % stages.length]];
+    })
+  ),
 };
 
 const PAYMENT_STAGE_BASE_COUNTS: Record<PaymentStage, number> = {
@@ -61,7 +81,12 @@ export default function TSYSUnifiedChart({
   paymentStage = 'Authorization',
   ruleStageParticipation = 'all'
 }: TSYSUnifiedChartProps) {
-  const [visibleRules, setVisibleRules] = React.useState<Set<string>>(new Set(RULE_IDS));
+  const [showAllRules, setShowAllRules] = React.useState(false);
+  const [chartType, setChartType] = React.useState<'stacked-area' | 'heatmap'>('stacked-area');
+  const [focusedRule, setFocusedRule] = React.useState<string | null>(null);
+  const [selectedRules, setSelectedRules] = React.useState<Set<string>>(new Set());
+  const [legendSearch, setLegendSearch] = React.useState('');
+  const [visibleRules, setVisibleRules] = React.useState<Set<string>>(new Set());
   
   const days = React.useMemo(() => dateRange ? getDaysFromDateRange(dateRange) : 14, [dateRange]);
   const dateGrouping = React.useMemo(() => getDateGrouping(days), [days]);
@@ -88,11 +113,6 @@ export default function TSYSUnifiedChart({
     });
   }, [ruleStageParticipation]);
 
-  // Update visible rules when filter changes
-  React.useEffect(() => {
-    setVisibleRules(new Set(filteredRuleIds));
-  }, [filteredRuleIds]);
-
   const rawData = React.useMemo(() => {
     const baseCount = PAYMENT_STAGE_BASE_COUNTS[paymentStage];
     return generateRuleParticipationData(days, baseCount, dateGrouping);
@@ -108,16 +128,113 @@ export default function TSYSUnifiedChart({
     return processedData;
   }, [rawData, smoothingWindow]);
 
-  const toggleRule = (ruleId: string) => {
-    setVisibleRules((prev) => {
-      const next = new Set(prev);
-      if (next.has(ruleId)) {
-        next.delete(ruleId);
-      } else {
-        next.add(ruleId);
-      }
-      return next;
+  // Calculate top 5 rules
+  const top5Rules = React.useMemo(() => {
+    return getTopRules(data, filteredRuleIds, 5);
+  }, [data, filteredRuleIds]);
+
+  // Determine which rules to display
+  const displayRules = React.useMemo(() => {
+    if (showAllRules) {
+      return filteredRuleIds;
+    }
+    return top5Rules;
+  }, [showAllRules, filteredRuleIds, top5Rules]);
+
+  // Update visible rules
+  React.useEffect(() => {
+    if (focusedRule) {
+      setVisibleRules(new Set([focusedRule]));
+    } else if (selectedRules.size > 0) {
+      setVisibleRules(selectedRules);
+    } else {
+      setVisibleRules(new Set(displayRules));
+    }
+  }, [focusedRule, selectedRules, displayRules]);
+
+  // Filter rules by search
+  const filteredDisplayRules = React.useMemo(() => {
+    if (!legendSearch) return displayRules;
+    const searchLower = legendSearch.toLowerCase();
+    return displayRules.filter((ruleId) => {
+      const description = RULE_DESCRIPTIONS[ruleId] || ruleId;
+      return ruleId.toLowerCase().includes(searchLower) || 
+             description.toLowerCase().includes(searchLower);
     });
+  }, [displayRules, legendSearch]);
+
+  // Get rule color with opacity based on focus/selection
+  const getRuleColor = (ruleId: string, isTop5: boolean): string => {
+    const baseColor = RULE_COLORS[ruleId] || '#94a3b8';
+    
+    if (focusedRule === ruleId) {
+      return baseColor; // Full opacity for focused
+    }
+    
+    if (focusedRule && focusedRule !== ruleId) {
+      return baseColor; // Will be set to 15% opacity via fillOpacity
+    }
+    
+    if (isTop5) {
+      return baseColor; // Full opacity for top 5
+    }
+    
+    // Desaturate non-top-5 rules
+    return baseColor;
+  };
+
+  // Get rule opacity
+  const getRuleOpacity = (ruleId: string, isTop5: boolean): number => {
+    if (focusedRule === ruleId) {
+      return 1.0; // Full opacity for focused
+    }
+    
+    if (focusedRule && focusedRule !== ruleId) {
+      return 0.15; // Fade others when focused
+    }
+    
+    if (isTop5) {
+      return 1.0; // Full opacity for top 5
+    }
+    
+    return showAllRules ? 0.5 : 1.0; // 50% for non-top-5 when showing all
+  };
+
+  // Get stroke width
+  const getStrokeWidth = (ruleId: string, isTop5: boolean): number => {
+    if (focusedRule === ruleId) {
+      return 2.5;
+    }
+    if (isTop5) {
+      return 1.5;
+    }
+    return showAllRules ? 1 : 1.5;
+  };
+
+  const toggleRule = (ruleId: string) => {
+    if (selectedRules.has(ruleId)) {
+      setSelectedRules((prev) => {
+        const next = new Set(prev);
+        next.delete(ruleId);
+        return next;
+      });
+    } else {
+      setSelectedRules((prev) => new Set([...prev, ruleId]));
+    }
+    setFocusedRule(null);
+  };
+
+  const handleRuleHover = (ruleId: string | null) => {
+    setFocusedRule(ruleId);
+  };
+
+  const handleRuleClick = (ruleId: string) => {
+    if (focusedRule === ruleId) {
+      setFocusedRule(null);
+    } else {
+      setFocusedRule(ruleId);
+      setSelectedRules(new Set());
+    }
   };
 
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -145,7 +262,7 @@ export default function TSYSUnifiedChart({
           boxShadow="lg"
           borderWidth="1px"
           borderColor="gray.200"
-          minW="200px"
+          minW="250px"
         >
           <Text fontSize="sm" fontWeight="bold" mb={2}>
             {tooltipHeader}
@@ -153,30 +270,48 @@ export default function TSYSUnifiedChart({
           <VStack align="stretch" gap={1.5}>
             {visiblePayload.map((item: any, index: number) => {
               const percentage = calculatePercentage(item.value, total);
+              const ruleId = item.dataKey;
+              const isTop5 = top5Rules.includes(ruleId);
+              // Mock historical average (in real app, this would come from backend)
+              const historicalAvg = isTop5 ? percentage * 0.9 : percentage * 1.1;
+              const change = percentage - historicalAvg;
+              
               return (
-                <HStack key={index} justify="space-between" gap={4}>
-                  <HStack gap={2}>
-                    <Box
-                      w="12px"
-                      h="12px"
-                      borderRadius="sm"
-                      bg={item.color}
-                      borderWidth="1px"
-                      borderColor="gray.300"
-                    />
-                    <Text fontSize="xs" color="gray.700" fontWeight="medium">
-                      {RULE_DESCRIPTIONS[item.dataKey] || item.dataKey}:
-                    </Text>
+                <VStack key={index} align="stretch" gap={0.5}>
+                  <HStack justify="space-between" gap={4}>
+                    <HStack gap={2}>
+                      <Box
+                        w="12px"
+                        h="12px"
+                        borderRadius="sm"
+                        bg={item.color}
+                        borderWidth="1px"
+                        borderColor="gray.300"
+                      />
+                      <VStack align="start" gap={0}>
+                        <Text fontSize="xs" color="gray.700" fontWeight="semibold">
+                          {RULE_DESCRIPTIONS[ruleId] || ruleId}
+                        </Text>
+                        <Text fontSize="xs" color="gray.500">
+                          {ruleId}
+                        </Text>
+                      </VStack>
+                    </HStack>
+                    <VStack align="end" gap={0}>
+                      <Text fontSize="xs" fontWeight="semibold">
+                        {item.value.toLocaleString()}
+                      </Text>
+                      <Text fontSize="xs" color="gray.500">
+                        {percentage}%
+                      </Text>
+                    </VStack>
                   </HStack>
-                  <VStack align="end" gap={0}>
-                    <Text fontSize="xs" fontWeight="semibold">
-                      {item.value.toLocaleString()}
+                  {focusedRule === ruleId && (
+                    <Text fontSize="xs" color={change >= 0 ? 'green.600' : 'red.600'}>
+                      {change >= 0 ? '+' : ''}{change.toFixed(1)}% vs historical avg
                     </Text>
-                    <Text fontSize="xs" color="gray.500">
-                      {percentage}%
-                    </Text>
-                  </VStack>
-                </HStack>
+                  )}
+                </VStack>
               );
             })}
             <Box pt={1} borderTopWidth="1px" borderColor="gray.200" mt={1}>
@@ -194,7 +329,15 @@ export default function TSYSUnifiedChart({
 
   const xAxisConfig = getXAxisConfig(data.length, dateGrouping);
   const showGridlines = data.length <= 30;
-  const useLineChart = data.length > 60; // Use line chart for very long ranges
+  const useLineChart = data.length > 60;
+
+  const chartTypeCollection = createListCollection({
+    items: [
+      { label: 'Stacked Area', value: 'stacked-area' },
+      { label: 'Heatmap', value: 'heatmap' },
+    ],
+  });
+
 
   return (
     <Box 
@@ -249,14 +392,49 @@ export default function TSYSUnifiedChart({
               </Tooltip.Root>
             </HStack>
           </VStack>
-          <Text fontSize="xs" color="gray.500">
-            Last Updated: {new Date().toLocaleString('en-US', { 
-              month: 'short', 
-              day: 'numeric', 
-              hour: '2-digit', 
-              minute: '2-digit' 
-            })}
-          </Text>
+          <HStack gap={3}>
+            <Box minW="150px">
+              <Text fontSize="xs" fontWeight="semibold" color="gray.600" mb={1}>
+                Chart Type
+              </Text>
+              <Select.Root
+                value={[chartType]}
+                onValueChange={(e) => setChartType(e.value[0] as 'stacked-area' | 'heatmap')}
+                collection={chartTypeCollection}
+                size="sm"
+              >
+                <Select.HiddenSelect />
+                <Select.Control>
+                  <Select.Trigger>
+                    <Select.ValueText />
+                  </Select.Trigger>
+                  <Select.IndicatorGroup>
+                    <Select.Indicator />
+                  </Select.IndicatorGroup>
+                </Select.Control>
+                <Portal>
+                  <Select.Positioner>
+                    <Select.Content>
+                      {chartTypeCollection.items.map((item) => (
+                        <Select.Item key={item.value} item={item}>
+                          {item.label}
+                          <Select.ItemIndicator />
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select.Positioner>
+                </Portal>
+              </Select.Root>
+            </Box>
+            <Text fontSize="xs" color="gray.500">
+              Last Updated: {new Date().toLocaleString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+              })}
+            </Text>
+          </HStack>
         </HStack>
 
         <Text fontSize="sm" color="gray.600">
@@ -265,8 +443,131 @@ export default function TSYSUnifiedChart({
 
         {/* Chart */}
         <Box height="400px" width="100%">
+          {chartType === 'heatmap' ? (
+            <Box height="100%" width="100%" overflowX="auto">
+              <Box minW="600px">
+                <VStack align="stretch" gap={2}>
+                  {/* X-axis labels */}
+                  <HStack gap={1} ml="120px">
+                    {data.slice(0, Math.min(20, data.length)).map((item, index) => (
+                      <Box
+                        key={index}
+                        w="40px"
+                        textAlign="center"
+                        fontSize="xs"
+                        color="gray.600"
+                        lineHeight="1.2"
+                      >
+                        {item.date.length > 8 ? item.date.substring(0, 5) : item.date}
+                      </Box>
+                    ))}
+                  </HStack>
+                  
+                  {/* Heatmap cells */}
+                  <Box overflowY="auto" maxH="350px">
+                    <VStack align="stretch" gap={1}>
+                      {displayRules.slice(0, 30).map((ruleId) => {
+                        const isTop5 = top5Rules.includes(ruleId);
+                        const isVisible = visibleRules.has(ruleId);
+                        if (!isVisible) return null;
+                        
+                        // Calculate max value for this rule across all dates
+                        const maxValue = Math.max(...data.map((item) => item[ruleId] || 0));
+                        
+                        return (
+                          <HStack key={ruleId} gap={1} align="center">
+                            {/* Y-axis label */}
+                            <Box
+                              w="120px"
+                              fontSize="xs"
+                              color="gray.700"
+                              fontWeight={isTop5 ? 'semibold' : 'normal'}
+                              textAlign="right"
+                              pr={2}
+                              lineHeight="1.2"
+                            >
+                              <Text fontSize="xs" lineClamp={1}>
+                                {RULE_DESCRIPTIONS[ruleId] || ruleId}
+                              </Text>
+                              <Text fontSize="xs" color="gray.500">
+                                {ruleId}
+                              </Text>
+                            </Box>
+                            
+                            {/* Heatmap cells */}
+                            {data.slice(0, Math.min(20, data.length)).map((item, dateIndex) => {
+                              const value = item[ruleId] || 0;
+                              const intensity = maxValue > 0 ? value / maxValue : 0;
+                              const opacity = Math.max(0.2, Math.min(1, intensity));
+                              const color = getRuleColor(ruleId, isTop5);
+                              
+                              // Convert color to rgba for opacity
+                              const rgbMatch = color.match(/\d+/g);
+                              let bgColor = color;
+                              if (rgbMatch && rgbMatch.length >= 3) {
+                                bgColor = `rgba(${rgbMatch[0]}, ${rgbMatch[1]}, ${rgbMatch[2]}, ${opacity})`;
+                              } else if (color.startsWith('#')) {
+                                // Convert hex to rgba
+                                const r = parseInt(color.slice(1, 3), 16);
+                                const g = parseInt(color.slice(3, 5), 16);
+                                const b = parseInt(color.slice(5, 7), 16);
+                                bgColor = `rgba(${r}, ${g}, ${b}, ${opacity})`;
+                              } else {
+                                bgColor = color;
+                              }
+                              
+                              const percentage = item.total > 0 ? calculatePercentage(value, item.total) : 0;
+                              
+                              return (
+                                <Tooltip.Root key={dateIndex}>
+                                  <Tooltip.Trigger asChild>
+                                    <Box
+                                      w="40px"
+                                      h="40px"
+                                      bg={bgColor}
+                                      borderWidth="1px"
+                                      borderColor="gray.200"
+                                      borderRadius="sm"
+                                      cursor="pointer"
+                                      _hover={{ borderColor: 'gray.400', borderWidth: '2px' }}
+                                      transition="all 0.2s"
+                                    />
+                                  </Tooltip.Trigger>
+                                  <Portal>
+                                    <Tooltip.Positioner>
+                                      <Tooltip.Content
+                                        bg="gray.900"
+                                        color="white"
+                                        px={3}
+                                        py={2}
+                                        borderRadius="md"
+                                        fontSize="sm"
+                                        boxShadow="lg"
+                                      >
+                                        <Tooltip.Arrow />
+                                        <VStack align="start" gap={1}>
+                                          <Text fontWeight="bold">{item.date}</Text>
+                                          <Text>{RULE_DESCRIPTIONS[ruleId] || ruleId}</Text>
+                                          <Text fontSize="xs">Count: {value.toLocaleString()}</Text>
+                                          <Text fontSize="xs">Participation: {percentage}%</Text>
+                                        </VStack>
+                                      </Tooltip.Content>
+                                    </Tooltip.Positioner>
+                                  </Portal>
+                                </Tooltip.Root>
+                              );
+                            })}
+                          </HStack>
+                        );
+                      })}
+                    </VStack>
+                  </Box>
+                </VStack>
+              </Box>
+            </Box>
+          ) : (
             <ResponsiveContainer width="100%" height="100%">
-            {useLineChart ? (
+              {useLineChart ? (
               <LineChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: xAxisConfig.angle !== 0 ? 40 : 5 }}>
                 {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" vertical={false} />}
                 <XAxis 
@@ -283,16 +584,21 @@ export default function TSYSUnifiedChart({
                 <Legend 
                   wrapperStyle={{ display: 'none' }}
                 />
-                {filteredRuleIds.map((ruleId) => {
+                {displayRules.map((ruleId) => {
                   if (!visibleRules.has(ruleId)) return null;
+                  const isTop5 = top5Rules.includes(ruleId);
+                  const opacity = getRuleOpacity(ruleId, isTop5);
+                  const color = getRuleColor(ruleId, isTop5);
+                  
                   return (
                     <Line
                       key={ruleId}
                       type="monotone"
                       dataKey={ruleId}
-                      stroke={RULE_COLORS[ruleId]}
-                      strokeWidth={2}
-                      dot={{ fill: RULE_COLORS[ruleId], r: 3 }}
+                      stroke={color}
+                      strokeWidth={getStrokeWidth(ruleId, isTop5)}
+                      strokeOpacity={opacity}
+                      dot={{ fill: color, r: 3, opacity }}
                       activeDot={{ r: 5 }}
                       animationDuration={400}
                     />
@@ -316,64 +622,142 @@ export default function TSYSUnifiedChart({
                 <Legend 
                   wrapperStyle={{ display: 'none' }}
                 />
-                {filteredRuleIds.map((ruleId) => {
+                {displayRules.map((ruleId) => {
                   if (!visibleRules.has(ruleId)) return null;
+                  const isTop5 = top5Rules.includes(ruleId);
+                  const opacity = getRuleOpacity(ruleId, isTop5);
+                  const color = getRuleColor(ruleId, isTop5);
+                  
                   return (
                     <Area
                       key={ruleId}
                       type={dateGrouping === 'weekly' || dateGrouping === 'monthly' ? 'monotone' : 'linear'}
                       dataKey={ruleId}
                       stackId="rules"
-                      fill={RULE_COLORS[ruleId]}
-                      stroke={RULE_COLORS[ruleId]}
-                      strokeWidth={1.5}
-                      fillOpacity={0.6}
+                      fill={color}
+                      stroke={color}
+                      strokeWidth={getStrokeWidth(ruleId, isTop5)}
+                      fillOpacity={opacity}
                       animationDuration={400}
                     />
                   );
                 })}
               </AreaChart>
-            )}
-          </ResponsiveContainer>
+              )}
+            </ResponsiveContainer>
+          )}
         </Box>
+
+        {/* Show all rules link */}
+        {!showAllRules && filteredRuleIds.length > 5 && (
+          <HStack justify="center">
+            <Button
+              variant="link"
+              size="sm"
+              colorPalette="blue"
+              onClick={() => setShowAllRules(true)}
+            >
+              Show all rules ({filteredRuleIds.length})
+            </Button>
+          </HStack>
+        )}
 
         {/* Responsive Legend */}
         <Box>
           {/* Desktop/Tablet: Legend below chart */}
           <Box display={{ base: 'none', md: 'block' }}>
-            <Box 
-              display="flex" 
-              flexWrap="wrap" 
-              gap={2} 
-              justifyContent={{ base: 'flex-start', lg: 'flex-end' }}
-              px={2}
-            >
-              {filteredRuleIds.map((ruleId) => {
-                const isVisible = visibleRules.has(ruleId);
-                return (
-                  <HStack
-                    key={ruleId}
-                    gap={1.5}
-                    cursor="pointer"
-                    onClick={() => toggleRule(ruleId)}
-                    opacity={isVisible ? 1 : 0.4}
-                    transition="opacity 0.2s"
-                  >
-                    <Box
-                      w="12px"
-                      h="12px"
-                      borderRadius="sm"
-                      bg={RULE_COLORS[ruleId]}
-                      borderWidth="1px"
-                      borderColor="gray.300"
-                    />
-                    <Text fontSize="xs" color="gray.600">
-                      {RULE_DESCRIPTIONS[ruleId] || ruleId}
-                    </Text>
-                  </HStack>
-                );
-              })}
-            </Box>
+            <VStack align="stretch" gap={3}>
+              {/* Search bar */}
+              <Box position="relative">
+                <Input
+                  placeholder="Search rules..."
+                  size="sm"
+                  value={legendSearch}
+                  onChange={(e) => setLegendSearch(e.target.value)}
+                  pl={8}
+                />
+                <Box
+                  position="absolute"
+                  left={2}
+                  top="50%"
+                  transform="translateY(-50%)"
+                  color="gray.400"
+                >
+                  <Search size={16} />
+                </Box>
+              </Box>
+              
+              {/* Scrollable legend */}
+              <Box
+                maxH="200px"
+                overflowY="auto"
+                borderWidth="1px"
+                borderColor="gray.200"
+                borderRadius="md"
+                p={3}
+              >
+                <VStack align="stretch" gap={2}>
+                  {filteredDisplayRules.map((ruleId) => {
+                    const isTop5 = top5Rules.includes(ruleId);
+                    const isVisible = visibleRules.has(ruleId);
+                    const isSelected = selectedRules.has(ruleId);
+                    const isFocused = focusedRule === ruleId;
+                    const opacity = getRuleOpacity(ruleId, isTop5);
+                    const color = getRuleColor(ruleId, isTop5);
+                    
+                    return (
+                      <HStack
+                        key={ruleId}
+                        gap={2}
+                        p={2}
+                        borderRadius="md"
+                        bg={isFocused ? 'blue.50' : isSelected ? 'gray.50' : 'transparent'}
+                        borderWidth={isFocused ? '2px' : '1px'}
+                        borderColor={isFocused ? 'blue.300' : isSelected ? 'gray.300' : 'transparent'}
+                        cursor="pointer"
+                        onClick={() => handleRuleClick(ruleId)}
+                        onMouseEnter={() => handleRuleHover(ruleId)}
+                        onMouseLeave={() => handleRuleHover(null)}
+                        transition="all 0.2s"
+                      >
+                        <Checkbox.Root
+                          checked={isSelected || isVisible}
+                          onCheckedChange={() => toggleRule(ruleId)}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Checkbox.HiddenInput />
+                          <Checkbox.Control>
+                            <Checkbox.Indicator />
+                          </Checkbox.Control>
+                        </Checkbox.Root>
+                        <Box
+                          w="16px"
+                          h="16px"
+                          borderRadius="sm"
+                          bg={color}
+                          borderWidth="1px"
+                          borderColor="gray.300"
+                          opacity={opacity}
+                        />
+                        <VStack align="start" gap={0} flex={1}>
+                          <Text fontSize="xs" fontWeight={isTop5 ? 'semibold' : 'normal'} color="gray.700">
+                            {RULE_DESCRIPTIONS[ruleId] || ruleId}
+                          </Text>
+                          <Text fontSize="xs" color="gray.500">
+                            {ruleId}
+                          </Text>
+                        </VStack>
+                        {isTop5 && (
+                          <Text fontSize="xs" color="blue.600" fontWeight="semibold">
+                            Top 5
+                          </Text>
+                        )}
+                      </HStack>
+                    );
+                  })}
+                </VStack>
+              </Box>
+            </VStack>
           </Box>
 
           {/* Mobile: Legend dropdown */}
@@ -396,34 +780,51 @@ export default function TSYSUnifiedChart({
               </Popover.Trigger>
               <Portal>
                 <Popover.Positioner>
-                  <Popover.Content maxW="300px">
+                  <Popover.Content maxW="300px" maxH="400px">
                     <Popover.Arrow />
                     <VStack align="stretch" gap={2} p={3}>
-                      {filteredRuleIds.map((ruleId) => {
-                        const isVisible = visibleRules.has(ruleId);
-                        return (
-                          <HStack
-                            key={ruleId}
-                            gap={2}
-                            cursor="pointer"
-                            onClick={() => toggleRule(ruleId)}
-                            opacity={isVisible ? 1 : 0.4}
-                            transition="opacity 0.2s"
-                          >
-                            <Box
-                              w="12px"
-                              h="12px"
-                              borderRadius="sm"
-                              bg={RULE_COLORS[ruleId]}
-                              borderWidth="1px"
-                              borderColor="gray.300"
-                            />
-                            <Text fontSize="xs" color="gray.600">
-                              {RULE_DESCRIPTIONS[ruleId] || ruleId}
-                            </Text>
-                          </HStack>
-                        );
-                      })}
+                      <Input
+                        placeholder="Search rules..."
+                        size="sm"
+                        value={legendSearch}
+                        onChange={(e) => setLegendSearch(e.target.value)}
+                      />
+                      <Box overflowY="auto" maxH="300px">
+                        <VStack align="stretch" gap={2}>
+                          {filteredDisplayRules.map((ruleId) => {
+                            const isTop5 = top5Rules.includes(ruleId);
+                            const isVisible = visibleRules.has(ruleId);
+                            const color = getRuleColor(ruleId, isTop5);
+                            
+                            return (
+                              <HStack
+                                key={ruleId}
+                                gap={2}
+                                cursor="pointer"
+                                onClick={() => toggleRule(ruleId)}
+                              >
+                                <Checkbox.Root checked={isVisible}>
+                                  <Checkbox.HiddenInput />
+                                  <Checkbox.Control>
+                                    <Checkbox.Indicator />
+                                  </Checkbox.Control>
+                                </Checkbox.Root>
+                                <Box
+                                  w="12px"
+                                  h="12px"
+                                  borderRadius="sm"
+                                  bg={color}
+                                  borderWidth="1px"
+                                  borderColor="gray.300"
+                                />
+                                <Text fontSize="xs" color="gray.600">
+                                  {RULE_DESCRIPTIONS[ruleId] || ruleId}
+                                </Text>
+                              </HStack>
+                            );
+                          })}
+                        </VStack>
+                      </Box>
                     </VStack>
                   </Popover.Content>
                 </Popover.Positioner>
@@ -435,4 +836,3 @@ export default function TSYSUnifiedChart({
     </Box>
   );
 }
-

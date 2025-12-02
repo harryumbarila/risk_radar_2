@@ -1,8 +1,11 @@
 // Utility functions for TSYS charts
 import type { FilterState } from '../../filter-bar/filter-bar';
 
-// Rule IDs that appear in the charts
-export const RULE_IDS = ['AH001', 'AH002', 'AH003', 'AH004', 'AH005', 'AH006', 'AH007'];
+// Generate 40+ rule IDs for testing
+export const RULE_IDS = Array.from({ length: 45 }, (_, i) => {
+  const num = i + 1;
+  return `AH${num.toString().padStart(3, '0')}`;
+});
 
 // Short descriptions for rules (for chart display)
 export const RULE_DESCRIPTIONS: Record<string, string> = {
@@ -13,17 +16,90 @@ export const RULE_DESCRIPTIONS: Record<string, string> = {
   AH005: 'Card Verify Fail',
   AH006: 'Velocity Exceeded',
   AH007: 'Merchant Risk',
+  // Generate descriptions for remaining rules
+  ...Object.fromEntries(
+    Array.from({ length: 38 }, (_, i) => {
+      const num = i + 8;
+      const ruleId = `AH${num.toString().padStart(3, '0')}`;
+      const descriptions = [
+        'Transaction Limit',
+        'Frequency Check',
+        'Amount Threshold',
+        'Location Anomaly',
+        'Time Pattern',
+        'Device Mismatch',
+        'IP Verification',
+        'Card Type Risk',
+        'Merchant Category',
+        'Transaction Size',
+        'Velocity Alert',
+        'Pattern Detection',
+        'Risk Score',
+        'Fraud Indicator',
+        'Behavior Analysis',
+        'Account Status',
+        'Payment Method',
+        'Currency Check',
+        'Country Validation',
+        'Time Zone Risk',
+        'Device Fingerprint',
+        'Session Analysis',
+        'Network Check',
+        'Historical Pattern',
+        'Amount Deviation',
+        'Frequency Alert',
+        'Location Change',
+        'Time Window',
+        'Merchant History',
+        'Card History',
+        'User Behavior',
+        'Transaction Flow',
+        'Risk Assessment',
+        'Pattern Match',
+        'Anomaly Detection',
+        'Threshold Exceeded',
+        'Validation Failed',
+        'Security Check',
+      ];
+      return [ruleId, descriptions[i % descriptions.length]];
+    })
+  ),
+};
+
+// Generate color palette for top 5 rules (strong colors)
+const TOP_5_COLORS = [
+  '#3b82f6', // Blue
+  '#10b981', // Green
+  '#f59e0b', // Amber
+  '#ef4444', // Red
+  '#8b5cf6', // Purple
+];
+
+// Generate continuous color scale for remaining rules
+const generateColorScale = (count: number): string[] => {
+  const colors: string[] = [];
+  // Use a gradient from light blue to light purple
+  for (let i = 0; i < count; i++) {
+    const ratio = i / (count - 1);
+    const hue = 200 + (ratio * 60); // Blue to purple
+    const saturation = 40 + (ratio * 20); // 40-60%
+    const lightness = 70 - (ratio * 10); // 70-60%
+    colors.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
+  }
+  return colors;
 };
 
 // Subtle, consistent color palette for rules (non-saturated)
 export const RULE_COLORS: Record<string, string> = {
-  AH001: '#93c5fd', // Light blue
-  AH002: '#a7f3d0', // Light green
-  AH003: '#fde68a', // Light yellow
-  AH004: '#fbcfe8', // Light pink
-  AH005: '#c4b5fd', // Light purple
-  AH006: '#fed7aa', // Light orange
-  AH007: '#bfdbfe', // Light indigo
+  ...Object.fromEntries(
+    RULE_IDS.map((ruleId, index) => {
+      if (index < 5) {
+        return [ruleId, TOP_5_COLORS[index]];
+      }
+      const scaleColors = generateColorScale(RULE_IDS.length - 5);
+      return [ruleId, scaleColors[index - 5]];
+    })
+  ),
 };
 
 // Calculate number of days from date range filter
@@ -135,9 +211,10 @@ export const generateRuleParticipationData = (
       };
       
       let total = 0;
-      RULE_IDS.forEach((ruleId) => {
-        const count = Math.floor(Math.random() * (baseCount / RULE_IDS.length)) + 
-                      Math.floor(baseCount / (RULE_IDS.length * 2));
+      RULE_IDS.forEach((ruleId, index) => {
+        // Top 5 rules get higher participation
+        const multiplier = index < 5 ? (6 - index) * 0.15 : (Math.random() * 0.05 + 0.01);
+        const count = Math.floor(baseCount * multiplier);
         dayData[ruleId] = count;
         total += count;
       });
@@ -162,9 +239,9 @@ export const generateRuleParticipationData = (
       };
       
       let total = 0;
-      RULE_IDS.forEach((ruleId) => {
-        const count = Math.floor(Math.random() * (baseCount * 7 / RULE_IDS.length)) + 
-                      Math.floor(baseCount * 7 / (RULE_IDS.length * 2));
+      RULE_IDS.forEach((ruleId, index) => {
+        const multiplier = index < 5 ? (6 - index) * 0.15 : (Math.random() * 0.05 + 0.01);
+        const count = Math.floor(baseCount * 7 * multiplier);
         weekData[ruleId] = count;
         total += count;
       });
@@ -187,9 +264,9 @@ export const generateRuleParticipationData = (
       };
       
       let total = 0;
-      RULE_IDS.forEach((ruleId) => {
-        const count = Math.floor(Math.random() * (baseCount * 30 / RULE_IDS.length)) + 
-                      Math.floor(baseCount * 30 / (RULE_IDS.length * 2));
+      RULE_IDS.forEach((ruleId, index) => {
+        const multiplier = index < 5 ? (6 - index) * 0.15 : (Math.random() * 0.05 + 0.01);
+        const count = Math.floor(baseCount * 30 * multiplier);
         monthData[ruleId] = count;
         total += count;
       });
@@ -234,4 +311,27 @@ export const getSmoothingWindow = (days: number): number => {
   if (days > 90) return 14;
   if (days > 30) return 7;
   return 0; // No smoothing
+};
+
+// Calculate top N rules by average participation
+export const getTopRules = (
+  data: Array<Record<string, any>>,
+  ruleIds: string[],
+  topN: number = 5
+): string[] => {
+  // Calculate average participation for each rule
+  const ruleAverages = ruleIds.map((ruleId) => {
+    const sum = data.reduce((acc, item) => acc + (item[ruleId] || 0), 0);
+    const avg = sum / data.length;
+    const total = data.reduce((acc, item) => acc + (item.total || 0), 0);
+    const avgTotal = total / data.length;
+    const percentage = calculatePercentage(avg, avgTotal);
+    return { ruleId, percentage, avg };
+  });
+
+  // Sort by percentage descending
+  ruleAverages.sort((a, b) => b.percentage - a.percentage);
+
+  // Return top N rule IDs
+  return ruleAverages.slice(0, topN).map((r) => r.ruleId);
 };
