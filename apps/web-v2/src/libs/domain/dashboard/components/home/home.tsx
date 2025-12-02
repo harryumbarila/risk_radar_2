@@ -253,10 +253,10 @@ export default function Home() {
               </Text>
             </HStack>
             <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
-              <TSYSAuthChart />
-              <TSYSCaptureChart />
-              <TSYSSettledChart />
-              <TSYSACHReturnsChart />
+              <TSYSAuthChart dateRange={filters} />
+              <TSYSCaptureChart dateRange={filters} />
+              <TSYSSettledChart dateRange={filters} />
+              <TSYSACHReturnsChart dateRange={filters} />
             </SimpleGrid>
           </VStack>
         </Box>
