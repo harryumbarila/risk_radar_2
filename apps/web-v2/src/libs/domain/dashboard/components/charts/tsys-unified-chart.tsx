@@ -557,47 +557,27 @@ export default function TSYSUnifiedChart({
         )}
 
         {/* Chart */}
-        <Box width="100%" minH="600px">
+        <Box width="100%">
           {effectiveChartType === 'heatmap' ? (
-            <Box width="100%" h="80vh" minH="600px" maxH="90vh">
+            <Box width="100%">
               {/* Calculate visible rules count for dynamic sizing */}
               {(() => {
                 const visibleRulesList = Array.from(visibleRules);
                 const ruleCount = visibleRulesList.length;
-                
-                // Minimum cell size: 32-40px, with padding of 6px
-                const cellSize = Math.max(32, ruleCount <= 1 ? 50 : ruleCount <= 5 ? 40 : 36);
-                const cellPadding = 6;
-                const cellWithPadding = cellSize + cellPadding * 2;
-                
-                // Row height: cell + vertical spacing (4-6px between rows)
-                const rowSpacing = 5;
-                const rowHeight = cellWithPadding + rowSpacing;
-                
-                // Header height with more vertical space
-                const headerHeight = 40;
-                
-                // Calculate total height needed
-                const totalContentHeight = ruleCount * rowHeight + headerHeight + 16; // + padding
-                
-                // Format date for compact display
-                const formatCompactDate = (dateStr: string): string => {
-                  try {
-                    const date = new Date(dateStr);
-                    if (isNaN(date.getTime())) return dateStr;
-                    // Use compact format: MM/DD
-                    const month = date.getMonth() + 1;
-                    const day = date.getDate();
-                    return `${month}/${day}`;
-                  } catch {
-                    return dateStr.length > 8 ? dateStr.substring(0, 5) : dateStr;
-                  }
-                };
+                // Dynamic cell size: wider horizontally, shorter vertically
+                const cellWidth = ruleCount <= 1 ? 80 : ruleCount <= 5 ? 70 : 50; // Increased horizontal size
+                const cellHeight = ruleCount <= 1 ? 40 : ruleCount <= 5 ? 32 : 24; // Reduced vertical size
+                const rowHeight = cellHeight + 2; // cell + gap (reduced gap)
+                const headerHeight = 20; // Reduced header height
+                const totalHeight = ruleCount * rowHeight + headerHeight + 4; // + padding (reduced)
+                const minHeight = Math.max(150, totalHeight); // Reduced min height
+                const maxHeight = 300; // Reduced max height
+                const dynamicHeight = Math.min(maxHeight, minHeight);
                 
                 return (
                   <Box
                     width="100%"
-                    height="100%"
+                    height={`${dynamicHeight}px`}
                     overflow="hidden"
                     position="relative"
                     transition="height 200ms ease-in-out"
@@ -606,11 +586,11 @@ export default function TSYSUnifiedChart({
                       width="100%"
                       height="100%"
                       overflowX="auto"
-                      overflowY={totalContentHeight > 600 ? "auto" : "hidden"}
+                      overflowY="auto"
                       position="relative"
                     >
-                      <Box minW="600px" position="relative">
-                        {/* Sticky header with date labels - improved spacing */}
+                      <Box minW="800px" position="relative">
+                        {/* Sticky header with date labels */}
                         <Box
                           position="sticky"
                           top={0}
@@ -618,142 +598,117 @@ export default function TSYSUnifiedChart({
                           bg="white"
                           borderBottomWidth="1px"
                           borderBottomColor="gray.200"
-                          pb={3}
-                          pt={2}
+                          pb={1}
                         >
-                          <HStack gap={3} ml="160px">
+                          <HStack gap={0.5} ml="110px" pt={1}>
                             {data.map((item, index) => (
                               <Box
                                 key={index}
-                                w={`${cellWithPadding}px`}
-                                minW={`${cellWithPadding}px`}
+                                w={`${cellWidth}px`}
+                                minW={`${cellWidth}px`}
                                 textAlign="center"
-                                fontSize="sm"
-                                color="gray.700"
-                                fontWeight="medium"
-                                lineHeight="1.4"
+                                fontSize="xs"
+                                color="gray.600"
+                                lineHeight="1.2"
                               >
-                                {formatCompactDate(item.date)}
+                                {item.date.length > 8 ? item.date.substring(0, 5) : item.date}
                               </Box>
                             ))}
                           </HStack>
                         </Box>
                         
-                        {/* Heatmap rows with sticky labels - improved spacing */}
-                        <VStack align="stretch" gap={0} p={2}>
-                          {visibleRulesList.map((ruleId, rowIndex) => {
+                        {/* Heatmap rows with sticky labels */}
+                        <VStack align="stretch" gap={0.5} p={1}>
+                          {visibleRulesList.map((ruleId) => {
                             const isTop5 = top5Rules.includes(ruleId);
-                            const isDividerRow = (rowIndex + 1) % 5 === 0 && rowIndex < visibleRulesList.length - 1;
                             
                             // Calculate max value for this rule across all dates (normalized per rule)
                             const maxValue = Math.max(...data.map((item) => item[ruleId] || 0));
                             const stages = RULE_STAGE_MAP[ruleId] || [];
                             
                             return (
-                              <React.Fragment key={ruleId}>
-                                <HStack 
-                                  gap={0} 
-                                  align="center" 
-                                  h={`${rowHeight}px`}
-                                  mb={isDividerRow ? 2 : 0}
+                              <HStack key={ruleId} gap={0.5} align="center" h={`${rowHeight}px`}>
+                                {/* Sticky Y-axis label */}
+                                <Box
+                                  position="sticky"
+                                  left={0}
+                                  zIndex={5}
+                                  w="110px"
+                                  minW="110px"
+                                  bg="white"
+                                  borderRightWidth="1px"
+                                  borderRightColor="gray.200"
+                                  pr={2}
+                                  display="flex"
+                                  flexDirection="column"
+                                  justifyContent="center"
+                                  alignItems="flex-start"
                                 >
-                                  {/* Sticky Y-axis label - expanded width, 2-line support */}
-                                  <Box
-                                    position="sticky"
-                                    left={0}
-                                    zIndex={5}
-                                    w="160px"
-                                    minW="160px"
-                                    bg="white"
-                                    borderRightWidth="1px"
-                                    borderRightColor="gray.200"
-                                    pr={3}
-                                    pl={2}
-                                    display="flex"
-                                    flexDirection="column"
-                                    justifyContent="center"
-                                    alignItems="flex-start"
-                                    h="100%"
+                                  <Text 
+                                    fontSize="xs" 
+                                    color="gray.700" 
+                                    fontWeight={isTop5 ? 'semibold' : 'normal'}
+                                    lineClamp={1}
                                   >
-                                    <Text 
-                                      fontSize="sm" 
-                                      color="gray.700" 
-                                      fontWeight={isTop5 ? 'semibold' : 'normal'}
-                                      lineClamp={2}
-                                      lineHeight="1.3"
-                                    >
-                                      {RULE_DESCRIPTIONS[ruleId] || ruleId}
-                                    </Text>
-                                    <Text fontSize="xs" color="gray.500" lineClamp={1} mt={0.5}>
-                                      {ruleId}
-                                    </Text>
-                                  </Box>
-                                  
-                                  {/* Heatmap cells - scrollable horizontally with increased spacing */}
-                                  <HStack gap={3} ml={0} align="center">
-                                    {data.map((item, dateIndex) => {
-                                      const value = item[ruleId] || 0;
-                                      const total = item.total || 1;
-                                      const percentage = calculatePercentage(value, total);
-                                      const bgColor = getHeatmapColor(value, maxValue);
-                                      
-                                      return (
-                                        <Tooltip.Root key={dateIndex}>
-                                          <Tooltip.Trigger asChild>
-                                            <Box
-                                              w={`${cellSize}px`}
-                                              h={`${cellSize}px`}
-                                              minW={`${cellSize}px`}
-                                              minH={`${cellSize}px`}
-                                              p={`${cellPadding}px`}
-                                              bg={bgColor}
-                                              borderWidth="1px"
-                                              borderColor="gray.200"
-                                              borderRadius="sm"
-                                              cursor="pointer"
-                                              _hover={{ borderColor: 'gray.400', borderWidth: '2px' }}
-                                              transition="all 0.2s"
-                                            />
-                                          </Tooltip.Trigger>
-                                          <Portal>
-                                            <Tooltip.Positioner>
-                                              <Tooltip.Content
-                                                bg="gray.900"
-                                                color="white"
-                                                px={3}
-                                                py={2}
-                                                borderRadius="md"
-                                                fontSize="sm"
-                                                boxShadow="lg"
-                                              >
-                                                <Tooltip.Arrow />
-                                                <VStack align="start" gap={1}>
-                                                  <Text fontWeight="bold">{item.date}</Text>
-                                                  <Text>{RULE_DESCRIPTIONS[ruleId] || ruleId}</Text>
-                                                  <Text fontSize="xs">{ruleId}</Text>
-                                                  <Text fontSize="xs">Count: {value.toLocaleString()}</Text>
-                                                  <Text fontSize="xs">Share: {percentage}%</Text>
-                                                  <Text fontSize="xs">Payment Stage: {stages.join(', ') || 'N/A'}</Text>
-                                                </VStack>
-                                              </Tooltip.Content>
-                                            </Tooltip.Positioner>
-                                          </Portal>
-                                        </Tooltip.Root>
-                                      );
-                                    })}
-                                  </HStack>
-                                </HStack>
+                                    {RULE_DESCRIPTIONS[ruleId] || ruleId}
+                                  </Text>
+                                  <Text fontSize="xs" color="gray.500" lineClamp={1}>
+                                    {ruleId}
+                                  </Text>
+                                </Box>
                                 
-                                {/* Subtle divider every 5 rows */}
-                                {isDividerRow && (
-                                  <Box
-                                    h="1px"
-                                    bg="gray.100"
-                                    mx="160px"
-                                    mb={1}
-                                  />
-                                )}
-                              </React.Fragment>
+                                {/* Heatmap cells - scrollable horizontally */}
+                                <HStack gap={0.5} ml={0}>
+                                  {data.map((item, dateIndex) => {
+                                    const value = item[ruleId] || 0;
+                                    const total = item.total || 1;
+                                    const percentage = calculatePercentage(value, total);
+                                    const bgColor = getHeatmapColor(value, maxValue);
+                                    
+                                    return (
+                                      <Tooltip.Root key={dateIndex}>
+                                        <Tooltip.Trigger asChild>
+                                          <Box
+                                            w={`${cellWidth}px`}
+                                            h={`${cellHeight}px`}
+                                            minW={`${cellWidth}px`}
+                                            bg={bgColor}
+                                            borderWidth="1px"
+                                            borderColor="gray.200"
+                                            borderRadius="sm"
+                                            cursor="pointer"
+                                            _hover={{ borderColor: 'gray.400', borderWidth: '2px' }}
+                                            transition="all 0.2s"
+                                          />
+                                        </Tooltip.Trigger>
+                                        <Portal>
+                                          <Tooltip.Positioner>
+                                            <Tooltip.Content
+                                              bg="gray.900"
+                                              color="white"
+                                              px={3}
+                                              py={2}
+                                              borderRadius="md"
+                                              fontSize="sm"
+                                              boxShadow="lg"
+                                            >
+                                              <Tooltip.Arrow />
+                                              <VStack align="start" gap={1}>
+                                                <Text fontWeight="bold">{item.date}</Text>
+                                                <Text>{RULE_DESCRIPTIONS[ruleId] || ruleId}</Text>
+                                                <Text fontSize="xs">{ruleId}</Text>
+                                                <Text fontSize="xs">Count: {value.toLocaleString()}</Text>
+                                                <Text fontSize="xs">Share: {percentage}%</Text>
+                                                <Text fontSize="xs">Payment Stage: {stages.join(', ') || 'N/A'}</Text>
+                                              </VStack>
+                                            </Tooltip.Content>
+                                          </Tooltip.Positioner>
+                                        </Portal>
+                                      </Tooltip.Root>
+                                    );
+                                  })}
+                                </HStack>
+                              </HStack>
                             );
                           })}
                         </VStack>
