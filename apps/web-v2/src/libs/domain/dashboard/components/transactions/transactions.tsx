@@ -604,6 +604,7 @@ export default function CustomTable({ filters }: CustomTableProps) {
         : now;
 
       filtered = filtered.filter((tx) => {
+        if (!tx.createdAt) return false;
         const txDate = new Date(tx.createdAt);
         return txDate >= startDate && txDate <= endDate;
       });
