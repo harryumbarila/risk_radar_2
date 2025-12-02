@@ -640,20 +640,18 @@ export default function TSYSUnifiedChart({
                                   borderRightColor="gray.200"
                                   pr={2}
                                   display="flex"
-                                  flexDirection="column"
+                                  flexDirection="row"
                                   justifyContent="center"
-                                  alignItems="flex-start"
+                                  alignItems="center"
                                 >
                                   <Text 
                                     fontSize="xs" 
                                     color="gray.700" 
                                     fontWeight={isTop5 ? 'semibold' : 'normal'}
                                     lineClamp={1}
+                                    textAlign="center"
                                   >
                                     {RULE_DESCRIPTIONS[ruleId] || ruleId}
-                                  </Text>
-                                  <Text fontSize="xs" color="gray.500" lineClamp={1}>
-                                    {ruleId}
                                   </Text>
                                 </Box>
                                 
