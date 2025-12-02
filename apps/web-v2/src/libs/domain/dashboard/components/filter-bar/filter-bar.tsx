@@ -11,10 +11,11 @@ import {
   Text,
   Flex,
   Portal,
+  Popover,
+  Checkbox,
   createListCollection,
 } from '@chakra-ui/react';
-import { X } from 'lucide-react';
-import type { RiskLevel, Source } from '../../utils/mockData';
+import { X, ChevronDown } from 'lucide-react';
 import { getRuleName } from '../../utils/ruleNames';
 import RuleLabel from '../rule-label/rule-label';
 
@@ -22,9 +23,9 @@ export interface FilterState {
   dateRange: '7' | '14' | '30' | 'custom';
   customStartDate?: string;
   customEndDate?: string;
-  riskLevel: 'all' | RiskLevel;
-  source: 'all' | Source;
-  ruleId: 'all' | string;
+  processor: 'all' | 'TSYS' | 'FSP';
+  source: 'all' | 'Talus Pay' | 'Global365' | 'SIT' | 'SC Flow';
+  ruleId: 'all' | string[];
   week?: number; // For week filter from chart click
   hourRange?: { day: number; hour: number }; // For heatmap click
 }
@@ -50,22 +51,21 @@ export default function FilterBar({
     ],
   });
 
-  const riskLevelCollection = createListCollection({
+  const processorCollection = createListCollection({
     items: [
-      { label: 'All', value: 'all' },
-      { label: 'High', value: 'high' },
-      { label: 'Medium', value: 'medium' },
-      { label: 'Low', value: 'low' },
+      { label: 'All Processors', value: 'all' },
+      { label: 'TSYS', value: 'TSYS' },
+      { label: 'FSP', value: 'FSP' },
     ],
   });
 
   const sourceCollection = createListCollection({
     items: [
-      { label: 'All', value: 'all' },
-      { label: 'TSYS', value: 'TSYS' },
-      { label: 'Fluidpay', value: 'Fluidpay' },
-      { label: 'Paya', value: 'Paya' },
-      { label: 'Other', value: 'Other' },
+      { label: 'All Sources', value: 'all' },
+      { label: 'Talus Pay', value: 'Talus Pay' },
+      { label: 'Global365', value: 'Global365' },
+      { label: 'SIT', value: 'SIT' },
+      { label: 'SC Flow', value: 'SC Flow' },
     ],
   });
 
@@ -97,8 +97,8 @@ export default function FilterBar({
       newFilters.dateRange = '7';
       delete newFilters.customStartDate;
       delete newFilters.customEndDate;
-    } else if (key === 'riskLevel') {
-      newFilters.riskLevel = 'all';
+    } else if (key === 'processor') {
+      newFilters.processor = 'all';
     } else if (key === 'source') {
       newFilters.source = 'all';
     } else if (key === 'ruleId') {
@@ -112,26 +112,28 @@ export default function FilterBar({
   const clearAll = () => {
     onFiltersChange({
       dateRange: '7',
-      riskLevel: 'all',
+      processor: 'all',
       source: 'all',
       ruleId: 'all',
     });
   };
 
+  const selectedRules = Array.isArray(filters.ruleId) ? filters.ruleId : (filters.ruleId === 'all' ? [] : [filters.ruleId]);
+  
   const hasActiveFilters =
     filters.dateRange !== '7' ||
-    filters.riskLevel !== 'all' ||
+    filters.processor !== 'all' ||
     filters.source !== 'all' ||
-    filters.ruleId !== 'all' ||
+    (Array.isArray(filters.ruleId) ? filters.ruleId.length > 0 : filters.ruleId !== 'all') ||
     filters.week !== undefined ||
     filters.hourRange !== undefined;
 
   // Count active filters
   const activeFilterCount = [
     filters.dateRange !== '7',
-    filters.riskLevel !== 'all',
+    filters.processor !== 'all',
     filters.source !== 'all',
-    filters.ruleId !== 'all',
+    (Array.isArray(filters.ruleId) ? filters.ruleId.length > 0 : filters.ruleId !== 'all'),
     filters.week !== undefined,
     filters.hourRange !== undefined,
   ].filter(Boolean).length;
@@ -243,19 +245,19 @@ export default function FilterBar({
             </>
           )}
 
-          {/* Risk Level */}
+          {/* Processor */}
           <VStack align="start" gap={1}>
             <Text fontSize="xs" color="gray.600">
-              Risk Level
+              Processor
             </Text>
             <Select.Root
-              collection={riskLevelCollection}
-              value={[filters.riskLevel || 'all']}
+              collection={processorCollection}
+              value={[filters.processor || 'all']}
               onValueChange={(e) =>
-                updateFilter('riskLevel', (e.value[0] || 'all') as FilterState['riskLevel'])
+                updateFilter('processor', (e.value[0] || 'all') as FilterState['processor'])
               }
               size="sm"
-              width="140px"
+              width="150px"
             >
               <Select.HiddenSelect />
               <Select.Control>
@@ -269,7 +271,7 @@ export default function FilterBar({
               <Portal>
                 <Select.Positioner>
                   <Select.Content>
-                    {riskLevelCollection.items.map((item) => (
+                    {processorCollection.items.map((item) => (
                       <Select.Item item={item} key={item.value}>
                         {item.label}
                         <Select.ItemIndicator />
@@ -284,7 +286,7 @@ export default function FilterBar({
           {/* Source */}
           <VStack align="start" gap={1}>
             <Text fontSize="xs" color="gray.600">
-              Source/Processor
+              Source
             </Text>
             <Select.Root
               collection={sourceCollection}
@@ -293,7 +295,7 @@ export default function FilterBar({
                 updateFilter('source', (e.value[0] || 'all') as FilterState['source'])
               }
               size="sm"
-              width="140px"
+              width="150px"
             >
               <Select.HiddenSelect />
               <Select.Control>
@@ -319,59 +321,94 @@ export default function FilterBar({
             </Select.Root>
           </VStack>
 
-          {/* Rule Type */}
+          {/* Rule Type - Multi Select */}
           <VStack align="start" gap={1}>
             <Text fontSize="xs" color="gray.600">
               Rule Type
             </Text>
-            <Select.Root
-              collection={ruleCollection}
-              value={[filters.ruleId || 'all']}
-              onValueChange={(e) =>
-                updateFilter('ruleId', (e.value[0] || 'all') as FilterState['ruleId'])
-              }
-              size="sm"
-              width="140px"
-            >
-              <Select.HiddenSelect />
-              <Select.Control>
-                <Select.Trigger>
-                  {filters.ruleId !== 'all' ? (
-                    <RuleLabel ruleId={filters.ruleId} fontSize="sm" />
-                  ) : (
-                    <Select.ValueText />
-                  )}
-                </Select.Trigger>
-                <Select.IndicatorGroup>
-                  <Select.Indicator />
-                </Select.IndicatorGroup>
-              </Select.Control>
+            <Popover.Root positioning={{ placement: 'bottom-start' }}>
+              <Popover.Trigger asChild>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  width="200px"
+                  justifyContent="space-between"
+                  suppressHydrationWarning
+                >
+                  <Text fontSize="sm" noOfLines={1}>
+                    {selectedRules.length === 0
+                      ? 'All Rules'
+                      : selectedRules.length === 1
+                      ? getRuleName(selectedRules[0])
+                      : `${selectedRules.length} rules selected`}
+                  </Text>
+                  <ChevronDown size={16} />
+                </Button>
+              </Popover.Trigger>
               <Portal>
-                <Select.Positioner>
-                  <Select.Content>
-                    {ruleCollection.items.map((item) => {
-                      const hasDescription = 'description' in item && item.value !== 'all';
-                      const description = hasDescription ? (item as { description: string }).description : undefined;
-                      return (
-                        <Select.Item item={item} key={item.value}>
-                          <HStack justify="space-between" w="full">
-                            <VStack align="start" gap={0}>
-                              <Text fontSize="sm">{item.label}</Text>
-                              {description && (
-                                <Text fontSize="xs" color="gray.500">
-                                  {description}
-                                </Text>
-                              )}
-                            </VStack>
-                            <Select.ItemIndicator />
-                          </HStack>
-                        </Select.Item>
-                      );
-                    })}
-                  </Select.Content>
-                </Select.Positioner>
+                <Popover.Positioner>
+                  <Popover.Content width="300px" maxHeight="400px" overflowY="auto">
+                    <Popover.Arrow />
+                    <Popover.CloseTrigger />
+                    <VStack align="stretch" gap={2} p={4}>
+                      <HStack justify="space-between">
+                        <Text fontWeight="bold" fontSize="sm">
+                          Select Rules
+                        </Text>
+                        {selectedRules.length > 0 && (
+                          <Button
+                            size="xs"
+                            variant="ghost"
+                            onClick={() => updateFilter('ruleId', 'all')}
+                          >
+                            Clear all
+                          </Button>
+                        )}
+                      </HStack>
+                      <Box borderWidth="1px" borderRadius="md" p={2}>
+                        <VStack align="stretch" gap={2}>
+                          {availableRules.map((rule) => {
+                            const isChecked = selectedRules.includes(rule);
+                            return (
+                              <HStack key={rule} gap={3} align="start">
+                                <Checkbox.Root
+                                  checked={isChecked}
+                                  onCheckedChange={(e) => {
+                                    const checked = e.checked ?? false;
+                                    const newSelected = checked
+                                      ? [...selectedRules, rule]
+                                      : selectedRules.filter((r) => r !== rule);
+                                    updateFilter('ruleId', newSelected.length === 0 ? 'all' : newSelected);
+                                  }}
+                                >
+                                  <Checkbox.HiddenInput />
+                                  <Checkbox.Control>
+                                    <Checkbox.Indicator />
+                                  </Checkbox.Control>
+                                </Checkbox.Root>
+                                <VStack align="start" gap={0} flex={1} cursor="pointer" onClick={() => {
+                                  const newSelected = isChecked
+                                    ? selectedRules.filter((r) => r !== rule)
+                                    : [...selectedRules, rule];
+                                  updateFilter('ruleId', newSelected.length === 0 ? 'all' : newSelected);
+                                }}>
+                                  <Text fontSize="sm" fontWeight="medium">
+                                    {rule}
+                                  </Text>
+                                  <Text fontSize="xs" color="gray.500">
+                                    {getRuleName(rule)}
+                                  </Text>
+                                </VStack>
+                              </HStack>
+                            );
+                          })}
+                        </VStack>
+                      </Box>
+                    </VStack>
+                  </Popover.Content>
+                </Popover.Positioner>
               </Portal>
-            </Select.Root>
+            </Popover.Root>
           </VStack>
         </HStack>
 
@@ -400,21 +437,21 @@ export default function FilterBar({
                 </Button>
               </Badge>
             )}
-            {filters.riskLevel !== 'all' && (
+            {filters.processor !== 'all' && (
               <Badge
-                colorPalette="red"
+                colorPalette="blue"
                 variant="subtle"
                 px={2}
                 py={1}
                 borderRadius="md"
               >
-                Risk: {filters.riskLevel === 'high' ? 'High' : filters.riskLevel === 'medium' ? 'Medium' : 'Low'}
+                Processor: {filters.processor}
                 <Button
                   size="xs"
                   variant="ghost"
                   ml={2}
-                  onClick={() => clearFilter('riskLevel')}
-                  aria-label="Remove risk filter"
+                  onClick={() => clearFilter('processor')}
+                  aria-label="Remove processor filter"
                 >
                   <X size={12} />
                 </Button>
@@ -440,25 +477,38 @@ export default function FilterBar({
                 </Button>
               </Badge>
             )}
-            {filters.ruleId !== 'all' && (
-              <Badge
-                colorPalette="orange"
-                variant="subtle"
-                px={2}
-                py={1}
-                borderRadius="md"
-              >
-                Rule: <RuleLabel ruleId={filters.ruleId} fontSize="xs" />
-                <Button
-                  size="xs"
-                  variant="ghost"
-                  ml={2}
-                  onClick={() => clearFilter('ruleId')}
-                  aria-label="Remove rule filter"
-                >
-                  <X size={12} />
-                </Button>
-              </Badge>
+            {selectedRules.length > 0 && (
+              <>
+                {selectedRules.map((ruleId) => (
+                  <Badge
+                    key={ruleId}
+                    colorPalette="orange"
+                    variant="subtle"
+                    px={2}
+                    py={1}
+                    borderRadius="md"
+                    display="flex"
+                    alignItems="center"
+                    gap={1}
+                  >
+                    Rule: <RuleLabel ruleId={ruleId} fontSize="xs" />
+                    <Button
+                      size="xs"
+                      variant="ghost"
+                      onClick={() => {
+                        const newSelected = selectedRules.filter((r) => r !== ruleId);
+                        updateFilter('ruleId', newSelected.length === 0 ? 'all' : newSelected);
+                      }}
+                      aria-label="Remove rule filter"
+                      p={0}
+                      minW="auto"
+                      h="auto"
+                    >
+                      <X size={12} />
+                    </Button>
+                  </Badge>
+                ))}
+              </>
             )}
             {filters.week !== undefined && (
               <Badge

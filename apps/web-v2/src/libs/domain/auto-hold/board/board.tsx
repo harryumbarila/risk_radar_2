@@ -4,10 +4,27 @@ import { Box, HStack, Button, Tabs, Text } from '@chakra-ui/react';
 import { UserCog, List } from 'lucide-react';
 import CustomTable from '@/libs/domain/dashboard/components/transactions/transactions';
 import ManagerQueueView from '../components/manager-queue-view/manager-queue-view';
+import AutoHoldFilterBar, { AutoHoldFilterState } from '../components/filter-bar/filter-bar';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
 
 export default function AutoHoldBoardPage() {
   const [viewMode, setViewMode] = React.useState<'analyst' | 'manager'>('analyst');
+  const [filters, setFilters] = React.useState<AutoHoldFilterState>({
+    dateRange: '7',
+    status: 'all',
+    processor: 'all',
+    source: 'all',
+    merchant: '',
+    mid: '',
+    ruleId: 'all',
+  });
+
+  // Get available rules from transactions (mock - in real app would come from API)
+  const availableRules = React.useMemo(() => {
+    // Extract unique rule IDs from exceptions or use default rules
+    // For now, using common auto hold rule IDs
+    return ['AH001', 'AH002', 'AH003', 'AH004', 'AH005', 'AH006', 'AH007', 'AH008', 'AH009', 'AH010'];
+  }, []);
   
   // Mock: Group transactions into batches for manager view
   // In real app, this would come from API or be shared state
@@ -74,13 +91,13 @@ export default function AutoHoldBoardPage() {
         >
           <HStack justify="space-between" mb={6}>
             <Tabs.List>
-              <Tabs.Trigger value="analyst">
+              <Tabs.Trigger value="analyst" suppressHydrationWarning>
                 <HStack gap={2}>
                   <List size={16} />
                   <Text>Analyst View</Text>
                 </HStack>
               </Tabs.Trigger>
-              <Tabs.Trigger value="manager">
+              <Tabs.Trigger value="manager" suppressHydrationWarning>
                 <HStack gap={2}>
                   <UserCog size={16} />
                   <Text>Manager Queue</Text>
@@ -91,7 +108,8 @@ export default function AutoHoldBoardPage() {
           </HStack>
 
           <Tabs.Content value="analyst">
-            <CustomTable />
+            <AutoHoldFilterBar filters={filters} onFiltersChange={setFilters} availableRules={availableRules} />
+            <CustomTable filters={filters} />
           </Tabs.Content>
 
           <Tabs.Content value="manager">

@@ -18,6 +18,10 @@ import SourceDistributionChart from '../charts/source-distribution-chart';
 import HeatmapChart from '../charts/heatmap-chart';
 import MerchantRanking from '../charts/merchant-ranking';
 import RuleLabel from '../rule-label/rule-label';
+import TSYSAuthChart from '../charts/tsys-auth-chart';
+import TSYSCaptureChart from '../charts/tsys-capture-chart';
+import TSYSSettledChart from '../charts/tsys-settled-chart';
+import TSYSACHReturnsChart from '../charts/tsys-ach-returns-chart';
 import { generateMockAlerts, calculateKpis, type MockAlert, type Source } from '../../utils/mockData';
 
 export default function Home() {
@@ -26,9 +30,9 @@ export default function Home() {
   const [allAlerts, setAllAlerts] = React.useState<MockAlert[]>([]);
   const [filters, setFilters] = React.useState<FilterState>({
     dateRange: '7',
-    riskLevel: 'all',
+    processor: 'all',
     source: 'all',
-    ruleId: 'all',
+    ruleId: 'all' as 'all' | string[],
   });
 
   // Generate mock data on mount
@@ -83,19 +87,22 @@ export default function Home() {
       }
     }
 
-    // Risk level filter
-    if (filters.riskLevel !== 'all') {
-      filtered = filtered.filter((a) => a.risk === filters.riskLevel);
+    // Processor filter (TSYS, FSP) - filters by the source field in mock data
+    if (filters.processor !== 'all') {
+      filtered = filtered.filter((a) => a.source === filters.processor);
     }
 
-    // Source filter
-    if (filters.source !== 'all') {
-      filtered = filtered.filter((a) => a.source === filters.source);
-    }
+    // Source filter (Talus Pay, Global365, SIT, SC Flow)
+    // Note: This filter is available in the UI but won't filter data until the source field
+    // is added to the MockAlert interface. For now, it's prepared for future implementation.
+    // if (filters.source !== 'all') {
+    //   filtered = filtered.filter((a) => a.dataSource === filters.source);
+    // }
 
     // Rule filter
     if (filters.ruleId !== 'all') {
-      filtered = filtered.filter((a) => a.ruleId === filters.ruleId);
+      const ruleIds = Array.isArray(filters.ruleId) ? filters.ruleId : [filters.ruleId];
+      filtered = filtered.filter((a) => ruleIds.includes(a.ruleId));
     }
 
     // Week filter (from chart click)
@@ -173,7 +180,10 @@ export default function Home() {
     const params = new URLSearchParams();
     if (filters.riskLevel !== 'all') params.set('risk', filters.riskLevel);
     if (filters.source !== 'all') params.set('source', filters.source);
-    if (filters.ruleId !== 'all') params.set('rule', filters.ruleId);
+    if (filters.ruleId !== 'all') {
+      const ruleIds = Array.isArray(filters.ruleId) ? filters.ruleId : [filters.ruleId];
+      params.set('rule', ruleIds.join(','));
+    }
     router.push(`/auto-hold?${params.toString()}`);
   };
 
@@ -217,6 +227,31 @@ export default function Home() {
           onFiltersChange={setFilters}
           availableRules={availableRules}
         />
+
+        {/* TSYS Performance Overview Section */}
+        <Box role="region" aria-label="TSYS Performance Overview">
+          <VStack align="stretch" gap={4}>
+            <HStack justify="space-between" align="center">
+              <Text fontSize="xl" fontWeight="bold">
+                TSYS Performance Overview
+              </Text>
+              <Text fontSize="xs" color="gray.500">
+                Last Updated: {new Date().toLocaleString('en-US', { 
+                  month: 'short', 
+                  day: 'numeric', 
+                  hour: '2-digit', 
+                  minute: '2-digit' 
+                })}
+              </Text>
+            </HStack>
+            <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
+              <TSYSAuthChart />
+              <TSYSCaptureChart />
+              <TSYSSettledChart />
+              <TSYSACHReturnsChart />
+            </SimpleGrid>
+          </VStack>
+        </Box>
 
         {/* KPI Cards */}
         <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap={6} role="region" aria-label="Key Performance Indicators">
