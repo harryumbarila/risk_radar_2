@@ -243,6 +243,10 @@ export default function Home() {
           paymentStage={filters.paymentStage}
           ruleStageParticipation={filters.ruleStageParticipation}
           selectedRuleIds={Array.isArray(filters.ruleId) ? filters.ruleId : (filters.ruleId === 'all' ? [] : [filters.ruleId])}
+          availableRuleIds={availableRules}
+          onRuleIdsChange={(ruleIds) => {
+            setFilters((prev) => ({ ...prev, ruleId: ruleIds }));
+          }}
         />
 
         {/* KPI Cards */}

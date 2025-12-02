@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Box, VStack, Text, HStack, Tooltip, Portal, Select, createListCollection, Badge, Button, Checkbox } from '@chakra-ui/react';
+import { Box, VStack, Text, HStack, Tooltip, Portal, Select, createListCollection, Button } from '@chakra-ui/react';
 import { Info, X } from 'lucide-react';
 import {
   AreaChart,
@@ -33,13 +33,15 @@ import {
 
 export type PaymentStage = 'Authorization' | 'Capture' | 'Settlement' | 'ACH Returns';
 export type RuleStageParticipation = 'all' | 'auth-only' | 'multi-stage' | 'settlement-only' | 'ach-only';
-export type TopContributorsFilter = 'all' | 'top5' | 'top10' | 'payment-stage-only';
+export type TopContributorsFilter = 'all' | 'top5' | 'top10';
 
 interface TSYSUnifiedChartProps {
   dateRange?: FilterState;
   paymentStage?: PaymentStage;
   ruleStageParticipation?: RuleStageParticipation;
   selectedRuleIds?: string[]; // Rules selected from FilterBar
+  availableRuleIds?: string[]; // All available rule IDs
+  onRuleIdsChange?: (ruleIds: string[]) => void; // Callback to update main filter
 }
 
 // Define which rules apply to which stages
@@ -93,12 +95,11 @@ export default function TSYSUnifiedChart({
   dateRange, 
   paymentStage = 'Authorization',
   ruleStageParticipation = 'all',
-  selectedRuleIds = []
+  selectedRuleIds = [],
+  availableRuleIds = [],
+  onRuleIdsChange
 }: TSYSUnifiedChartProps) {
   const [manualChartType, setManualChartType] = React.useState<'stacked-area' | 'heatmap' | null>(null);
-  const [focusedRule, setFocusedRule] = React.useState<string | null>(null);
-  const [focusMode, setFocusMode] = React.useState<'off' | 'single' | 'subset'>('off');
-  const [focusedSubset, setFocusedSubset] = React.useState<Set<string>>(new Set());
   const [topContributorsFilter, setTopContributorsFilter] = React.useState<TopContributorsFilter>('all');
   const [expandedOthers, setExpandedOthers] = React.useState(false);
   
@@ -164,15 +165,31 @@ export default function TSYSUnifiedChart({
         return top5Rules;
       case 'top10':
         return top10Rules;
-      case 'payment-stage-only':
-        return filteredRuleIds.filter((ruleId) => {
-          const stages = RULE_STAGE_MAP[ruleId] || [];
-          return stages.includes(paymentStage);
-        });
       default:
         return filteredRuleIds;
     }
-  }, [topContributorsFilter, top5Rules, top10Rules, filteredRuleIds, paymentStage]);
+  }, [topContributorsFilter, top5Rules, top10Rules, filteredRuleIds]);
+
+  // Update main filter when Top Contributors changes
+  React.useEffect(() => {
+    if (onRuleIdsChange) {
+      let rulesToSelect: string[] = [];
+      switch (topContributorsFilter) {
+        case 'top5':
+          rulesToSelect = top5Rules;
+          break;
+        case 'top10':
+          rulesToSelect = top10Rules;
+          break;
+        case 'all':
+          rulesToSelect = availableRuleIds.length > 0 ? availableRuleIds : filteredRuleIds;
+          break;
+      }
+      if (rulesToSelect.length > 0) {
+        onRuleIdsChange(rulesToSelect);
+      }
+    }
+  }, [topContributorsFilter, top5Rules, top10Rules, availableRuleIds, filteredRuleIds, onRuleIdsChange]);
 
   // Determine chart type: auto-switch to heatmap if 12+ rules
   const effectiveChartType = React.useMemo(() => {
@@ -197,21 +214,10 @@ export default function TSYSUnifiedChart({
     return [];
   }, [shouldCollapseToTop5, contributorFilteredRules, top5Rules]);
 
-  // Visible rules: based on focus mode
+  // Visible rules: always use displayRules (no focus mode)
   const visibleRules = React.useMemo(() => {
-    if (focusMode === 'single' && focusedRule) {
-      return new Set([focusedRule]);
-    }
-    if (focusMode === 'subset') {
-      // In subset mode, only show rules that are in the focusedSubset AND in displayRules
-      if (focusedSubset.size > 0) {
-        return new Set(Array.from(focusedSubset).filter(ruleId => displayRules.includes(ruleId)));
-      }
-      // If no subset selected, show nothing (empty state will handle this)
-      return new Set();
-    }
     return new Set(displayRules);
-  }, [focusMode, focusedRule, focusedSubset, displayRules]);
+  }, [displayRules]);
 
   // Empty state check
   const hasNoRules = filteredRuleIds.length === 0 || displayRules.length === 0;
@@ -223,18 +229,6 @@ export default function TSYSUnifiedChart({
 
   // Get rule opacity
   const getRuleOpacity = (ruleId: string, isTop5: boolean): number => {
-    if (focusMode === 'single' && focusedRule === ruleId) {
-      return 1.0;
-    }
-    if (focusMode === 'single' && focusedRule && focusedRule !== ruleId) {
-      return 0.15;
-    }
-    if (focusMode === 'subset' && focusedSubset.has(ruleId)) {
-      return 1.0;
-    }
-    if (focusMode === 'subset' && focusedSubset.size > 0 && !focusedSubset.has(ruleId)) {
-      return 0.15;
-    }
     if (isTop5) {
       return 1.0;
     }
@@ -243,9 +237,6 @@ export default function TSYSUnifiedChart({
 
   // Get stroke width
   const getStrokeWidth = (ruleId: string, isTop5: boolean): number => {
-    if (focusMode === 'single' && focusedRule === ruleId) {
-      return 2.5;
-    }
     if (isTop5) {
       return 1.5;
     }
@@ -260,31 +251,6 @@ export default function TSYSUnifiedChart({
     return HEATMAP_COLORS[index];
   };
 
-  const handleRuleHover = (ruleId: string | null) => {
-    if (focusMode === 'off') {
-      setFocusedRule(ruleId);
-    }
-  };
-
-  const handleRuleClick = (ruleId: string) => {
-    if (focusMode === 'subset') {
-      setFocusedSubset((prev) => {
-        const next = new Set(prev);
-        if (next.has(ruleId)) {
-          next.delete(ruleId);
-        } else {
-          next.add(ruleId);
-        }
-        return next;
-      });
-    } else if (focusMode === 'single') {
-      if (focusedRule === ruleId) {
-        setFocusedRule(null);
-      } else {
-        setFocusedRule(ruleId);
-      }
-    }
-  };
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -388,7 +354,6 @@ export default function TSYSUnifiedChart({
       { label: 'All Rules', value: 'all' },
       { label: 'Top 5', value: 'top5' },
       { label: 'Top 10', value: 'top10' },
-      { label: 'Payment Stage Only', value: 'payment-stage-only' },
     ],
   });
 
@@ -535,58 +500,6 @@ export default function TSYSUnifiedChart({
                 </Portal>
               </Select.Root>
             </Box>
-            <Box minW="150px">
-              <Text fontSize="xs" fontWeight="semibold" color="gray.600" mb={1}>
-                Focus Mode
-              </Text>
-              <Select.Root
-                value={[focusMode]}
-                onValueChange={(e) => {
-                  const mode = e.value[0] as 'off' | 'single' | 'subset';
-                  setFocusMode(mode);
-                  if (mode === 'off') {
-                    setFocusedRule(null);
-                    setFocusedSubset(new Set());
-                  }
-                }}
-                collection={createListCollection({
-                  items: [
-                    { label: 'Off', value: 'off' },
-                    { label: 'Single Rule', value: 'single' },
-                    { label: 'Selected Subset', value: 'subset' },
-                  ],
-                })}
-                size="sm"
-              >
-                <Select.HiddenSelect />
-                <Select.Control>
-                  <Select.Trigger>
-                    <Select.ValueText />
-                  </Select.Trigger>
-                  <Select.IndicatorGroup>
-                    <Select.Indicator />
-                  </Select.IndicatorGroup>
-                </Select.Control>
-                <Portal>
-                  <Select.Positioner>
-                    <Select.Content>
-                      <Select.Item item={{ label: 'Off', value: 'off' }}>
-                        Off
-                        <Select.ItemIndicator />
-                      </Select.Item>
-                      <Select.Item item={{ label: 'Single Rule', value: 'single' }}>
-                        Single Rule
-                        <Select.ItemIndicator />
-                      </Select.Item>
-                      <Select.Item item={{ label: 'Selected Subset', value: 'subset' }}>
-                        Selected Subset
-                        <Select.ItemIndicator />
-                      </Select.Item>
-                    </Select.Content>
-                  </Select.Positioner>
-                </Portal>
-              </Select.Root>
-            </Box>
             <Text fontSize="xs" color="gray.500">
               Last Updated: {new Date().toLocaleString('en-US', { 
                 month: 'short', 
@@ -622,47 +535,6 @@ export default function TSYSUnifiedChart({
               >
                 <X size={14} />
               </Button>
-            </HStack>
-          </Box>
-        )}
-
-        {/* Focus subset chips */}
-        {focusMode === 'subset' && (
-          <Box>
-            <Text fontSize="xs" fontWeight="semibold" color="gray.600" mb={1}>
-              Selected Rules
-            </Text>
-            <HStack gap={2} flexWrap="wrap">
-              {Array.from(focusedSubset).map((ruleId) => (
-                <Badge
-                  key={ruleId}
-                  colorPalette="blue"
-                  variant="subtle"
-                  px={2}
-                  py={1}
-                  borderRadius="md"
-                  cursor="pointer"
-                  onClick={() => handleRuleClick(ruleId)}
-                >
-                  {RULE_DESCRIPTIONS[ruleId] || ruleId}
-                  <Button
-                    size="xs"
-                    variant="ghost"
-                    ml={1}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRuleClick(ruleId);
-                    }}
-                  >
-                    <X size={12} />
-                  </Button>
-                </Badge>
-              ))}
-              {focusedSubset.size === 0 && (
-                <Text fontSize="xs" color="gray.400">
-                  Click rules in chart to add to subset
-                </Text>
-              )}
             </HStack>
           </Box>
         )}
