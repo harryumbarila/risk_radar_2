@@ -348,8 +348,7 @@ export default function TSYSUnifiedChart({ dateRange }: TSYSUnifiedChartProps) {
         </HStack>
 
         {/* Chart */}
-        <VStack align="stretch" gap={4}>
-          <Box height="400px" width="100%">
+        <Box height="400px" width="100%">
             <ResponsiveContainer width="100%" height="100%">
             {useLineChart ? (
               <LineChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: xAxisConfig.angle !== 0 ? 40 : 5 }}>
