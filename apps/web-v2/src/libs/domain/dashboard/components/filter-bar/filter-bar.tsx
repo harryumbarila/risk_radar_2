@@ -26,6 +26,8 @@ export interface FilterState {
   processor: 'all' | 'TSYS' | 'FSP';
   source: 'all' | 'Talus Pay' | 'Global365' | 'SIT' | 'SC Flow';
   ruleId: 'all' | string[];
+  paymentStage?: 'Authorization' | 'Capture' | 'Settlement' | 'ACH Returns';
+  ruleStageParticipation?: 'all' | 'auth-only' | 'multi-stage' | 'settlement-only' | 'ach-only';
   week?: number; // For week filter from chart click
   hourRange?: { day: number; hour: number }; // For heatmap click
 }
@@ -69,6 +71,25 @@ export default function FilterBar({
     ],
   });
 
+  const paymentStageCollection = createListCollection({
+    items: [
+      { label: 'Authorization', value: 'Authorization' },
+      { label: 'Capture', value: 'Capture' },
+      { label: 'Settlement', value: 'Settlement' },
+      { label: 'ACH Returns', value: 'ACH Returns' },
+    ],
+  });
+
+  const ruleStageParticipationCollection = createListCollection({
+    items: [
+      { label: 'All rules', value: 'all' },
+      { label: 'Auth-only rules', value: 'auth-only' },
+      { label: 'Multi-stage rules', value: 'multi-stage' },
+      { label: 'Settlement-only rules', value: 'settlement-only' },
+      { label: 'ACH-only rules', value: 'ach-only' },
+    ],
+  });
+
   const ruleCollection = React.useMemo(
     () =>
       createListCollection({
@@ -103,6 +124,10 @@ export default function FilterBar({
       newFilters.source = 'all';
     } else if (key === 'ruleId') {
       newFilters.ruleId = 'all';
+    } else if (key === 'paymentStage') {
+      delete newFilters.paymentStage;
+    } else if (key === 'ruleStageParticipation') {
+      delete newFilters.ruleStageParticipation;
     } else {
       delete newFilters[key];
     }
@@ -115,6 +140,8 @@ export default function FilterBar({
       processor: 'all',
       source: 'all',
       ruleId: 'all',
+      paymentStage: undefined,
+      ruleStageParticipation: undefined,
     });
   };
 
@@ -125,6 +152,8 @@ export default function FilterBar({
     filters.processor !== 'all' ||
     filters.source !== 'all' ||
     (Array.isArray(filters.ruleId) ? filters.ruleId.length > 0 : filters.ruleId !== 'all') ||
+    filters.paymentStage !== undefined ||
+    filters.ruleStageParticipation !== undefined ||
     filters.week !== undefined ||
     filters.hourRange !== undefined;
 
@@ -134,6 +163,8 @@ export default function FilterBar({
     filters.processor !== 'all',
     filters.source !== 'all',
     (Array.isArray(filters.ruleId) ? filters.ruleId.length > 0 : filters.ruleId !== 'all'),
+    filters.paymentStage !== undefined,
+    filters.ruleStageParticipation !== undefined,
     filters.week !== undefined,
     filters.hourRange !== undefined,
   ].filter(Boolean).length;
@@ -321,6 +352,84 @@ export default function FilterBar({
             </Select.Root>
           </VStack>
 
+          {/* Payment Stage */}
+          <VStack align="start" gap={1}>
+            <Text fontSize="xs" color="gray.600">
+              Payment Stage
+            </Text>
+            <Select.Root
+              collection={paymentStageCollection}
+              value={filters.paymentStage ? [filters.paymentStage] : []}
+              onValueChange={(e) => {
+                const value = e.value[0] as FilterState['paymentStage'];
+                updateFilter('paymentStage', value);
+              }}
+              size="sm"
+              width="150px"
+            >
+              <Select.HiddenSelect />
+              <Select.Control>
+                <Select.Trigger>
+                  <Select.ValueText placeholder="All Stages" />
+                </Select.Trigger>
+                <Select.IndicatorGroup>
+                  <Select.Indicator />
+                </Select.IndicatorGroup>
+              </Select.Control>
+              <Portal>
+                <Select.Positioner>
+                  <Select.Content>
+                    {paymentStageCollection.items.map((item) => (
+                      <Select.Item item={item} key={item.value}>
+                        {item.label}
+                        <Select.ItemIndicator />
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select.Positioner>
+              </Portal>
+            </Select.Root>
+          </VStack>
+
+          {/* Rule Stage Participation */}
+          <VStack align="start" gap={1}>
+            <Text fontSize="xs" color="gray.600">
+              Rule Stage Participation
+            </Text>
+            <Select.Root
+              collection={ruleStageParticipationCollection}
+              value={filters.ruleStageParticipation ? [filters.ruleStageParticipation] : ['all']}
+              onValueChange={(e) => {
+                const value = (e.value[0] || 'all') as FilterState['ruleStageParticipation'];
+                updateFilter('ruleStageParticipation', value);
+              }}
+              size="sm"
+              width="200px"
+            >
+              <Select.HiddenSelect />
+              <Select.Control>
+                <Select.Trigger>
+                  <Select.ValueText />
+                </Select.Trigger>
+                <Select.IndicatorGroup>
+                  <Select.Indicator />
+                </Select.IndicatorGroup>
+              </Select.Control>
+              <Portal>
+                <Select.Positioner>
+                  <Select.Content>
+                    {ruleStageParticipationCollection.items.map((item) => (
+                      <Select.Item item={item} key={item.value}>
+                        {item.label}
+                        <Select.ItemIndicator />
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select.Positioner>
+              </Portal>
+            </Select.Root>
+          </VStack>
+
           {/* Rule Type - Multi Select */}
           <VStack align="start" gap={1}>
             <Text fontSize="xs" color="gray.600">
@@ -472,6 +581,46 @@ export default function FilterBar({
                   ml={2}
                   onClick={() => clearFilter('source')}
                   aria-label="Remove source filter"
+                >
+                  <X size={12} />
+                </Button>
+              </Badge>
+            )}
+            {filters.paymentStage && (
+              <Badge
+                colorPalette="green"
+                variant="subtle"
+                px={2}
+                py={1}
+                borderRadius="md"
+              >
+                Payment Stage: {filters.paymentStage}
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  ml={2}
+                  onClick={() => clearFilter('paymentStage')}
+                  aria-label="Remove payment stage filter"
+                >
+                  <X size={12} />
+                </Button>
+              </Badge>
+            )}
+            {filters.ruleStageParticipation && filters.ruleStageParticipation !== 'all' && (
+              <Badge
+                colorPalette="pink"
+                variant="subtle"
+                px={2}
+                py={1}
+                borderRadius="md"
+              >
+                Rule Stage: {ruleStageParticipationCollection.items.find(i => i.value === filters.ruleStageParticipation)?.label || filters.ruleStageParticipation}
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  ml={2}
+                  onClick={() => clearFilter('ruleStageParticipation')}
+                  aria-label="Remove rule stage participation filter"
                 >
                   <X size={12} />
                 </Button>

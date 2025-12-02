@@ -229,7 +229,11 @@ export default function Home() {
         />
 
         {/* TSYS Performance Overview Section */}
-        <TSYSUnifiedChart dateRange={filters} />
+        <TSYSUnifiedChart 
+          dateRange={filters} 
+          paymentStage={filters.paymentStage}
+          ruleStageParticipation={filters.ruleStageParticipation}
+        />
 
         {/* KPI Cards */}
         <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap={6} role="region" aria-label="Key Performance Indicators">

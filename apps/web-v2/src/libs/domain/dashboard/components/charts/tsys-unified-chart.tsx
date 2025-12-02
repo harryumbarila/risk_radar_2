@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Box, VStack, Text, HStack, Tooltip, Portal, Select, createListCollection, Popover, Button } from '@chakra-ui/react';
+import { Box, VStack, Text, HStack, Tooltip, Portal, Popover, Button } from '@chakra-ui/react';
 import { Info, ChevronDown } from 'lucide-react';
 import {
   AreaChart,
@@ -34,6 +34,8 @@ export type RuleStageParticipation = 'all' | 'auth-only' | 'multi-stage' | 'sett
 
 interface TSYSUnifiedChartProps {
   dateRange?: FilterState;
+  paymentStage?: PaymentStage;
+  ruleStageParticipation?: RuleStageParticipation;
 }
 
 // Define which rules apply to which stages
@@ -54,9 +56,11 @@ const PAYMENT_STAGE_BASE_COUNTS: Record<PaymentStage, number> = {
   'ACH Returns': 800,
 };
 
-export default function TSYSUnifiedChart({ dateRange }: TSYSUnifiedChartProps) {
-  const [paymentStage, setPaymentStage] = React.useState<PaymentStage>('Authorization');
-  const [ruleStageParticipation, setRuleStageParticipation] = React.useState<RuleStageParticipation>('all');
+export default function TSYSUnifiedChart({ 
+  dateRange, 
+  paymentStage = 'Authorization',
+  ruleStageParticipation = 'all'
+}: TSYSUnifiedChartProps) {
   const [visibleRules, setVisibleRules] = React.useState<Set<string>>(new Set(RULE_IDS));
   
   const days = React.useMemo(() => dateRange ? getDaysFromDateRange(dateRange) : 14, [dateRange]);
@@ -192,25 +196,6 @@ export default function TSYSUnifiedChart({ dateRange }: TSYSUnifiedChartProps) {
   const showGridlines = data.length <= 30;
   const useLineChart = data.length > 60; // Use line chart for very long ranges
 
-  const paymentStageCollection = createListCollection({
-    items: [
-      { label: 'Authorization', value: 'Authorization' },
-      { label: 'Capture', value: 'Capture' },
-      { label: 'Settlement', value: 'Settlement' },
-      { label: 'ACH Returns', value: 'ACH Returns' },
-    ],
-  });
-
-  const ruleStageCollection = createListCollection({
-    items: [
-      { label: 'All rules', value: 'all' },
-      { label: 'Auth-only rules', value: 'auth-only' },
-      { label: 'Multi-stage rules', value: 'multi-stage' },
-      { label: 'Settlement-only rules', value: 'settlement-only' },
-      { label: 'ACH-only rules', value: 'ach-only' },
-    ],
-  });
-
   return (
     <Box 
       bg="white" 
@@ -272,76 +257,6 @@ export default function TSYSUnifiedChart({ dateRange }: TSYSUnifiedChartProps) {
               minute: '2-digit' 
             })}
           </Text>
-        </HStack>
-
-        {/* Filters */}
-        <HStack gap={4} flexWrap={{ base: 'wrap', md: 'nowrap' }}>
-          <Box flex={1} minW={{ base: '100%', md: '200px' }}>
-            <Text fontSize="xs" fontWeight="semibold" color="gray.600" mb={1}>
-              Payment Stage
-            </Text>
-            <Select.Root
-              value={[paymentStage]}
-              onValueChange={(e) => setPaymentStage(e.value[0] as PaymentStage)}
-              collection={paymentStageCollection}
-              size="sm"
-            >
-              <Select.HiddenSelect />
-              <Select.Control>
-                <Select.Trigger>
-                  <Select.ValueText />
-                </Select.Trigger>
-                <Select.IndicatorGroup>
-                  <Select.Indicator />
-                </Select.IndicatorGroup>
-              </Select.Control>
-              <Portal>
-                <Select.Positioner>
-                  <Select.Content>
-                    {paymentStageCollection.items.map((item) => (
-                      <Select.Item key={item.value} item={item}>
-                        {item.label}
-                        <Select.ItemIndicator />
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select.Positioner>
-              </Portal>
-            </Select.Root>
-          </Box>
-          <Box flex={1} minW={{ base: '100%', md: '200px' }}>
-            <Text fontSize="xs" fontWeight="semibold" color="gray.600" mb={1}>
-              Rule Stage Participation
-            </Text>
-            <Select.Root
-              value={[ruleStageParticipation]}
-              onValueChange={(e) => setRuleStageParticipation(e.value[0] as RuleStageParticipation)}
-              collection={ruleStageCollection}
-              size="sm"
-            >
-              <Select.HiddenSelect />
-              <Select.Control>
-                <Select.Trigger>
-                  <Select.ValueText />
-                </Select.Trigger>
-                <Select.IndicatorGroup>
-                  <Select.Indicator />
-                </Select.IndicatorGroup>
-              </Select.Control>
-              <Portal>
-                <Select.Positioner>
-                  <Select.Content>
-                    {ruleStageCollection.items.map((item) => (
-                      <Select.Item key={item.value} item={item}>
-                        {item.label}
-                        <Select.ItemIndicator />
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select.Positioner>
-              </Portal>
-            </Select.Root>
-          </Box>
         </HStack>
 
         <Text fontSize="sm" color="gray.600">
