@@ -102,6 +102,7 @@ export default function TSYSUnifiedChart({
   const [manualChartType, setManualChartType] = React.useState<'stacked-area' | 'heatmap' | null>(null);
   const [topContributorsFilter, setTopContributorsFilter] = React.useState<TopContributorsFilter>('all');
   const [expandedOthers, setExpandedOthers] = React.useState(false);
+  const [heatmapDensity, setHeatmapDensity] = React.useState<'compact' | 'normal' | 'spacious'>('normal');
   
   const days = React.useMemo(() => dateRange ? getDaysFromDateRange(dateRange) : 14, [dateRange]);
   const dateGrouping = React.useMemo(() => getDateGrouping(days), [days]);
@@ -517,6 +518,53 @@ export default function TSYSUnifiedChart({
                 </Portal>
               </Select.Root>
             </Box>
+            {effectiveChartType === 'heatmap' && (
+              <Box minW="150px">
+                <Text fontSize="xs" fontWeight="semibold" color="gray.600" mb={1}>
+                  Density
+                </Text>
+                <Select.Root
+                  value={[heatmapDensity]}
+                  onValueChange={(e) => setHeatmapDensity(e.value[0] as 'compact' | 'normal' | 'spacious')}
+                  collection={createListCollection({
+                    items: [
+                      { label: 'Compact', value: 'compact' },
+                      { label: 'Normal', value: 'normal' },
+                      { label: 'Spacious', value: 'spacious' },
+                    ],
+                  })}
+                  size="sm"
+                >
+                  <Select.HiddenSelect />
+                  <Select.Control>
+                    <Select.Trigger>
+                      <Select.ValueText />
+                    </Select.Trigger>
+                    <Select.IndicatorGroup>
+                      <Select.Indicator />
+                    </Select.IndicatorGroup>
+                  </Select.Control>
+                  <Portal>
+                    <Select.Positioner>
+                      <Select.Content>
+                        <Select.Item item={{ label: 'Compact', value: 'compact' }}>
+                          Compact
+                          <Select.ItemIndicator />
+                        </Select.Item>
+                        <Select.Item item={{ label: 'Normal', value: 'normal' }}>
+                          Normal
+                          <Select.ItemIndicator />
+                        </Select.Item>
+                        <Select.Item item={{ label: 'Spacious', value: 'spacious' }}>
+                          Spacious
+                          <Select.ItemIndicator />
+                        </Select.Item>
+                      </Select.Content>
+                    </Select.Positioner>
+                  </Portal>
+                </Select.Root>
+              </Box>
+            )}
             <Text fontSize="xs" color="gray.500">
               Last Updated: {new Date().toLocaleString('en-US', { 
                 month: 'short', 
@@ -564,15 +612,37 @@ export default function TSYSUnifiedChart({
               {(() => {
                 const visibleRulesList = Array.from(visibleRules);
                 const ruleCount = visibleRulesList.length;
-                // Dynamic cell size: wider horizontally, shorter vertically
-                const cellWidth = ruleCount <= 1 ? 80 : ruleCount <= 5 ? 70 : 50; // Increased horizontal size
-                const cellHeight = ruleCount <= 1 ? 40 : ruleCount <= 5 ? 32 : 24; // Reduced vertical size
-                const rowHeight = cellHeight + 2; // cell + gap (reduced gap)
-                const headerHeight = 20; // Reduced header height
-                const totalHeight = ruleCount * rowHeight + headerHeight + 4; // + padding (reduced)
-                const minHeight = Math.max(150, totalHeight); // Reduced min height
-                const maxHeight = 300; // Reduced max height
+                const dataCount = data.length;
+                
+                // Density-based cell sizing
+                const densityMultipliers = {
+                  compact: { width: 0.8, height: 0.7 },
+                  normal: { width: 1.0, height: 1.0 },
+                  spacious: { width: 1.3, height: 1.2 },
+                };
+                const multiplier = densityMultipliers[heatmapDensity];
+                
+                // Base cell sizes
+                const baseCellWidth = ruleCount <= 1 ? 80 : ruleCount <= 5 ? 70 : 50;
+                const baseCellHeight = ruleCount <= 1 ? 40 : ruleCount <= 5 ? 32 : 24;
+                
+                // Apply density multiplier
+                const cellWidth = Math.round(baseCellWidth * multiplier.width);
+                const cellHeight = Math.round(baseCellHeight * multiplier.height);
+                const rowHeight = cellHeight + 2;
+                const headerHeight = 20;
+                const totalHeight = ruleCount * rowHeight + headerHeight + 4;
+                const minHeight = Math.max(150, totalHeight);
+                const maxHeight = 300;
                 const dynamicHeight = Math.min(maxHeight, minHeight);
+                
+                // Calculate available width (subtract label width and padding)
+                const labelWidth = 110;
+                const padding = 16; // 8px on each side
+                const gapSize = 0.5 * 4; // 0.5 gap in px (4px per gap unit in Chakra)
+                const totalGaps = (dataCount - 1) * gapSize;
+                const availableWidth = `calc(100% - ${labelWidth + padding}px)`;
+                const cellFlexBasis = dataCount > 0 ? `calc((${availableWidth} - ${totalGaps}px) / ${dataCount})` : `${cellWidth}px`;
                 
                 return (
                   <Box
@@ -585,11 +655,10 @@ export default function TSYSUnifiedChart({
                     <Box
                       width="100%"
                       height="100%"
-                      overflowX="auto"
                       overflowY="auto"
                       position="relative"
                     >
-                      <Box minW="800px" position="relative">
+                      <Box width="100%" position="relative">
                         {/* Sticky header with date labels */}
                         <Box
                           position="sticky"
@@ -600,12 +669,12 @@ export default function TSYSUnifiedChart({
                           borderBottomColor="gray.200"
                           pb={1}
                         >
-                          <HStack gap={0.5} ml="110px" pt={1}>
+                          <HStack gap={0.5} ml={`${labelWidth}px`} pt={1} width={`calc(100% - ${labelWidth}px)`}>
                             {data.map((item, index) => (
                               <Box
                                 key={index}
-                                w={`${cellWidth}px`}
-                                minW={`${cellWidth}px`}
+                                flex="1"
+                                minW="0"
                                 textAlign="center"
                                 fontSize="xs"
                                 color="gray.600"
@@ -633,8 +702,8 @@ export default function TSYSUnifiedChart({
                                   position="sticky"
                                   left={0}
                                   zIndex={5}
-                                  w="110px"
-                                  minW="110px"
+                                  w={`${labelWidth}px`}
+                                  minW={`${labelWidth}px`}
                                   bg="white"
                                   borderRightWidth="1px"
                                   borderRightColor="gray.200"
@@ -655,8 +724,8 @@ export default function TSYSUnifiedChart({
                                   </Text>
                                 </Box>
                                 
-                                {/* Heatmap cells - scrollable horizontally */}
-                                <HStack gap={0.5} ml={0}>
+                                {/* Heatmap cells - full width distribution */}
+                                <HStack gap={0.5} ml={0} flex="1" width={`calc(100% - ${labelWidth}px)`}>
                                   {data.map((item, dateIndex) => {
                                     const value = item[ruleId] || 0;
                                     const total = item.total || 1;
@@ -667,9 +736,9 @@ export default function TSYSUnifiedChart({
                                       <Tooltip.Root key={dateIndex}>
                                         <Tooltip.Trigger asChild>
                                           <Box
-                                            w={`${cellWidth}px`}
+                                            flex="1"
+                                            minW="0"
                                             h={`${cellHeight}px`}
-                                            minW={`${cellWidth}px`}
                                             bg={bgColor}
                                             borderWidth="1px"
                                             borderColor="gray.200"
