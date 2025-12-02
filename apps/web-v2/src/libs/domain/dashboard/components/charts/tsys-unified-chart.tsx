@@ -202,8 +202,13 @@ export default function TSYSUnifiedChart({
     if (focusMode === 'single' && focusedRule) {
       return new Set([focusedRule]);
     }
-    if (focusMode === 'subset' && focusedSubset.size > 0) {
-      return focusedSubset;
+    if (focusMode === 'subset') {
+      // In subset mode, only show rules that are in the focusedSubset AND in displayRules
+      if (focusedSubset.size > 0) {
+        return new Set(Array.from(focusedSubset).filter(ruleId => displayRules.includes(ruleId)));
+      }
+      // If no subset selected, show nothing (empty state will handle this)
+      return new Set();
     }
     return new Set(displayRules);
   }, [focusMode, focusedRule, focusedSubset, displayRules]);
@@ -422,8 +427,8 @@ export default function TSYSUnifiedChart({
       aria-label="TSYS Performance Overview Chart"
     >
       <VStack align="stretch" gap={4}>
-        <HStack justify="space-between" align="flex-start">
-          <VStack align="start" gap={1}>
+        <HStack justify="space-between" align="flex-start" flexWrap="wrap" gap={4}>
+          <VStack align="start" gap={1} flex={1}>
             <HStack gap={2} align="center">
               <Text fontSize="xl" fontWeight="bold">
                 TSYS Performance Overview
@@ -463,7 +468,7 @@ export default function TSYSUnifiedChart({
               </Tooltip.Root>
             </HStack>
           </VStack>
-          <HStack gap={3}>
+          <HStack gap={3} flexWrap="wrap">
             <Box minW="150px">
               <Text fontSize="xs" fontWeight="semibold" color="gray.600" mb={1}>
                 Chart Type
@@ -492,6 +497,91 @@ export default function TSYSUnifiedChart({
                           <Select.ItemIndicator />
                         </Select.Item>
                       ))}
+                    </Select.Content>
+                  </Select.Positioner>
+                </Portal>
+              </Select.Root>
+            </Box>
+            <Box minW="150px">
+              <Text fontSize="xs" fontWeight="semibold" color="gray.600" mb={1}>
+                Top Contributors
+              </Text>
+              <Select.Root
+                value={[topContributorsFilter]}
+                onValueChange={(e) => setTopContributorsFilter(e.value[0] as TopContributorsFilter)}
+                collection={topContributorsCollection}
+                size="sm"
+              >
+                <Select.HiddenSelect />
+                <Select.Control>
+                  <Select.Trigger>
+                    <Select.ValueText />
+                  </Select.Trigger>
+                  <Select.IndicatorGroup>
+                    <Select.Indicator />
+                  </Select.IndicatorGroup>
+                </Select.Control>
+                <Portal>
+                  <Select.Positioner>
+                    <Select.Content>
+                      {topContributorsCollection.items.map((item) => (
+                        <Select.Item key={item.value} item={item}>
+                          {item.label}
+                          <Select.ItemIndicator />
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select.Positioner>
+                </Portal>
+              </Select.Root>
+            </Box>
+            <Box minW="150px">
+              <Text fontSize="xs" fontWeight="semibold" color="gray.600" mb={1}>
+                Focus Mode
+              </Text>
+              <Select.Root
+                value={[focusMode]}
+                onValueChange={(e) => {
+                  const mode = e.value[0] as 'off' | 'single' | 'subset';
+                  setFocusMode(mode);
+                  if (mode === 'off') {
+                    setFocusedRule(null);
+                    setFocusedSubset(new Set());
+                  }
+                }}
+                collection={createListCollection({
+                  items: [
+                    { label: 'Off', value: 'off' },
+                    { label: 'Single Rule', value: 'single' },
+                    { label: 'Selected Subset', value: 'subset' },
+                  ],
+                })}
+                size="sm"
+              >
+                <Select.HiddenSelect />
+                <Select.Control>
+                  <Select.Trigger>
+                    <Select.ValueText />
+                  </Select.Trigger>
+                  <Select.IndicatorGroup>
+                    <Select.Indicator />
+                  </Select.IndicatorGroup>
+                </Select.Control>
+                <Portal>
+                  <Select.Positioner>
+                    <Select.Content>
+                      <Select.Item item={{ label: 'Off', value: 'off' }}>
+                        Off
+                        <Select.ItemIndicator />
+                      </Select.Item>
+                      <Select.Item item={{ label: 'Single Rule', value: 'single' }}>
+                        Single Rule
+                        <Select.ItemIndicator />
+                      </Select.Item>
+                      <Select.Item item={{ label: 'Selected Subset', value: 'subset' }}>
+                        Selected Subset
+                        <Select.ItemIndicator />
+                      </Select.Item>
                     </Select.Content>
                   </Select.Positioner>
                 </Portal>
@@ -536,250 +626,216 @@ export default function TSYSUnifiedChart({
           </Box>
         )}
 
-        {/* Controls */}
-        <HStack gap={4} flexWrap="wrap">
-          <Box minW="150px">
+        {/* Focus subset chips */}
+        {focusMode === 'subset' && (
+          <Box>
             <Text fontSize="xs" fontWeight="semibold" color="gray.600" mb={1}>
-              Top Contributors
+              Selected Rules
             </Text>
-            <Select.Root
-              value={[topContributorsFilter]}
-              onValueChange={(e) => setTopContributorsFilter(e.value[0] as TopContributorsFilter)}
-              collection={topContributorsCollection}
-              size="sm"
-            >
-              <Select.HiddenSelect />
-              <Select.Control>
-                <Select.Trigger>
-                  <Select.ValueText />
-                </Select.Trigger>
-                <Select.IndicatorGroup>
-                  <Select.Indicator />
-                </Select.IndicatorGroup>
-              </Select.Control>
-              <Portal>
-                <Select.Positioner>
-                  <Select.Content>
-                    {topContributorsCollection.items.map((item) => (
-                      <Select.Item key={item.value} item={item}>
-                        {item.label}
-                        <Select.ItemIndicator />
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select.Positioner>
-              </Portal>
-            </Select.Root>
-          </Box>
-
-          <Box minW="150px">
-            <Text fontSize="xs" fontWeight="semibold" color="gray.600" mb={1}>
-              Focus Mode
-            </Text>
-            <Select.Root
-              value={[focusMode]}
-              onValueChange={(e) => {
-                const mode = e.value[0] as 'off' | 'single' | 'subset';
-                setFocusMode(mode);
-                if (mode === 'off') {
-                  setFocusedRule(null);
-                  setFocusedSubset(new Set());
-                }
-              }}
-              collection={createListCollection({
-                items: [
-                  { label: 'Off', value: 'off' },
-                  { label: 'Single Rule', value: 'single' },
-                  { label: 'Selected Subset', value: 'subset' },
-                ],
-              })}
-              size="sm"
-            >
-              <Select.HiddenSelect />
-              <Select.Control>
-                <Select.Trigger>
-                  <Select.ValueText />
-                </Select.Trigger>
-                <Select.IndicatorGroup>
-                  <Select.Indicator />
-                </Select.IndicatorGroup>
-              </Select.Control>
-              <Portal>
-                <Select.Positioner>
-                  <Select.Content>
-                    <Select.Item item={{ label: 'Off', value: 'off' }}>
-                      Off
-                      <Select.ItemIndicator />
-                    </Select.Item>
-                    <Select.Item item={{ label: 'Single Rule', value: 'single' }}>
-                      Single Rule
-                      <Select.ItemIndicator />
-                    </Select.Item>
-                    <Select.Item item={{ label: 'Selected Subset', value: 'subset' }}>
-                      Selected Subset
-                      <Select.ItemIndicator />
-                    </Select.Item>
-                  </Select.Content>
-                </Select.Positioner>
-              </Portal>
-            </Select.Root>
-          </Box>
-
-          {/* Focus subset chips */}
-          {focusMode === 'subset' && (
-            <Box flex={1}>
-              <Text fontSize="xs" fontWeight="semibold" color="gray.600" mb={1}>
-                Selected Rules
-              </Text>
-              <HStack gap={2} flexWrap="wrap">
-                {Array.from(focusedSubset).map((ruleId) => (
-                  <Badge
-                    key={ruleId}
-                    colorPalette="blue"
-                    variant="subtle"
-                    px={2}
-                    py={1}
-                    borderRadius="md"
-                    cursor="pointer"
-                    onClick={() => handleRuleClick(ruleId)}
+            <HStack gap={2} flexWrap="wrap">
+              {Array.from(focusedSubset).map((ruleId) => (
+                <Badge
+                  key={ruleId}
+                  colorPalette="blue"
+                  variant="subtle"
+                  px={2}
+                  py={1}
+                  borderRadius="md"
+                  cursor="pointer"
+                  onClick={() => handleRuleClick(ruleId)}
+                >
+                  {RULE_DESCRIPTIONS[ruleId] || ruleId}
+                  <Button
+                    size="xs"
+                    variant="ghost"
+                    ml={1}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRuleClick(ruleId);
+                    }}
                   >
-                    {RULE_DESCRIPTIONS[ruleId] || ruleId}
-                    <Button
-                      size="xs"
-                      variant="ghost"
-                      ml={1}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRuleClick(ruleId);
-                      }}
-                    >
-                      <X size={12} />
-                    </Button>
-                  </Badge>
-                ))}
-                {focusedSubset.size === 0 && (
-                  <Text fontSize="xs" color="gray.400">
-                    Click rules in chart to add to subset
-                  </Text>
-                )}
-              </HStack>
-            </Box>
-          )}
-        </HStack>
+                    <X size={12} />
+                  </Button>
+                </Badge>
+              ))}
+              {focusedSubset.size === 0 && (
+                <Text fontSize="xs" color="gray.400">
+                  Click rules in chart to add to subset
+                </Text>
+              )}
+            </HStack>
+          </Box>
+        )}
 
         {/* Chart */}
-        <Box height="400px" width="100%">
+        <Box width="100%">
           {effectiveChartType === 'heatmap' ? (
-            <Box height="100%" width="100%" overflowX="auto">
-              <Box minW="600px">
-                <VStack align="stretch" gap={2}>
-                  {/* X-axis labels */}
-                  <HStack gap={1} ml="120px">
-                    {data.map((item, index) => (
-                      <Box
-                        key={index}
-                        w="40px"
-                        textAlign="center"
-                        fontSize="xs"
-                        color="gray.600"
-                        lineHeight="1.2"
-                      >
-                        {item.date.length > 8 ? item.date.substring(0, 5) : item.date}
-                      </Box>
-                    ))}
-                  </HStack>
-                  
-                  {/* Heatmap cells */}
-                  <Box overflowY="auto" maxH="350px">
-                    <VStack align="stretch" gap={1}>
-                      {displayRules.map((ruleId) => {
-                        const isTop5 = top5Rules.includes(ruleId);
-                        const isVisible = visibleRules.has(ruleId);
-                        if (!isVisible) return null;
-                        
-                        // Calculate max value for this rule across all dates
-                        const maxValue = Math.max(...data.map((item) => item[ruleId] || 0));
-                        const stages = RULE_STAGE_MAP[ruleId] || [];
-                        
-                        return (
-                          <HStack key={ruleId} gap={1} align="center">
-                            {/* Y-axis label */}
-                            <Box
-                              w="120px"
-                              fontSize="xs"
-                              color="gray.700"
-                              fontWeight={isTop5 ? 'semibold' : 'normal'}
-                              textAlign="right"
-                              pr={2}
-                              lineHeight="1.2"
-                            >
-                              <Text fontSize="xs" lineClamp={1}>
-                                {RULE_DESCRIPTIONS[ruleId] || ruleId}
-                              </Text>
-                              <Text fontSize="xs" color="gray.500">
-                                {ruleId}
-                              </Text>
-                            </Box>
-                            
-                            {/* Heatmap cells */}
-                            {data.map((item, dateIndex) => {
-                              const value = item[ruleId] || 0;
-                              const total = item.total || 1;
-                              const percentage = calculatePercentage(value, total);
-                              const bgColor = getHeatmapColor(value, maxValue);
-                              const stages = RULE_STAGE_MAP[ruleId] || [];
-                              
-                              return (
-                                <Tooltip.Root key={dateIndex}>
-                                  <Tooltip.Trigger asChild>
-                                    <Box
-                                      w="40px"
-                                      h="40px"
-                                      bg={bgColor}
-                                      borderWidth="1px"
-                                      borderColor="gray.200"
-                                      borderRadius="sm"
-                                      cursor="pointer"
-                                      _hover={{ borderColor: 'gray.400', borderWidth: '2px' }}
-                                      transition="all 0.2s"
-                                    />
-                                  </Tooltip.Trigger>
-                                  <Portal>
-                                    <Tooltip.Positioner>
-                                      <Tooltip.Content
-                                        bg="gray.900"
-                                        color="white"
-                                        px={3}
-                                        py={2}
-                                        borderRadius="md"
-                                        fontSize="sm"
-                                        boxShadow="lg"
-                                      >
-                                        <Tooltip.Arrow />
-                                        <VStack align="start" gap={1}>
-                                          <Text fontWeight="bold">{item.date}</Text>
-                                          <Text>{RULE_DESCRIPTIONS[ruleId] || ruleId}</Text>
-                                          <Text fontSize="xs">{ruleId}</Text>
-                                          <Text fontSize="xs">Count: {value.toLocaleString()}</Text>
-                                          <Text fontSize="xs">Share: {percentage}%</Text>
-                                          <Text fontSize="xs">Payment Stage: {stages.join(', ') || 'N/A'}</Text>
-                                        </VStack>
-                                      </Tooltip.Content>
-                                    </Tooltip.Positioner>
-                                  </Portal>
-                                </Tooltip.Root>
-                              );
-                            })}
+            <Box width="100%">
+              {/* Calculate visible rules count for dynamic sizing */}
+              {(() => {
+                const visibleRulesList = Array.from(visibleRules);
+                const ruleCount = visibleRulesList.length;
+                // Dynamic cell size based on rule count
+                const cellSize = ruleCount <= 1 ? 60 : ruleCount <= 5 ? 50 : 36;
+                const rowHeight = cellSize + 4; // cell + gap
+                const headerHeight = 24;
+                const totalHeight = ruleCount * rowHeight + headerHeight + 8; // + padding
+                const minHeight = Math.max(200, totalHeight);
+                const maxHeight = 400;
+                const dynamicHeight = Math.min(maxHeight, minHeight);
+                
+                return (
+                  <Box
+                    width="100%"
+                    height={`${dynamicHeight}px`}
+                    overflow="hidden"
+                    position="relative"
+                    transition="height 200ms ease-in-out"
+                  >
+                    <Box
+                      width="100%"
+                      height="100%"
+                      overflowX="auto"
+                      overflowY="auto"
+                      position="relative"
+                    >
+                      <Box minW="600px" position="relative">
+                        {/* Sticky header with date labels */}
+                        <Box
+                          position="sticky"
+                          top={0}
+                          zIndex={10}
+                          bg="white"
+                          borderBottomWidth="1px"
+                          borderBottomColor="gray.200"
+                          pb={1}
+                        >
+                          <HStack gap={0.5} ml="110px" pt={1}>
+                            {data.map((item, index) => (
+                              <Box
+                                key={index}
+                                w={`${cellSize}px`}
+                                minW={`${cellSize}px`}
+                                textAlign="center"
+                                fontSize="xs"
+                                color="gray.600"
+                                lineHeight="1.2"
+                              >
+                                {item.date.length > 8 ? item.date.substring(0, 5) : item.date}
+                              </Box>
+                            ))}
                           </HStack>
-                        );
-                      })}
-                    </VStack>
+                        </Box>
+                        
+                        {/* Heatmap rows with sticky labels */}
+                        <VStack align="stretch" gap={0.5} p={1}>
+                          {visibleRulesList.map((ruleId) => {
+                            const isTop5 = top5Rules.includes(ruleId);
+                            
+                            // Calculate max value for this rule across all dates (normalized per rule)
+                            const maxValue = Math.max(...data.map((item) => item[ruleId] || 0));
+                            const stages = RULE_STAGE_MAP[ruleId] || [];
+                            
+                            return (
+                              <HStack key={ruleId} gap={0.5} align="center" h={`${rowHeight}px`}>
+                                {/* Sticky Y-axis label */}
+                                <Box
+                                  position="sticky"
+                                  left={0}
+                                  zIndex={5}
+                                  w="110px"
+                                  minW="110px"
+                                  bg="white"
+                                  borderRightWidth="1px"
+                                  borderRightColor="gray.200"
+                                  pr={2}
+                                  display="flex"
+                                  flexDirection="column"
+                                  justifyContent="center"
+                                  alignItems="flex-start"
+                                >
+                                  <Text 
+                                    fontSize="xs" 
+                                    color="gray.700" 
+                                    fontWeight={isTop5 ? 'semibold' : 'normal'}
+                                    lineClamp={1}
+                                  >
+                                    {RULE_DESCRIPTIONS[ruleId] || ruleId}
+                                  </Text>
+                                  <Text fontSize="xs" color="gray.500" lineClamp={1}>
+                                    {ruleId}
+                                  </Text>
+                                </Box>
+                                
+                                {/* Heatmap cells - scrollable horizontally */}
+                                <HStack gap={0.5} ml={0}>
+                                  {data.map((item, dateIndex) => {
+                                    const value = item[ruleId] || 0;
+                                    const total = item.total || 1;
+                                    const percentage = calculatePercentage(value, total);
+                                    const bgColor = getHeatmapColor(value, maxValue);
+                                    
+                                    return (
+                                      <Tooltip.Root key={dateIndex}>
+                                        <Tooltip.Trigger asChild>
+                                          <Box
+                                            w={`${cellSize}px`}
+                                            h={`${cellSize}px`}
+                                            minW={`${cellSize}px`}
+                                            bg={bgColor}
+                                            borderWidth="1px"
+                                            borderColor="gray.200"
+                                            borderRadius="sm"
+                                            cursor="pointer"
+                                            _hover={{ borderColor: 'gray.400', borderWidth: '2px' }}
+                                            transition="all 0.2s"
+                                          />
+                                        </Tooltip.Trigger>
+                                        <Portal>
+                                          <Tooltip.Positioner>
+                                            <Tooltip.Content
+                                              bg="gray.900"
+                                              color="white"
+                                              px={3}
+                                              py={2}
+                                              borderRadius="md"
+                                              fontSize="sm"
+                                              boxShadow="lg"
+                                            >
+                                              <Tooltip.Arrow />
+                                              <VStack align="start" gap={1}>
+                                                <Text fontWeight="bold">{item.date}</Text>
+                                                <Text>{RULE_DESCRIPTIONS[ruleId] || ruleId}</Text>
+                                                <Text fontSize="xs">{ruleId}</Text>
+                                                <Text fontSize="xs">Count: {value.toLocaleString()}</Text>
+                                                <Text fontSize="xs">Share: {percentage}%</Text>
+                                                <Text fontSize="xs">Payment Stage: {stages.join(', ') || 'N/A'}</Text>
+                                              </VStack>
+                                            </Tooltip.Content>
+                                          </Tooltip.Positioner>
+                                        </Portal>
+                                      </Tooltip.Root>
+                                    );
+                                  })}
+                                </HStack>
+                              </HStack>
+                            );
+                          })}
+                        </VStack>
+                      </Box>
+                    </Box>
                   </Box>
-                </VStack>
-              </Box>
+                );
+              })()}
+              
+              {/* Color scale explanation */}
+              <Text fontSize="xs" color="gray.500" mt={2} textAlign="center">
+                Colors represent relative intensity per rule, not absolute scale.
+              </Text>
             </Box>
           ) : (
-            <ResponsiveContainer width="100%" height="100%">
+            <Box height="400px" width="100%">
+              <ResponsiveContainer width="100%" height="100%">
               {useLineChart ? (
                 <LineChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: xAxisConfig.angle !== 0 ? 40 : 5 }}>
                   {showGridlines && <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" vertical={false} />}
@@ -857,7 +913,8 @@ export default function TSYSUnifiedChart({
                   })}
                 </AreaChart>
               )}
-            </ResponsiveContainer>
+              </ResponsiveContainer>
+            </Box>
           )}
         </Box>
 
