@@ -335,7 +335,7 @@ export default function FilterBar({
                   justifyContent="space-between"
                   suppressHydrationWarning
                 >
-                  <Text fontSize="sm" noOfLines={1}>
+                  <Text fontSize="sm" lineClamp={1}>
                     {selectedRules.length === 0
                       ? 'All Rules'
                       : selectedRules.length === 1
