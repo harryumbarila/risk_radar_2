@@ -849,6 +849,35 @@ export default function CustomTable({ filters }: CustomTableProps) {
       enableSorting: true,
       meta: { align: 'left' },
     }),
+    columnHelper.display({
+      id: 'actions',
+      header: () => (
+        <Text fontSize="xs" fontWeight="semibold" color="gray.600" textAlign="center">
+          Actions
+        </Text>
+      ),
+      cell: (info) => {
+        const transaction = info.row.original;
+        // Group transactions by batch (using createdBatchDate as batch identifier)
+        // For now, we'll use the single transaction as the batch
+        // In a real scenario, you'd group by batch ID or date
+        const batchTransactions = [transaction];
+        
+        return (
+          <Box py={0.5} display="flex" justifyContent="center" alignItems="center">
+            <BatchDrawer
+              batch={batchTransactions}
+              trigger={
+                <Button size="xs" variant="outline" colorPalette="blue">
+                  View Batch
+                </Button>
+              }
+            />
+          </Box>
+        );
+      },
+      meta: { align: 'center' },
+    }),
   ] as ColumnDef<MerchantTransaction>[], []);
 
   const frameworks = createListCollection({
@@ -864,10 +893,10 @@ export default function CustomTable({ filters }: CustomTableProps) {
       {/* Header */}
       <VStack align="start" gap={1} mb={3}>
         <Text fontWeight="bold" fontSize="lg">
-          Transaction Review
+          Batch Review
         </Text>
         <Text color="gray.600" fontSize="sm">
-          {transactions.length} transaction{transactions.length !== 1 ? 's' : ''} flagged for review
+          {transactions.length} batch{transactions.length !== 1 ? 'es' : ''} flagged for review
           {filters?.dateRange && filters.dateRange !== 'custom' && (
             <> in the last <b>{filters.dateRange} days</b></>
           )}
