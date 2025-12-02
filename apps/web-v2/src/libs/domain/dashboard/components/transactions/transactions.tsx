@@ -389,7 +389,7 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
   const resellers = ['Reseller A', 'Reseller B', null];
   const referralPartners = ['Partner X', 'Partner Y', null];
   const solutionConsultants = ['SC Alpha', 'SC Beta', null];
-  const sources = ['Talus Pay', 'Global365', 'SIT', 'SC Flow'];
+  const dataSources = ['Auth', 'Capture', 'Settled', 'Returns'];
   
   return [
     {
@@ -413,7 +413,7 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       divert: true,
       nextDayFunding: 'Yes',
       netDivertBalance: '$12,500.00',
-      source: sources[0],
+      source: dataSources[0],
       dataSourceIdentifier: 'DS-001',
       ahRuleApplied: ['AH001', 'AH002', 'AH003', 'AH004'],
       autoHoldRuleApplied: ['AH001'],
@@ -440,7 +440,7 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       divert: false,
       nextDayFunding: 'No',
       netDivertBalance: '$0.00',
-      source: sources[1],
+      source: dataSources[1],
       dataSourceIdentifier: 'DS-002',
       ahRuleApplied: ['AH002'],
       autoHoldRuleApplied: ['AH002', 'AH003'],
@@ -467,7 +467,7 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       divert: true,
       nextDayFunding: 'Yes',
       netDivertBalance: '$456.78',
-      source: sources[2],
+      source: dataSources[2],
       dataSourceIdentifier: 'DS-003',
       ahRuleApplied: ['AH003', 'AH004'],
       autoHoldRuleApplied: ['AH003'],
@@ -493,7 +493,7 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       divert: false,
       nextDayFunding: 'No',
       netDivertBalance: '$0.00',
-      source: sources[3],
+      source: dataSources[3],
       dataSourceIdentifier: 'DS-004',
       ahRuleApplied: ['AH004', 'AH005'],
       autoHoldRuleApplied: ['AH004'],
@@ -520,7 +520,7 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       divert: true,
       nextDayFunding: 'Yes',
       netDivertBalance: '$125.45',
-      source: sources[0],
+      source: dataSources[0],
       dataSourceIdentifier: 'DS-005',
       ahRuleApplied: ['AH005'],
       autoHoldRuleApplied: ['AH005'],
@@ -747,7 +747,7 @@ export default function CustomTable({ filters }: CustomTableProps) {
     columnHelper.accessor('source', {
       header: () => (
         <Text fontSize="xs" fontWeight="semibold" color="gray.600">
-          Source
+          Data Source
         </Text>
       ),
       cell: (info) => (
