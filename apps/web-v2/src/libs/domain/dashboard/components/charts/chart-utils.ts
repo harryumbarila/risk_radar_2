@@ -1,70 +1,32 @@
 // Utility functions for TSYS charts
 import type { FilterState } from '../filter-bar/filter-bar';
+import { RULE_DEFINITIONS } from '../../utils/ruleNames';
 
-// Generate 40+ rule IDs for testing
-export const RULE_IDS = Array.from({ length: 45 }, (_, i) => {
-  const num = i + 1;
+// Generate rule IDs - first 30 are from definitions, then generate up to 45 for testing
+const DEFINED_RULE_IDS = Object.keys(RULE_DEFINITIONS);
+const ADDITIONAL_RULE_IDS = Array.from({ length: 15 }, (_, i) => {
+  const num = i + 31;
   return `AH${num.toString().padStart(3, '0')}`;
 });
 
-// Short descriptions for rules (for chart display)
-export const RULE_DESCRIPTIONS: Record<string, string> = {
-  AH001: 'High Amount',
-  AH002: 'Rapid Volume',
-  AH003: 'Unusual Pattern',
-  AH004: 'Geo Risk',
-  AH005: 'Card Verify Fail',
-  AH006: 'Velocity Exceeded',
-  AH007: 'Merchant Risk',
-  // Generate descriptions for remaining rules
-  ...Object.fromEntries(
-    Array.from({ length: 38 }, (_, i) => {
-      const num = i + 8;
-      const ruleId = `AH${num.toString().padStart(3, '0')}`;
-      const descriptions = [
-        'Transaction Limit',
-        'Frequency Check',
-        'Amount Threshold',
-        'Location Anomaly',
-        'Time Pattern',
-        'Device Mismatch',
-        'IP Verification',
-        'Card Type Risk',
-        'Merchant Category',
-        'Transaction Size',
-        'Velocity Alert',
-        'Pattern Detection',
-        'Risk Score',
-        'Fraud Indicator',
-        'Behavior Analysis',
-        'Account Status',
-        'Payment Method',
-        'Currency Check',
-        'Country Validation',
-        'Time Zone Risk',
-        'Device Fingerprint',
-        'Session Analysis',
-        'Network Check',
-        'Historical Pattern',
-        'Amount Deviation',
-        'Frequency Alert',
-        'Location Change',
-        'Time Window',
-        'Merchant History',
-        'Card History',
-        'User Behavior',
-        'Transaction Flow',
-        'Risk Assessment',
-        'Pattern Match',
-        'Anomaly Detection',
-        'Threshold Exceeded',
-        'Validation Failed',
-        'Security Check',
-      ];
-      return [ruleId, descriptions[i % descriptions.length]];
-    })
-  ),
+export const RULE_IDS = [...DEFINED_RULE_IDS, ...ADDITIONAL_RULE_IDS];
+
+// Short descriptions for rules (for chart display) - using actual rule names
+export const RULE_DESCRIPTIONS: Record<string, string> = Object.fromEntries(
+  Object.entries(RULE_DEFINITIONS).map(([code, def]) => [code, def.name])
+);
+
+// For rules beyond AH030, generate placeholder descriptions
+const generatePlaceholderRules = () => {
+  const placeholders: Record<string, string> = {};
+  for (let i = 31; i <= 45; i++) {
+    const ruleId = `AH${i.toString().padStart(3, '0')}`;
+    placeholders[ruleId] = `Rule ${ruleId}`;
+  }
+  return placeholders;
 };
+
+Object.assign(RULE_DESCRIPTIONS, generatePlaceholderRules());
 
 // Generate color palette for top 5 rules (strong colors)
 const TOP_5_COLORS = [

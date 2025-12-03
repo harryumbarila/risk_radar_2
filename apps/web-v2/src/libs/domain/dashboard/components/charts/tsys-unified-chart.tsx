@@ -30,6 +30,7 @@ import {
   formatWeeklyDate,
   getTopRules,
 } from './chart-utils';
+import { RULE_DEFINITIONS } from '../../utils/ruleNames';
 
 export type PaymentStage = 'Authorization' | 'Capture' | 'Settlement' | 'ACH Returns';
 export type RuleStageParticipation = 'all' | 'auth-only' | 'multi-stage' | 'settlement-only' | 'ach-only';
@@ -44,19 +45,30 @@ interface TSYSUnifiedChartProps {
   onRuleIdsChange?: (ruleIds: string[]) => void; // Callback to update main filter
 }
 
-// Define which rules apply to which stages
-const RULE_STAGE_MAP: Record<string, PaymentStage[]> = {
-  AH001: ['Authorization', 'Capture'],
-  AH002: ['Authorization'],
-  AH003: ['Authorization', 'Capture', 'Settlement'],
-  AH004: ['Authorization', 'Capture'],
-  AH005: ['Authorization'],
-  AH006: ['Settlement'],
-  AH007: ['ACH Returns'],
-  // Generate mappings for remaining rules
-  ...Object.fromEntries(
-    Array.from({ length: 38 }, (_, i) => {
-      const num = i + 8;
+// Define which rules apply to which stages based on source
+// Source mapping: TSYS DFT256 Capture -> Capture, TSYS ADF Auth -> Authorization, 
+// TSYS TDDF Settle -> Settlement, ACH Returns -> ACH Returns
+const getStagesFromSource = (source: string): PaymentStage[] => {
+  if (source.includes('Capture')) return ['Capture'];
+  if (source.includes('Auth')) return ['Authorization'];
+  if (source.includes('Settle')) return ['Settlement'];
+  if (source === 'ACH Returns') return ['ACH Returns'];
+  return ['Authorization']; // Default
+};
+
+const RULE_STAGE_MAP: Record<string, PaymentStage[]> = Object.fromEntries(
+  Object.entries(RULE_DEFINITIONS).map(([code, def]) => [
+    code,
+    getStagesFromSource(def.source)
+  ])
+);
+
+// Generate mappings for remaining rules (AH031-AH045) - placeholder stages
+Object.assign(
+  RULE_STAGE_MAP,
+  Object.fromEntries(
+    Array.from({ length: 15 }, (_, i) => {
+      const num = i + 31;
       const ruleId = `AH${num.toString().padStart(3, '0')}`;
       const stages = [
         ['Authorization'],
@@ -70,8 +82,8 @@ const RULE_STAGE_MAP: Record<string, PaymentStage[]> = {
       ];
       return [ruleId, stages[i % stages.length]];
     })
-  ),
-};
+  )
+);
 
 const PAYMENT_STAGE_BASE_COUNTS: Record<PaymentStage, number> = {
   'Authorization': 1200,
