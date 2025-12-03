@@ -1,7 +1,9 @@
 'use client';
 import React from 'react';
-import { Box, VStack, Text, HStack, Tooltip, Portal, Select, createListCollection, Button, Drawer, Badge, Table, CloseButton } from '@chakra-ui/react';
-import { Info, X, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Box, VStack, Text, HStack, Tooltip, Portal, Select, createListCollection, Button, Drawer, Badge, Table, CloseButton, SimpleGrid } from '@chakra-ui/react';
+import { Info, X, TrendingUp, TrendingDown, Minus, FileText } from 'lucide-react';
+import BatchDrawer from '../../auto-hold/components/batch-drawer/batch-drawer';
+import { MerchantTransaction } from '@/data/interfaces/transaction';
 import {
   AreaChart,
   Area,
@@ -1180,42 +1182,53 @@ export default function TSYSUnifiedChart({
 
       {/* Heatmap Cell Detail Drawer */}
       {effectiveChartType === 'heatmap' && (
-        <HeatmapCellDrawer
-          isOpen={isDrawerOpen}
-          onClose={() => {
-            setIsDrawerOpen(false);
-            // Keep selectedCell for highlight, clear after animation
-            setTimeout(() => setSelectedCell(null), 180);
-          }}
-          selectedCell={selectedCell}
-          paymentStage={paymentStage}
-        />
+        <>
+          <HeatmapCellDrawerWrapper
+            isOpen={isDrawerOpen}
+            onClose={() => {
+              setIsDrawerOpen(false);
+              // Keep selectedCell for highlight, clear after animation
+              setTimeout(() => setSelectedCell(null), 180);
+            }}
+            selectedCell={selectedCell}
+            paymentStage={paymentStage}
+          />
+        </>
       )}
     </Box>
   );
 }
 
-// Mock transaction data generator
-function generateMockTransactions(count: number): Array<{
-  id: string;
-  amount: string;
-  processor: string;
-  mid: string;
-  exception: string;
-  status: 'Auth' | 'Capture' | 'Settle' | 'Return';
-}> {
+// Mock transaction data generator with full fields
+function generateMockTransactions(count: number, date: string, ruleId: string): MerchantTransaction[] {
   const processors = ['TSYS', 'FSP'];
+  const sources = ['Talus Pay', 'Global365', 'SIT', 'SC Flow'];
   const exceptions = ['High Amount', 'Rapid Volume', 'Unusual Pattern', 'Foreign Card', 'None'];
-  const statuses: Array<'Auth' | 'Capture' | 'Settle' | 'Return'> = ['Auth', 'Capture', 'Settle', 'Return'];
+  const dbaNames = ['Acme Corp', 'Tech Solutions Inc', 'Global Retail', 'Digital Services', 'Commerce Hub', 'Trade Partners', 'Business Solutions'];
   
-  return Array.from({ length: count }, (_, i) => ({
-    id: `TXN-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
-    amount: `$${(Math.random() * 10000 + 100).toFixed(2)}`,
-    processor: processors[Math.floor(Math.random() * processors.length)],
-    mid: `MID-${Math.floor(Math.random() * 10000)}`,
-    exception: exceptions[Math.floor(Math.random() * exceptions.length)],
-    status: statuses[Math.floor(Math.random() * statuses.length)],
-  }));
+  const baseDate = new Date(date);
+  
+  return Array.from({ length: count }, (_, i) => {
+    const randomHours = Math.floor(Math.random() * 24);
+    const randomMinutes = Math.floor(Math.random() * 60);
+    const txDate = new Date(baseDate);
+    txDate.setHours(randomHours, randomMinutes, 0, 0);
+    
+    return {
+      id: `TXN-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
+      merchant: dbaNames[Math.floor(Math.random() * dbaNames.length)],
+      dbaName: dbaNames[Math.floor(Math.random() * dbaNames.length)],
+      amount: `$${(Math.random() * 10000 + 100).toFixed(2)}`,
+      processor: processors[Math.floor(Math.random() * processors.length)],
+      mid: `MID-${Math.floor(Math.random() * 10000)}`,
+      exception: exceptions[Math.floor(Math.random() * exceptions.length)],
+      date: txDate.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+      createdAt: txDate.toISOString(),
+      status: 'Unreviewed' as const,
+      source: sources[Math.floor(Math.random() * sources.length)],
+      ahRuleApplied: [ruleId],
+    };
+  });
 }
 
 // Heatmap Cell Detail Drawer Component
@@ -1224,15 +1237,46 @@ interface HeatmapCellDrawerProps {
   onClose: () => void;
   selectedCell: SelectedCell | null;
   paymentStage: PaymentStage;
+  onTransactionClick?: (tx: MerchantTransaction) => void;
 }
 
-function HeatmapCellDrawer({ isOpen, onClose, selectedCell, paymentStage }: HeatmapCellDrawerProps) {
-  // Regenerate transactions when selectedCell changes
-  const transactions = React.useMemo(() => 
+function HeatmapCellDrawer({ isOpen, onClose, selectedCell, paymentStage, onTransactionClick }: HeatmapCellDrawerProps) {
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [pageSize, setPageSize] = React.useState(25);
+  const [selectedTransaction, setSelectedTransaction] = React.useState<MerchantTransaction | null>(null);
+  const bodyRef = React.useRef<HTMLDivElement>(null);
+  
+  // Expose selectedTransaction to parent via callback
+  React.useEffect(() => {
+    if (selectedTransaction && onTransactionClick) {
+      onTransactionClick(selectedTransaction);
+      setSelectedTransaction(null); // Reset after callback
+    }
+  }, [selectedTransaction, onTransactionClick]);
+
+  // Regenerate all transactions when selectedCell changes
+  const allTransactions = React.useMemo(() => 
     selectedCell && selectedCell.value > 0 
-      ? generateMockTransactions(Math.min(5, Math.max(1, Math.floor(selectedCell.value / 100)))) 
+      ? generateMockTransactions(selectedCell.value, selectedCell.date, selectedCell.ruleId)
       : []
-  , [selectedCell?.ruleId, selectedCell?.dateIndex, selectedCell?.value]);
+  , [selectedCell?.ruleId, selectedCell?.dateIndex, selectedCell?.value, selectedCell?.date]);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(allTransactions.length / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const paginatedTransactions = allTransactions.slice(startIndex, endIndex);
+
+  // Reset to page 1 when cell changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+    // Scroll to top when drawer opens or cell changes
+    if (isOpen && bodyRef.current) {
+      setTimeout(() => {
+        bodyRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 100);
+    }
+  }, [selectedCell?.ruleId, selectedCell?.dateIndex, isOpen]);
 
   // Calculate trend vs previous day (mock)
   const previousDayValue = selectedCell ? Math.floor(selectedCell.value * (0.7 + Math.random() * 0.6)) : 0;
@@ -1261,7 +1305,7 @@ function HeatmapCellDrawer({ isOpen, onClose, selectedCell, paymentStage }: Heat
   if (!selectedCell) return null;
 
   const stages = RULE_STAGE_MAP[selectedCell.ruleId] || [];
-  const hasTransactions = transactions.length > 0;
+  const hasTransactions = allTransactions.length > 0;
 
   return (
     <Drawer.Root open={isOpen} onOpenChange={(e) => !e.open && onClose()} placement="end" size="md">
@@ -1269,7 +1313,8 @@ function HeatmapCellDrawer({ isOpen, onClose, selectedCell, paymentStage }: Heat
         <Drawer.Backdrop bg="blackAlpha.600" backdropFilter="blur(4px)" />
         <Drawer.Positioner>
           <Drawer.Content
-            width={{ base: 'full', md: '500px', lg: '600px' }}
+            width={{ base: 'full', md: '45%', lg: '45%' }}
+            maxW={{ base: 'full', md: '800px' }}
             height="full"
             display="flex"
             flexDirection="column"
@@ -1278,7 +1323,7 @@ function HeatmapCellDrawer({ isOpen, onClose, selectedCell, paymentStage }: Heat
             borderRadius="none"
             transition="transform 0.18s ease-in-out"
           >
-            {/* Header */}
+            {/* Compact Summary Header */}
             <Drawer.Header
               position="sticky"
               top={0}
@@ -1286,209 +1331,265 @@ function HeatmapCellDrawer({ isOpen, onClose, selectedCell, paymentStage }: Heat
               bg="white"
               borderBottomWidth="1px"
               borderBottomColor="gray.200"
-              pb={4}
+              pb={3}
+              pt={4}
             >
               <HStack justify="space-between" align="start" mb={2}>
-                <VStack align="start" gap={1} flex={1}>
-                  <Text fontSize="lg" fontWeight="bold" color="gray.900">
-                    {selectedCell.date}
-                  </Text>
-                  <HStack gap={2} align="center">
-                    <Text fontSize="md" fontWeight="semibold" color="gray.700">
+                <VStack align="start" gap={0.5} flex={1}>
+                  <HStack gap={2} align="center" flexWrap="wrap">
+                    <Text fontSize="sm" fontWeight="semibold" color="gray.700">
+                      {selectedCell.date}
+                    </Text>
+                    <Text fontSize="sm" fontWeight="semibold" color="gray.700">
                       {RULE_DESCRIPTIONS[selectedCell.ruleId] || selectedCell.ruleId}
                     </Text>
                     <Badge colorPalette="blue" variant="subtle" fontSize="xs">
                       {selectedCell.ruleId}
                     </Badge>
+                    <Text fontSize="xs" color="gray.500">
+                      {stages.join(', ') || paymentStage}
+                    </Text>
                   </HStack>
-                  <Text fontSize="sm" color="gray.600">
-                    Payment Stage: {stages.join(', ') || paymentStage}
-                  </Text>
-                  <Text fontSize="xs" color="gray.500" mt={1}>
-                    Transactions contributing to this cell
-                  </Text>
-                </VStack>
-                <CloseButton onClick={onClose} aria-label="Close drawer" />
-              </HStack>
-            </Drawer.Header>
-
-            {/* Body */}
-            <Drawer.Body overflowY="auto" flex={1} p={6}>
-              <VStack align="stretch" gap={6}>
-                {/* Summary Card */}
-                <Box
-                  p={4}
-                  bg="gray.50"
-                  borderRadius="lg"
-                  borderWidth="1px"
-                  borderColor="gray.200"
-                >
-                  <VStack align="stretch" gap={3}>
-                    <HStack justify="space-between" align="center">
-                      <Text fontSize="sm" fontWeight="semibold" color="gray.700">
-                        Total Count
-                      </Text>
-                      <Text fontSize="lg" fontWeight="bold" color="gray.900">
-                        {selectedCell.value.toLocaleString()}
-                      </Text>
-                    </HStack>
-                    <HStack justify="space-between" align="center">
-                      <Text fontSize="sm" fontWeight="semibold" color="gray.700">
-                        Share
-                      </Text>
-                      <Text fontSize="lg" fontWeight="bold" color="gray.900">
-                        {selectedCell.percentage.toFixed(1)}%
-                      </Text>
-                    </HStack>
-                    <HStack justify="space-between" align="center">
-                      <Text fontSize="sm" fontWeight="semibold" color="gray.700">
-                        Trend vs Previous Day
-                      </Text>
-                      <HStack gap={2} align="center">
-                        {trend === 'up' && <TrendingUp size={16} color="#10b981" />}
-                        {trend === 'down' && <TrendingDown size={16} color="#ef4444" />}
-                        {trend === 'neutral' && <Minus size={16} color="#6b7280" />}
-                        <Text 
-                          fontSize="sm" 
-                          fontWeight="semibold" 
-                          color={trend === 'up' ? 'green.600' : trend === 'down' ? 'red.600' : 'gray.600'}
-                        >
+                  <SimpleGrid columns={4} gap={3} w="full" mt={2}>
+                    <VStack align="start" gap={0}>
+                      <Text fontSize="xs" color="gray.500">Total</Text>
+                      <Text fontSize="sm" fontWeight="bold">{selectedCell.value.toLocaleString()}</Text>
+                    </VStack>
+                    <VStack align="start" gap={0}>
+                      <Text fontSize="xs" color="gray.500">Share</Text>
+                      <Text fontSize="sm" fontWeight="bold">{selectedCell.percentage.toFixed(1)}%</Text>
+                    </VStack>
+                    <VStack align="start" gap={0}>
+                      <Text fontSize="xs" color="gray.500">Trend</Text>
+                      <HStack gap={1} align="center">
+                        {trend === 'up' && <TrendingUp size={12} color="#10b981" />}
+                        {trend === 'down' && <TrendingDown size={12} color="#ef4444" />}
+                        {trend === 'neutral' && <Minus size={12} color="#6b7280" />}
+                        <Text fontSize="xs" fontWeight="semibold" color={trend === 'up' ? 'green.600' : trend === 'down' ? 'red.600' : 'gray.600'}>
                           {trend === 'up' ? '+' : trend === 'down' ? '-' : ''}{trendPercentage}%
                         </Text>
                       </HStack>
-                    </HStack>
-                    <HStack justify="space-between" align="center">
-                      <Text fontSize="sm" fontWeight="semibold" color="gray.700">
-                        Intensity
-                      </Text>
-                      <HStack gap={2} align="center">
+                    </VStack>
+                    <VStack align="start" gap={0}>
+                      <Text fontSize="xs" color="gray.500">Intensity</Text>
+                      <HStack gap={1} align="center">
                         <Box
-                          w="40px"
-                          h="20px"
+                          w="24px"
+                          h="12px"
                           bg={selectedCell.bgColor}
                           borderWidth="1px"
                           borderColor="gray.300"
                           borderRadius="sm"
                         />
                         <Text fontSize="xs" color="gray.600">
-                          {((selectedCell.value / selectedCell.maxValue) * 100).toFixed(0)}% of max
+                          {((selectedCell.value / selectedCell.maxValue) * 100).toFixed(0)}%
                         </Text>
                       </HStack>
-                    </HStack>
-                  </VStack>
-                </Box>
-
-                {/* Transactions Preview Table */}
-                {hasTransactions ? (
-                  <>
-                    <VStack align="stretch" gap={3}>
-                      <HStack justify="space-between" align="center">
-                        <Text fontSize="md" fontWeight="semibold" color="gray.900">
-                          Recent Transactions
-                        </Text>
-                        <Text fontSize="xs" color="gray.500">
-                          Showing {transactions.length} of {selectedCell.value.toLocaleString()}
-                        </Text>
-                      </HStack>
-                      <Box
-                        borderWidth="1px"
-                        borderColor="gray.200"
-                        borderRadius="md"
-                        overflow="hidden"
-                      >
-                        <Table.Root size="sm" variant="plain">
-                          <Table.Header>
-                            <Table.Row>
-                              <Table.ColumnHeader>ID</Table.ColumnHeader>
-                              <Table.ColumnHeader>Amount</Table.ColumnHeader>
-                              <Table.ColumnHeader>Processor</Table.ColumnHeader>
-                              <Table.ColumnHeader>MID</Table.ColumnHeader>
-                              <Table.ColumnHeader>Exception</Table.ColumnHeader>
-                              <Table.ColumnHeader>Status</Table.ColumnHeader>
-                            </Table.Row>
-                          </Table.Header>
-                          <Table.Body>
-                            {transactions.map((tx) => (
-                              <Table.Row key={tx.id}>
-                                <Table.Cell>
-                                  <Text fontSize="xs" fontFamily="mono" color="gray.700">
-                                    {tx.id}
-                                  </Text>
-                                </Table.Cell>
-                                <Table.Cell>
-                                  <Text fontSize="xs" fontWeight="medium" color="gray.900">
-                                    {tx.amount}
-                                  </Text>
-                                </Table.Cell>
-                                <Table.Cell>
-                                  <Badge colorPalette="blue" variant="subtle" fontSize="xs">
-                                    {tx.processor}
-                                  </Badge>
-                                </Table.Cell>
-                                <Table.Cell>
-                                  <Text fontSize="xs" color="gray.600">
-                                    {tx.mid}
-                                  </Text>
-                                </Table.Cell>
-                                <Table.Cell>
-                                  {tx.exception !== 'None' ? (
-                                    <Badge colorPalette="orange" variant="subtle" fontSize="xs">
-                                      {tx.exception}
-                                    </Badge>
-                                  ) : (
-                                    <Text fontSize="xs" color="gray.400">
-                                      —
-                                    </Text>
-                                  )}
-                                </Table.Cell>
-                                <Table.Cell>
-                                  <Badge
-                                    colorPalette={
-                                      tx.status === 'Auth' ? 'blue' :
-                                      tx.status === 'Capture' ? 'green' :
-                                      tx.status === 'Settle' ? 'purple' : 'red'
-                                    }
-                                    variant="subtle"
-                                    fontSize="xs"
-                                  >
-                                    {tx.status}
-                                  </Badge>
-                                </Table.Cell>
-                              </Table.Row>
-                            ))}
-                          </Table.Body>
-                        </Table.Root>
-                      </Box>
                     </VStack>
-                    <Button
-                      variant="outline"
-                      colorScheme="blue"
-                      width="full"
-                      size="sm"
+                  </SimpleGrid>
+                </VStack>
+                <CloseButton onClick={onClose} aria-label="Close drawer" size="sm" />
+              </HStack>
+            </Drawer.Header>
+
+            {/* Body with Full Transaction Table */}
+            <Drawer.Body ref={bodyRef} overflowY="auto" flex={1} p={0}>
+              {hasTransactions ? (
+                <Box width="100%" height="100%" display="flex" flexDirection="column">
+                  {/* Table Container */}
+                  <Box flex={1} overflowY="auto" width="100%">
+                    <Table.Root size="sm" variant="plain">
+                      <Table.Header position="sticky" top={0} zIndex={5} bg="white" borderBottomWidth="1px" borderBottomColor="gray.200">
+                        <Table.Row>
+                          <Table.ColumnHeader fontSize="xs" fontWeight="semibold" color="gray.600" py={2} px={4}>
+                            Transaction ID
+                          </Table.ColumnHeader>
+                          <Table.ColumnHeader fontSize="xs" fontWeight="semibold" color="gray.600" py={2} px={4}>
+                            Merchant DBA
+                          </Table.ColumnHeader>
+                          <Table.ColumnHeader fontSize="xs" fontWeight="semibold" color="gray.600" py={2} px={4}>
+                            MID
+                          </Table.ColumnHeader>
+                          <Table.ColumnHeader fontSize="xs" fontWeight="semibold" color="gray.600" py={2} px={4} textAlign="right">
+                            Amount
+                          </Table.ColumnHeader>
+                          <Table.ColumnHeader fontSize="xs" fontWeight="semibold" color="gray.600" py={2} px={4}>
+                            Timestamp
+                          </Table.ColumnHeader>
+                          <Table.ColumnHeader fontSize="xs" fontWeight="semibold" color="gray.600" py={2} px={4}>
+                            Processor
+                          </Table.ColumnHeader>
+                          <Table.ColumnHeader fontSize="xs" fontWeight="semibold" color="gray.600" py={2} px={4}>
+                            Source
+                          </Table.ColumnHeader>
+                          <Table.ColumnHeader fontSize="xs" fontWeight="semibold" color="gray.600" py={2} px={4}>
+                            Exception
+                          </Table.ColumnHeader>
+                        </Table.Row>
+                      </Table.Header>
+                      <Table.Body>
+                        {paginatedTransactions.map((tx, index) => (
+                          <Table.Row
+                            key={tx.id}
+                            cursor="pointer"
+                            _hover={{ bg: 'gray.50' }}
+                            bg={index % 2 === 0 ? 'white' : 'gray.50'}
+                            onClick={() => setSelectedTransaction(tx)}
+                          >
+                            <Table.Cell py={2} px={4}>
+                              <Text fontSize="xs" fontFamily="mono" color="gray.700">
+                                {tx.id.substring(0, 12)}...
+                              </Text>
+                            </Table.Cell>
+                            <Table.Cell py={2} px={4}>
+                              <Text fontSize="xs" fontWeight="medium" color="gray.900">
+                                {tx.dbaName || tx.merchant}
+                              </Text>
+                            </Table.Cell>
+                            <Table.Cell py={2} px={4}>
+                              <Text fontSize="xs" color="gray.600">
+                                {tx.mid}
+                              </Text>
+                            </Table.Cell>
+                            <Table.Cell py={2} px={4} textAlign="right">
+                              <Text fontSize="xs" fontWeight="semibold" color="gray.900">
+                                {tx.amount}
+                              </Text>
+                            </Table.Cell>
+                            <Table.Cell py={2} px={4}>
+                              <Text fontSize="xs" color="gray.600">
+                                {tx.date}
+                              </Text>
+                            </Table.Cell>
+                            <Table.Cell py={2} px={4}>
+                              <Badge colorPalette="blue" variant="subtle" fontSize="xs">
+                                {tx.processor}
+                              </Badge>
+                            </Table.Cell>
+                            <Table.Cell py={2} px={4}>
+                              <Text fontSize="xs" color="gray.600">
+                                {tx.source || '—'}
+                              </Text>
+                            </Table.Cell>
+                            <Table.Cell py={2} px={4}>
+                              {tx.exception && tx.exception !== 'None' ? (
+                                <Badge colorPalette="orange" variant="subtle" fontSize="xs">
+                                  {tx.exception}
+                                </Badge>
+                              ) : (
+                                <Text fontSize="xs" color="gray.400">
+                                  —
+                                </Text>
+                              )}
+                            </Table.Cell>
+                          </Table.Row>
+                        ))}
+                      </Table.Body>
+                    </Table.Root>
+                  </Box>
+
+                  {/* Pagination Controls */}
+                  {totalPages > 1 && (
+                    <Box
+                      position="sticky"
+                      bottom={0}
+                      bg="white"
+                      borderTopWidth="1px"
+                      borderTopColor="gray.200"
+                      p={3}
+                      display="flex"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      flexWrap="wrap"
+                      gap={3}
                     >
-                      View all transactions ({selectedCell.value.toLocaleString()})
-                    </Button>
-                  </>
-                ) : (
-                  <Box
-                    p={8}
-                    bg="gray.50"
-                    borderRadius="lg"
-                    borderWidth="1px"
-                    borderColor="gray.200"
-                    textAlign="center"
-                  >
-                    <VStack gap={2}>
+                      <HStack gap={2} align="center">
+                        <Text fontSize="xs" color="gray.600">
+                          Showing {startIndex + 1}-{Math.min(endIndex, allTransactions.length)} of {allTransactions.length}
+                        </Text>
+                        <Select.Root
+                          value={[pageSize.toString()]}
+                          onValueChange={(e) => {
+                            setPageSize(Number(e.value[0]));
+                            setCurrentPage(1);
+                          }}
+                          size="xs"
+                          collection={createListCollection({
+                            items: [
+                              { label: '20 per page', value: '20' },
+                              { label: '25 per page', value: '25' },
+                              { label: '50 per page', value: '50' },
+                            ],
+                          })}
+                        >
+                          <Select.HiddenSelect />
+                          <Select.Control>
+                            <Select.Trigger>
+                              <Select.ValueText />
+                            </Select.Trigger>
+                          </Select.Control>
+                          <Portal>
+                            <Select.Positioner>
+                              <Select.Content>
+                                {[20, 25, 50].map((size) => (
+                                  <Select.Item key={size} item={{ label: `${size} per page`, value: size.toString() }}>
+                                    {size} per page
+                                  </Select.Item>
+                                ))}
+                              </Select.Content>
+                            </Select.Positioner>
+                          </Portal>
+                        </Select.Root>
+                      </HStack>
+                      <HStack gap={2}>
+                        <Button
+                          size="xs"
+                          variant="outline"
+                          onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                          disabled={currentPage === 1}
+                        >
+                          Previous
+                        </Button>
+                        <Text fontSize="xs" color="gray.600" minW="80px" textAlign="center">
+                          Page {currentPage} of {totalPages}
+                        </Text>
+                        <Button
+                          size="xs"
+                          variant="outline"
+                          onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                          disabled={currentPage === totalPages}
+                        >
+                          Next
+                        </Button>
+                      </HStack>
+                    </Box>
+                  )}
+                </Box>
+              ) : (
+                <Box
+                  p={12}
+                  bg="gray.50"
+                  borderRadius="lg"
+                  borderWidth="1px"
+                  borderColor="gray.200"
+                  textAlign="center"
+                  m={6}
+                >
+                  <VStack gap={3}>
+                    <Box color="gray.400">
+                      <FileText size={48} />
+                    </Box>
+                    <VStack gap={1}>
                       <Text fontSize="sm" color="gray.500" fontWeight="medium">
                         No transactions found
                       </Text>
                       <Text fontSize="xs" color="gray.400">
-                        This cell has no transaction data for the selected date and rule.
+                        No transactions found for this date and rule.
                       </Text>
                     </VStack>
-                  </Box>
-                )}
-              </VStack>
+                  </VStack>
+                </Box>
+              )}
             </Drawer.Body>
           </Drawer.Content>
         </Drawer.Positioner>
@@ -1496,3 +1597,44 @@ function HeatmapCellDrawer({ isOpen, onClose, selectedCell, paymentStage }: Heat
     </Drawer.Root>
   );
 }
+
+// Wrapper component that manages both the heatmap drawer and transaction batch drawer
+function HeatmapCellDrawerWrapper(props: Omit<HeatmapCellDrawerProps, 'onTransactionClick'>) {
+  const [selectedTransaction, setSelectedTransaction] = React.useState<MerchantTransaction | null>(null);
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+  
+  React.useEffect(() => {
+    if (selectedTransaction && triggerRef.current) {
+      // Small delay to ensure the button is rendered
+      setTimeout(() => {
+        triggerRef.current?.click();
+        setSelectedTransaction(null); // Reset after opening
+      }, 100);
+    }
+  }, [selectedTransaction]);
+  
+  return (
+    <>
+      <HeatmapCellDrawer
+        {...props}
+        onTransactionClick={setSelectedTransaction}
+      />
+      {selectedTransaction && (
+        <Box position="absolute" left="-9999px" opacity={0} pointerEvents="none" aria-hidden="true">
+          <BatchDrawer
+            batch={[selectedTransaction]}
+            trigger={
+              <Button
+                ref={triggerRef}
+                aria-hidden="true"
+              >
+                Open Transaction
+              </Button>
+            }
+          />
+        </Box>
+      )}
+    </>
+  );
+}
+
