@@ -298,7 +298,7 @@ export const generateTrendingData = (
     
     return dataPoint;
   });
-};
+}
 
 // Calculate percentage
 export const calculatePercentage = (value: number, total: number): number => {
