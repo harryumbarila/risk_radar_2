@@ -25,19 +25,6 @@ interface RulesWikiDrawerProps {
   lastUpdated?: string;
 }
 
-function getSeverityColor(severity: string): string {
-  switch (severity) {
-    case 'Critical':
-      return 'red';
-    case 'Moderate':
-      return 'amber';
-    case 'Info':
-      return 'blue';
-    default:
-      return 'gray';
-  }
-}
-
 function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -183,39 +170,14 @@ export default function RulesWikiDrawer({
                     >
                       <VStack align="stretch" gap={3}>
                         {/* Rule Header */}
-                        <HStack justify="space-between" align="start">
-                          <VStack align="start" gap={1} flex={1}>
-                            <Text fontSize="sm" fontWeight="semibold" color="gray.900">
-                              {rule.name}
-                            </Text>
-                            <Text fontSize="xs" color="gray.500">
-                              {rule.id}
-                            </Text>
-                          </VStack>
-                          <Badge
-                            variant="subtle"
-                            colorPalette={getSeverityColor(rule.severity)}
-                            px={3}
-                            py={1}
-                            borderRadius="md"
-                            bg={
-                              rule.severity === 'Critical'
-                                ? 'red.100'
-                                : rule.severity === 'Moderate'
-                                  ? 'amber.100'
-                                  : 'blue.100'
-                            }
-                            color={
-                              rule.severity === 'Critical'
-                                ? 'red.700'
-                                : rule.severity === 'Moderate'
-                                  ? 'amber.700'
-                                  : 'blue.700'
-                            }
-                          >
-                            {rule.severity}
-                          </Badge>
-                        </HStack>
+                        <VStack align="start" gap={1}>
+                          <Text fontSize="sm" fontWeight="semibold" color="gray.900">
+                            {rule.name}
+                          </Text>
+                          <Text fontSize="xs" color="gray.500">
+                            {rule.id}
+                          </Text>
+                        </VStack>
 
                         {/* Rule Meta */}
                         <HStack gap={2} flexWrap="wrap">
