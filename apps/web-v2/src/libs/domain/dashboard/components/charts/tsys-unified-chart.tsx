@@ -990,7 +990,8 @@ export default function TSYSUnifiedChart({
                                     const isSelected = selectedCell?.ruleId === ruleId && selectedCell?.dateIndex === dateIndex;
                                     
                                     const handleCellClick = () => {
-                                      setSelectedCell({
+                                      // Update selected cell (this will update drawer if already open)
+                                      const newSelectedCell = {
                                         ruleId,
                                         date: item.date,
                                         dateIndex,
@@ -998,8 +999,12 @@ export default function TSYSUnifiedChart({
                                         percentage,
                                         maxValue,
                                         bgColor,
-                                      });
-                                      setIsDrawerOpen(true);
+                                      };
+                                      setSelectedCell(newSelectedCell);
+                                      // Open drawer if not already open, otherwise it will update automatically
+                                      if (!isDrawerOpen) {
+                                        setIsDrawerOpen(true);
+                                      }
                                     };
                                     
                                     return (
@@ -1018,6 +1023,8 @@ export default function TSYSUnifiedChart({
                                             transition="all 0.18s ease-in-out"
                                             onClick={handleCellClick}
                                             boxShadow={isSelected ? "0 0 0 2px rgba(59, 130, 246, 0.2)" : "none"}
+                                            opacity={isSelected ? 1 : 1}
+                                            transform={isSelected ? "scale(1.02)" : "scale(1)"}
                                           />
                                         </Tooltip.Trigger>
                                         <Portal>
@@ -1220,11 +1227,12 @@ interface HeatmapCellDrawerProps {
 }
 
 function HeatmapCellDrawer({ isOpen, onClose, selectedCell, paymentStage }: HeatmapCellDrawerProps) {
-  const [transactions] = React.useState(() => 
+  // Regenerate transactions when selectedCell changes
+  const transactions = React.useMemo(() => 
     selectedCell && selectedCell.value > 0 
       ? generateMockTransactions(Math.min(5, Math.max(1, Math.floor(selectedCell.value / 100)))) 
       : []
-  );
+  , [selectedCell?.ruleId, selectedCell?.dateIndex, selectedCell?.value]);
 
   // Calculate trend vs previous day (mock)
   const previousDayValue = selectedCell ? Math.floor(selectedCell.value * (0.7 + Math.random() * 0.6)) : 0;
