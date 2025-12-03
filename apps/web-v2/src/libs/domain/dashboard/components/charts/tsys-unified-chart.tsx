@@ -202,10 +202,15 @@ export default function TSYSUnifiedChart({
     }
   }, [topContributorsFilter, top5Rules, top10Rules, availableRuleIds, filteredRuleIds, onRuleIdsChange, selectedRuleIds]);
 
-  // Generate trending data
+  // Generate trending data based on filtered rules and data
   const trendingData = React.useMemo(() => {
-    return generateTrendingData(days);
-  }, [days]);
+    if (effectiveChartType === 'trending') {
+      // Use contributorFilteredRules to respect Top Contributors filter
+      return generateTrendingData(data, contributorFilteredRules);
+    }
+    // Return empty array if not trending (won't be used)
+    return [];
+  }, [data, contributorFilteredRules, effectiveChartType]);
 
   // Determine chart type: auto-switch to heatmap if 12+ rules
   const effectiveChartType = React.useMemo(() => {
