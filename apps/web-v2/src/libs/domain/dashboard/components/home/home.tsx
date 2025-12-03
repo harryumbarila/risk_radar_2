@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Box, VStack, SimpleGrid, HStack, Button, Skeleton, Text } from '@chakra-ui/react';
+import { Box, VStack, SimpleGrid, HStack, Button, Skeleton, Text, Tooltip, Portal } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 import {
   User,
@@ -9,6 +9,7 @@ import {
   ShoppingCart,
   Clock,
   DollarSign,
+  Info,
 } from 'lucide-react';
 import FilterBar, { type FilterState } from '../filter-bar/filter-bar';
 import KpiCard from '../kpi-card/kpi-card';
@@ -17,6 +18,8 @@ import SourceDistributionChart from '../charts/source-distribution-chart';
 import MerchantRanking from '../charts/merchant-ranking';
 import RuleLabel from '../rule-label/rule-label';
 import TSYSUnifiedChart from '../charts/tsys-unified-chart';
+import ChargebackRateChart from '../charts/chargeback-rate-chart';
+import ChargebackReasonCodeChart from '../charts/chargeback-reason-code-chart';
 import { generateMockAlerts, calculateKpis, type MockAlert, type Source } from '../../utils/mockData';
 import { RULE_DEFINITIONS } from '../../utils/ruleNames';
 
@@ -283,6 +286,60 @@ export default function Home() {
             tooltip="Total number of chargebacks received in the last 30 days. Chargebacks represent disputed transactions that require investigation."
           />
         </SimpleGrid>
+
+        {/* Separator */}
+        <Box borderTop="1px" borderColor="gray.200" mt={2} pt={4} />
+
+        {/* Chargeback Insights Section */}
+        <VStack align="stretch" gap={4}>
+          <HStack justify="space-between" align="center">
+            <HStack gap={2} align="center">
+              <Text fontSize="xl" fontWeight="bold">
+                Chargeback Insights
+              </Text>
+              <Tooltip.Root>
+                <Tooltip.Trigger asChild>
+                  <Box
+                    as="span"
+                    color="gray.400"
+                    _hover={{ color: 'gray.600' }}
+                    cursor="help"
+                    display="inline-flex"
+                    alignItems="center"
+                    aria-label="Section information"
+                  >
+                    <Info size={16} />
+                  </Box>
+                </Tooltip.Trigger>
+                <Portal>
+                  <Tooltip.Positioner>
+                    <Tooltip.Content
+                      maxW="300px"
+                      zIndex={1100}
+                      bg="gray.900"
+                      color="white"
+                      px={3}
+                      py={2}
+                      borderRadius="md"
+                      fontSize="sm"
+                      boxShadow="lg"
+                    >
+                      <Tooltip.Arrow />
+                      Comprehensive chargeback analytics including rate trends and reason code distribution to help identify patterns and reduce risk.
+                    </Tooltip.Content>
+                  </Tooltip.Positioner>
+                </Portal>
+              </Tooltip.Root>
+            </HStack>
+            <Text fontSize="xs" color="gray.500">
+              Last Updated: {new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+            </Text>
+          </HStack>
+          <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
+            <ChargebackRateChart dateRange={filters} />
+            <ChargebackReasonCodeChart dateRange={filters} />
+          </SimpleGrid>
+        </VStack>
 
         {/* Separator */}
         <Box borderTop="1px" borderColor="gray.200" mt={2} pt={4} />
