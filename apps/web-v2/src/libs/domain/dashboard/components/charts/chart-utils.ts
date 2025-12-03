@@ -269,10 +269,12 @@ export const generateTrendingData = (
       
       // Generate values for each rule with variation
       mockRuleIds.forEach((ruleId) => {
+        if (!ruleId || baseValues[ruleId] === undefined) return;
         const randomVariation = (Math.random() - 0.5) * 0.3; // ±15% variation
-        const value = Math.max(100, Math.floor(baseValues[ruleId] * (1 + weeklyVariation + randomVariation)));
+        const baseValue = baseValues[ruleId] || 1000; // Fallback to 1000 if undefined
+        const value = Math.max(100, Math.floor(baseValue * (1 + weeklyVariation + randomVariation)));
         dataPoint[ruleId] = value;
-        baseValues[ruleId] = value * 0.9 + baseValues[ruleId] * 0.1; // Smoothing
+        baseValues[ruleId] = value * 0.9 + baseValue * 0.1; // Smoothing
       });
       
       data.push(dataPoint);
