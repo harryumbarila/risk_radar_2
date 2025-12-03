@@ -268,13 +268,24 @@ export default function TSYSUnifiedChart({
   }, [data, trendingRules, effectiveChartType]);
 
   // For 20+ rules, collapse to Top 5 + Others (only for stacked-area, not heatmap)
-  const shouldCollapseToTop5 = contributorFilteredRules.length >= 20 && effectiveChartType === 'stacked-area';
+  // BUT: Don't collapse if user explicitly selected "Top 10" or "All Rules" - respect their choice
+  const shouldCollapseToTop5 = 
+    contributorFilteredRules.length >= 20 && 
+    effectiveChartType === 'stacked-area' &&
+    topContributorsFilter === 'top5'; // Only collapse if user selected Top 5
+  
   const displayRules = React.useMemo(() => {
+    // If user selected Top 10 or All Rules, always show all contributorFilteredRules
+    if (topContributorsFilter === 'top10' || topContributorsFilter === 'all') {
+      return contributorFilteredRules;
+    }
+    
+    // For Top 5, apply collapse logic if needed
     if (shouldCollapseToTop5 && !expandedOthers) {
       return top5Rules;
     }
     return contributorFilteredRules;
-  }, [shouldCollapseToTop5, expandedOthers, top5Rules, contributorFilteredRules, effectiveChartType]);
+  }, [shouldCollapseToTop5, expandedOthers, top5Rules, contributorFilteredRules, effectiveChartType, topContributorsFilter]);
 
   const otherRules = React.useMemo(() => {
     if (shouldCollapseToTop5) {
