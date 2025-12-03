@@ -502,10 +502,10 @@ export default function FilterBar({
                                   updateFilter('ruleId', newSelected.length === 0 ? 'all' : newSelected);
                                 }}>
                                   <Text fontSize="sm" fontWeight="medium">
-                                    {rule}
+                                    {getRuleName(rule)}
                                   </Text>
                                   <Text fontSize="xs" color="gray.500">
-                                    {getRuleName(rule)}
+                                    {rule}
                                   </Text>
                                 </VStack>
                               </HStack>
