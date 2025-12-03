@@ -464,13 +464,21 @@ export default function FilterBar({
                         <Text fontWeight="bold" fontSize="sm">
                           Select Rules
                         </Text>
-                        {selectedRules.length > 0 && (
+                        {selectedRules.length > 0 ? (
                           <Button
                             size="xs"
                             variant="ghost"
                             onClick={() => updateFilter('ruleId', 'all')}
                           >
                             Clear all
+                          </Button>
+                        ) : (
+                          <Button
+                            size="xs"
+                            variant="ghost"
+                            onClick={() => updateFilter('ruleId', availableRules)}
+                          >
+                            Select all
                           </Button>
                         )}
                       </HStack>
