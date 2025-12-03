@@ -249,7 +249,9 @@ export const generateTrendingData = (
     const mockRuleIds = ['AH001', 'AH002', 'AH003', 'AH004', 'AH005'];
     let baseValues: Record<string, number> = {};
     mockRuleIds.forEach((ruleId, index) => {
-      baseValues[ruleId] = 2000 - (index * 200); // Decreasing base values
+      if (ruleId) {
+        baseValues[ruleId] = 2000 - (index * 200); // Decreasing base values
+      }
     });
     
     for (let i = 13; i >= 0; i--) {
