@@ -272,7 +272,7 @@ export default function AuthHeader(): React.JSX.Element {
               </Popover.Trigger>
               <Portal>
                 <Popover.Positioner>
-                  <Popover.Content>
+                  <Popover.Content suppressHydrationWarning>
                     <Popover.Arrow />
                     <Popover.Body>
                       <Popover.Title fontWeight="medium">
