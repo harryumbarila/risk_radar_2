@@ -26,8 +26,7 @@ export interface FilterState {
   processor: 'all' | 'TSYS' | 'FSP';
   source: 'all' | 'Talus Pay' | 'Global365' | 'SIT' | 'SC Flow';
   ruleId: 'all' | string[];
-  paymentStage?: 'Authorization' | 'Capture' | 'Settlement' | 'ACH Returns';
-  ruleStageParticipation?: 'all' | 'auth-only' | 'multi-stage' | 'settlement-only' | 'ach-only';
+  paymentStage?: ('Authorization' | 'Capture' | 'Settlement' | 'ACH Returns')[];
   week?: number; // For week filter from chart click
   hourRange?: { day: number; hour: number }; // For heatmap click
 }
@@ -80,15 +79,6 @@ export default function FilterBar({
     ],
   });
 
-  const ruleStageParticipationCollection = createListCollection({
-    items: [
-      { label: 'All rules', value: 'all' },
-      { label: 'Auth-only rules', value: 'auth-only' },
-      { label: 'Multi-stage rules', value: 'multi-stage' },
-      { label: 'Settlement-only rules', value: 'settlement-only' },
-      { label: 'ACH-only rules', value: 'ach-only' },
-    ],
-  });
 
   const ruleCollection = React.useMemo(
     () =>
@@ -126,8 +116,6 @@ export default function FilterBar({
       newFilters.ruleId = 'all';
     } else if (key === 'paymentStage') {
       delete newFilters.paymentStage;
-    } else if (key === 'ruleStageParticipation') {
-      delete newFilters.ruleStageParticipation;
     } else {
       delete newFilters[key];
     }
@@ -141,7 +129,6 @@ export default function FilterBar({
       source: 'all',
       ruleId: 'all',
       paymentStage: undefined,
-      ruleStageParticipation: undefined,
     });
   };
 
@@ -152,8 +139,7 @@ export default function FilterBar({
     filters.processor !== 'all' ||
     filters.source !== 'all' ||
     (Array.isArray(filters.ruleId) ? filters.ruleId.length > 0 : filters.ruleId !== 'all') ||
-    filters.paymentStage !== undefined ||
-    filters.ruleStageParticipation !== undefined ||
+    (filters.paymentStage !== undefined && filters.paymentStage.length > 0) ||
     filters.week !== undefined ||
     filters.hourRange !== undefined;
 
@@ -163,8 +149,7 @@ export default function FilterBar({
     filters.processor !== 'all',
     filters.source !== 'all',
     (Array.isArray(filters.ruleId) ? filters.ruleId.length > 0 : filters.ruleId !== 'all'),
-    filters.paymentStage !== undefined,
-    filters.ruleStageParticipation !== undefined,
+    (filters.paymentStage !== undefined && filters.paymentStage.length > 0),
     filters.week !== undefined,
     filters.hourRange !== undefined,
   ].filter(Boolean).length;
@@ -352,82 +337,106 @@ export default function FilterBar({
             </Select.Root>
           </VStack>
 
-          {/* Payment Stage */}
+          {/* Payment Stage - Multi Select */}
           <VStack align="start" gap={1}>
             <Text fontSize="xs" color="gray.600">
               Payment Stage
             </Text>
-            <Select.Root
-              collection={paymentStageCollection}
-              value={filters.paymentStage ? [filters.paymentStage] : []}
-              onValueChange={(e) => {
-                const value = e.value[0] as FilterState['paymentStage'];
-                updateFilter('paymentStage', value);
-              }}
-              size="sm"
-              width="150px"
-            >
-              <Select.HiddenSelect />
-              <Select.Control>
-                <Select.Trigger>
-                  <Select.ValueText placeholder="All Stages" />
-                </Select.Trigger>
-                <Select.IndicatorGroup>
-                  <Select.Indicator />
-                </Select.IndicatorGroup>
-              </Select.Control>
+            <Popover.Root positioning={{ placement: 'bottom-start' }}>
+              <Popover.Trigger asChild>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  width="200px"
+                  justifyContent="space-between"
+                  suppressHydrationWarning
+                >
+                  <Text fontSize="sm" lineClamp={1}>
+                    {!filters.paymentStage || filters.paymentStage.length === 0
+                      ? 'All Stages'
+                      : filters.paymentStage.length === 1
+                      ? filters.paymentStage[0]
+                      : `${filters.paymentStage.length} stages selected`}
+                  </Text>
+                  <ChevronDown size={16} />
+                </Button>
+              </Popover.Trigger>
               <Portal>
-                <Select.Positioner>
-                  <Select.Content>
-                    {paymentStageCollection.items.map((item) => (
-                      <Select.Item item={item} key={item.value}>
-                        {item.label}
-                        <Select.ItemIndicator />
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select.Positioner>
+                <Popover.Positioner>
+                  <Popover.Content width="250px" maxHeight="300px" overflowY="auto">
+                    <Popover.Arrow />
+                    <Popover.CloseTrigger />
+                    <VStack align="stretch" gap={2} p={4}>
+                      <HStack justify="space-between">
+                        <Text fontWeight="bold" fontSize="sm">
+                          Select Payment Stages
+                        </Text>
+                        {filters.paymentStage && filters.paymentStage.length > 0 ? (
+                          <Button
+                            size="xs"
+                            variant="ghost"
+                            onClick={() => updateFilter('paymentStage', undefined)}
+                          >
+                            Clear all
+                          </Button>
+                        ) : (
+                          <Button
+                            size="xs"
+                            variant="ghost"
+                            onClick={() => updateFilter('paymentStage', ['Authorization', 'Capture', 'Settlement', 'ACH Returns'])}
+                          >
+                            Select all
+                          </Button>
+                        )}
+                      </HStack>
+                      <Box borderWidth="1px" borderRadius="md" p={2}>
+                        <VStack align="stretch" gap={2}>
+                          {paymentStageCollection.items.map((item) => {
+                            const isChecked = filters.paymentStage?.includes(item.value as any) || false;
+                            return (
+                              <HStack key={item.value} gap={3} align="start">
+                                <Checkbox.Root
+                                  checked={isChecked}
+                                  onCheckedChange={(e) => {
+                                    const checked = e.checked === true;
+                                    const current = filters.paymentStage || [];
+                                    const newSelected = checked
+                                      ? [...current, item.value as any]
+                                      : current.filter((s) => s !== item.value);
+                                    updateFilter('paymentStage', newSelected.length === 0 ? undefined : newSelected);
+                                  }}
+                                >
+                                  <Checkbox.HiddenInput />
+                                  <Checkbox.Control>
+                                    <Checkbox.Indicator />
+                                  </Checkbox.Control>
+                                </Checkbox.Root>
+                                <Text 
+                                  fontSize="sm" 
+                                  fontWeight="medium"
+                                  flex={1}
+                                  cursor="pointer"
+                                  onClick={() => {
+                                    const current = filters.paymentStage || [];
+                                    const isChecked = current.includes(item.value as any);
+                                    const newSelected = isChecked
+                                      ? current.filter((s) => s !== item.value)
+                                      : [...current, item.value as any];
+                                    updateFilter('paymentStage', newSelected.length === 0 ? undefined : newSelected);
+                                  }}
+                                >
+                                  {item.label}
+                                </Text>
+                              </HStack>
+                            );
+                          })}
+                        </VStack>
+                      </Box>
+                    </VStack>
+                  </Popover.Content>
+                </Popover.Positioner>
               </Portal>
-            </Select.Root>
-          </VStack>
-
-          {/* Rule Stage Participation */}
-          <VStack align="start" gap={1}>
-            <Text fontSize="xs" color="gray.600">
-              Rule Stage Participation
-            </Text>
-            <Select.Root
-              collection={ruleStageParticipationCollection}
-              value={filters.ruleStageParticipation ? [filters.ruleStageParticipation] : ['all']}
-              onValueChange={(e) => {
-                const value = (e.value[0] || 'all') as FilterState['ruleStageParticipation'];
-                updateFilter('ruleStageParticipation', value);
-              }}
-              size="sm"
-              width="200px"
-            >
-              <Select.HiddenSelect />
-              <Select.Control>
-                <Select.Trigger>
-                  <Select.ValueText />
-                </Select.Trigger>
-                <Select.IndicatorGroup>
-                  <Select.Indicator />
-                </Select.IndicatorGroup>
-              </Select.Control>
-              <Portal>
-                <Select.Positioner>
-                  <Select.Content>
-                    {ruleStageParticipationCollection.items.map((item) => (
-                      <Select.Item item={item} key={item.value}>
-                        {item.label}
-                        <Select.ItemIndicator />
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select.Positioner>
-              </Portal>
-            </Select.Root>
+            </Popover.Root>
           </VStack>
 
           {/* Rule Type - Multi Select */}
@@ -594,45 +603,38 @@ export default function FilterBar({
                 </Button>
               </Badge>
             )}
-            {filters.paymentStage && (
-              <Badge
-                colorPalette="green"
-                variant="subtle"
-                px={2}
-                py={1}
-                borderRadius="md"
-              >
-                Payment Stage: {filters.paymentStage}
-                <Button
-                  size="xs"
-                  variant="ghost"
-                  ml={2}
-                  onClick={() => clearFilter('paymentStage')}
-                  aria-label="Remove payment stage filter"
-                >
-                  <X size={12} />
-                </Button>
-              </Badge>
-            )}
-            {filters.ruleStageParticipation && filters.ruleStageParticipation !== 'all' && (
-              <Badge
-                colorPalette="pink"
-                variant="subtle"
-                px={2}
-                py={1}
-                borderRadius="md"
-              >
-                Rule Stage: {ruleStageParticipationCollection.items.find(i => i.value === filters.ruleStageParticipation)?.label || filters.ruleStageParticipation}
-                <Button
-                  size="xs"
-                  variant="ghost"
-                  ml={2}
-                  onClick={() => clearFilter('ruleStageParticipation')}
-                  aria-label="Remove rule stage participation filter"
-                >
-                  <X size={12} />
-                </Button>
-              </Badge>
+            {filters.paymentStage && filters.paymentStage.length > 0 && (
+              <>
+                {filters.paymentStage.map((stage) => (
+                  <Badge
+                    key={stage}
+                    colorPalette="green"
+                    variant="subtle"
+                    px={2}
+                    py={1}
+                    borderRadius="md"
+                    display="flex"
+                    alignItems="center"
+                    gap={1}
+                  >
+                    Payment Stage: {stage}
+                    <Button
+                      size="xs"
+                      variant="ghost"
+                      onClick={() => {
+                        const newStages = filters.paymentStage?.filter((s) => s !== stage);
+                        updateFilter('paymentStage', newStages && newStages.length > 0 ? newStages : undefined);
+                      }}
+                      aria-label="Remove payment stage filter"
+                      p={0}
+                      minW="auto"
+                      h="auto"
+                    >
+                      <X size={12} />
+                    </Button>
+                  </Badge>
+                ))}
+              </>
             )}
             {selectedRules.length > 0 && (
               <>

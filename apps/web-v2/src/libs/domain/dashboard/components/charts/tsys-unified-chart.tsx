@@ -36,13 +36,11 @@ import {
 import { RULE_DEFINITIONS } from '../../utils/ruleNames';
 
 export type PaymentStage = 'Authorization' | 'Capture' | 'Settlement' | 'ACH Returns';
-export type RuleStageParticipation = 'all' | 'auth-only' | 'multi-stage' | 'settlement-only' | 'ach-only';
 export type TopContributorsFilter = 'all' | 'top5' | 'top10';
 
 interface TSYSUnifiedChartProps {
   dateRange?: FilterState;
-  paymentStage?: PaymentStage;
-  ruleStageParticipation?: RuleStageParticipation;
+  paymentStage?: PaymentStage[];
   selectedRuleIds?: string[]; // Rules selected from FilterBar
   availableRuleIds?: string[]; // All available rule IDs
   onRuleIdsChange?: (ruleIds: string[]) => void; // Callback to update main filter
@@ -98,8 +96,7 @@ interface SelectedCell {
 
 export default function TSYSUnifiedChart({ 
   dateRange, 
-  paymentStage = 'Authorization',
-  ruleStageParticipation = 'all',
+  paymentStage = ['Authorization'],
   selectedRuleIds = [],
   availableRuleIds = [],
   onRuleIdsChange
@@ -114,41 +111,25 @@ export default function TSYSUnifiedChart({
   const dateGrouping = React.useMemo(() => getDateGrouping(days), [days]);
   const smoothingWindow = React.useMemo(() => getSmoothingWindow(days), [days]);
   
-  // Use rules from FilterBar (selectedRuleIds), filtered by Rule Stage Participation
+  // Use rules from FilterBar (selectedRuleIds)
   // This is the base set of rules to work with
   const baseRuleIds = React.useMemo(() => {
     // Start with rules selected in FilterBar
-    let rules = selectedRuleIds.length > 0 ? selectedRuleIds : RULE_IDS;
-    
-    // Apply Rule Stage Participation filter
-    if (ruleStageParticipation !== 'all') {
-      rules = rules.filter((ruleId) => {
-        const stages = RULE_STAGE_MAP[ruleId] || [];
-        switch (ruleStageParticipation) {
-          case 'auth-only':
-            return stages.length === 1 && stages.includes('Authorization');
-          case 'multi-stage':
-            return stages.length > 1;
-          case 'settlement-only':
-            return stages.length === 1 && stages.includes('Settlement');
-          case 'ach-only':
-            return stages.length === 1 && stages.includes('ACH Returns');
-          default:
-            return true;
-        }
-      });
-    }
-    
-    return rules;
-  }, [selectedRuleIds, ruleStageParticipation]);
+    return selectedRuleIds.length > 0 ? selectedRuleIds : RULE_IDS;
+  }, [selectedRuleIds]);
 
   // Use baseRuleIds for calculations (this ensures we always have the full set)
   const filteredRuleIds = baseRuleIds;
 
+  // Use first payment stage for data generation (or default to Authorization)
+  const activePaymentStage = React.useMemo(() => {
+    return paymentStage && paymentStage.length > 0 ? paymentStage[0] : 'Authorization';
+  }, [paymentStage]);
+
   const rawData = React.useMemo(() => {
-    const baseCount = PAYMENT_STAGE_BASE_COUNTS[paymentStage];
+    const baseCount = PAYMENT_STAGE_BASE_COUNTS[activePaymentStage];
     return generateRuleParticipationData(days, baseCount, dateGrouping);
-  }, [days, dateGrouping, paymentStage]);
+  }, [days, dateGrouping, activePaymentStage]);
 
   const data = React.useMemo(() => {
     let processedData = [...rawData];
@@ -1236,7 +1217,7 @@ interface HeatmapCellDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   selectedCell: SelectedCell | null;
-  paymentStage: PaymentStage;
+  paymentStage: PaymentStage[];
   onTransactionClick?: (tx: MerchantTransaction) => void;
 }
 
@@ -1245,6 +1226,9 @@ function HeatmapCellDrawer({ isOpen, onClose, selectedCell, paymentStage, onTran
   const [pageSize, setPageSize] = React.useState(25);
   const [selectedTransaction, setSelectedTransaction] = React.useState<MerchantTransaction | null>(null);
   const bodyRef = React.useRef<HTMLDivElement>(null);
+  
+  // Use first payment stage or default
+  const activePaymentStage = paymentStage && paymentStage.length > 0 ? paymentStage[0] : 'Authorization';
   
   // Expose selectedTransaction to parent via callback
   React.useEffect(() => {
@@ -1347,7 +1331,7 @@ function HeatmapCellDrawer({ isOpen, onClose, selectedCell, paymentStage, onTran
                       {selectedCell.ruleId}
                     </Badge>
                     <Text fontSize="xs" color="gray.500">
-                      {stages.join(', ') || paymentStage}
+                      {stages.join(', ') || activePaymentStage}
                     </Text>
                   </HStack>
                   <SimpleGrid columns={4} gap={3} w="full" mt={2}>

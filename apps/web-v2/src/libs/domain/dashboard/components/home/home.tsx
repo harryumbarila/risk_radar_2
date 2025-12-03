@@ -221,7 +221,6 @@ export default function Home() {
         <TSYSUnifiedChart 
           dateRange={filters} 
           paymentStage={filters.paymentStage}
-          ruleStageParticipation={filters.ruleStageParticipation}
           selectedRuleIds={Array.isArray(filters.ruleId) ? filters.ruleId : (filters.ruleId === 'all' ? [] : [filters.ruleId])}
           availableRuleIds={availableRules}
           onRuleIdsChange={(ruleIds) => {
