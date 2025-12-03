@@ -263,10 +263,10 @@ export default function TSYSUnifiedChart({
 
   // Get heatmap color intensity
   const getHeatmapColor = (value: number, maxValue: number): string => {
-    if (maxValue === 0) return HEATMAP_COLORS[0];
+    if (maxValue === 0) return HEATMAP_COLORS[0] || '#e0f2fe';
     const ratio = value / maxValue;
     const index = Math.min(Math.floor(ratio * (HEATMAP_COLORS.length - 1)), HEATMAP_COLORS.length - 1);
-    return HEATMAP_COLORS[index];
+    return HEATMAP_COLORS[index] || '#e0f2fe';
   };
 
 
