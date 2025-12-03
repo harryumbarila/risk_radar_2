@@ -233,9 +233,9 @@ export default function TSYSUnifiedChart({
   const trendingRules = React.useMemo(() => {
     if (effectiveChartType === 'trending') {
       // Use contributorFilteredRules which already respects Top Contributors filter
-      // But limit to top 5 for trending chart if more than 5 rules
-      if (contributorFilteredRules.length > 5) {
-        return contributorFilteredRules.slice(0, 5);
+      // For trending chart, show up to 10 rules max to avoid visual clutter
+      if (contributorFilteredRules.length > 10) {
+        return contributorFilteredRules.slice(0, 10);
       }
       return contributorFilteredRules;
     }
