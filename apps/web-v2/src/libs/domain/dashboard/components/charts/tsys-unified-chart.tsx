@@ -202,6 +202,13 @@ export default function TSYSUnifiedChart({
     }
   }, [topContributorsFilter, top5Rules, top10Rules, availableRuleIds, filteredRuleIds, onRuleIdsChange, selectedRuleIds]);
 
+  // Determine chart type: auto-switch to heatmap if 12+ rules
+  const effectiveChartType = React.useMemo(() => {
+    if (manualChartType) return manualChartType;
+    if (contributorFilteredRules.length >= 12) return 'heatmap';
+    return 'stacked-area';
+  }, [manualChartType, contributorFilteredRules.length]);
+
   // Generate trending data based on filtered rules and data
   const trendingData = React.useMemo(() => {
     if (effectiveChartType === 'trending') {
@@ -211,13 +218,6 @@ export default function TSYSUnifiedChart({
     // Return empty array if not trending (won't be used)
     return [];
   }, [data, contributorFilteredRules, effectiveChartType]);
-
-  // Determine chart type: auto-switch to heatmap if 12+ rules
-  const effectiveChartType = React.useMemo(() => {
-    if (manualChartType) return manualChartType;
-    if (contributorFilteredRules.length >= 12) return 'heatmap';
-    return 'stacked-area';
-  }, [manualChartType, contributorFilteredRules.length]);
 
   // For 20+ rules, collapse to Top 5 + Others (only for stacked-area, not heatmap)
   const shouldCollapseToTop5 = contributorFilteredRules.length >= 20 && effectiveChartType === 'stacked-area';
