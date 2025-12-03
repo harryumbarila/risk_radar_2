@@ -157,16 +157,25 @@ export default function TSYSUnifiedChart({
   }, [data, baseRuleIds]);
 
   // Apply Top Contributors filter - this determines which rules to show in charts
+  // This should update immediately when topContributorsFilter changes, independent of filter sync
   const contributorFilteredRules = React.useMemo(() => {
+    // Ensure we have the necessary data before calculating
+    if (top5Rules.length === 0 && topContributorsFilter === 'top5') {
+      return [];
+    }
+    if (top10Rules.length === 0 && topContributorsFilter === 'top10') {
+      return [];
+    }
+    
     switch (topContributorsFilter) {
       case 'top5':
-        return top5Rules;
+        return top5Rules.length > 0 ? top5Rules : [];
       case 'top10':
-        return top10Rules;
+        return top10Rules.length > 0 ? top10Rules : [];
       case 'all':
-        return baseRuleIds; // Use baseRuleIds instead of filteredRuleIds
+        return baseRuleIds.length > 0 ? baseRuleIds : [];
       default:
-        return baseRuleIds;
+        return baseRuleIds.length > 0 ? baseRuleIds : [];
     }
   }, [topContributorsFilter, top5Rules, top10Rules, baseRuleIds]);
 
@@ -174,9 +183,9 @@ export default function TSYSUnifiedChart({
   const prevTopContributorsFilterRef = React.useRef<TopContributorsFilter | null>(null);
   const hasInitializedRef = React.useRef(false);
   
-  // Update main filter when Top Contributors changes
+  // Update main filter when Top Contributors changes (but don't block chart updates)
   React.useEffect(() => {
-    // Wait for top5Rules to be calculated before initializing
+    // Wait for rules to be calculated before initializing
     if (topContributorsFilter === 'top5' && top5Rules.length === 0) {
       return;
     }
@@ -196,29 +205,35 @@ export default function TSYSUnifiedChart({
     
     prevTopContributorsFilterRef.current = topContributorsFilter;
     
+    // Update main filter asynchronously to not block chart rendering
     if (onRuleIdsChange) {
-      let rulesToSelect: string[] = [];
-      switch (topContributorsFilter) {
-        case 'top5':
-          rulesToSelect = top5Rules;
-          break;
-        case 'top10':
-          rulesToSelect = top10Rules;
-          break;
-        case 'all':
-          rulesToSelect = availableRuleIds.length > 0 ? availableRuleIds : baseRuleIds;
-          break;
-      }
+      // Use setTimeout to ensure this doesn't block the chart update
+      const timeoutId = setTimeout(() => {
+        let rulesToSelect: string[] = [];
+        switch (topContributorsFilter) {
+          case 'top5':
+            rulesToSelect = top5Rules;
+            break;
+          case 'top10':
+            rulesToSelect = top10Rules;
+            break;
+          case 'all':
+            rulesToSelect = availableRuleIds.length > 0 ? availableRuleIds : baseRuleIds;
+            break;
+        }
+        
+        // Only update if rules are different from current selection to avoid loops
+        const currentRules = Array.isArray(selectedRuleIds) ? selectedRuleIds : [];
+        const rulesAreDifferent = 
+          rulesToSelect.length !== currentRules.length ||
+          !rulesToSelect.every(rule => currentRules.includes(rule));
+        
+        if (rulesToSelect.length > 0 && rulesAreDifferent) {
+          onRuleIdsChange(rulesToSelect);
+        }
+      }, 0);
       
-      // Only update if rules are different from current selection to avoid loops
-      const currentRules = Array.isArray(selectedRuleIds) ? selectedRuleIds : [];
-      const rulesAreDifferent = 
-        rulesToSelect.length !== currentRules.length ||
-        !rulesToSelect.every(rule => currentRules.includes(rule));
-      
-      if (rulesToSelect.length > 0 && rulesAreDifferent) {
-        onRuleIdsChange(rulesToSelect);
-      }
+      return () => clearTimeout(timeoutId);
     }
   }, [topContributorsFilter, top5Rules, top10Rules, availableRuleIds, baseRuleIds, onRuleIdsChange, selectedRuleIds]);
 
