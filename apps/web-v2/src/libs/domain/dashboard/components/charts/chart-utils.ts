@@ -233,7 +233,7 @@ export const generateRuleParticipationData = (
   return data;
 };
 
-// Generate trending data for auto hold counts and daily authorization volumes
+// Generate trending data for individual rules (top 5 by default)
 // Based on filtered rule participation data
 export const generateTrendingData = (
   ruleData: Array<Record<string, any>>,
@@ -245,56 +245,54 @@ export const generateTrendingData = (
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    let authBase = 12000;
-    let autoHoldBase = 350;
+    // Generate mock data for top 5 rules
+    const mockRuleIds = ['AH001', 'AH002', 'AH003', 'AH004', 'AH005'];
+    let baseValues: Record<string, number> = {};
+    mockRuleIds.forEach((ruleId, index) => {
+      baseValues[ruleId] = 2000 - (index * 200); // Decreasing base values
+    });
     
     for (let i = 13; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(today.getDate() - i);
       
       const dayOfWeek = date.getDay();
-      const weeklyVariation = dayOfWeek === 0 || dayOfWeek === 6 ? -500 : 0;
-      const randomVariation = (Math.random() - 0.5) * 3000;
-      const authVolume = Math.max(10000, Math.min(15500, authBase + weeklyVariation + randomVariation));
-      authBase = authVolume * 0.9 + authBase * 0.1;
+      const weeklyVariation = dayOfWeek === 0 || dayOfWeek === 6 ? -0.15 : 0;
       
-      const autoHoldRatio = 0.03 + (Math.random() * 0.01);
-      const autoHold = Math.max(200, Math.min(600, Math.floor(authVolume * autoHoldRatio)));
-      autoHoldBase = autoHold * 0.9 + autoHoldBase * 0.1;
-      
-      data.push({
+      const dataPoint: Record<string, any> = {
         date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
         dateValue: date.toISOString().split('T')[0],
         dateObj: new Date(date),
-        authVolume,
-        autoHold,
+      };
+      
+      // Generate values for each rule with variation
+      mockRuleIds.forEach((ruleId) => {
+        const randomVariation = (Math.random() - 0.5) * 0.3; // ±15% variation
+        const value = Math.max(100, Math.floor(baseValues[ruleId] * (1 + weeklyVariation + randomVariation)));
+        dataPoint[ruleId] = value;
+        baseValues[ruleId] = value * 0.9 + baseValues[ruleId] * 0.1; // Smoothing
       });
+      
+      data.push(dataPoint);
     }
     return data;
   }
   
-  // Calculate trending data from rule participation
+  // Return rule participation data directly (each rule as a separate dataKey)
+  // The data already contains individual rule values
   return ruleData.map((item) => {
-    // Authorization volumes = total of all filtered rules
-    const authVolume = filteredRuleIds.reduce((sum, ruleId) => {
-      return sum + (item[ruleId] || 0);
-    }, 0);
-    
-    // Auto hold counts = sum of all rule counts (each rule that fired counts as 1)
-    // For simplicity, we'll use the total number of rules that have activity
-    // Or we can use a percentage of auth volume (3-4%)
-    const activeRulesCount = filteredRuleIds.filter((ruleId) => (item[ruleId] || 0) > 0).length;
-    // Auto hold is roughly 3-4% of auth volume, but with some variation
-    const autoHoldRatio = 0.03 + (Math.random() * 0.01);
-    const autoHold = Math.max(activeRulesCount * 50, Math.floor(authVolume * autoHoldRatio));
-    
-    return {
+    const dataPoint: Record<string, any> = {
       date: item.date,
       dateValue: item.dateValue,
       dateObj: item.dateObj,
-      authVolume: Math.max(0, authVolume),
-      autoHold: Math.max(0, autoHold),
     };
+    
+    // Include only the filtered rules in the data point
+    filteredRuleIds.forEach((ruleId) => {
+      dataPoint[ruleId] = Math.max(0, item[ruleId] || 0);
+    });
+    
+    return dataPoint;
   });
 };
 

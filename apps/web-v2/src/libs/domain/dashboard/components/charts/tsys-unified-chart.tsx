@@ -209,15 +209,27 @@ export default function TSYSUnifiedChart({
     return 'stacked-area';
   }, [manualChartType, contributorFilteredRules.length]);
 
+  // For trending chart, use top 5 rules by default
+  const trendingRules = React.useMemo(() => {
+    if (effectiveChartType === 'trending') {
+      // Default to top 5 rules for trending chart
+      if (topContributorsFilter === 'all' && contributorFilteredRules.length > 5) {
+        return top5Rules;
+      }
+      return contributorFilteredRules.slice(0, 5); // Limit to top 5
+    }
+    return [];
+  }, [effectiveChartType, topContributorsFilter, contributorFilteredRules, top5Rules]);
+
   // Generate trending data based on filtered rules and data
   const trendingData = React.useMemo(() => {
     if (effectiveChartType === 'trending') {
-      // Use contributorFilteredRules to respect Top Contributors filter
-      return generateTrendingData(data, contributorFilteredRules);
+      // Use top 5 rules for trending chart
+      return generateTrendingData(data, trendingRules);
     }
     // Return empty array if not trending (won't be used)
     return [];
-  }, [data, contributorFilteredRules, effectiveChartType]);
+  }, [data, trendingRules, effectiveChartType]);
 
   // For 20+ rules, collapse to Top 5 + Others (only for stacked-area, not heatmap)
   const shouldCollapseToTop5 = contributorFilteredRules.length >= 20 && effectiveChartType === 'stacked-area';
@@ -277,8 +289,9 @@ export default function TSYSUnifiedChart({
     if (active && payload && payload.length) {
       // Special tooltip for trending chart
       if (effectiveChartType === 'trending') {
-        const authItem = payload.find((item: any) => item.dataKey === 'authVolume');
-        const autoHoldItem = payload.find((item: any) => item.dataKey === 'autoHold');
+        // Filter payload to only show visible rules
+        const visiblePayload = payload.filter((item: any) => trendingRules.includes(item.dataKey));
+        const total = visiblePayload.reduce((sum: number, item: any) => sum + (item.value || 0), 0);
         
         return (
           <Box
@@ -288,52 +301,54 @@ export default function TSYSUnifiedChart({
             boxShadow="lg"
             borderWidth="1px"
             borderColor="gray.200"
-            minW="200px"
+            minW="250px"
           >
             <Text fontSize="sm" fontWeight="bold" mb={2}>
               {label}
             </Text>
-            <VStack align="stretch" gap={2}>
-              {authItem && (
-                <HStack justify="space-between" gap={4}>
-                  <HStack gap={2}>
-                    <Box
-                      w="12px"
-                      h="12px"
-                      borderRadius="sm"
-                      bg="#3b82f6"
-                      borderWidth="1px"
-                      borderColor="gray.300"
-                    />
-                    <Text fontSize="xs" color="gray.700" fontWeight="semibold">
-                      Daily authorization volumes
-                    </Text>
+            <VStack align="stretch" gap={1.5}>
+              {visiblePayload.map((item: any, index: number) => {
+                const ruleId = item.dataKey;
+                const percentage = calculatePercentage(item.value, total);
+                const isTop5 = top5Rules.includes(ruleId);
+                
+                return (
+                  <HStack key={index} justify="space-between" gap={4}>
+                    <HStack gap={2}>
+                      <Box
+                        w="12px"
+                        h="12px"
+                        borderRadius="sm"
+                        bg={item.color}
+                        borderWidth="1px"
+                        borderColor="gray.300"
+                      />
+                      <VStack align="start" gap={0}>
+                        <Text fontSize="xs" color="gray.700" fontWeight="semibold">
+                          {RULE_DESCRIPTIONS[ruleId] || ruleId}
+                        </Text>
+                        <Text fontSize="xs" color="gray.500">
+                          {ruleId}
+                        </Text>
+                      </VStack>
+                    </HStack>
+                    <VStack align="end" gap={0}>
+                      <Text fontSize="xs" fontWeight="semibold">
+                        {item.value.toLocaleString()}
+                      </Text>
+                      <Text fontSize="xs" color="gray.500">
+                        {percentage}%
+                      </Text>
+                    </VStack>
                   </HStack>
-                  <Text fontSize="xs" fontWeight="semibold">
-                    {authItem.value.toLocaleString()}
-                  </Text>
+                );
+              })}
+              <Box pt={1} borderTopWidth="1px" borderColor="gray.200" mt={1}>
+                <HStack justify="space-between">
+                  <Text fontSize="xs" fontWeight="bold" color="gray.700">Total:</Text>
+                  <Text fontSize="xs" fontWeight="bold">{total.toLocaleString()}</Text>
                 </HStack>
-              )}
-              {autoHoldItem && (
-                <HStack justify="space-between" gap={4}>
-                  <HStack gap={2}>
-                    <Box
-                      w="12px"
-                      h="12px"
-                      borderRadius="sm"
-                      bg="#ef4444"
-                      borderWidth="1px"
-                      borderColor="gray.300"
-                    />
-                    <Text fontSize="xs" color="gray.700" fontWeight="semibold">
-                      Auto hold counts
-                    </Text>
-                  </HStack>
-                  <Text fontSize="xs" fontWeight="semibold">
-                    {autoHoldItem.value.toLocaleString()}
-                  </Text>
-                </HStack>
-              )}
+              </Box>
             </VStack>
           </Box>
         );
@@ -687,7 +702,6 @@ export default function TSYSUnifiedChart({
                     tickLine={{ stroke: '#e5e7eb' }}
                   />
                   <YAxis 
-                    domain={[0, 16000]}
                     tick={{ fontSize: 11, fill: '#6b7280' }}
                     axisLine={{ stroke: '#e5e7eb' }}
                     tickLine={{ stroke: '#e5e7eb' }}
@@ -699,26 +713,26 @@ export default function TSYSUnifiedChart({
                     iconType="line"
                     iconSize={12}
                   />
-                  <Line
-                    type="monotone"
-                    dataKey="authVolume"
-                    name="Daily authorization volumes"
-                    stroke="#3b82f6"
-                    strokeWidth={2}
-                    dot={{ fill: '#3b82f6', r: 3 }}
-                    activeDot={{ r: 5 }}
-                    animationDuration={300}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="autoHold"
-                    name="Auto hold counts"
-                    stroke="#ef4444"
-                    strokeWidth={2}
-                    dot={{ fill: '#ef4444', r: 3 }}
-                    activeDot={{ r: 5 }}
-                    animationDuration={300}
-                  />
+                  {trendingRules.map((ruleId) => {
+                    const isTop5 = top5Rules.includes(ruleId);
+                    const opacity = getRuleOpacity(ruleId, isTop5);
+                    const color = getRuleColor(ruleId, isTop5);
+                    
+                    return (
+                      <Line
+                        key={ruleId}
+                        type="monotone"
+                        dataKey={ruleId}
+                        name={RULE_DESCRIPTIONS[ruleId] || ruleId}
+                        stroke={color}
+                        strokeWidth={getStrokeWidth(ruleId, isTop5)}
+                        strokeOpacity={opacity}
+                        dot={{ fill: color, r: 3, opacity }}
+                        activeDot={{ r: 5 }}
+                        animationDuration={300}
+                      />
+                    );
+                  })}
                 </LineChart>
               </ResponsiveContainer>
             </Box>
