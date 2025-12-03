@@ -18,6 +18,7 @@ import {
 import type { FilterState } from '../filter-bar/filter-bar';
 import {
   generateRuleParticipationData,
+  generateTrendingData,
   RULE_IDS,
   RULE_COLORS,
   RULE_DESCRIPTIONS,
@@ -91,7 +92,7 @@ export default function TSYSUnifiedChart({
   availableRuleIds = [],
   onRuleIdsChange
 }: TSYSUnifiedChartProps) {
-  const [manualChartType, setManualChartType] = React.useState<'stacked-area' | 'heatmap' | null>(null);
+  const [manualChartType, setManualChartType] = React.useState<'stacked-area' | 'heatmap' | 'trending' | null>(null);
   const [topContributorsFilter, setTopContributorsFilter] = React.useState<TopContributorsFilter>('all');
   const [expandedOthers, setExpandedOthers] = React.useState(false);
   const [heatmapDensity, setHeatmapDensity] = React.useState<'compact' | 'normal' | 'spacious'>('normal');
@@ -200,6 +201,11 @@ export default function TSYSUnifiedChart({
       }
     }
   }, [topContributorsFilter, top5Rules, top10Rules, availableRuleIds, filteredRuleIds, onRuleIdsChange, selectedRuleIds]);
+
+  // Generate trending data
+  const trendingData = React.useMemo(() => {
+    return generateTrendingData(days);
+  }, [days]);
 
   // Determine chart type: auto-switch to heatmap if 12+ rules
   const effectiveChartType = React.useMemo(() => {
@@ -356,6 +362,7 @@ export default function TSYSUnifiedChart({
     items: [
       { label: 'Stacked Area', value: 'stacked-area' },
       { label: 'Heatmap', value: 'heatmap' },
+      { label: 'Trending', value: 'trending' },
     ],
   });
 
@@ -450,7 +457,7 @@ export default function TSYSUnifiedChart({
               </Text>
               <Select.Root
                 value={[effectiveChartType]}
-                onValueChange={(e) => setManualChartType(e.value[0] as 'stacked-area' | 'heatmap')}
+                onValueChange={(e) => setManualChartType(e.value[0] as 'stacked-area' | 'heatmap' | 'trending')}
                 collection={chartTypeCollection}
                 size="sm"
               >
@@ -598,7 +605,54 @@ export default function TSYSUnifiedChart({
 
         {/* Chart */}
         <Box width="100%">
-          {effectiveChartType === 'heatmap' ? (
+          {effectiveChartType === 'trending' ? (
+            <Box height="400px" width="100%">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={trendingData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" vertical={false} />
+                  <XAxis 
+                    dataKey="date" 
+                    tick={{ fontSize: 11, fill: '#6b7280' }}
+                    axisLine={{ stroke: '#e5e7eb' }}
+                    tickLine={{ stroke: '#e5e7eb' }}
+                  />
+                  <YAxis 
+                    domain={[0, 16000]}
+                    tick={{ fontSize: 11, fill: '#6b7280' }}
+                    axisLine={{ stroke: '#e5e7eb' }}
+                    tickLine={{ stroke: '#e5e7eb' }}
+                    label={{ value: 'Count', angle: -90, position: 'insideLeft', fontSize: 11, fill: '#6b7280' }}
+                  />
+                  <RechartsTooltip content={<CustomTooltip />} />
+                  <Legend 
+                    wrapperStyle={{ paddingTop: '20px' }}
+                    iconType="line"
+                    iconSize={12}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="authVolume"
+                    name="Daily authorization volumes"
+                    stroke="#3b82f6"
+                    strokeWidth={2}
+                    dot={{ fill: '#3b82f6', r: 3 }}
+                    activeDot={{ r: 5 }}
+                    animationDuration={300}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="autoHold"
+                    name="Auto hold counts"
+                    stroke="#ef4444"
+                    strokeWidth={2}
+                    dot={{ fill: '#ef4444', r: 3 }}
+                    activeDot={{ r: 5 }}
+                    animationDuration={300}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </Box>
+          ) : effectiveChartType === 'heatmap' ? (
             <Box width="100%">
               {/* Calculate visible rules count for dynamic sizing */}
               {(() => {

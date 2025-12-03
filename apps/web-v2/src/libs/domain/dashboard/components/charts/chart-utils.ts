@@ -233,6 +233,48 @@ export const generateRuleParticipationData = (
   return data;
 };
 
+// Generate trending data for auto hold counts and daily authorization volumes
+export const generateTrendingData = (
+  days: number = 14
+) => {
+  const data = [];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  // Base values with some variation
+  let authBase = 12000;
+  let autoHoldBase = 350;
+  
+  for (let i = days - 1; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
+    
+    // Authorization volumes: high values with fluctuations (10,000-15,500)
+    // Add some cyclical pattern (weekly)
+    const dayOfWeek = date.getDay();
+    const weeklyVariation = dayOfWeek === 0 || dayOfWeek === 6 ? -500 : 0; // Lower on weekends
+    const randomVariation = (Math.random() - 0.5) * 3000;
+    const authVolume = Math.max(10000, Math.min(15500, authBase + weeklyVariation + randomVariation));
+    authBase = authVolume * 0.9 + authBase * 0.1; // Smooth transition
+    
+    // Auto hold counts: consistently low, mirrors auth pattern but at smaller scale (200-600)
+    // Auto hold is roughly 3-4% of auth volume
+    const autoHoldRatio = 0.03 + (Math.random() * 0.01); // 3-4%
+    const autoHold = Math.max(200, Math.min(600, Math.floor(authVolume * autoHoldRatio)));
+    autoHoldBase = autoHold * 0.9 + autoHoldBase * 0.1; // Smooth transition
+    
+    data.push({
+      date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      dateValue: date.toISOString().split('T')[0],
+      dateObj: new Date(date),
+      authVolume,
+      autoHold,
+    });
+  }
+  
+  return data;
+};
+
 // Calculate percentage
 export const calculatePercentage = (value: number, total: number): number => {
   if (total === 0) return 0;
