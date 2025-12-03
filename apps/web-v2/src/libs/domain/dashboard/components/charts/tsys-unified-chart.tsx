@@ -335,6 +335,11 @@ export default function TSYSUnifiedChart({
         const visiblePayload = payload.filter((item: any) => trendingRules.includes(item.dataKey));
         const total = visiblePayload.reduce((sum: number, item: any) => sum + (item.value || 0), 0);
         
+        // Limit to 10 rules for display, with scroll if more
+        const maxVisibleRules = 10;
+        const rulesToShow = visiblePayload.slice(0, maxVisibleRules);
+        const hasMoreRules = visiblePayload.length > maxVisibleRules;
+        
         return (
           <Box
             bg="white"
@@ -344,62 +349,95 @@ export default function TSYSUnifiedChart({
             borderWidth="1px"
             borderColor="gray.200"
             minW="250px"
+            maxW="350px"
           >
             <Text fontSize="sm" fontWeight="bold" mb={2}>
               {label}
             </Text>
-            <VStack align="stretch" gap={1.5}>
-              {visiblePayload.map((item: any, index: number) => {
-                const ruleId = item.dataKey;
-                const percentage = calculatePercentage(item.value, total);
-                const isTop5 = top5Rules.includes(ruleId);
-                
-                return (
-                  <HStack key={index} justify="space-between" gap={4}>
-                    <HStack gap={2}>
-                      <Box
-                        w="12px"
-                        h="12px"
-                        borderRadius="sm"
-                        bg={item.color}
-                        borderWidth="1px"
-                        borderColor="gray.300"
-                      />
-                      <VStack align="start" gap={0}>
-                        <Text fontSize="xs" color="gray.700" fontWeight="semibold">
-                          {RULE_DESCRIPTIONS[ruleId] || ruleId}
+            {hasMoreRules && (
+              <Text fontSize="xs" color="gray.500" mb={2}>
+                Showing {maxVisibleRules} of {visiblePayload.length} rules
+              </Text>
+            )}
+            <Box
+              maxH="400px"
+              overflowY="auto"
+              overflowX="hidden"
+              css={{
+                '&::-webkit-scrollbar': {
+                  width: '6px',
+                },
+                '&::-webkit-scrollbar-track': {
+                  background: '#f1f1f1',
+                  borderRadius: '4px',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  background: '#888',
+                  borderRadius: '4px',
+                },
+                '&::-webkit-scrollbar-thumb:hover': {
+                  background: '#555',
+                },
+              }}
+            >
+              <VStack align="stretch" gap={1.5}>
+                {rulesToShow.map((item: any, index: number) => {
+                  const ruleId = item.dataKey;
+                  const percentage = calculatePercentage(item.value, total);
+                  const isTop5 = top5Rules.includes(ruleId);
+                  
+                  return (
+                    <HStack key={index} justify="space-between" gap={4}>
+                      <HStack gap={2}>
+                        <Box
+                          w="12px"
+                          h="12px"
+                          borderRadius="sm"
+                          bg={item.color}
+                          borderWidth="1px"
+                          borderColor="gray.300"
+                        />
+                        <VStack align="start" gap={0}>
+                          <Text fontSize="xs" color="gray.700" fontWeight="semibold">
+                            {RULE_DESCRIPTIONS[ruleId] || ruleId}
+                          </Text>
+                          <Text fontSize="xs" color="gray.500">
+                            {ruleId}
+                          </Text>
+                        </VStack>
+                      </HStack>
+                      <VStack align="end" gap={0}>
+                        <Text fontSize="xs" fontWeight="semibold">
+                          {item.value.toLocaleString()}
                         </Text>
                         <Text fontSize="xs" color="gray.500">
-                          {ruleId}
+                          {percentage}%
                         </Text>
                       </VStack>
                     </HStack>
-                    <VStack align="end" gap={0}>
-                      <Text fontSize="xs" fontWeight="semibold">
-                        {item.value.toLocaleString()}
-                      </Text>
-                      <Text fontSize="xs" color="gray.500">
-                        {percentage}%
-                      </Text>
-                    </VStack>
-                  </HStack>
-                );
-              })}
-              <Box pt={1} borderTopWidth="1px" borderColor="gray.200" mt={1}>
-                <HStack justify="space-between">
-                  <Text fontSize="xs" fontWeight="bold" color="gray.700">Total:</Text>
-                  <Text fontSize="xs" fontWeight="bold">{total.toLocaleString()}</Text>
-                </HStack>
-              </Box>
-            </VStack>
+                  );
+                })}
+              </VStack>
+            </Box>
+            <Box pt={1} borderTopWidth="1px" borderColor="gray.200" mt={1}>
+              <HStack justify="space-between">
+                <Text fontSize="xs" fontWeight="bold" color="gray.700">Total:</Text>
+                <Text fontSize="xs" fontWeight="bold">{total.toLocaleString()}</Text>
+              </HStack>
+            </Box>
           </Box>
         );
       }
       
-      // Regular tooltip for other chart types
+      // Regular tooltip for stacked area and other chart types
       const visiblePayload = payload.filter((item: any) => visibleRules.has(item.dataKey));
       const total = visiblePayload.reduce((sum: number, item: any) => sum + (item.value || 0), 0);
       const dataItem = payload[0]?.payload;
+      
+      // Limit to 10 rules for display, with scroll if more
+      const maxVisibleRules = 10;
+      const rulesToShow = visiblePayload.slice(0, maxVisibleRules);
+      const hasMoreRules = visiblePayload.length > maxVisibleRules;
       
       let tooltipHeader = label;
       if (dateGrouping === 'weekly' && dataItem?.dateRange) {
@@ -421,60 +459,88 @@ export default function TSYSUnifiedChart({
           borderWidth="1px"
           borderColor="gray.200"
           minW="250px"
+          maxW="350px"
         >
           <Text fontSize="sm" fontWeight="bold" mb={2}>
             {tooltipHeader}
           </Text>
-          <VStack align="stretch" gap={1.5}>
-            {visiblePayload.map((item: any, index: number) => {
-              const percentage = calculatePercentage(item.value, total);
-              const ruleId = item.dataKey;
-              const isTop5 = top5Rules.includes(ruleId);
-              const stages = RULE_STAGE_MAP[ruleId] || [];
-              
-              return (
-                <VStack key={index} align="stretch" gap={0.5}>
-                  <HStack justify="space-between" gap={4}>
-                    <HStack gap={2}>
-                      <Box
-                        w="12px"
-                        h="12px"
-                        borderRadius="sm"
-                        bg={item.color}
-                        borderWidth="1px"
-                        borderColor="gray.300"
-                      />
-                      <VStack align="start" gap={0}>
-                        <Text fontSize="xs" color="gray.700" fontWeight="semibold">
-                          {RULE_DESCRIPTIONS[ruleId] || ruleId}
+          {hasMoreRules && (
+            <Text fontSize="xs" color="gray.500" mb={2}>
+              Showing {maxVisibleRules} of {visiblePayload.length} rules
+            </Text>
+          )}
+          <Box
+            maxH="400px"
+            overflowY="auto"
+            overflowX="hidden"
+            css={{
+              '&::-webkit-scrollbar': {
+                width: '6px',
+              },
+              '&::-webkit-scrollbar-track': {
+                background: '#f1f1f1',
+                borderRadius: '4px',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                background: '#888',
+                borderRadius: '4px',
+              },
+              '&::-webkit-scrollbar-thumb:hover': {
+                background: '#555',
+              },
+            }}
+          >
+            <VStack align="stretch" gap={1.5}>
+              {rulesToShow.map((item: any, index: number) => {
+                const percentage = calculatePercentage(item.value, total);
+                const ruleId = item.dataKey;
+                const isTop5 = top5Rules.includes(ruleId);
+                const stages = RULE_STAGE_MAP[ruleId] || [];
+                
+                return (
+                  <VStack key={index} align="stretch" gap={0.5}>
+                    <HStack justify="space-between" gap={4}>
+                      <HStack gap={2}>
+                        <Box
+                          w="12px"
+                          h="12px"
+                          borderRadius="sm"
+                          bg={item.color}
+                          borderWidth="1px"
+                          borderColor="gray.300"
+                        />
+                        <VStack align="start" gap={0}>
+                          <Text fontSize="xs" color="gray.700" fontWeight="semibold">
+                            {RULE_DESCRIPTIONS[ruleId] || ruleId}
+                          </Text>
+                          <Text fontSize="xs" color="gray.500">
+                            {ruleId}
+                          </Text>
+                        </VStack>
+                      </HStack>
+                      <VStack align="end" gap={0}>
+                        <Text fontSize="xs" fontWeight="semibold">
+                          {item.value.toLocaleString()}
                         </Text>
                         <Text fontSize="xs" color="gray.500">
-                          {ruleId}
+                          {percentage}%
                         </Text>
                       </VStack>
                     </HStack>
-                    <VStack align="end" gap={0}>
-                      <Text fontSize="xs" fontWeight="semibold">
-                        {item.value.toLocaleString()}
-                      </Text>
-                      <Text fontSize="xs" color="gray.500">
-                        {percentage}%
-                      </Text>
-                    </VStack>
-                  </HStack>
-                  <Text fontSize="xs" color="gray.500">
-                    Payment Stage: {stages.join(', ') || 'N/A'}
-                  </Text>
-                </VStack>
-              );
-            })}
-            <Box pt={1} borderTopWidth="1px" borderColor="gray.200" mt={1}>
-              <HStack justify="space-between">
-                <Text fontSize="xs" fontWeight="bold" color="gray.700">Total:</Text>
-                <Text fontSize="xs" fontWeight="bold">{total.toLocaleString()}</Text>
-              </HStack>
-            </Box>
-          </VStack>
+                    <Text fontSize="xs" color="gray.500">
+                      Payment Stage: {stages.join(', ') || 'N/A'}
+                    </Text>
+                  </VStack>
+                );
+              })}
+            </VStack>
+          </Box>
+          <Box pt={1} borderTopWidth="1px" borderColor="gray.200" mt={1}>
+            <HStack justify="space-between">
+              <Text fontSize="xs" fontWeight="bold" color="gray.700">Total:</Text>
+              <Text fontSize="xs" fontWeight="bold">{total.toLocaleString()}</Text>
+            </HStack>
+          </Box>
         </Box>
       );
     }
@@ -644,7 +710,8 @@ export default function TSYSUnifiedChart({
                 </Portal>
               </Select.Root>
             </Box>
-            {effectiveChartType === 'heatmap' && (
+            {/* Density filter only shows when chart type is heatmap */}
+            {effectiveChartType === 'heatmap' ? (
               <Box minW="150px">
                 <Text fontSize="xs" fontWeight="semibold" color="gray.600" mb={1}>
                   Density
@@ -690,7 +757,7 @@ export default function TSYSUnifiedChart({
                   </Portal>
                 </Select.Root>
               </Box>
-            )}
+            ) : null}
             <Text fontSize="xs" color="gray.500">
               Last Updated: {new Date().toLocaleString('en-US', { 
                 month: 'short', 
