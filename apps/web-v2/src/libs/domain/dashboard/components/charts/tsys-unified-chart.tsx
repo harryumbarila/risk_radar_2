@@ -2,7 +2,7 @@
 import React from 'react';
 import { Box, VStack, Text, HStack, Tooltip, Portal, Select, createListCollection, Button, Drawer, Badge, Table, CloseButton, SimpleGrid } from '@chakra-ui/react';
 import { Info, X, TrendingUp, TrendingDown, Minus, FileText } from 'lucide-react';
-import BatchDrawer from '../../auto-hold/components/batch-drawer/batch-drawer';
+import BatchDrawer from '../../../auto-hold/components/batch-drawer/batch-drawer';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
 import {
   AreaChart,
