@@ -7,7 +7,7 @@ export interface RiskRule {
   id: string;
   name: string;
   type: 'Auto Hold' | 'Alert' | 'Monitoring';
-  source: 'TSYS' | 'Fluidpay' | 'Paya' | 'Internal';
+  source: 'TSYS DFT256 Capture' | 'TSYS ADF Auth' | 'TSYS TDDF Settle' | 'ACH Returns' | 'TSYS' | 'Fluidpay' | 'Paya' | 'Internal';
   severity: 'Critical' | 'Moderate' | 'Info';
   status: boolean;
   last_updated: string;
