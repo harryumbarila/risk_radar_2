@@ -711,7 +711,7 @@ export default function TSYSUnifiedChart({
               </Select.Root>
             </Box>
             {/* Density filter only shows when chart type is heatmap */}
-            {effectiveChartType === 'heatmap' ? (
+            {effectiveChartType === 'heatmap' && (
               <Box minW="150px">
                 <Text fontSize="xs" fontWeight="semibold" color="gray.600" mb={1}>
                   Density
@@ -757,7 +757,7 @@ export default function TSYSUnifiedChart({
                   </Portal>
                 </Select.Root>
               </Box>
-            ) : null}
+            )}
             <Text fontSize="xs" color="gray.500">
               Last Updated: {new Date().toLocaleString('en-US', { 
                 month: 'short', 
