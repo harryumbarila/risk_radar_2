@@ -93,7 +93,7 @@ export default function TSYSUnifiedChart({
   onRuleIdsChange
 }: TSYSUnifiedChartProps) {
   const [manualChartType, setManualChartType] = React.useState<'stacked-area' | 'heatmap' | 'trending' | null>(null);
-  const [topContributorsFilter, setTopContributorsFilter] = React.useState<TopContributorsFilter>('all');
+  const [topContributorsFilter, setTopContributorsFilter] = React.useState<TopContributorsFilter>('top5');
   const [expandedOthers, setExpandedOthers] = React.useState(false);
   const [heatmapDensity, setHeatmapDensity] = React.useState<'compact' | 'normal' | 'spacious'>('normal');
   
@@ -165,13 +165,27 @@ export default function TSYSUnifiedChart({
   }, [topContributorsFilter, top5Rules, top10Rules, filteredRuleIds]);
 
   // Track previous topContributorsFilter to only update when it actually changes
-  const prevTopContributorsFilterRef = React.useRef<TopContributorsFilter>(topContributorsFilter);
+  const prevTopContributorsFilterRef = React.useRef<TopContributorsFilter | null>(null);
+  const hasInitializedRef = React.useRef(false);
   
-  // Update main filter when Top Contributors changes (only when filter value changes, not when dependencies recalculate)
+  // Update main filter when Top Contributors changes
   React.useEffect(() => {
-    // Only update if topContributorsFilter actually changed (user interaction)
-    if (prevTopContributorsFilterRef.current === topContributorsFilter) {
+    // Wait for top5Rules to be calculated before initializing
+    if (topContributorsFilter === 'top5' && top5Rules.length === 0) {
       return;
+    }
+    if (topContributorsFilter === 'top10' && top10Rules.length === 0) {
+      return;
+    }
+    
+    // Skip if filter hasn't changed (after initial mount)
+    if (hasInitializedRef.current && prevTopContributorsFilterRef.current === topContributorsFilter) {
+      return;
+    }
+    
+    // Mark as initialized after first successful run
+    if (!hasInitializedRef.current) {
+      hasInitializedRef.current = true;
     }
     
     prevTopContributorsFilterRef.current = topContributorsFilter;
@@ -209,17 +223,18 @@ export default function TSYSUnifiedChart({
     return 'stacked-area';
   }, [manualChartType, contributorFilteredRules.length]);
 
-  // For trending chart, use top 5 rules by default
+  // For trending chart, respect Top Contributors filter
   const trendingRules = React.useMemo(() => {
     if (effectiveChartType === 'trending') {
-      // Default to top 5 rules for trending chart
-      if (topContributorsFilter === 'all' && contributorFilteredRules.length > 5) {
-        return top5Rules;
+      // Use contributorFilteredRules which already respects Top Contributors filter
+      // But limit to top 5 for trending chart if more than 5 rules
+      if (contributorFilteredRules.length > 5) {
+        return contributorFilteredRules.slice(0, 5);
       }
-      return contributorFilteredRules.slice(0, 5); // Limit to top 5
+      return contributorFilteredRules;
     }
     return [];
-  }, [effectiveChartType, topContributorsFilter, contributorFilteredRules, top5Rules]);
+  }, [effectiveChartType, contributorFilteredRules]);
 
   // Generate trending data based on filtered rules and data
   const trendingData = React.useMemo(() => {
