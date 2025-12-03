@@ -102,7 +102,8 @@ export default function TSYSUnifiedChart({
   const smoothingWindow = React.useMemo(() => getSmoothingWindow(days), [days]);
   
   // Use rules from FilterBar (selectedRuleIds), filtered by Rule Stage Participation
-  const filteredRuleIds = React.useMemo(() => {
+  // This is the base set of rules to work with
+  const baseRuleIds = React.useMemo(() => {
     // Start with rules selected in FilterBar
     let rules = selectedRuleIds.length > 0 ? selectedRuleIds : RULE_IDS;
     
@@ -128,6 +129,9 @@ export default function TSYSUnifiedChart({
     return rules;
   }, [selectedRuleIds, ruleStageParticipation]);
 
+  // Use baseRuleIds for calculations (this ensures we always have the full set)
+  const filteredRuleIds = baseRuleIds;
+
   const rawData = React.useMemo(() => {
     const baseCount = PAYMENT_STAGE_BASE_COUNTS[paymentStage];
     return generateRuleParticipationData(days, baseCount, dateGrouping);
@@ -143,26 +147,28 @@ export default function TSYSUnifiedChart({
     return processedData;
   }, [rawData, smoothingWindow]);
 
-  // Calculate top rules
+  // Calculate top rules based on baseRuleIds (always use full set for ranking)
   const top5Rules = React.useMemo(() => {
-    return getTopRules(data, filteredRuleIds, 5);
-  }, [data, filteredRuleIds]);
+    return getTopRules(data, baseRuleIds, 5);
+  }, [data, baseRuleIds]);
 
   const top10Rules = React.useMemo(() => {
-    return getTopRules(data, filteredRuleIds, 10);
-  }, [data, filteredRuleIds]);
+    return getTopRules(data, baseRuleIds, 10);
+  }, [data, baseRuleIds]);
 
-  // Apply Top Contributors filter
+  // Apply Top Contributors filter - this determines which rules to show in charts
   const contributorFilteredRules = React.useMemo(() => {
     switch (topContributorsFilter) {
       case 'top5':
         return top5Rules;
       case 'top10':
         return top10Rules;
+      case 'all':
+        return baseRuleIds; // Use baseRuleIds instead of filteredRuleIds
       default:
-        return filteredRuleIds;
+        return baseRuleIds;
     }
-  }, [topContributorsFilter, top5Rules, top10Rules, filteredRuleIds]);
+  }, [topContributorsFilter, top5Rules, top10Rules, baseRuleIds]);
 
   // Track previous topContributorsFilter to only update when it actually changes
   const prevTopContributorsFilterRef = React.useRef<TopContributorsFilter | null>(null);
@@ -200,7 +206,7 @@ export default function TSYSUnifiedChart({
           rulesToSelect = top10Rules;
           break;
         case 'all':
-          rulesToSelect = availableRuleIds.length > 0 ? availableRuleIds : filteredRuleIds;
+          rulesToSelect = availableRuleIds.length > 0 ? availableRuleIds : baseRuleIds;
           break;
       }
       
@@ -214,7 +220,7 @@ export default function TSYSUnifiedChart({
         onRuleIdsChange(rulesToSelect);
       }
     }
-  }, [topContributorsFilter, top5Rules, top10Rules, availableRuleIds, filteredRuleIds, onRuleIdsChange, selectedRuleIds]);
+  }, [topContributorsFilter, top5Rules, top10Rules, availableRuleIds, baseRuleIds, onRuleIdsChange, selectedRuleIds]);
 
   // Determine chart type: auto-switch to heatmap if 12+ rules
   const effectiveChartType = React.useMemo(() => {
