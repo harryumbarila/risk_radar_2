@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
-import { Box, VStack, Text, HStack, Tooltip, Portal, Select, createListCollection, Button } from '@chakra-ui/react';
-import { Info, X } from 'lucide-react';
+import { Box, VStack, Text, HStack, Tooltip, Portal, Select, createListCollection, Button, Drawer, Badge, Table, CloseButton } from '@chakra-ui/react';
+import { Info, X, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import {
   AreaChart,
   Area,
@@ -84,6 +84,16 @@ const HEATMAP_COLORS = [
   '#0369a1', // Very dark blue
 ];
 
+interface SelectedCell {
+  ruleId: string;
+  date: string;
+  dateIndex: number;
+  value: number;
+  percentage: number;
+  maxValue: number;
+  bgColor: string;
+}
+
 export default function TSYSUnifiedChart({ 
   dateRange, 
   paymentStage = 'Authorization',
@@ -95,6 +105,8 @@ export default function TSYSUnifiedChart({
   const [manualChartType, setManualChartType] = React.useState<'stacked-area' | 'heatmap' | 'trending' | null>(null);
   const [topContributorsFilter, setTopContributorsFilter] = React.useState<TopContributorsFilter>('top5');
   const [expandedOthers, setExpandedOthers] = React.useState(false);
+  const [selectedCell, setSelectedCell] = React.useState<SelectedCell | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
   
   const days = React.useMemo(() => dateRange ? getDaysFromDateRange(dateRange) : 14, [dateRange]);
   const dateGrouping = React.useMemo(() => getDateGrouping(days), [days]);
@@ -975,6 +987,20 @@ export default function TSYSUnifiedChart({
                                     const total = item.total || 1;
                                     const percentage = calculatePercentage(value, total);
                                     const bgColor = getHeatmapColor(value, maxValue);
+                                    const isSelected = selectedCell?.ruleId === ruleId && selectedCell?.dateIndex === dateIndex;
+                                    
+                                    const handleCellClick = () => {
+                                      setSelectedCell({
+                                        ruleId,
+                                        date: item.date,
+                                        dateIndex,
+                                        value,
+                                        percentage,
+                                        maxValue,
+                                        bgColor,
+                                      });
+                                      setIsDrawerOpen(true);
+                                    };
                                     
                                     return (
                                       <Tooltip.Root key={dateIndex}>
@@ -984,12 +1010,14 @@ export default function TSYSUnifiedChart({
                                             minW="0"
                                             h={`${cellHeight}px`}
                                             bg={bgColor}
-                                            borderWidth="1px"
-                                            borderColor="gray.200"
+                                            borderWidth={isSelected ? "3px" : "1px"}
+                                            borderColor={isSelected ? "blue.500" : "gray.200"}
                                             borderRadius="sm"
                                             cursor="pointer"
-                                            _hover={{ borderColor: 'gray.400', borderWidth: '2px' }}
-                                            transition="all 0.2s"
+                                            _hover={{ borderColor: isSelected ? 'blue.600' : 'gray.400', borderWidth: isSelected ? '3px' : '2px' }}
+                                            transition="all 0.18s ease-in-out"
+                                            onClick={handleCellClick}
+                                            boxShadow={isSelected ? "0 0 0 2px rgba(59, 130, 246, 0.2)" : "none"}
                                           />
                                         </Tooltip.Trigger>
                                         <Portal>
@@ -1011,6 +1039,7 @@ export default function TSYSUnifiedChart({
                                                 <Text fontSize="xs">Count: {value.toLocaleString()}</Text>
                                                 <Text fontSize="xs">Share: {percentage}%</Text>
                                                 <Text fontSize="xs">Payment Stage: {stages.join(', ') || 'N/A'}</Text>
+                                                <Text fontSize="xs" color="gray.400" mt={1}>Click for details</Text>
                                               </VStack>
                                             </Tooltip.Content>
                                           </Tooltip.Positioner>
@@ -1141,6 +1170,321 @@ export default function TSYSUnifiedChart({
           </Box>
         )}
       </VStack>
+
+      {/* Heatmap Cell Detail Drawer */}
+      {effectiveChartType === 'heatmap' && (
+        <HeatmapCellDrawer
+          isOpen={isDrawerOpen}
+          onClose={() => {
+            setIsDrawerOpen(false);
+            // Keep selectedCell for highlight, clear after animation
+            setTimeout(() => setSelectedCell(null), 180);
+          }}
+          selectedCell={selectedCell}
+          paymentStage={paymentStage}
+        />
+      )}
     </Box>
+  );
+}
+
+// Mock transaction data generator
+function generateMockTransactions(count: number): Array<{
+  id: string;
+  amount: string;
+  processor: string;
+  mid: string;
+  exception: string;
+  status: 'Auth' | 'Capture' | 'Settle' | 'Return';
+}> {
+  const processors = ['TSYS', 'FSP'];
+  const exceptions = ['High Amount', 'Rapid Volume', 'Unusual Pattern', 'Foreign Card', 'None'];
+  const statuses: Array<'Auth' | 'Capture' | 'Settle' | 'Return'> = ['Auth', 'Capture', 'Settle', 'Return'];
+  
+  return Array.from({ length: count }, (_, i) => ({
+    id: `TXN-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
+    amount: `$${(Math.random() * 10000 + 100).toFixed(2)}`,
+    processor: processors[Math.floor(Math.random() * processors.length)],
+    mid: `MID-${Math.floor(Math.random() * 10000)}`,
+    exception: exceptions[Math.floor(Math.random() * exceptions.length)],
+    status: statuses[Math.floor(Math.random() * statuses.length)],
+  }));
+}
+
+// Heatmap Cell Detail Drawer Component
+interface HeatmapCellDrawerProps {
+  isOpen: boolean;
+  onClose: () => void;
+  selectedCell: SelectedCell | null;
+  paymentStage: PaymentStage;
+}
+
+function HeatmapCellDrawer({ isOpen, onClose, selectedCell, paymentStage }: HeatmapCellDrawerProps) {
+  const [transactions] = React.useState(() => 
+    selectedCell && selectedCell.value > 0 
+      ? generateMockTransactions(Math.min(5, Math.max(1, Math.floor(selectedCell.value / 100)))) 
+      : []
+  );
+
+  // Calculate trend vs previous day (mock)
+  const previousDayValue = selectedCell ? Math.floor(selectedCell.value * (0.7 + Math.random() * 0.6)) : 0;
+  const trend = selectedCell 
+    ? selectedCell.value > previousDayValue 
+      ? 'up' 
+      : selectedCell.value < previousDayValue 
+        ? 'down' 
+        : 'neutral'
+    : 'neutral';
+  const trendPercentage = selectedCell && previousDayValue > 0
+    ? Math.abs(((selectedCell.value - previousDayValue) / previousDayValue) * 100).toFixed(1)
+    : '0';
+
+  // Handle ESC key
+  React.useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [isOpen, onClose]);
+
+  if (!selectedCell) return null;
+
+  const stages = RULE_STAGE_MAP[selectedCell.ruleId] || [];
+  const hasTransactions = transactions.length > 0;
+
+  return (
+    <Drawer.Root open={isOpen} onOpenChange={(e) => !e.open && onClose()} placement="end" size="md">
+      <Portal>
+        <Drawer.Backdrop bg="blackAlpha.600" backdropFilter="blur(4px)" />
+        <Drawer.Positioner>
+          <Drawer.Content
+            width={{ base: 'full', md: '500px', lg: '600px' }}
+            height="full"
+            display="flex"
+            flexDirection="column"
+            bg="white"
+            boxShadow="xl"
+            borderRadius="none"
+            transition="transform 0.18s ease-in-out"
+          >
+            {/* Header */}
+            <Drawer.Header
+              position="sticky"
+              top={0}
+              zIndex={10}
+              bg="white"
+              borderBottomWidth="1px"
+              borderBottomColor="gray.200"
+              pb={4}
+            >
+              <HStack justify="space-between" align="start" mb={2}>
+                <VStack align="start" gap={1} flex={1}>
+                  <Text fontSize="lg" fontWeight="bold" color="gray.900">
+                    {selectedCell.date}
+                  </Text>
+                  <HStack gap={2} align="center">
+                    <Text fontSize="md" fontWeight="semibold" color="gray.700">
+                      {RULE_DESCRIPTIONS[selectedCell.ruleId] || selectedCell.ruleId}
+                    </Text>
+                    <Badge colorPalette="blue" variant="subtle" fontSize="xs">
+                      {selectedCell.ruleId}
+                    </Badge>
+                  </HStack>
+                  <Text fontSize="sm" color="gray.600">
+                    Payment Stage: {stages.join(', ') || paymentStage}
+                  </Text>
+                  <Text fontSize="xs" color="gray.500" mt={1}>
+                    Transactions contributing to this cell
+                  </Text>
+                </VStack>
+                <CloseButton onClick={onClose} aria-label="Close drawer" />
+              </HStack>
+            </Drawer.Header>
+
+            {/* Body */}
+            <Drawer.Body overflowY="auto" flex={1} p={6}>
+              <VStack align="stretch" gap={6}>
+                {/* Summary Card */}
+                <Box
+                  p={4}
+                  bg="gray.50"
+                  borderRadius="lg"
+                  borderWidth="1px"
+                  borderColor="gray.200"
+                >
+                  <VStack align="stretch" gap={3}>
+                    <HStack justify="space-between" align="center">
+                      <Text fontSize="sm" fontWeight="semibold" color="gray.700">
+                        Total Count
+                      </Text>
+                      <Text fontSize="lg" fontWeight="bold" color="gray.900">
+                        {selectedCell.value.toLocaleString()}
+                      </Text>
+                    </HStack>
+                    <HStack justify="space-between" align="center">
+                      <Text fontSize="sm" fontWeight="semibold" color="gray.700">
+                        Share
+                      </Text>
+                      <Text fontSize="lg" fontWeight="bold" color="gray.900">
+                        {selectedCell.percentage.toFixed(1)}%
+                      </Text>
+                    </HStack>
+                    <HStack justify="space-between" align="center">
+                      <Text fontSize="sm" fontWeight="semibold" color="gray.700">
+                        Trend vs Previous Day
+                      </Text>
+                      <HStack gap={2} align="center">
+                        {trend === 'up' && <TrendingUp size={16} color="#10b981" />}
+                        {trend === 'down' && <TrendingDown size={16} color="#ef4444" />}
+                        {trend === 'neutral' && <Minus size={16} color="#6b7280" />}
+                        <Text 
+                          fontSize="sm" 
+                          fontWeight="semibold" 
+                          color={trend === 'up' ? 'green.600' : trend === 'down' ? 'red.600' : 'gray.600'}
+                        >
+                          {trend === 'up' ? '+' : trend === 'down' ? '-' : ''}{trendPercentage}%
+                        </Text>
+                      </HStack>
+                    </HStack>
+                    <HStack justify="space-between" align="center">
+                      <Text fontSize="sm" fontWeight="semibold" color="gray.700">
+                        Intensity
+                      </Text>
+                      <HStack gap={2} align="center">
+                        <Box
+                          w="40px"
+                          h="20px"
+                          bg={selectedCell.bgColor}
+                          borderWidth="1px"
+                          borderColor="gray.300"
+                          borderRadius="sm"
+                        />
+                        <Text fontSize="xs" color="gray.600">
+                          {((selectedCell.value / selectedCell.maxValue) * 100).toFixed(0)}% of max
+                        </Text>
+                      </HStack>
+                    </HStack>
+                  </VStack>
+                </Box>
+
+                {/* Transactions Preview Table */}
+                {hasTransactions ? (
+                  <>
+                    <VStack align="stretch" gap={3}>
+                      <HStack justify="space-between" align="center">
+                        <Text fontSize="md" fontWeight="semibold" color="gray.900">
+                          Recent Transactions
+                        </Text>
+                        <Text fontSize="xs" color="gray.500">
+                          Showing {transactions.length} of {selectedCell.value.toLocaleString()}
+                        </Text>
+                      </HStack>
+                      <Box
+                        borderWidth="1px"
+                        borderColor="gray.200"
+                        borderRadius="md"
+                        overflow="hidden"
+                      >
+                        <Table.Root size="sm" variant="plain">
+                          <Table.Header>
+                            <Table.Row>
+                              <Table.ColumnHeader>ID</Table.ColumnHeader>
+                              <Table.ColumnHeader>Amount</Table.ColumnHeader>
+                              <Table.ColumnHeader>Processor</Table.ColumnHeader>
+                              <Table.ColumnHeader>MID</Table.ColumnHeader>
+                              <Table.ColumnHeader>Exception</Table.ColumnHeader>
+                              <Table.ColumnHeader>Status</Table.ColumnHeader>
+                            </Table.Row>
+                          </Table.Header>
+                          <Table.Body>
+                            {transactions.map((tx) => (
+                              <Table.Row key={tx.id}>
+                                <Table.Cell>
+                                  <Text fontSize="xs" fontFamily="mono" color="gray.700">
+                                    {tx.id}
+                                  </Text>
+                                </Table.Cell>
+                                <Table.Cell>
+                                  <Text fontSize="xs" fontWeight="medium" color="gray.900">
+                                    {tx.amount}
+                                  </Text>
+                                </Table.Cell>
+                                <Table.Cell>
+                                  <Badge colorPalette="blue" variant="subtle" fontSize="xs">
+                                    {tx.processor}
+                                  </Badge>
+                                </Table.Cell>
+                                <Table.Cell>
+                                  <Text fontSize="xs" color="gray.600">
+                                    {tx.mid}
+                                  </Text>
+                                </Table.Cell>
+                                <Table.Cell>
+                                  {tx.exception !== 'None' ? (
+                                    <Badge colorPalette="orange" variant="subtle" fontSize="xs">
+                                      {tx.exception}
+                                    </Badge>
+                                  ) : (
+                                    <Text fontSize="xs" color="gray.400">
+                                      —
+                                    </Text>
+                                  )}
+                                </Table.Cell>
+                                <Table.Cell>
+                                  <Badge
+                                    colorPalette={
+                                      tx.status === 'Auth' ? 'blue' :
+                                      tx.status === 'Capture' ? 'green' :
+                                      tx.status === 'Settle' ? 'purple' : 'red'
+                                    }
+                                    variant="subtle"
+                                    fontSize="xs"
+                                  >
+                                    {tx.status}
+                                  </Badge>
+                                </Table.Cell>
+                              </Table.Row>
+                            ))}
+                          </Table.Body>
+                        </Table.Root>
+                      </Box>
+                    </VStack>
+                    <Button
+                      variant="outline"
+                      colorScheme="blue"
+                      width="full"
+                      size="sm"
+                    >
+                      View all transactions ({selectedCell.value.toLocaleString()})
+                    </Button>
+                  </>
+                ) : (
+                  <Box
+                    p={8}
+                    bg="gray.50"
+                    borderRadius="lg"
+                    borderWidth="1px"
+                    borderColor="gray.200"
+                    textAlign="center"
+                  >
+                    <VStack gap={2}>
+                      <Text fontSize="sm" color="gray.500" fontWeight="medium">
+                        No transactions found
+                      </Text>
+                      <Text fontSize="xs" color="gray.400">
+                        This cell has no transaction data for the selected date and rule.
+                      </Text>
+                    </VStack>
+                  </Box>
+                )}
+              </VStack>
+            </Drawer.Body>
+          </Drawer.Content>
+        </Drawer.Positioner>
+      </Portal>
+    </Drawer.Root>
   );
 }
