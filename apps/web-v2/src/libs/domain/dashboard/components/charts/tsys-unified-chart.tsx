@@ -334,10 +334,8 @@ export default function TSYSUnifiedChart({
         const visiblePayload = payload.filter((item: any) => trendingRules.includes(item.dataKey));
         const total = visiblePayload.reduce((sum: number, item: any) => sum + (item.value || 0), 0);
         
-        // Limit to 10 rules for display, with scroll if more
-        const maxVisibleRules = 10;
-        const rulesToShow = visiblePayload.slice(0, maxVisibleRules);
-        const hasMoreRules = visiblePayload.length > maxVisibleRules;
+        // Show all rules, with scroll if more than 10
+        const hasMoreRules = visiblePayload.length > 10;
         
         return (
           <Box
@@ -349,74 +347,90 @@ export default function TSYSUnifiedChart({
             borderColor="gray.200"
             minW="250px"
             maxW="350px"
+            onMouseDown={(e) => e.stopPropagation()}
+            onWheel={(e) => e.stopPropagation()}
           >
             <Text fontSize="sm" fontWeight="bold" mb={2}>
               {label}
             </Text>
             {hasMoreRules && (
               <Text fontSize="xs" color="gray.500" mb={2}>
-                Showing {maxVisibleRules} of {visiblePayload.length} rules
+                Showing {visiblePayload.length} rules (scroll to see all)
               </Text>
             )}
             <Box
               maxH="400px"
               overflowY="auto"
               overflowX="hidden"
-              css={{
-                '&::-webkit-scrollbar': {
-                  width: '6px',
-                },
-                '&::-webkit-scrollbar-track': {
-                  background: '#f1f1f1',
-                  borderRadius: '4px',
-                },
-                '&::-webkit-scrollbar-thumb': {
-                  background: '#888',
-                  borderRadius: '4px',
-                },
-                '&::-webkit-scrollbar-thumb:hover': {
-                  background: '#555',
-                },
+              style={{
+                scrollbarWidth: 'thin',
+                scrollbarColor: '#888 #f1f1f1',
               }}
             >
-              <VStack align="stretch" gap={1.5}>
-                {rulesToShow.map((item: any, index: number) => {
-                  const ruleId = item.dataKey;
-                  const percentage = calculatePercentage(item.value, total);
-                  const isTop5 = top5Rules.includes(ruleId);
-                  
-                  return (
-                    <HStack key={index} justify="space-between" gap={4}>
-                      <HStack gap={2}>
-                        <Box
-                          w="12px"
-                          h="12px"
-                          borderRadius="sm"
-                          bg={item.color}
-                          borderWidth="1px"
-                          borderColor="gray.300"
-                        />
-                        <VStack align="start" gap={0}>
-                          <Text fontSize="xs" color="gray.700" fontWeight="semibold">
-                            {RULE_DESCRIPTIONS[ruleId] || ruleId}
-                          </Text>
-                          <Text fontSize="xs" color="gray.500">
-                            {ruleId}
-                          </Text>
-                        </VStack>
-                      </HStack>
-                      <VStack align="end" gap={0}>
-                        <Text fontSize="xs" fontWeight="semibold">
-                          {item.value.toLocaleString()}
-                        </Text>
+              <style>
+                {`
+                  .tooltip-scroll::-webkit-scrollbar {
+                    width: 6px;
+                  }
+                  .tooltip-scroll::-webkit-scrollbar-track {
+                    background: #f1f1f1;
+                    border-radius: 4px;
+                  }
+                  .tooltip-scroll::-webkit-scrollbar-thumb {
+                    background: #888;
+                    border-radius: 4px;
+                  }
+                  .tooltip-scroll::-webkit-scrollbar-thumb:hover {
+                    background: #555;
+                  }
+                `}
+              </style>
+              <Box className="tooltip-scroll">
+                <VStack align="stretch" gap={1.5}>
+                  {visiblePayload.map((item: any, index: number) => {
+                    const ruleId = item.dataKey;
+                    const percentage = calculatePercentage(item.value, total);
+                    const isTop5 = top5Rules.includes(ruleId);
+                    const stages = RULE_STAGE_MAP[ruleId] || [];
+                    
+                    return (
+                      <VStack key={index} align="stretch" gap={0.5}>
+                        <HStack justify="space-between" gap={4}>
+                          <HStack gap={2}>
+                            <Box
+                              w="12px"
+                              h="12px"
+                              borderRadius="sm"
+                              bg={item.color}
+                              borderWidth="1px"
+                              borderColor="gray.300"
+                            />
+                            <VStack align="start" gap={0}>
+                              <Text fontSize="xs" color="gray.700" fontWeight="semibold">
+                                {RULE_DESCRIPTIONS[ruleId] || ruleId}
+                              </Text>
+                              <Text fontSize="xs" color="gray.500">
+                                {ruleId}
+                              </Text>
+                            </VStack>
+                          </HStack>
+                          <VStack align="end" gap={0}>
+                            <Text fontSize="xs" fontWeight="semibold">
+                              {item.value.toLocaleString()}
+                            </Text>
+                            <Text fontSize="xs" color="gray.500">
+                              {percentage}%
+                            </Text>
+                          </VStack>
+                        </HStack>
                         <Text fontSize="xs" color="gray.500">
-                          {percentage}%
+                          Payment Stage: {stages.join(', ') || 'N/A'}
                         </Text>
                       </VStack>
-                    </HStack>
-                  );
-                })}
-              </VStack>
+                    );
+                  })}
+                </VStack>
+              </Box>
             </Box>
             <Box pt={1} borderTopWidth="1px" borderColor="gray.200" mt={1}>
               <HStack justify="space-between">
@@ -433,10 +447,8 @@ export default function TSYSUnifiedChart({
       const total = visiblePayload.reduce((sum: number, item: any) => sum + (item.value || 0), 0);
       const dataItem = payload[0]?.payload;
       
-      // Limit to 10 rules for display, with scroll if more
-      const maxVisibleRules = 10;
-      const rulesToShow = visiblePayload.slice(0, maxVisibleRules);
-      const hasMoreRules = visiblePayload.length > maxVisibleRules;
+      // Show all rules, with scroll if more than 10
+      const hasMoreRules = visiblePayload.length > 10;
       
       let tooltipHeader = label;
       if (dateGrouping === 'weekly' && dataItem?.dateRange) {
@@ -459,80 +471,90 @@ export default function TSYSUnifiedChart({
           borderColor="gray.200"
           minW="250px"
           maxW="350px"
+          onMouseDown={(e) => e.stopPropagation()}
+          onWheel={(e) => e.stopPropagation()}
         >
           <Text fontSize="sm" fontWeight="bold" mb={2}>
             {tooltipHeader}
           </Text>
           {hasMoreRules && (
             <Text fontSize="xs" color="gray.500" mb={2}>
-              Showing {maxVisibleRules} of {visiblePayload.length} rules
+              Showing {visiblePayload.length} rules (scroll to see all)
             </Text>
           )}
           <Box
             maxH="400px"
             overflowY="auto"
             overflowX="hidden"
-            css={{
-              '&::-webkit-scrollbar': {
-                width: '6px',
-              },
-              '&::-webkit-scrollbar-track': {
-                background: '#f1f1f1',
-                borderRadius: '4px',
-              },
-              '&::-webkit-scrollbar-thumb': {
-                background: '#888',
-                borderRadius: '4px',
-              },
-              '&::-webkit-scrollbar-thumb:hover': {
-                background: '#555',
-              },
+            style={{
+              scrollbarWidth: 'thin',
+              scrollbarColor: '#888 #f1f1f1',
             }}
           >
-            <VStack align="stretch" gap={1.5}>
-              {rulesToShow.map((item: any, index: number) => {
-                const percentage = calculatePercentage(item.value, total);
-                const ruleId = item.dataKey;
-                const isTop5 = top5Rules.includes(ruleId);
-                const stages = RULE_STAGE_MAP[ruleId] || [];
-                
-                return (
-                  <VStack key={index} align="stretch" gap={0.5}>
-                    <HStack justify="space-between" gap={4}>
-                      <HStack gap={2}>
-                        <Box
-                          w="12px"
-                          h="12px"
-                          borderRadius="sm"
-                          bg={item.color}
-                          borderWidth="1px"
-                          borderColor="gray.300"
-                        />
-                        <VStack align="start" gap={0}>
-                          <Text fontSize="xs" color="gray.700" fontWeight="semibold">
-                            {RULE_DESCRIPTIONS[ruleId] || ruleId}
+            <style>
+              {`
+                .tooltip-scroll::-webkit-scrollbar {
+                  width: 6px;
+                }
+                .tooltip-scroll::-webkit-scrollbar-track {
+                  background: #f1f1f1;
+                  border-radius: 4px;
+                }
+                .tooltip-scroll::-webkit-scrollbar-thumb {
+                  background: #888;
+                  border-radius: 4px;
+                }
+                .tooltip-scroll::-webkit-scrollbar-thumb:hover {
+                  background: #555;
+                }
+              `}
+            </style>
+            <Box className="tooltip-scroll">
+              <VStack align="stretch" gap={1.5}>
+                {visiblePayload.map((item: any, index: number) => {
+                  const percentage = calculatePercentage(item.value, total);
+                  const ruleId = item.dataKey;
+                  const isTop5 = top5Rules.includes(ruleId);
+                  const stages = RULE_STAGE_MAP[ruleId] || [];
+                  
+                  return (
+                    <VStack key={index} align="stretch" gap={0.5}>
+                      <HStack justify="space-between" gap={4}>
+                        <HStack gap={2}>
+                          <Box
+                            w="12px"
+                            h="12px"
+                            borderRadius="sm"
+                            bg={item.color}
+                            borderWidth="1px"
+                            borderColor="gray.300"
+                          />
+                          <VStack align="start" gap={0}>
+                            <Text fontSize="xs" color="gray.700" fontWeight="semibold">
+                              {RULE_DESCRIPTIONS[ruleId] || ruleId}
+                            </Text>
+                            <Text fontSize="xs" color="gray.500">
+                              {ruleId}
+                            </Text>
+                          </VStack>
+                        </HStack>
+                        <VStack align="end" gap={0}>
+                          <Text fontSize="xs" fontWeight="semibold">
+                            {item.value.toLocaleString()}
                           </Text>
                           <Text fontSize="xs" color="gray.500">
-                            {ruleId}
+                            {percentage}%
                           </Text>
                         </VStack>
                       </HStack>
-                      <VStack align="end" gap={0}>
-                        <Text fontSize="xs" fontWeight="semibold">
-                          {item.value.toLocaleString()}
-                        </Text>
-                        <Text fontSize="xs" color="gray.500">
-                          {percentage}%
-                        </Text>
-                      </VStack>
-                    </HStack>
-                    <Text fontSize="xs" color="gray.500">
-                      Payment Stage: {stages.join(', ') || 'N/A'}
-                    </Text>
-                  </VStack>
-                );
-              })}
-            </VStack>
+                      <Text fontSize="xs" color="gray.500">
+                        Payment Stage: {stages.join(', ') || 'N/A'}
+                      </Text>
+                    </VStack>
+                  );
+                })}
+              </VStack>
+            </Box>
           </Box>
           <Box pt={1} borderTopWidth="1px" borderColor="gray.200" mt={1}>
             <HStack justify="space-between">
