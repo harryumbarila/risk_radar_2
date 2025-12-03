@@ -18,31 +18,25 @@ import MerchantRanking from '../charts/merchant-ranking';
 import RuleLabel from '../rule-label/rule-label';
 import TSYSUnifiedChart from '../charts/tsys-unified-chart';
 import { generateMockAlerts, calculateKpis, type MockAlert, type Source } from '../../utils/mockData';
+import { RULE_DEFINITIONS } from '../../utils/ruleNames';
 
 export default function Home() {
   const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(true);
   const [allAlerts, setAllAlerts] = React.useState<MockAlert[]>([]);
-  // Generate 40+ mock rules for filter
+  // Use only the 30 defined rules (AH001-AH030)
   const availableRules = React.useMemo(() => {
-    // Generate 45 rule IDs: AH001 to AH045
-    return Array.from({ length: 45 }, (_, i) => {
-      const num = i + 1;
-      return `AH${num.toString().padStart(3, '0')}`;
-    });
+    return Object.keys(RULE_DEFINITIONS).sort();
   }, []);
 
   const [filters, setFilters] = React.useState<FilterState>(() => {
-    // Initialize with all rules selected
-    const allRuleIds = Array.from({ length: 45 }, (_, i) => {
-      const num = i + 1;
-      return `AH${num.toString().padStart(3, '0')}`;
-    });
+    // Initialize with all 30 defined rules selected
+    const allRuleIds = Object.keys(RULE_DEFINITIONS).sort();
     return {
       dateRange: '7',
       processor: 'all',
       source: 'all',
-      ruleId: allRuleIds, // All rules selected by default
+      ruleId: allRuleIds, // All 30 rules selected by default
     };
   });
 

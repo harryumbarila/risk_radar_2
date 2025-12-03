@@ -63,27 +63,7 @@ const RULE_STAGE_MAP: Record<string, PaymentStage[]> = Object.fromEntries(
   ])
 );
 
-// Generate mappings for remaining rules (AH031-AH045) - placeholder stages
-Object.assign(
-  RULE_STAGE_MAP,
-  Object.fromEntries(
-    Array.from({ length: 15 }, (_, i) => {
-      const num = i + 31;
-      const ruleId = `AH${num.toString().padStart(3, '0')}`;
-      const stages = [
-        ['Authorization'],
-        ['Capture'],
-        ['Settlement'],
-        ['ACH Returns'],
-        ['Authorization', 'Capture'],
-        ['Authorization', 'Settlement'],
-        ['Capture', 'Settlement'],
-        ['Authorization', 'Capture', 'Settlement'],
-      ];
-      return [ruleId, stages[i % stages.length]];
-    })
-  )
-);
+// Only 30 rules are defined (AH001-AH030), no additional mappings needed
 
 const PAYMENT_STAGE_BASE_COUNTS: Record<PaymentStage, number> = {
   'Authorization': 1200,

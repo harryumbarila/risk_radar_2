@@ -2,14 +2,8 @@
 import type { FilterState } from '../filter-bar/filter-bar';
 import { RULE_DEFINITIONS } from '../../utils/ruleNames';
 
-// Generate rule IDs - first 30 are from definitions, then generate up to 45 for testing
-const DEFINED_RULE_IDS = Object.keys(RULE_DEFINITIONS);
-const ADDITIONAL_RULE_IDS = Array.from({ length: 15 }, (_, i) => {
-  const num = i + 31;
-  return `AH${num.toString().padStart(3, '0')}`;
-});
-
-export const RULE_IDS = [...DEFINED_RULE_IDS, ...ADDITIONAL_RULE_IDS];
+// Use only the 30 defined rules (AH001-AH030)
+export const RULE_IDS = Object.keys(RULE_DEFINITIONS).sort();
 
 // Short descriptions for rules (for chart display) - using actual rule names
 export const RULE_DESCRIPTIONS: Record<string, string> = Object.fromEntries(
