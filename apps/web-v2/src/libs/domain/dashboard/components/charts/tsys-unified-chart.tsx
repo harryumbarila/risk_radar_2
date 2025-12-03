@@ -270,6 +270,71 @@ export default function TSYSUnifiedChart({
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
+      // Special tooltip for trending chart
+      if (effectiveChartType === 'trending') {
+        const authItem = payload.find((item: any) => item.dataKey === 'authVolume');
+        const autoHoldItem = payload.find((item: any) => item.dataKey === 'autoHold');
+        
+        return (
+          <Box
+            bg="white"
+            p={3}
+            borderRadius="md"
+            boxShadow="lg"
+            borderWidth="1px"
+            borderColor="gray.200"
+            minW="200px"
+          >
+            <Text fontSize="sm" fontWeight="bold" mb={2}>
+              {label}
+            </Text>
+            <VStack align="stretch" gap={2}>
+              {authItem && (
+                <HStack justify="space-between" gap={4}>
+                  <HStack gap={2}>
+                    <Box
+                      w="12px"
+                      h="12px"
+                      borderRadius="sm"
+                      bg="#3b82f6"
+                      borderWidth="1px"
+                      borderColor="gray.300"
+                    />
+                    <Text fontSize="xs" color="gray.700" fontWeight="semibold">
+                      Daily authorization volumes
+                    </Text>
+                  </HStack>
+                  <Text fontSize="xs" fontWeight="semibold">
+                    {authItem.value.toLocaleString()}
+                  </Text>
+                </HStack>
+              )}
+              {autoHoldItem && (
+                <HStack justify="space-between" gap={4}>
+                  <HStack gap={2}>
+                    <Box
+                      w="12px"
+                      h="12px"
+                      borderRadius="sm"
+                      bg="#ef4444"
+                      borderWidth="1px"
+                      borderColor="gray.300"
+                    />
+                    <Text fontSize="xs" color="gray.700" fontWeight="semibold">
+                      Auto hold counts
+                    </Text>
+                  </HStack>
+                  <Text fontSize="xs" fontWeight="semibold">
+                    {autoHoldItem.value.toLocaleString()}
+                  </Text>
+                </HStack>
+              )}
+            </VStack>
+          </Box>
+        );
+      }
+      
+      // Regular tooltip for other chart types
       const visiblePayload = payload.filter((item: any) => visibleRules.has(item.dataKey));
       const total = visiblePayload.reduce((sum: number, item: any) => sum + (item.value || 0), 0);
       const dataItem = payload[0]?.payload;
