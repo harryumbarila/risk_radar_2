@@ -95,7 +95,6 @@ export default function TSYSUnifiedChart({
   const [manualChartType, setManualChartType] = React.useState<'stacked-area' | 'heatmap' | 'trending' | null>(null);
   const [topContributorsFilter, setTopContributorsFilter] = React.useState<TopContributorsFilter>('top5');
   const [expandedOthers, setExpandedOthers] = React.useState(false);
-  const [heatmapDensity, setHeatmapDensity] = React.useState<'compact' | 'normal' | 'spacious'>('normal');
   
   const days = React.useMemo(() => dateRange ? getDaysFromDateRange(dateRange) : 14, [dateRange]);
   const dateGrouping = React.useMemo(() => getDateGrouping(days), [days]);
@@ -710,54 +709,7 @@ export default function TSYSUnifiedChart({
                 </Portal>
               </Select.Root>
             </Box>
-            {/* Density filter only shows when chart type is heatmap */}
-            {effectiveChartType === 'heatmap' && (
-              <Box minW="150px">
-                <Text fontSize="xs" fontWeight="semibold" color="gray.600" mb={1}>
-                  Density
-                </Text>
-                <Select.Root
-                  value={[heatmapDensity]}
-                  onValueChange={(e) => setHeatmapDensity(e.value[0] as 'compact' | 'normal' | 'spacious')}
-                  collection={createListCollection({
-                    items: [
-                      { label: 'Compact', value: 'compact' },
-                      { label: 'Normal', value: 'normal' },
-                      { label: 'Spacious', value: 'spacious' },
-                    ],
-                  })}
-                  size="sm"
-                >
-                  <Select.HiddenSelect />
-                  <Select.Control>
-                    <Select.Trigger>
-                      <Select.ValueText />
-                    </Select.Trigger>
-                    <Select.IndicatorGroup>
-                      <Select.Indicator />
-                    </Select.IndicatorGroup>
-                  </Select.Control>
-                  <Portal>
-                    <Select.Positioner>
-                      <Select.Content>
-                        <Select.Item item={{ label: 'Compact', value: 'compact' }}>
-                          Compact
-                          <Select.ItemIndicator />
-                        </Select.Item>
-                        <Select.Item item={{ label: 'Normal', value: 'normal' }}>
-                          Normal
-                          <Select.ItemIndicator />
-                        </Select.Item>
-                        <Select.Item item={{ label: 'Spacious', value: 'spacious' }}>
-                          Spacious
-                          <Select.ItemIndicator />
-                        </Select.Item>
-                      </Select.Content>
-                    </Select.Positioner>
-                  </Portal>
-                </Select.Root>
-              </Box>
-            )}
+            {/* Density filter removed - no longer needed */}
             <Text fontSize="xs" color="gray.500">
               Last Updated: {new Date().toLocaleString('en-US', { 
                 month: 'short', 
@@ -853,13 +805,8 @@ export default function TSYSUnifiedChart({
                 const ruleCount = visibleRulesList.length;
                 const dataCount = data.length;
                 
-                // Density-based cell sizing
-                const densityMultipliers = {
-                  compact: { width: 0.8, height: 0.7 },
-                  normal: { width: 1.0, height: 1.0 },
-                  spacious: { width: 1.3, height: 1.2 },
-                };
-                const multiplier = densityMultipliers[heatmapDensity];
+                // Fixed cell sizing (density filter removed)
+                const multiplier = { width: 1.0, height: 1.0 };
                 
                 // Base cell sizes
                 const baseCellWidth = ruleCount <= 1 ? 80 : ruleCount <= 5 ? 70 : 50;
