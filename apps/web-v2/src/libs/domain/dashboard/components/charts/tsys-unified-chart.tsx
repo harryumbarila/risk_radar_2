@@ -336,56 +336,74 @@ export default function TSYSUnifiedChart({
         
         // Show all rules, with scroll if more than 10
         const hasMoreRules = visiblePayload.length > 10;
+        const scrollId = `tooltip-scroll-${Math.random().toString(36).substr(2, 9)}`;
         
         return (
-          <Box
-            bg="white"
-            p={3}
-            borderRadius="md"
-            boxShadow="lg"
-            borderWidth="1px"
-            borderColor="gray.200"
-            minW="250px"
-            maxW="350px"
-            onMouseDown={(e) => e.stopPropagation()}
-            onWheel={(e) => e.stopPropagation()}
-          >
-            <Text fontSize="sm" fontWeight="bold" mb={2}>
-              {label}
-            </Text>
-            {hasMoreRules && (
-              <Text fontSize="xs" color="gray.500" mb={2}>
-                Showing {visiblePayload.length} rules (scroll to see all)
-              </Text>
-            )}
+          <>
+            <style>
+              {`
+                #${scrollId}::-webkit-scrollbar {
+                  width: 6px;
+                }
+                #${scrollId}::-webkit-scrollbar-track {
+                  background: #f1f1f1;
+                  border-radius: 4px;
+                }
+                #${scrollId}::-webkit-scrollbar-thumb {
+                  background: #888;
+                  border-radius: 4px;
+                }
+                #${scrollId}::-webkit-scrollbar-thumb:hover {
+                  background: #555;
+                }
+              `}
+            </style>
             <Box
-              maxH="400px"
-              overflowY="auto"
-              overflowX="hidden"
-              style={{
-                scrollbarWidth: 'thin',
-                scrollbarColor: '#888 #f1f1f1',
+              bg="white"
+              p={3}
+              borderRadius="md"
+              boxShadow="lg"
+              borderWidth="1px"
+              borderColor="gray.200"
+              minW="250px"
+              maxW="350px"
+              position="relative"
+              zIndex={1000}
+              onMouseDown={(e) => e.stopPropagation()}
+              onMouseMove={(e) => e.stopPropagation()}
+              onWheel={(e) => {
+                e.stopPropagation();
+                const target = e.currentTarget.querySelector(`#${scrollId}`) as HTMLElement;
+                if (target) {
+                  target.scrollTop += e.deltaY;
+                }
               }}
             >
-              <style>
-                {`
-                  .tooltip-scroll::-webkit-scrollbar {
-                    width: 6px;
-                  }
-                  .tooltip-scroll::-webkit-scrollbar-track {
-                    background: #f1f1f1;
-                    border-radius: 4px;
-                  }
-                  .tooltip-scroll::-webkit-scrollbar-thumb {
-                    background: #888;
-                    border-radius: 4px;
-                  }
-                  .tooltip-scroll::-webkit-scrollbar-thumb:hover {
-                    background: #555;
-                  }
-                `}
-              </style>
-              <Box className="tooltip-scroll">
+              <Text fontSize="sm" fontWeight="bold" mb={2}>
+                {label}
+              </Text>
+              {hasMoreRules && (
+                <Text fontSize="xs" color="gray.500" mb={2}>
+                  Showing {visiblePayload.length} rules (scroll to see all)
+                </Text>
+              )}
+              <Box
+                id={scrollId}
+                maxH="400px"
+                overflowY="auto"
+                overflowX="hidden"
+                style={{
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: '#888 #f1f1f1',
+                  pointerEvents: 'auto',
+                }}
+                onWheel={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  const target = e.currentTarget;
+                  target.scrollTop += e.deltaY;
+                }}
+              >
                 <VStack align="stretch" gap={1.5}>
                   {visiblePayload.map((item: any, index: number) => {
                     const ruleId = item.dataKey;
@@ -431,14 +449,14 @@ export default function TSYSUnifiedChart({
                   })}
                 </VStack>
               </Box>
+              <Box pt={1} borderTopWidth="1px" borderColor="gray.200" mt={1}>
+                <HStack justify="space-between">
+                  <Text fontSize="xs" fontWeight="bold" color="gray.700">Total:</Text>
+                  <Text fontSize="xs" fontWeight="bold">{total.toLocaleString()}</Text>
+                </HStack>
+              </Box>
             </Box>
-            <Box pt={1} borderTopWidth="1px" borderColor="gray.200" mt={1}>
-              <HStack justify="space-between">
-                <Text fontSize="xs" fontWeight="bold" color="gray.700">Total:</Text>
-                <Text fontSize="xs" fontWeight="bold">{total.toLocaleString()}</Text>
-              </HStack>
-            </Box>
-          </Box>
+          </>
         );
       }
       
@@ -449,6 +467,7 @@ export default function TSYSUnifiedChart({
       
       // Show all rules, with scroll if more than 10
       const hasMoreRules = visiblePayload.length > 10;
+      const scrollId = `tooltip-scroll-${Math.random().toString(36).substr(2, 9)}`;
       
       let tooltipHeader = label;
       if (dateGrouping === 'weekly' && dataItem?.dateRange) {
@@ -462,54 +481,71 @@ export default function TSYSUnifiedChart({
       }
       
       return (
-        <Box
-          bg="white"
-          p={3}
-          borderRadius="md"
-          boxShadow="lg"
-          borderWidth="1px"
-          borderColor="gray.200"
-          minW="250px"
-          maxW="350px"
-          onMouseDown={(e) => e.stopPropagation()}
-          onWheel={(e) => e.stopPropagation()}
-        >
-          <Text fontSize="sm" fontWeight="bold" mb={2}>
-            {tooltipHeader}
-          </Text>
-          {hasMoreRules && (
-            <Text fontSize="xs" color="gray.500" mb={2}>
-              Showing {visiblePayload.length} rules (scroll to see all)
-            </Text>
-          )}
+        <>
+          <style>
+            {`
+              #${scrollId}::-webkit-scrollbar {
+                width: 6px;
+              }
+              #${scrollId}::-webkit-scrollbar-track {
+                background: #f1f1f1;
+                border-radius: 4px;
+              }
+              #${scrollId}::-webkit-scrollbar-thumb {
+                background: #888;
+                border-radius: 4px;
+              }
+              #${scrollId}::-webkit-scrollbar-thumb:hover {
+                background: #555;
+              }
+            `}
+          </style>
           <Box
-            maxH="400px"
-            overflowY="auto"
-            overflowX="hidden"
-            style={{
-              scrollbarWidth: 'thin',
-              scrollbarColor: '#888 #f1f1f1',
+            bg="white"
+            p={3}
+            borderRadius="md"
+            boxShadow="lg"
+            borderWidth="1px"
+            borderColor="gray.200"
+            minW="250px"
+            maxW="350px"
+            position="relative"
+            zIndex={1000}
+            onMouseDown={(e) => e.stopPropagation()}
+            onMouseMove={(e) => e.stopPropagation()}
+            onWheel={(e) => {
+              e.stopPropagation();
+              const target = e.currentTarget.querySelector(`#${scrollId}`) as HTMLElement;
+              if (target) {
+                target.scrollTop += e.deltaY;
+              }
             }}
           >
-            <style>
-              {`
-                .tooltip-scroll::-webkit-scrollbar {
-                  width: 6px;
-                }
-                .tooltip-scroll::-webkit-scrollbar-track {
-                  background: #f1f1f1;
-                  border-radius: 4px;
-                }
-                .tooltip-scroll::-webkit-scrollbar-thumb {
-                  background: #888;
-                  border-radius: 4px;
-                }
-                .tooltip-scroll::-webkit-scrollbar-thumb:hover {
-                  background: #555;
-                }
-              `}
-            </style>
-            <Box className="tooltip-scroll">
+            <Text fontSize="sm" fontWeight="bold" mb={2}>
+              {tooltipHeader}
+            </Text>
+            {hasMoreRules && (
+              <Text fontSize="xs" color="gray.500" mb={2}>
+                Showing {visiblePayload.length} rules (scroll to see all)
+              </Text>
+            )}
+            <Box
+              id={scrollId}
+              maxH="400px"
+              overflowY="auto"
+              overflowX="hidden"
+              style={{
+                scrollbarWidth: 'thin',
+                scrollbarColor: '#888 #f1f1f1',
+                pointerEvents: 'auto',
+              }}
+              onWheel={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                const target = e.currentTarget;
+                target.scrollTop += e.deltaY;
+              }}
+            >
               <VStack align="stretch" gap={1.5}>
                 {visiblePayload.map((item: any, index: number) => {
                   const percentage = calculatePercentage(item.value, total);
@@ -555,14 +591,14 @@ export default function TSYSUnifiedChart({
                 })}
               </VStack>
             </Box>
+            <Box pt={1} borderTopWidth="1px" borderColor="gray.200" mt={1}>
+              <HStack justify="space-between">
+                <Text fontSize="xs" fontWeight="bold" color="gray.700">Total:</Text>
+                <Text fontSize="xs" fontWeight="bold">{total.toLocaleString()}</Text>
+              </HStack>
+            </Box>
           </Box>
-          <Box pt={1} borderTopWidth="1px" borderColor="gray.200" mt={1}>
-            <HStack justify="space-between">
-              <Text fontSize="xs" fontWeight="bold" color="gray.700">Total:</Text>
-              <Text fontSize="xs" fontWeight="bold">{total.toLocaleString()}</Text>
-            </HStack>
-          </Box>
-        </Box>
+        </>
       );
     }
     return null;
