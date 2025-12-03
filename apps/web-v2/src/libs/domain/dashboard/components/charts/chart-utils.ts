@@ -340,12 +340,17 @@ export const getTopRules = (
   ruleIds: string[],
   topN: number = 5
 ): string[] => {
+  // Return empty array if no data or no rules
+  if (!data || data.length === 0 || !ruleIds || ruleIds.length === 0) {
+    return [];
+  }
+
   // Calculate average participation for each rule
   const ruleAverages = ruleIds.map((ruleId) => {
     const sum = data.reduce((acc, item) => acc + (item[ruleId] || 0), 0);
-    const avg = sum / data.length;
+    const avg = data.length > 0 ? sum / data.length : 0;
     const total = data.reduce((acc, item) => acc + (item.total || 0), 0);
-    const avgTotal = total / data.length;
+    const avgTotal = data.length > 0 ? total / data.length : 0;
     const percentage = calculatePercentage(avg, avgTotal);
     return { ruleId, percentage, avg };
   });
