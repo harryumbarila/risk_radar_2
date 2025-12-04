@@ -47,12 +47,19 @@ export default function Home() {
   // Generate mock data on mount - optimized to prevent blocking
   React.useEffect(() => {
     setIsLoading(true);
+    
+    // Safety timeout to ensure loading state doesn't get stuck
+    const safetyTimeout = setTimeout(() => {
+      setIsLoading(false);
+    }, 5000); // 5 second safety timeout
+    
     // Use requestIdleCallback or setTimeout to prevent blocking main thread
     const generateData = () => {
       try {
         // Reduce initial data size for faster initial load
         const alerts = generateMockAlerts(500); // Reduced from 2500 to 500
         setAllAlerts(alerts);
+        clearTimeout(safetyTimeout);
         setIsLoading(false);
         
         // Load remaining data asynchronously after initial render
@@ -66,6 +73,7 @@ export default function Home() {
         }, 1000);
       } catch (error) {
         console.error('Error generating mock alerts:', error);
+        clearTimeout(safetyTimeout);
         setAllAlerts([]);
         setIsLoading(false);
       }
@@ -73,7 +81,10 @@ export default function Home() {
     
     // Use setTimeout to defer data generation and prevent blocking
     const timeoutId = setTimeout(generateData, 0);
-    return () => clearTimeout(timeoutId);
+    return () => {
+      clearTimeout(timeoutId);
+      clearTimeout(safetyTimeout);
+    };
   }, []);
 
   // Filter alerts based on current filters
