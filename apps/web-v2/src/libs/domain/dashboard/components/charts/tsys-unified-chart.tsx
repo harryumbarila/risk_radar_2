@@ -127,7 +127,8 @@ export default function TSYSUnifiedChart({
   }, [paymentStage]);
 
   const rawData = React.useMemo(() => {
-    const baseCount = PAYMENT_STAGE_BASE_COUNTS[activePaymentStage];
+    const stage: PaymentStage = activePaymentStage || 'Authorization';
+    const baseCount = PAYMENT_STAGE_BASE_COUNTS[stage];
     return generateRuleParticipationData(days, baseCount, dateGrouping);
   }, [days, dateGrouping, activePaymentStage]);
 
@@ -171,9 +172,15 @@ export default function TSYSUnifiedChart({
   // Track previous topContributorsFilter to only update when it actually changes
   const prevTopContributorsFilterRef = React.useRef<TopContributorsFilter | null>(null);
   const hasInitializedRef = React.useRef(false);
+  const isUpdatingRef = React.useRef(false);
   
   // Update main filter when Top Contributors changes (but don't block chart updates)
   React.useEffect(() => {
+    // Prevent infinite loops by checking if we're already updating
+    if (isUpdatingRef.current) {
+      return;
+    }
+    
     // Skip if filter hasn't changed (after initial mount)
     if (hasInitializedRef.current && prevTopContributorsFilterRef.current === topContributorsFilter) {
       return;
@@ -209,20 +216,33 @@ export default function TSYSUnifiedChart({
     
     // Update main filter asynchronously to not block chart rendering
     if (onRuleIdsChange && rulesToSelect.length > 0) {
-      // Use setTimeout to ensure this doesn't block the chart update
-      const timeoutId = setTimeout(() => {
-        // Only update if rules are different from current selection to avoid loops
-        const currentRules = Array.isArray(selectedRuleIds) ? selectedRuleIds : [];
-        const rulesAreDifferent = 
-          rulesToSelect.length !== currentRules.length ||
-          !rulesToSelect.every(rule => currentRules.includes(rule));
-        
-        if (rulesAreDifferent) {
-          onRuleIdsChange(rulesToSelect);
-        }
-      }, 0);
+      // Only update if rules are different from current selection to avoid loops
+      const currentRules = Array.isArray(selectedRuleIds) ? selectedRuleIds : [];
+      const rulesAreDifferent = 
+        rulesToSelect.length !== currentRules.length ||
+        !rulesToSelect.every(rule => currentRules.includes(rule));
       
-      return () => clearTimeout(timeoutId);
+      if (rulesAreDifferent) {
+        isUpdatingRef.current = true;
+        // Use setTimeout to ensure this doesn't block the chart update
+        const timeoutId = setTimeout(() => {
+          try {
+            onRuleIdsChange(rulesToSelect);
+          } catch (error) {
+            console.error('Error updating rule IDs:', error);
+          } finally {
+            // Reset the flag after a short delay to allow state to settle
+            setTimeout(() => {
+              isUpdatingRef.current = false;
+            }, 100);
+          }
+        }, 0);
+        
+        return () => {
+          clearTimeout(timeoutId);
+          isUpdatingRef.current = false;
+        };
+      }
     }
   }, [topContributorsFilter, top5Rules, top10Rules, availableRuleIds, baseRuleIds, onRuleIdsChange, selectedRuleIds]);
 
@@ -1195,18 +1215,24 @@ function generateMockTransactions(count: number, date: string, ruleId: string): 
     const txDate = new Date(baseDate);
     txDate.setHours(randomHours, randomMinutes, 0, 0);
     
+    const merchantName = dbaNames[Math.floor(Math.random() * dbaNames.length)] || 'Unknown Merchant';
+    const dbaName = dbaNames[Math.floor(Math.random() * dbaNames.length)] || 'Unknown DBA';
+    const processor = processors[Math.floor(Math.random() * processors.length)] || 'TSYS';
+    const source = sources[Math.floor(Math.random() * sources.length)] || 'Talus Pay';
+    const exception = exceptions[Math.floor(Math.random() * exceptions.length)] || 'None';
+    
     return {
       id: `TXN-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
-      merchant: dbaNames[Math.floor(Math.random() * dbaNames.length)],
-      dbaName: dbaNames[Math.floor(Math.random() * dbaNames.length)],
+      merchant: merchantName,
+      dbaName: dbaName,
       amount: `$${(Math.random() * 10000 + 100).toFixed(2)}`,
-      processor: processors[Math.floor(Math.random() * processors.length)],
+      processor: processor,
       mid: `MID-${Math.floor(Math.random() * 10000)}`,
-      exception: exceptions[Math.floor(Math.random() * exceptions.length)],
+      exception: exception,
       date: txDate.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
       createdAt: txDate.toISOString(),
       status: 'Unreviewed' as const,
-      source: sources[Math.floor(Math.random() * sources.length)],
+      source: source,
       ahRuleApplied: [ruleId],
     };
   });
@@ -1382,7 +1408,7 @@ function HeatmapCellDrawer({ isOpen, onClose, selectedCell, paymentStage, onTran
                 <Box width="100%" height="100%" display="flex" flexDirection="column">
                   {/* Table Container */}
                   <Box flex={1} overflowY="auto" width="100%">
-                    <Table.Root size="sm" variant="plain">
+                    <Table.Root size="sm">
                       <Table.Header position="sticky" top={0} zIndex={5} bg="white" borderBottomWidth="1px" borderBottomColor="gray.200">
                         <Table.Row>
                           <Table.ColumnHeader fontSize="xs" fontWeight="semibold" color="gray.600" py={2} px={4}>
