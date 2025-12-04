@@ -118,9 +118,9 @@ export default function AutoHoldBoardPage() {
             
             {/* Table skeleton */}
             <VStack align="stretch" gap={2}>
-              <Skeleton height="50px" width="100%" /> {/* Table header */}
+              <Skeleton height="50px" width="100%" />
               {Array(5).fill(0).map((_, i) => (
-                <Skeleton key={i} height="60px" width="100%" /> {/* Table rows */}
+                <Skeleton key={i} height="60px" width="100%" />
               ))}
             </VStack>
           </VStack>
