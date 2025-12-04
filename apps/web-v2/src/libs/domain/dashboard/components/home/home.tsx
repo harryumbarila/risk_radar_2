@@ -205,6 +205,21 @@ export default function Home() {
     router.push('/risk-rules');
   };
 
+  // Memoize the onRuleIdsChange callback to prevent infinite loops
+  const handleRuleIdsChange = React.useCallback((ruleIds: string[]) => {
+    setFilters((prev) => {
+      const currentRuleIds = Array.isArray(prev.ruleId) ? prev.ruleId : (prev.ruleId === 'all' ? [] : [prev.ruleId]);
+      // Only update if rules actually changed
+      if (
+        ruleIds.length !== currentRuleIds.length ||
+        !ruleIds.every(rule => currentRuleIds.includes(rule))
+      ) {
+        return { ...prev, ruleId: ruleIds };
+      }
+      return prev;
+    });
+  }, []);
+
   if (isLoading) {
     return (
       <Box>
@@ -248,19 +263,7 @@ export default function Home() {
           paymentStage={filters.paymentStage}
           selectedRuleIds={Array.isArray(filters.ruleId) ? filters.ruleId : (filters.ruleId === 'all' ? [] : [filters.ruleId])}
           availableRuleIds={availableRules}
-          onRuleIdsChange={React.useCallback((ruleIds: string[]) => {
-            setFilters((prev) => {
-              const currentRuleIds = Array.isArray(prev.ruleId) ? prev.ruleId : (prev.ruleId === 'all' ? [] : [prev.ruleId]);
-              // Only update if rules actually changed
-              if (
-                ruleIds.length !== currentRuleIds.length ||
-                !ruleIds.every(rule => currentRuleIds.includes(rule))
-              ) {
-                return { ...prev, ruleId: ruleIds };
-              }
-              return prev;
-            });
-          }, [])}
+          onRuleIdsChange={handleRuleIdsChange}
         />
 
         {/* KPI Cards */}
