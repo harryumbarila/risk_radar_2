@@ -214,21 +214,6 @@ function OriginPartnerCell({
   );
 }
 
-// Helper: Next Day Funding Cell Component
-function NextDayFundingCell({ 
-  nextDayFunding 
-}: { 
-  nextDayFunding?: string;
-}) {
-  // Convert "Yes" to "NDF", "No" stays as "No"
-  const displayValue = nextDayFunding === 'Yes' ? 'NDF' : (nextDayFunding === 'No' ? 'No' : '—');
-  
-  return (
-    <Text fontSize="sm" fontWeight="semibold">
-      {displayValue}
-    </Text>
-  );
-}
 
 // Helper: Rule Chips Component (refined with lighter colors and collapse)
 function RuleChips({ 
@@ -806,18 +791,20 @@ export default function CustomTable({ filters }: CustomTableProps) {
     columnHelper.display({
       id: 'nextDayFunding',
       header: () => (
-        <Text fontSize="xs" fontWeight="semibold" color="gray.600">
+        <Text fontSize="xs" fontWeight="semibold" color="gray.600" textAlign="center">
           Next Day Funding
         </Text>
       ),
-      cell: (info) => (
-        <Box py={0.5}>
-          <NextDayFundingCell
-            nextDayFunding={info.row.original.nextDayFunding}
-          />
-        </Box>
-      ),
-      meta: { align: 'left' },
+      cell: (info) => {
+        // Convert "Yes" to true, "No" to false for BooleanIcon
+        const value = info.row.original.nextDayFunding === 'Yes' || info.row.original.nextDayFunding === 'NDF';
+        return (
+          <Box display="flex" justifyContent="center" alignItems="center" py={0.5} minH="20px">
+            <BooleanIcon value={value === true} label="Next Day Funding Enabled" />
+          </Box>
+        );
+      },
+      meta: { align: 'center' },
     }),
     columnHelper.accessor('source', {
       header: () => (

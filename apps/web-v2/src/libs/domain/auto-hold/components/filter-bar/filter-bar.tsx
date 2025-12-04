@@ -99,8 +99,6 @@ export default function AutoHoldFilterBar({
       newFilters.processor = 'all';
     } else if (key === 'source') {
       newFilters.source = 'all';
-    } else if (key === 'merchant') {
-      newFilters.merchant = '';
     } else if (key === 'mid') {
       newFilters.mid = '';
     } else if (key === 'ruleId') {
@@ -128,7 +126,6 @@ export default function AutoHoldFilterBar({
     filters.status !== 'all' ||
     filters.processor !== 'all' ||
     filters.source !== 'all' ||
-    filters.merchant !== '' ||
     filters.mid !== '' ||
     (Array.isArray(filters.ruleId) ? filters.ruleId.length > 0 : filters.ruleId !== 'all') ||
     filters.customStartDate !== undefined ||
@@ -140,7 +137,6 @@ export default function AutoHoldFilterBar({
     filters.status !== 'all',
     filters.processor !== 'all',
     filters.source !== 'all',
-    filters.merchant !== '',
     filters.mid !== '',
     (Array.isArray(filters.ruleId) ? filters.ruleId.length > 0 : filters.ruleId !== 'all'),
     filters.customStartDate !== undefined,
@@ -375,34 +371,6 @@ export default function AutoHoldFilterBar({
             </Select.Root>
           </VStack>
 
-          {/* Merchant Search */}
-          <VStack align="start" gap={1}>
-            <Text fontSize="xs" color="gray.600">
-              Merchant
-            </Text>
-            <Box position="relative" width="200px">
-              <Box
-                position="absolute"
-                left={3}
-                top="50%"
-                transform="translateY(-50%)"
-                zIndex={1}
-                pointerEvents="none"
-                color="gray.400"
-              >
-                <Search size={16} />
-              </Box>
-              <Input
-                size="sm"
-                placeholder="Search merchant..."
-                value={filters.merchant || ''}
-                onChange={(e) => updateFilter('merchant', e.target.value)}
-                pl={10}
-                suppressHydrationWarning
-              />
-            </Box>
-          </VStack>
-
           {/* MID Search */}
           <VStack align="start" gap={1}>
             <Text fontSize="xs" color="gray.600">
@@ -617,30 +585,6 @@ export default function AutoHoldFilterBar({
                   size="xs"
                   variant="ghost"
                   onClick={() => clearFilter('source')}
-                  p={0}
-                  minW="auto"
-                  h="auto"
-                >
-                  <X size={12} />
-                </Button>
-              </Badge>
-            )}
-            {filters.merchant && (
-              <Badge
-                colorPalette="blue"
-                variant="subtle"
-                px={2}
-                py={1}
-                borderRadius="md"
-                display="flex"
-                alignItems="center"
-                gap={1}
-              >
-                Merchant: {filters.merchant}
-                <Button
-                  size="xs"
-                  variant="ghost"
-                  onClick={() => clearFilter('merchant')}
                   p={0}
                   minW="auto"
                   h="auto"
