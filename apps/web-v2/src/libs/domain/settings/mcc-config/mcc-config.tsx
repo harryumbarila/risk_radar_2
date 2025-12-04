@@ -40,7 +40,7 @@ export default function SettingsMCCConfig(): React.JSX.Element {
           <Breadcrumb.Root>
             <Breadcrumb.List>
               <Breadcrumb.Item>
-                <Breadcrumb.Link as={Link} href="/" prefetch={false}>
+                <Breadcrumb.Link as={Link} href="/">
                   Dashboard
                 </Breadcrumb.Link>
               </Breadcrumb.Item>
