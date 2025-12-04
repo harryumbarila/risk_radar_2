@@ -20,7 +20,7 @@ import MiniCharts, {
   type ExceptionTypeData,
 } from '../mini-charts/mini-charts';
 import { toaster } from '@/ui/components/common/atoms/toaster/toaster';
-import { Check, Ban, ArrowLeft } from 'lucide-react';
+import { Check, Ban, ArrowLeft, TrendingUp } from 'lucide-react';
 import { Button } from '@chakra-ui/react';
 import ContactTab from '../tabs/contact-tab';
 import ChargebacksTab from '../tabs/chargebacks-tab';
@@ -185,6 +185,26 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
         title: 'Case diverted',
         description: 'This batch has been diverted for further review.',
       });
+  };
+
+  const handleEscalate = () => {
+    setIsLoading(true);
+    try {
+      // Simulate API call
+      setTimeout(() => {
+        toaster.success({
+          title: 'Batch escalated',
+          description: 'This batch has been escalated for priority review.',
+        });
+        setIsLoading(false);
+      }, 1000);
+    } catch (error) {
+      toaster.error({
+        title: 'Error',
+        description: 'Failed to escalate batch.',
+      });
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -430,6 +450,15 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
                     Back to Queue
                   </Button>
                 </Drawer.ActionTrigger>
+                <Button
+                  variant="outline"
+                  onClick={handleEscalate}
+                  disabled={isLoading}
+                  aria-label="Escalate"
+                >
+                  <TrendingUp size={16} />
+                  Escalate
+                </Button>
                 <Button
                   colorPalette="red"
                   variant="outline"

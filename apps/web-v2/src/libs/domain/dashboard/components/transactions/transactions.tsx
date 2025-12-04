@@ -14,16 +14,10 @@ import {
   createListCollection,
 } from '@chakra-ui/react';
 import { Check, Circle, Copy } from 'lucide-react';
-import {
-  MdOutlineArrowUpward,
-  MdCheck,
-  MdOutlineRemoveRedEye,
-} from 'react-icons/md';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
 import { statusColor } from '@/libs/utils/utils';
 import { DataTable } from '@/ui/components/common/organisms/data-table';
-import { CollapsibleBodyProps } from '@/ui/components/common/organisms/data-table/data-table.model';
 import BatchDrawer from '@/libs/domain/auto-hold/components/batch-drawer/batch-drawer';
 import { AutoHoldFilterState } from '@/libs/domain/auto-hold/components/filter-bar/filter-bar';
 
@@ -314,88 +308,6 @@ function BatchTriggerTag({ value }: { value?: string }) {
   );
 }
 
-function CollapsibleContent(props: CollapsibleBodyProps<MerchantTransaction>) {
-  return (
-    <Box
-      p={6}
-      display="flex"
-      flexDirection="column"
-      gap={4}
-      bg="bg"
-      borderWidth="1px"
-      borderRadius={10}
-    >
-      {/* Header */}
-      <Box>
-        <Text fontWeight="bold" fontSize="lg">
-          Transaction Details
-        </Text>
-      </Box>
-
-      {/* Transaction Info Grid */}
-      <SimpleGrid columns={{ base: 1, md: 3 }}>
-        <VStack align="start" gap={1}>
-          <Text fontWeight="normal" color="gray.500">
-            Transaction ID
-          </Text>
-          <Text fontWeight="bold">{props.row.original.id}</Text>
-        </VStack>
-
-        <VStack align="start" gap={1}>
-          <Text fontWeight="normal" color="gray.500">
-            Processor
-          </Text>
-          <Text fontWeight="bold">{props.row.original.processor}</Text>
-        </VStack>
-
-        <VStack align="start" gap={1}>
-          <Text fontWeight="normal" color="gray.500">
-            Date & Time
-          </Text>
-          <Text fontWeight="bold">{props.row.original.date}</Text>
-        </VStack>
-      </SimpleGrid>
-
-      <SimpleGrid columns={{ base: 1, md: 3 }}>
-        <VStack align="start" gap={1}>
-          <Text fontWeight="normal" color="gray.500">
-            MID
-          </Text>
-          <Text fontWeight="bold">{props.row.original.mid}</Text>
-        </VStack>
-
-        <VStack align="start" gap={1}>
-          <Text fontWeight="normal" color="gray.500">
-            DBA
-          </Text>
-          <Text fontWeight="bold">{props.row.original.dbaName || props.row.original.merchant}</Text>
-        </VStack>
-      </SimpleGrid>
-
-      {/* Risk Assessment */}
-      <VStack align="start" gap={1}>
-        <Text fontWeight="semibold" color="gray.500">
-          Risk Assessment
-        </Text>
-        <Text>
-          {props.row.original.exception}
-        </Text>
-      </VStack>
-
-      {/* Action Buttons */}
-      <HStack justify="flex-end" w="full" gap={4} pt={2}>
-        <Button variant="outline">
-          <MdOutlineArrowUpward />
-          Escalate
-        </Button>
-        <Button>
-          <MdCheck />
-          Mark as Reviewed
-        </Button>
-      </HStack>
-    </Box>
-  );
-}
 
 interface CustomTableProps {
   filters?: AutoHoldFilterState;
@@ -992,7 +904,6 @@ export default function CustomTable({ filters }: CustomTableProps) {
           }}
           isLoading={false}
           columns={columns}
-          CollapsibleBody={CollapsibleContent}
         />
       </Box>
 
