@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Box, HStack, Button, Tabs, Text } from '@chakra-ui/react';
+import { Box, HStack, Button, Tabs, Text, VStack, Skeleton, SimpleGrid } from '@chakra-ui/react';
 import { UserCog, List } from 'lucide-react';
 import CustomTable from '@/libs/domain/dashboard/components/transactions/transactions';
 import ManagerQueueView from '../components/manager-queue-view/manager-queue-view';
@@ -9,6 +9,7 @@ import { MerchantTransaction } from '@/data/interfaces/transaction';
 import { RULE_DEFINITIONS } from '@/libs/domain/dashboard/utils/ruleNames';
 
 export default function AutoHoldBoardPage() {
+  const [isLoading, setIsLoading] = React.useState(true);
   const [viewMode, setViewMode] = React.useState<'analyst' | 'manager'>('analyst');
   const [filters, setFilters] = React.useState<AutoHoldFilterState>({
     dateRange: '7',
@@ -24,6 +25,17 @@ export default function AutoHoldBoardPage() {
   const availableRules = React.useMemo(() => {
     // Use all 30 rules defined in RULE_DEFINITIONS
     return Object.keys(RULE_DEFINITIONS).sort();
+  }, []);
+  
+  // Simulate data loading on mount
+  React.useEffect(() => {
+    setIsLoading(true);
+    // Simulate API call delay
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800); // 800ms delay to show skeleton
+    
+    return () => clearTimeout(timer);
   }, []);
   
   // Mock: Group transactions into batches for manager view
@@ -81,6 +93,41 @@ export default function AutoHoldBoardPage() {
     
     return Array.from(batchMap.values());
   }, []);
+
+  // Loading skeleton
+  if (isLoading) {
+    return (
+      <Box>
+        <Box bg="white" p={6} borderRadius="xl" boxShadow="sm">
+          <VStack align="stretch" gap={6}>
+            {/* Header skeleton */}
+            <HStack justify="space-between">
+              <Skeleton height="40px" width="200px" />
+              <Skeleton height="40px" width="150px" />
+            </HStack>
+            
+            {/* Filter bar skeleton */}
+            <VStack align="stretch" gap={4}>
+              <Skeleton height="60px" width="100%" />
+              <SimpleGrid columns={{ base: 2, md: 4, lg: 6 }} gap={4}>
+                {Array(6).fill(0).map((_, i) => (
+                  <Skeleton key={i} height="40px" />
+                ))}
+              </SimpleGrid>
+            </VStack>
+            
+            {/* Table skeleton */}
+            <VStack align="stretch" gap={2}>
+              <Skeleton height="50px" width="100%" /> {/* Table header */}
+              {Array(5).fill(0).map((_, i) => (
+                <Skeleton key={i} height="60px" width="100%" /> {/* Table rows */}
+              ))}
+            </VStack>
+          </VStack>
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <Box>

@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 
-import { Box, VStack, HStack, Button, Input } from '@chakra-ui/react';
+import { Box, VStack, HStack, Button, Input, Skeleton } from '@chakra-ui/react';
 import { Search } from 'lucide-react';
 
 import MCCMainTable from './components/mcc-main-table';
@@ -10,8 +10,9 @@ import mccWhitelistData from '@/data/mcc-whitelist.json';
 import type { MCCWhitelistData } from './components/useWhitelistStore';
 
 export default function MCCConfigPage(): React.JSX.Element {
+  const [isLoading, setIsLoading] = React.useState(true);
   const [searchTerm, setSearchTerm] = React.useState('');
-  const [mccData, setMccData] = React.useState<MCCWhitelistData[]>(mccWhitelistData as MCCWhitelistData[]);
+  const [mccData, setMccData] = React.useState<MCCWhitelistData[]>([]);
 
   // Filter MCC data based on search
   const filteredMccData = React.useMemo(() => {
@@ -25,10 +26,51 @@ export default function MCCConfigPage(): React.JSX.Element {
     );
   }, [mccData, searchTerm]);
 
+  // Simulate data loading on mount
+  React.useEffect(() => {
+    setIsLoading(true);
+    // Simulate API call delay
+    const timer = setTimeout(() => {
+      setMccData(mccWhitelistData as MCCWhitelistData[]);
+      setIsLoading(false);
+    }, 800);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // Search is handled by filteredMccData
   };
+
+  // Loading skeleton
+  if (isLoading) {
+    return (
+      <Box>
+        <VStack align="stretch" gap={6}>
+          {/* Search Bar skeleton */}
+          <Box
+            bg="white"
+            p={4}
+            borderRadius="xl"
+            borderWidth="1px"
+            borderColor="gray.200"
+            boxShadow="0 2px 8px rgba(0,0,0,0.05)"
+          >
+            <Skeleton height="40px" width="100%" />
+          </Box>
+
+          {/* Table skeleton */}
+          <VStack align="stretch" gap={2}>
+            <Skeleton height="50px" width="100%" /> {/* Table header */}
+            {Array(10).fill(0).map((_, i) => (
+              <Skeleton key={i} height="60px" width="100%" /> {/* Table rows */}
+            ))}
+          </VStack>
+        </VStack>
+      </Box>
+    );
+  }
 
   return (
     <Box>
