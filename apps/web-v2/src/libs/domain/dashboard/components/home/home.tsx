@@ -48,11 +48,13 @@ export default function Home() {
   // Generate mock data on mount - optimized to prevent blocking
   React.useEffect(() => {
     setIsLoading(true);
+    setError(null);
     
-    // Safety timeout to ensure loading state doesn't get stuck
+    // Safety timeout to ensure loading state doesn't get stuck (reduced to match other modules)
     const safetyTimeout = setTimeout(() => {
+      console.warn('Dashboard loading timeout reached, forcing load completion');
       setIsLoading(false);
-    }, 5000); // 5 second safety timeout
+    }, 3000); // 3 second safety timeout
     
     // Use requestIdleCallback or setTimeout to prevent blocking main thread
     const generateData = () => {
@@ -67,14 +69,14 @@ export default function Home() {
         setTimeout(() => {
           try {
             const remainingAlerts = generateMockAlerts(2000);
-            setAllAlerts([...alerts, ...remainingAlerts]);
+            setAllAlerts((prev) => [...prev, ...remainingAlerts]);
           } catch (error) {
             console.warn('Error loading additional mock data:', error);
           }
         }, 1000);
       } catch (error) {
         console.error('Error generating mock alerts:', error);
-        setError(error instanceof Error ? error : new Error('Unknown error'));
+        setError(error instanceof Error ? error : new Error(String(error)));
         clearTimeout(safetyTimeout);
         setAllAlerts([]);
         setIsLoading(false);
@@ -82,7 +84,7 @@ export default function Home() {
     };
     
     // Use setTimeout to defer data generation and prevent blocking
-    const timeoutId = setTimeout(generateData, 0);
+    const timeoutId = setTimeout(generateData, 100); // Small delay to ensure component is mounted
     return () => {
       clearTimeout(timeoutId);
       clearTimeout(safetyTimeout);
