@@ -50,11 +50,11 @@ export default function Home() {
     setIsLoading(true);
     setError(null);
     
-    // Safety timeout to ensure loading state doesn't get stuck (reduced to match other modules)
+    // Safety timeout to ensure loading state doesn't get stuck (matches other modules)
     const safetyTimeout = setTimeout(() => {
       console.warn('Dashboard loading timeout reached, forcing load completion');
       setIsLoading(false);
-    }, 3000); // 3 second safety timeout
+    }, 800); // 800ms to match other modules
     
     // Use requestIdleCallback or setTimeout to prevent blocking main thread
     const generateData = () => {
@@ -257,12 +257,29 @@ export default function Home() {
     return (
       <Box>
         <VStack gap={6} align="stretch">
-          <Skeleton height="200px" />
+          {/* Filter Bar Skeleton */}
+          <Skeleton height="60px" />
+          
+          {/* TSYS Chart Skeleton */}
+          <Skeleton height="400px" />
+          
+          {/* KPI Cards Skeleton */}
           <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap={6}>
             {Array(6).fill(0).map((_, i) => (
               <Skeleton key={i} height="150px" />
             ))}
           </SimpleGrid>
+          
+          {/* Chargeback Charts Skeleton */}
+          <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
+            <Skeleton height="300px" />
+            <Skeleton height="300px" />
+          </SimpleGrid>
+          
+          {/* Other Charts Skeleton */}
+          <Skeleton height="400px" />
+          <Skeleton height="400px" />
+          <Skeleton height="400px" />
         </VStack>
       </Box>
     );
