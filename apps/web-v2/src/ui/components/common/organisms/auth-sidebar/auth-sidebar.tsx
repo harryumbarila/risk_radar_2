@@ -114,7 +114,7 @@ export default function AuthSidebar(): React.JSX.Element {
           );
 
           return (
-            <Link key={item.name} href={item.path} onClick={onClose}>
+            <Link key={item.name} href={item.path} onClick={onClose} prefetch={false}>
               {isCollapsed ? (
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>{content}</Tooltip.Trigger>
@@ -165,7 +165,7 @@ export default function AuthSidebar(): React.JSX.Element {
               );
 
               return (
-                <Link key={item.name} href={item.path} onClick={onClose}>
+                <Link key={item.name} href={item.path} onClick={onClose} prefetch={false}>
                   {content}
                 </Link>
               );
