@@ -72,7 +72,7 @@ export default function NotFound() {
           )}
         </VStack>
 
-        <Link href="/">
+        <Link href="/" prefetch={false}>
           <Button colorScheme="blue" size="lg" mt={4}>
             Return Home
           </Button>
