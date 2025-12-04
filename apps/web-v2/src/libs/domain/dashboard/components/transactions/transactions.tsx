@@ -13,7 +13,7 @@ import {
   Tooltip,
   createListCollection,
 } from '@chakra-ui/react';
-import { Check, Circle } from 'lucide-react';
+import { Check, Circle, Copy } from 'lucide-react';
 import {
   MdOutlineArrowUpward,
   MdCheck,
@@ -28,6 +28,75 @@ import BatchDrawer from '@/libs/domain/auto-hold/components/batch-drawer/batch-d
 import { AutoHoldFilterState } from '@/libs/domain/auto-hold/components/filter-bar/filter-bar';
 
 const columnHelper = createColumnHelper<MerchantTransaction>();
+
+// MID Cell Component with Copy Functionality
+function MIDCell({ mid }: { mid: string }) {
+  const [copied, setCopied] = React.useState(false);
+  
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent row click
+    try {
+      await navigator.clipboard.writeText(mid);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy MID:', err);
+    }
+  };
+  
+  return (
+    <HStack 
+      gap={2} 
+      py={0.5}
+      cursor="pointer"
+      onClick={handleCopy}
+      _hover={{ opacity: 0.8 }}
+      role="button"
+      aria-label={`Copy MID ${mid}`}
+    >
+      <Text fontSize="sm" fontFamily="mono">
+        {mid}
+      </Text>
+      <Tooltip.Root>
+        <Tooltip.Trigger asChild>
+          <Box
+            as="span"
+            display="inline-flex"
+            alignItems="center"
+            justifyContent="center"
+            color={copied ? 'green.600' : 'gray.400'}
+            _hover={{ color: copied ? 'green.600' : 'gray.600' }}
+            transition="color 0.2s"
+          >
+            {copied ? (
+              <Check size={14} />
+            ) : (
+              <Copy size={14} />
+            )}
+          </Box>
+        </Tooltip.Trigger>
+        <Portal>
+          <Tooltip.Positioner>
+            <Tooltip.Content
+              maxW="200px"
+              zIndex={2000}
+              bg="gray.900"
+              color="white"
+              px={3}
+              py={2}
+              borderRadius="md"
+              fontSize="sm"
+              boxShadow="lg"
+            >
+              <Tooltip.Arrow />
+              {copied ? 'Copied!' : 'Click to copy MID'}
+            </Tooltip.Content>
+          </Tooltip.Positioner>
+        </Portal>
+      </Tooltip.Root>
+    </HStack>
+  );
+}
 
 // Helper: Get severity color for rules (lighter tones)
 function getSeverityColor(ruleId: string): 'red' | 'yellow' | 'blue' | 'gray' {
@@ -635,9 +704,7 @@ export default function CustomTable({ filters }: CustomTableProps) {
         </Text>
       ),
       cell: (info) => (
-        <Text fontSize="sm" fontFamily="mono" py={0.5}>
-          {info.getValue()}
-        </Text>
+        <MIDCell mid={info.getValue()} />
       ),
       enableSorting: true,
       meta: { align: 'left' },
