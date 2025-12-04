@@ -6,7 +6,14 @@ export async function middleware(
 ): Promise<Response | undefined> {
   const { pathname } = request.nextUrl;
 
-  console.log({ pathname });
+  // Skip middleware for Next.js internal routes and RSC requests
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api') ||
+    pathname.includes('__rsc')
+  ) {
+    return NextResponse.next();
+  }
 
   // Skip authentication for the version endpoint
   //   if (pathname === '/api/version') {
