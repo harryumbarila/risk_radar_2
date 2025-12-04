@@ -6,6 +6,7 @@ import CustomTable from '@/libs/domain/dashboard/components/transactions/transac
 import ManagerQueueView from '../components/manager-queue-view/manager-queue-view';
 import AutoHoldFilterBar, { AutoHoldFilterState } from '../components/filter-bar/filter-bar';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
+import { RULE_DEFINITIONS } from '@/libs/domain/dashboard/utils/ruleNames';
 
 export default function AutoHoldBoardPage() {
   const [viewMode, setViewMode] = React.useState<'analyst' | 'manager'>('analyst');
@@ -19,11 +20,10 @@ export default function AutoHoldBoardPage() {
     ruleId: 'all',
   });
 
-  // Get available rules from transactions (mock - in real app would come from API)
+  // Get available rules from RULE_DEFINITIONS (all 30 rules)
   const availableRules = React.useMemo(() => {
-    // Extract unique rule IDs from exceptions or use default rules
-    // For now, using common auto hold rule IDs
-    return ['AH001', 'AH002', 'AH003', 'AH004', 'AH005', 'AH006', 'AH007', 'AH008', 'AH009', 'AH010'];
+    // Use all 30 rules defined in RULE_DEFINITIONS
+    return Object.keys(RULE_DEFINITIONS).sort();
   }, []);
   
   // Mock: Group transactions into batches for manager view
