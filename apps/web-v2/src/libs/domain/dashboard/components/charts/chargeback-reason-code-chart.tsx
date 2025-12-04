@@ -48,9 +48,18 @@ const CATEGORY_COLORS: Record<string, string> = {
   'Processing Error': '#10b981',
 };
 
+interface ReasonCodeData {
+  code: string;
+  name: string;
+  category: string;
+  count: number;
+  percentage: string;
+  color: string;
+}
+
 // Generate mock reason code data
-const generateReasonCodeData = () => {
-  const data = [];
+const generateReasonCodeData = (): ReasonCodeData[] => {
+  const data: ReasonCodeData[] = [];
   const totalChargebacks = 1250;
   
   // Distribute chargebacks across reason codes with some variation
@@ -74,7 +83,7 @@ const generateReasonCodeData = () => {
 };
 
 export default function ChargebackReasonCodeChart({ dateRange }: ChargebackReasonCodeChartProps) {
-  const data = React.useMemo(() => generateReasonCodeData(), []);
+  const data: ReasonCodeData[] = React.useMemo(() => generateReasonCodeData(), []);
 
   // Group by category for legend
   const categoryData = React.useMemo(() => {
@@ -200,14 +209,6 @@ export default function ChargebackReasonCodeChart({ dateRange }: ChargebackReaso
                 width={80}
               />
               <RechartsTooltip content={<CustomTooltip />} />
-              <Legend
-                payload={categoryData.map((item) => ({
-                  value: item.category,
-                  type: 'square',
-                  color: item.color,
-                }))}
-                wrapperStyle={{ paddingTop: '20px' }}
-              />
               <Bar
                 dataKey="count"
                 radius={[0, 4, 4, 0]}
@@ -226,4 +227,5 @@ export default function ChargebackReasonCodeChart({ dateRange }: ChargebackReaso
     </Box>
   );
 }
+
 
