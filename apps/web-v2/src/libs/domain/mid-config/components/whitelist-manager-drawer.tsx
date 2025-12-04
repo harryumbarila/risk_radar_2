@@ -75,13 +75,13 @@ export default function WhitelistManagerDrawer(): React.JSX.Element | null {
                 <Breadcrumb.Root>
                   <Breadcrumb.List>
                     <Breadcrumb.Item>
-                      <Breadcrumb.Link as={Link} href="/" prefetch={false}>
+                      <Breadcrumb.Link as={Link} href="/">
                         Dashboard
                       </Breadcrumb.Link>
                     </Breadcrumb.Item>
                     <Breadcrumb.Separator>/</Breadcrumb.Separator>
                     <Breadcrumb.Item>
-                      <Breadcrumb.Link as={Link} href="/mid-config" prefetch={false}>
+                      <Breadcrumb.Link as={Link} href="/mid-config">
                         MID Configuration
                       </Breadcrumb.Link>
                     </Breadcrumb.Item>
