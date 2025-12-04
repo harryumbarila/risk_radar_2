@@ -28,6 +28,7 @@ export default function Home() {
   const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(true);
   const [allAlerts, setAllAlerts] = React.useState<MockAlert[]>([]);
+  const [error, setError] = React.useState<Error | null>(null);
   // Use only the 30 defined rules (AH001-AH030)
   const availableRules = React.useMemo(() => {
     return Object.keys(RULE_DEFINITIONS).sort();
@@ -73,6 +74,7 @@ export default function Home() {
         }, 1000);
       } catch (error) {
         console.error('Error generating mock alerts:', error);
+        setError(error instanceof Error ? error : new Error('Unknown error'));
         clearTimeout(safetyTimeout);
         setAllAlerts([]);
         setIsLoading(false);
@@ -230,6 +232,24 @@ export default function Home() {
       return prev;
     });
   }, []);
+
+  if (error) {
+    return (
+      <Box p={6}>
+        <VStack gap={4} align="stretch">
+          <Text fontSize="lg" fontWeight="bold" color="red.600">
+            Error loading dashboard
+          </Text>
+          <Text fontSize="sm" color="gray.600">
+            {error.message}
+          </Text>
+          <Button onClick={() => window.location.reload()}>
+            Reload Page
+          </Button>
+        </VStack>
+      </Box>
+    );
+  }
 
   if (isLoading) {
     return (
