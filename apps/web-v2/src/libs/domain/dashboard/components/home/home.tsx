@@ -13,13 +13,14 @@ import {
 } from 'lucide-react';
 import FilterBar, { type FilterState } from '../filter-bar/filter-bar';
 import KpiCard from '../kpi-card/kpi-card';
-import TopRulesChart from '../charts/top-rules-chart';
-import SourceDistributionChart from '../charts/source-distribution-chart';
-import MerchantRanking from '../charts/merchant-ranking';
 import RuleLabel from '../rule-label/rule-label';
 import TSYSUnifiedChart from '../charts/tsys-unified-chart';
-import ChargebackRateChart from '../charts/chargeback-rate-chart';
-import ChargebackReasonCodeChart from '../charts/chargeback-reason-code-chart';
+// Lazy load heavy chart components
+const TopRulesChart = React.lazy(() => import('../charts/top-rules-chart').then(m => ({ default: m.default })));
+const SourceDistributionChart = React.lazy(() => import('../charts/source-distribution-chart').then(m => ({ default: m.default })));
+const MerchantRanking = React.lazy(() => import('../charts/merchant-ranking').then(m => ({ default: m.default })));
+const ChargebackRateChart = React.lazy(() => import('../charts/chargeback-rate-chart').then(m => ({ default: m.default })));
+const ChargebackReasonCodeChart = React.lazy(() => import('../charts/chargeback-reason-code-chart').then(m => ({ default: m.default })));
 import { generateMockAlerts, calculateKpis, type MockAlert, type Source } from '../../utils/mockData';
 import { RULE_DEFINITIONS } from '../../utils/ruleNames';
 
@@ -43,27 +44,36 @@ export default function Home() {
     };
   });
 
-  // Generate mock data on mount
+  // Generate mock data on mount - optimized to prevent blocking
   React.useEffect(() => {
     setIsLoading(true);
-    // Simulate loading
-    try {
-      setTimeout(() => {
-        try {
-          const alerts = generateMockAlerts(2500);
-          setAllAlerts(alerts);
-          setIsLoading(false);
-        } catch (error) {
-          console.error('Error generating mock alerts:', error);
-          setAllAlerts([]);
-          setIsLoading(false);
-        }
-      }, 500);
-    } catch (error) {
-      console.error('Error in useEffect:', error);
-      setAllAlerts([]);
-      setIsLoading(false);
-    }
+    // Use requestIdleCallback or setTimeout to prevent blocking main thread
+    const generateData = () => {
+      try {
+        // Reduce initial data size for faster initial load
+        const alerts = generateMockAlerts(500); // Reduced from 2500 to 500
+        setAllAlerts(alerts);
+        setIsLoading(false);
+        
+        // Load remaining data asynchronously after initial render
+        setTimeout(() => {
+          try {
+            const remainingAlerts = generateMockAlerts(2000);
+            setAllAlerts([...alerts, ...remainingAlerts]);
+          } catch (error) {
+            console.warn('Error loading additional mock data:', error);
+          }
+        }, 1000);
+      } catch (error) {
+        console.error('Error generating mock alerts:', error);
+        setAllAlerts([]);
+        setIsLoading(false);
+      }
+    };
+    
+    // Use setTimeout to defer data generation and prevent blocking
+    const timeoutId = setTimeout(generateData, 0);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   // Filter alerts based on current filters
@@ -358,8 +368,12 @@ export default function Home() {
             </Text>
           </HStack>
           <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
-            <ChargebackRateChart dateRange={filters} />
-            <ChargebackReasonCodeChart dateRange={filters} />
+            <React.Suspense fallback={<Skeleton height="300px" />}>
+              <ChargebackRateChart dateRange={filters} />
+            </React.Suspense>
+            <React.Suspense fallback={<Skeleton height="300px" />}>
+              <ChargebackReasonCodeChart dateRange={filters} />
+            </React.Suspense>
           </SimpleGrid>
         </VStack>
 
@@ -368,22 +382,28 @@ export default function Home() {
 
         {/* Charts Row 1: Top Rules */}
         <SimpleGrid columns={{ base: 1, lg: 1 }} gap={6} role="region" aria-label="Risk Analysis Charts">
-          <TopRulesChart alerts={filteredAlerts} onRuleClick={handleRuleClick} />
+          <React.Suspense fallback={<Skeleton height="400px" />}>
+            <TopRulesChart alerts={filteredAlerts} onRuleClick={handleRuleClick} />
+          </React.Suspense>
         </SimpleGrid>
 
         {/* Charts Row 2: Source Distribution */}
         <SimpleGrid columns={{ base: 1, lg: 1 }} gap={6}>
-          <SourceDistributionChart
-            alerts={filteredAlerts}
-            onSourceClick={handleSourceClick}
-          />
+          <React.Suspense fallback={<Skeleton height="400px" />}>
+            <SourceDistributionChart
+              alerts={filteredAlerts}
+              onSourceClick={handleSourceClick}
+            />
+          </React.Suspense>
         </SimpleGrid>
 
         {/* Merchant Ranking */}
-        <MerchantRanking
-          alerts={filteredAlerts}
-          onMerchantClick={handleMerchantClick}
-        />
+        <React.Suspense fallback={<Skeleton height="400px" />}>
+          <MerchantRanking
+            alerts={filteredAlerts}
+            onMerchantClick={handleMerchantClick}
+          />
+        </React.Suspense>
       </VStack>
     </Box>
   );
