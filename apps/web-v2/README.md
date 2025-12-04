@@ -128,8 +128,17 @@ src/
 Create a `.env.local` file in the root directory with the following variables:
 
 ```env
-# Add your environment variables here
+# Backend API URL (required)
+NEXT_PUBLIC_BACKEND_BASE_URL=https://dashboard-api.taluspay-staging.com
+
+# Risk Radar Base URL (optional, for local development)
+NEXT_PUBLIC_RISK_RADAR_BASE_URL=http://localhost:3001
+
+# Merchant Base URL (optional)
+NEXT_PUBLIC_MERCHANT_BASE_URL=https://taluspay-staging.com
 ```
+
+**Note**: The `NEXT_PUBLIC_BACKEND_BASE_URL` is used by the Risk API client. If not set, it defaults to `https://dashboard-api.taluspay-staging.com`.
 
 ## License
 
