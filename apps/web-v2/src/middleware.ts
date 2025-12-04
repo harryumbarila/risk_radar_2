@@ -17,15 +17,8 @@ export async function middleware(
     return NextResponse.next();
   }
 
-  // Skip authentication for the version endpoint
-  //   if (pathname === '/api/version') {
-  //     return undefined; // Skip middleware for this path
-  //   }
-
-  // shouldByPassMiddleware from getSessionOnEdge was moved under the hood of handleSessionOnEdge
-
-  // Additional logic if needed
-  //   return handleSessionOnEdge({ request, pathname, searchParams, headers });
+  // For all other routes, just pass through
+  // Authentication logic can be added here later if needed
   return NextResponse.next();
 }
 
