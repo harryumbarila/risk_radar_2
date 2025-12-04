@@ -47,11 +47,23 @@ export default function Home() {
   React.useEffect(() => {
     setIsLoading(true);
     // Simulate loading
-    setTimeout(() => {
-      const alerts = generateMockAlerts(2500);
-      setAllAlerts(alerts);
+    try {
+      setTimeout(() => {
+        try {
+          const alerts = generateMockAlerts(2500);
+          setAllAlerts(alerts);
+          setIsLoading(false);
+        } catch (error) {
+          console.error('Error generating mock alerts:', error);
+          setAllAlerts([]);
+          setIsLoading(false);
+        }
+      }, 500);
+    } catch (error) {
+      console.error('Error in useEffect:', error);
+      setAllAlerts([]);
       setIsLoading(false);
-    }, 500);
+    }
   }, []);
 
   // Filter alerts based on current filters
@@ -226,9 +238,19 @@ export default function Home() {
           paymentStage={filters.paymentStage}
           selectedRuleIds={Array.isArray(filters.ruleId) ? filters.ruleId : (filters.ruleId === 'all' ? [] : [filters.ruleId])}
           availableRuleIds={availableRules}
-          onRuleIdsChange={(ruleIds) => {
-            setFilters((prev) => ({ ...prev, ruleId: ruleIds }));
-          }}
+          onRuleIdsChange={React.useCallback((ruleIds: string[]) => {
+            setFilters((prev) => {
+              const currentRuleIds = Array.isArray(prev.ruleId) ? prev.ruleId : (prev.ruleId === 'all' ? [] : [prev.ruleId]);
+              // Only update if rules actually changed
+              if (
+                ruleIds.length !== currentRuleIds.length ||
+                !ruleIds.every(rule => currentRuleIds.includes(rule))
+              ) {
+                return { ...prev, ruleId: ruleIds };
+              }
+              return prev;
+            });
+          }, [])}
         />
 
         {/* KPI Cards */}
