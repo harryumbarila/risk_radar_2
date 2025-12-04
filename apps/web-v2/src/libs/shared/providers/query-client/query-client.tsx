@@ -47,11 +47,13 @@ export default function ReactQueryProvider({
   return (
     <PersistQueryClientProvider
       persistOptions={{ persister }}
-      onSuccess={() =>
-        queryClient
-          .resumePausedMutations()
-          .then(() => queryClient.invalidateQueries())
-      }
+      onSuccess={() => {
+        // Only resume paused mutations, don't invalidate all queries
+        // This prevents infinite loops
+        queryClient.resumePausedMutations().catch((error) => {
+          console.warn('Error resuming paused mutations:', error);
+        });
+      }}
       client={queryClient}
     >
       <NetworkStateContext.Provider
