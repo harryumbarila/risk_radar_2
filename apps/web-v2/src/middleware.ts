@@ -6,11 +6,13 @@ export async function middleware(
 ): Promise<Response | undefined> {
   const { pathname } = request.nextUrl;
 
-  // Skip middleware for Next.js internal routes and RSC requests
+  // Skip middleware for Next.js internal routes, RSC requests, and static assets
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
-    pathname.includes('__rsc')
+    pathname.includes('__rsc') ||
+    pathname.startsWith('/favicon') ||
+    pathname.match(/\.(ico|png|jpg|jpeg|svg|gif|webp|woff|woff2|ttf|eot)$/i)
   ) {
     return NextResponse.next();
   }
