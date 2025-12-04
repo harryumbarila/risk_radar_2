@@ -15,10 +15,6 @@ import {
 } from '@chakra-ui/react';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
 import BatchSummary, { type BatchSummaryData } from '../batch-summary/batch-summary';
-import MiniCharts, {
-  type HourlyTransactionData,
-  type ExceptionTypeData,
-} from '../mini-charts/mini-charts';
 import { toaster } from '@/ui/components/common/atoms/toaster/toaster';
 import { Check, Ban, ArrowLeft, TrendingUp } from 'lucide-react';
 import { Button } from '@chakra-ui/react';
@@ -36,18 +32,9 @@ interface BatchDrawerProps {
   trigger?: React.ReactNode;
 }
 
-// Risk color constants
-const riskColors = {
-  high: '#ef4444',
-  medium: '#f59e0b',
-  low: '#10b981',
-};
-
 // Generate mock batch data
 function generateBatchData(batch: MerchantTransaction[]): {
   summary: BatchSummaryData;
-  hourlyData: HourlyTransactionData[];
-  exceptionData: ExceptionTypeData[];
 } {
   // Calculate total amount
   const totalAmount = batch.reduce((sum, tx) => {
@@ -72,22 +59,7 @@ function generateBatchData(batch: MerchantTransaction[]): {
   const startDate = dates.length > 0 ? new Date(Math.min(...dates.map((d) => d.getTime()))) : new Date();
   const endDate = dates.length > 0 ? new Date(Math.max(...dates.map((d) => d.getTime()))) : new Date();
 
-  // Generate hourly distribution
-  const hourlyCounts: Record<number, number> = {};
-  batch.forEach((tx) => {
-    const dateStr = tx.createdAt || tx.date;
-    if (dateStr) {
-      const date = new Date(dateStr);
-      const hour = date.getHours();
-      hourlyCounts[hour] = (hourlyCounts[hour] || 0) + 1;
-    }
-  });
-  const hourlyData: HourlyTransactionData[] = Array.from({ length: 24 }, (_, i) => ({
-    hour: i,
-    count: hourlyCounts[i] || 0,
-  }));
-
-  // Generate exception distribution
+  // Generate exception distribution counts for summary
   const exceptionCounts: Record<string, number> = {};
   batch.forEach((tx) => {
     const exceptions = tx.exception.split(',').map((e) => e.trim());
@@ -95,12 +67,6 @@ function generateBatchData(batch: MerchantTransaction[]): {
       exceptionCounts[e] = (exceptionCounts[e] || 0) + 1;
     });
   });
-
-  const exceptionData: ExceptionTypeData[] = Array.from(exceptionTypesSet).map((type, index) => ({
-    name: type,
-    value: exceptionCounts[type] || 0,
-    color: index % 2 === 0 ? riskColors.high : riskColors.medium,
-  }));
 
   const summary: BatchSummaryData = {
     totalTransactions: batch.length,
@@ -124,14 +90,14 @@ function generateBatchData(batch: MerchantTransaction[]): {
     exceptionCounts,
   };
 
-  return { summary, hourlyData, exceptionData };
+  return { summary };
 }
 
 export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
   const [isLoading, setIsLoading] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState('transactions');
 
-  const { summary, hourlyData, exceptionData } = React.useMemo(
+  const { summary } = React.useMemo(
     () => generateBatchData(batch),
     [batch]
   );
@@ -293,10 +259,7 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
                 {/* Batch Summary */}
                 <BatchSummary data={summary} />
 
-                {/* Mini Charts */}
-                <MiniCharts hourlyData={hourlyData} exceptionData={exceptionData} />
-
-                {/* Volume Tab - Fixed below charts */}
+                {/* Volume Tab - Fixed below summary */}
                 <Box
                   bg="white"
                   p={6}
