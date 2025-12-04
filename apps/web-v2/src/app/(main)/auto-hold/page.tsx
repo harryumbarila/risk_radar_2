@@ -17,9 +17,15 @@ export const metadata: Metadata = {
 export default async function AutoHoldPage(): Promise<React.JSX.Element> {
   const queryClient = getQueryClient();
 
-  await queryClient.prefetchQuery(
-    $riskApi.queryOptions('get', '/v1/auto-hold-exception')
-  );
+  // Prefetch with error handling to prevent "Failed to fetch" errors
+  try {
+    await queryClient.prefetchQuery(
+      $riskApi.queryOptions('get', '/v1/auto-hold-exception')
+    );
+  } catch (error) {
+    // Silently handle prefetch errors - the page will still work with mock data
+    console.warn('Auto-hold prefetch failed, using mock data:', error);
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
