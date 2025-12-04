@@ -47,22 +47,12 @@ export default function Home() {
 
   // Generate mock data on mount - optimized to prevent blocking
   React.useEffect(() => {
-    setIsLoading(true);
-    setError(null);
-    
-    // Safety timeout to ensure loading state doesn't get stuck (matches other modules)
-    const safetyTimeout = setTimeout(() => {
-      console.warn('Dashboard loading timeout reached, forcing load completion');
-      setIsLoading(false);
-    }, 800); // 800ms to match other modules
-    
-    // Use requestIdleCallback or setTimeout to prevent blocking main thread
-    const generateData = () => {
+    // Simulate data loading with timeout (matches other modules)
+    const timer = setTimeout(() => {
       try {
         // Reduce initial data size for faster initial load
-        const alerts = generateMockAlerts(500); // Reduced from 2500 to 500
+        const alerts = generateMockAlerts(500);
         setAllAlerts(alerts);
-        clearTimeout(safetyTimeout);
         setIsLoading(false);
         
         // Load remaining data asynchronously after initial render
@@ -77,18 +67,12 @@ export default function Home() {
       } catch (error) {
         console.error('Error generating mock alerts:', error);
         setError(error instanceof Error ? error : new Error(String(error)));
-        clearTimeout(safetyTimeout);
         setAllAlerts([]);
         setIsLoading(false);
       }
-    };
+    }, 800); // 800ms to match other modules
     
-    // Use setTimeout to defer data generation and prevent blocking
-    const timeoutId = setTimeout(generateData, 100); // Small delay to ensure component is mounted
-    return () => {
-      clearTimeout(timeoutId);
-      clearTimeout(safetyTimeout);
-    };
+    return () => clearTimeout(timer);
   }, []);
 
   // Filter alerts based on current filters
