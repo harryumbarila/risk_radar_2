@@ -29,6 +29,19 @@ export default function Home() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [allAlerts, setAllAlerts] = React.useState<MockAlert[]>([]);
   const [error, setError] = React.useState<Error | null>(null);
+  
+  // Safety check: ensure loading state is cleared even if useEffect fails
+  React.useEffect(() => {
+    const safetyTimer = setTimeout(() => {
+      if (isLoading) {
+        console.warn('Dashboard: Safety timeout - forcing loading state to false');
+        setIsLoading(false);
+      }
+    }, 2000); // 2 second safety net
+    
+    return () => clearTimeout(safetyTimer);
+  }, [isLoading]);
+  
   // Use only the 30 defined rules (AH001-AH030)
   const availableRules = React.useMemo(() => {
     return Object.keys(RULE_DEFINITIONS).sort();
