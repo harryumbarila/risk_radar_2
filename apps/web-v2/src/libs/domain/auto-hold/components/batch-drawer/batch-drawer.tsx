@@ -18,6 +18,7 @@ import { toaster } from '@/ui/components/common/atoms/toaster/toaster';
 import { Check, Ban, ArrowLeft, TrendingUp } from 'lucide-react';
 import { Button } from '@chakra-ui/react';
 import ContactTab from '../tabs/contact-tab';
+import DemographicsTab from '../tabs/demographics-tab';
 import ChargebacksTab from '../tabs/chargebacks-tab';
 import MatchTab from '../tabs/match-tab';
 import VolumeTab from '../tabs/volume-tab';
@@ -39,6 +40,10 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
   // Get merchant info from first transaction
   const merchantInfo = batch[0];
   const status = merchantInfo?.status || 'Unreviewed';
+  
+  // Mock data for demographics
+  const source = merchantInfo?.source || 'Talus Pay';
+  const riskWatch = merchantInfo?.riskWatch || false;
 
   // Mock notes count
   const notesCount = 3;
@@ -179,6 +184,27 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
                       {status}
                     </Badge>
                   </HStack>
+                  <HStack gap={2}>
+                    <Text fontSize="xs" color="gray.600" textTransform="uppercase">
+                      Source:
+                    </Text>
+                    <Text fontSize="sm" fontWeight="semibold" color="gray.900">
+                      {source}
+                    </Text>
+                  </HStack>
+                  <HStack gap={2}>
+                    <Text fontSize="xs" color="gray.600" textTransform="uppercase">
+                      Risk Watch:
+                    </Text>
+                    <Badge
+                      colorPalette={riskWatch ? 'red' : 'green'}
+                      variant="subtle"
+                      px={3}
+                      py={1}
+                    >
+                      {riskWatch ? 'Yes' : 'No'}
+                    </Badge>
+                  </HStack>
                 </HStack>
               </VStack>
             </Drawer.Header>
@@ -190,7 +216,7 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
               py={6}
             >
               <VStack align="stretch" gap={6}>
-                {/* Volume Tab - Fixed below summary */}
+                {/* Demographics Section - Fixed above tabs */}
                 <Box
                   bg="white"
                   p={6}
@@ -199,7 +225,10 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
                   borderWidth="1px"
                   borderColor="gray.200"
                 >
-                  <VolumeTab merchantId={merchantInfo?.mid || ''} />
+                  <DemographicsTab
+                    merchantId={merchantInfo?.mid || ''}
+                    merchantName={merchantInfo?.merchant || ''}
+                  />
                 </Box>
 
                 {/* Tabs */}
@@ -318,6 +347,18 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
                       <NotesTab merchantId={merchantInfo?.mid || ''} />
                     </Tabs.Content>
                   </Tabs.Root>
+                </Box>
+
+                {/* Volume Tab - Fixed below tabs */}
+                <Box
+                  bg="white"
+                  p={6}
+                  borderRadius="xl"
+                  boxShadow="0 2px 8px rgba(0,0,0,0.05)"
+                  borderWidth="1px"
+                  borderColor="gray.200"
+                >
+                  <VolumeTab merchantId={merchantInfo?.mid || ''} />
                 </Box>
               </VStack>
             </Drawer.Body>
