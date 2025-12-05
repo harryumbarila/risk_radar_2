@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Box, HStack, Button, Tabs, Text, VStack, Skeleton, SimpleGrid } from '@chakra-ui/react';
+import { Box, HStack, Tabs, Text, VStack, Skeleton, SimpleGrid } from '@chakra-ui/react';
 import { UserCog, List } from 'lucide-react';
 import CustomTable from '@/libs/domain/dashboard/components/transactions/transactions';
 import ManagerQueueView from '../components/manager-queue-view/manager-queue-view';
@@ -44,9 +44,6 @@ export default function AutoHoldBoardPage() {
   // In real app, this would come from API or be shared state
   const allBatches: MerchantTransaction[][] = React.useMemo(() => {
     const baseDate = new Date();
-    const tx1Date = new Date('2025-04-08T09:15:00.000Z');
-    const tx2Date = new Date('2025-04-08T10:23:00.000Z');
-    const tx3Date = new Date('2025-04-08T11:05:00.000Z');
     
     // Mock transactions grouped by batch (merchant + date)
     const dataSources: ('Auth' | 'Capture' | 'Settled' | 'Returns')[] = ['Auth', 'Capture', 'Settled', 'Returns'];
@@ -82,19 +79,25 @@ export default function AutoHoldBoardPage() {
       txDate.setDate(txDate.getDate() - Math.floor(i / 4));
       txDate.setHours(9 + (i % 8), 15 + (i * 5) % 45, 0, 0);
       
+      const merchant = merchants[i % merchants.length] || 'Unknown Merchant';
+      const exception = exceptions[i % exceptions.length] || 'None';
+      const processor = processors[i % processors.length] || 'TSYS';
+      const status = statuses[i % statuses.length] || 'Unreviewed';
+      const dataSource = dataSources[i % dataSources.length] || 'Auth';
+      
       return {
         id: String(i + 1),
-        merchant: merchants[i % merchants.length],
+        merchant: merchant,
         amount: `$${(Math.random() * 15000 + 100).toFixed(2)}`,
-        exception: exceptions[i % exceptions.length],
-        processor: processors[i % processors.length],
+        exception: exception,
+        processor: processor,
         mid: generateMID(i),
         date: txDate.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
-        status: statuses[i % statuses.length],
+        status: status,
         createdAt: txDate.toISOString(),
         updatedAt: txDate.toISOString(),
-        source: dataSources[i % dataSources.length],
-        dataSourceIdentifier: generateDataSourceIdentifier(dataSources[i % dataSources.length], txDate),
+        source: dataSource,
+        dataSourceIdentifier: generateDataSourceIdentifier(dataSource, txDate),
       };
     });
     
