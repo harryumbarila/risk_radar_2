@@ -25,8 +25,8 @@ const generateAuthData = (tx: MerchantTransaction, index: number) => {
   
   const cardF6 = String(Math.floor(Math.random() * 900000) + 100000);
   const cardL4 = String(Math.floor(Math.random() * 9000) + 1000).padStart(4, '0');
-  const cardType = cardTypes[index % cardTypes.length] || cardTypes[0];
-  const posEntryMode = posEntryModes[index % posEntryModes.length] || posEntryModes[0];
+  const cardType: string = cardTypes[index % cardTypes.length] || cardTypes[0] || '';
+  const posEntryMode: string = posEntryModes[index % posEntryModes.length] || posEntryModes[0] || '';
   const calcEntryType = posEntryMode.includes('Manual') ? 'Keyed' : posEntryMode.includes('Chip') ? 'Chip' : 'Contactless';
   const calcCNP = posEntryMode.includes('Manual') || posEntryMode.includes('Mail') ? 'Yes' : 'No';
   const posConditionCode = posConditionCodes[index % posConditionCodes.length] || posConditionCodes[0];
@@ -64,8 +64,8 @@ const generateCaptureData = (tx: MerchantTransaction, index: number) => {
   
   const cardF6 = String(Math.floor(Math.random() * 900000) + 100000);
   const cardL4 = String(Math.floor(Math.random() * 9000) + 1000).padStart(4, '0');
-  const cardType = cardTypes[index % cardTypes.length] || cardTypes[0];
-  const posEntryMode = posEntryModes[index % posEntryModes.length] || posEntryModes[0];
+  const cardType: string = cardTypes[index % cardTypes.length] || cardTypes[0] || '';
+  const posEntryMode: string = posEntryModes[index % posEntryModes.length] || posEntryModes[0] || '';
   const calcEntryType = posEntryMode.includes('Manual') ? 'Keyed' : posEntryMode.includes('Chip') ? 'Chip' : 'Contactless';
   const cardNotPresent = posEntryMode.includes('Manual') ? 'Yes' : 'No';
   const authCode = String(Math.floor(Math.random() * 900000) + 100000);
