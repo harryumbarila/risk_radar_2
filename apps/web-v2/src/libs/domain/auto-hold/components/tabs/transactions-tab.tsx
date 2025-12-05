@@ -25,16 +25,16 @@ const generateAuthData = (tx: MerchantTransaction, index: number) => {
   
   const cardF6 = String(Math.floor(Math.random() * 900000) + 100000);
   const cardL4 = String(Math.floor(Math.random() * 9000) + 1000).padStart(4, '0');
-  const cardType = cardTypes[index % cardTypes.length];
-  const posEntryMode = posEntryModes[index % posEntryModes.length];
+  const cardType = cardTypes[index % cardTypes.length] || cardTypes[0];
+  const posEntryMode = posEntryModes[index % posEntryModes.length] || posEntryModes[0];
   const calcEntryType = posEntryMode.includes('Manual') ? 'Keyed' : posEntryMode.includes('Chip') ? 'Chip' : 'Contactless';
   const calcCNP = posEntryMode.includes('Manual') || posEntryMode.includes('Mail') ? 'Yes' : 'No';
-  const posConditionCode = posConditionCodes[index % posConditionCodes.length];
-  const processingCode = processingCodes[0];
-  const authResponse = authResponses[0];
-  const messageType = messageTypes[0];
-  const avsCode = avsCodes[index % avsCodes.length];
-  const fundingSource = fundingSources[index % fundingSources.length];
+  const posConditionCode = posConditionCodes[index % posConditionCodes.length] || posConditionCodes[0];
+  const processingCode = processingCodes[0] || '';
+  const authResponse = authResponses[0] || '';
+  const messageType = messageTypes[0] || '';
+  const avsCode = avsCodes[index % avsCodes.length] || avsCodes[0];
+  const fundingSource = fundingSources[index % fundingSources.length] || fundingSources[0];
   const apprCode = String(Math.floor(Math.random() * 900000) + 100000);
   
   return {
@@ -64,8 +64,8 @@ const generateCaptureData = (tx: MerchantTransaction, index: number) => {
   
   const cardF6 = String(Math.floor(Math.random() * 900000) + 100000);
   const cardL4 = String(Math.floor(Math.random() * 9000) + 1000).padStart(4, '0');
-  const cardType = cardTypes[index % cardTypes.length];
-  const posEntryMode = posEntryModes[index % posEntryModes.length];
+  const cardType = cardTypes[index % cardTypes.length] || cardTypes[0];
+  const posEntryMode = posEntryModes[index % posEntryModes.length] || posEntryModes[0];
   const calcEntryType = posEntryMode.includes('Manual') ? 'Keyed' : posEntryMode.includes('Chip') ? 'Chip' : 'Contactless';
   const cardNotPresent = posEntryMode.includes('Manual') ? 'Yes' : 'No';
   const authCode = String(Math.floor(Math.random() * 900000) + 100000);
@@ -90,7 +90,7 @@ const generateCaptureData = (tx: MerchantTransaction, index: number) => {
 
 const generateSettledData = (tx: MerchantTransaction, index: number) => {
   const mccs = ['5655', '5411', '5812', '5999', '5311'];
-  const mcc = mccs[index % mccs.length];
+  const mcc = mccs[index % mccs.length] || mccs[0];
   const chargebackCount = Math.floor(Math.random() * 50) + 10;
   const chargebackVol = (Math.random() * 10000 + 5000).toFixed(2);
   const salesCount = Math.floor(Math.random() * 500) + 200;
@@ -122,8 +122,8 @@ const generateReturnsData = (tx: MerchantTransaction, index: number) => {
     mid: tx.mid,
     achReturnDate: returnDate.toLocaleDateString('en-US'),
     achReturnAmt: `$${parseFloat(returnAmt).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-    achReturnCode: returnCodes[index % returnCodes.length],
-    crDb: crDb[index % crDb.length],
+    achReturnCode: returnCodes[index % returnCodes.length] || returnCodes[0],
+    crDb: crDb[index % crDb.length] || crDb[0],
   };
 };
 
