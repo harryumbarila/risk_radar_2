@@ -92,6 +92,73 @@ function MIDCell({ mid }: { mid: string }) {
   );
 }
 
+// Data Source Cell Component with Click to Copy Functionality
+function DataSourceCell({ source, identifier }: { source: string; identifier: string }) {
+  const [copied, setCopied] = React.useState(false);
+  
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent row click
+    try {
+      await navigator.clipboard.writeText(identifier);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy identifier:', err);
+    }
+  };
+  
+  return (
+    <Tooltip.Root>
+      <Tooltip.Trigger asChild>
+        <Box 
+          as="span" 
+          cursor="pointer"
+          onClick={handleCopy}
+          display="inline-flex"
+          alignItems="center"
+          gap={1}
+          _hover={{ opacity: 0.8 }}
+          transition="opacity 0.2s"
+        >
+          <Text fontSize="sm" py={0.5}>
+            {source}
+          </Text>
+          {copied ? (
+            <Check size={14} color="green" />
+          ) : (
+            <Copy size={14} color="gray" />
+          )}
+        </Box>
+      </Tooltip.Trigger>
+      <Portal>
+        <Tooltip.Positioner>
+          <Tooltip.Content
+            bg="gray.900"
+            color="white"
+            px={3}
+            py={2}
+            borderRadius="md"
+            fontSize="sm"
+            boxShadow="lg"
+            maxW="300px"
+          >
+            <Tooltip.Arrow />
+            <VStack align="stretch" gap={1}>
+              <Text fontWeight="semibold">Data Source Identifier:</Text>
+              <Text fontFamily="mono" fontSize="sm" color="gray.200">
+                {identifier}
+              </Text>
+              <Text fontSize="xs" color="gray.400" mt={1}>
+                Click to copy
+              </Text>
+            </VStack>
+          </Tooltip.Content>
+        </Tooltip.Positioner>
+      </Portal>
+    </Tooltip.Root>
+  );
+}
+
 // Helper: Get severity color for rules (lighter tones)
 function getSeverityColor(ruleId: string): 'red' | 'yellow' | 'blue' | 'gray' {
   const num = parseInt(ruleId.replace('AH', ''));
@@ -342,6 +409,68 @@ function formatUWDate(date: Date): string {
   return `${month} ${day}, ${year}`;
 }
 
+// Real data source identifiers
+export const REAL_DATA_SOURCE_IDENTIFIERS = {
+  Returns: [
+    'ACH Returns 20251125',
+    'ACH Returns 20251126',
+  ],
+  Auth: [
+    'TSYS ADF Auth 11252025_20251125_061057',
+    'TSYS ADF Auth 11252025_20251125_081124',
+  ],
+  Capture: [
+    'TSYS DFT256 Capture 20251125_031528_24',
+    'TSYS DFT256 Capture 20251125_051906_02',
+  ],
+  Settled: [
+    'TSYS TDDF Settle 20251124_193646',
+    'TSYS TDDF Settle 20251125_193453',
+  ],
+};
+
+// Generate MID: 16 digits starting with 5555 or 7777
+export function generateMID(index: number = 0): string {
+  // Use index to deterministically choose prefix (alternate between 5555 and 7777)
+  const prefix = index % 2 === 0 ? '5555' : '7777';
+  // Generate remaining 12 digits based on index for consistency
+  let seed = index * 9301 + 49297;
+  const generateDigit = () => {
+    seed = (seed * 9301 + 49297) % 233280;
+    return Math.floor((seed / 233280) * 10);
+  };
+  const remainingDigits = Array.from({ length: 12 }, generateDigit).join('');
+  return `${prefix}${remainingDigits}`;
+}
+
+// Generate realistic data source identifiers using real data
+export function generateDataSourceIdentifier(source: string, date: Date): string {
+  // Map source to identifier category
+  let category: keyof typeof REAL_DATA_SOURCE_IDENTIFIERS;
+  
+  switch (source) {
+    case 'Returns':
+      category = 'Returns';
+      break;
+    case 'Auth':
+      category = 'Auth';
+      break;
+    case 'Capture':
+      category = 'Capture';
+      break;
+    case 'Settled':
+      category = 'Settled';
+      break;
+    default:
+      category = 'Auth'; // Default to Auth
+  }
+  
+  // Select a random identifier from the appropriate category
+  const identifiers = REAL_DATA_SOURCE_IDENTIFIERS[category];
+  const randomIndex = Math.floor(Math.random() * identifiers.length);
+  return identifiers[randomIndex];
+}
+
 // Generate transactions with new fields
 const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] => {
   const baseDate = new Date();
@@ -351,6 +480,12 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
   const solutionConsultants = ['SC Alpha', 'SC Beta', null];
   const dataSources = ['Auth', 'Capture', 'Settled', 'Returns'];
   
+  const tx1Date = new Date(baseDate.getTime() - 1 * 24 * 60 * 60 * 1000);
+  const tx2Date = new Date(baseDate.getTime() - 0.5 * 24 * 60 * 60 * 1000);
+  const tx3Date = new Date(baseDate.getTime() - 1 * 24 * 60 * 60 * 1000);
+  const tx4Date = new Date(baseDate.getTime() - 1 * 24 * 60 * 60 * 1000);
+  const tx5Date = new Date(baseDate.getTime() - 2 * 24 * 60 * 60 * 1000);
+  
   return [
     {
       id: '1',
@@ -359,8 +494,8 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       amount: '$12,500.00',
       exception: 'High-risk country, Unusual amount',
       processor: 'TSYS',
-      mid: '8675309001',
-      date: formatDate(new Date(baseDate.getTime() - 1 * 24 * 60 * 60 * 1000)),
+      mid: generateMID(0),
+      date: formatDate(tx1Date),
       uwDate: formatUWDate(new Date(baseDate.getTime() - 30 * 24 * 60 * 60 * 1000)),
       status: 'Unreviewed',
       createdAt: getDateInLast7Days(1),
@@ -374,7 +509,7 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       nextDayFunding: 'Yes',
       netDivertBalance: '$12,500.00',
       source: dataSources[0],
-      dataSourceIdentifier: 'DS-001',
+      dataSourceIdentifier: generateDataSourceIdentifier(dataSources[0], tx1Date),
       ahRuleApplied: ['AH001', 'AH002', 'AH003', 'AH004'],
       autoHoldRuleApplied: ['AH001'],
       createdBatchTrigger: 'Daily Batch',
@@ -387,8 +522,8 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       amount: '$8,750.50',
       exception: 'New merchant, Pattern match anomaly',
       processor: 'FSP',
-      mid: '8675309002',
-      date: formatDate(new Date(baseDate.getTime() - 0.5 * 24 * 60 * 60 * 1000)),
+      mid: generateMID(1),
+      date: formatDate(tx2Date),
       uwDate: formatUWDate(new Date(baseDate.getTime() - 25 * 24 * 60 * 60 * 1000)),
       status: 'In Progress',
       createdAt: getDateInLast7Days(0),
@@ -402,7 +537,7 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       nextDayFunding: 'No',
       netDivertBalance: '$0.00',
       source: dataSources[1],
-      dataSourceIdentifier: 'DS-002',
+      dataSourceIdentifier: generateDataSourceIdentifier(dataSources[1], tx2Date),
       ahRuleApplied: ['AH002'],
       autoHoldRuleApplied: ['AH002', 'AH003'],
       createdBatchTrigger: 'Manual',
@@ -415,8 +550,8 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       amount: '$456.78',
       exception: 'Frequency anomaly',
       processor: 'TSYS',
-      mid: '8675309003',
-      date: formatDate(new Date(baseDate.getTime() - 1 * 24 * 60 * 60 * 1000)),
+      mid: generateMID(2),
+      date: formatDate(tx3Date),
       uwDate: formatUWDate(new Date(baseDate.getTime() - 20 * 24 * 60 * 60 * 1000)),
       status: 'Unreviewed',
       createdAt: getDateInLast7Days(1),
@@ -430,7 +565,7 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       nextDayFunding: 'Yes',
       netDivertBalance: '$456.78',
       source: dataSources[2],
-      dataSourceIdentifier: 'DS-003',
+      dataSourceIdentifier: generateDataSourceIdentifier(dataSources[2], tx3Date),
       ahRuleApplied: ['AH003', 'AH004'],
       autoHoldRuleApplied: ['AH003'],
       createdBatchTrigger: 'Daily Batch',
@@ -443,8 +578,8 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       amount: '$25,000.00',
       exception: 'High-risk merchant category',
       processor: 'FSP',
-      mid: '8675309004',
-      date: formatDate(new Date(baseDate.getTime() - 1 * 24 * 60 * 60 * 1000)),
+      mid: generateMID(3),
+      date: formatDate(tx4Date),
       uwDate: formatUWDate(new Date(baseDate.getTime() - 15 * 24 * 60 * 60 * 1000)),
       status: 'Unreviewed',
       createdAt: getDateInLast7Days(1),
@@ -457,7 +592,7 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       nextDayFunding: 'No',
       netDivertBalance: '$0.00',
       source: dataSources[3],
-      dataSourceIdentifier: 'DS-004',
+      dataSourceIdentifier: generateDataSourceIdentifier(dataSources[3], tx4Date),
       ahRuleApplied: ['AH004', 'AH005'],
       autoHoldRuleApplied: ['AH004'],
       createdBatchTrigger: 'Weekly Batch',
@@ -470,8 +605,8 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       amount: '$125.45',
       exception: 'Manual review flag',
       processor: 'TSYS',
-      mid: '8675309005',
-      date: formatDate(new Date(baseDate.getTime() - 2 * 24 * 60 * 60 * 1000)),
+      mid: generateMID(4),
+      date: formatDate(tx5Date),
       uwDate: formatUWDate(new Date(baseDate.getTime() - 10 * 24 * 60 * 60 * 1000)),
       status: 'Reviewed',
       createdAt: getDateInLast7Days(2),
@@ -485,7 +620,7 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       nextDayFunding: 'Yes',
       netDivertBalance: '$125.45',
       source: dataSources[0],
-      dataSourceIdentifier: 'DS-005',
+      dataSourceIdentifier: generateDataSourceIdentifier(dataSources[0], tx5Date),
       ahRuleApplied: ['AH005'],
       autoHoldRuleApplied: ['AH005'],
       createdBatchTrigger: 'Daily Batch',
@@ -516,6 +651,11 @@ export default function CustomTable({ filters }: CustomTableProps) {
     // Filter by source
     if (filters.source && filters.source !== 'all') {
       filtered = filtered.filter((tx) => tx.source === filters.source);
+    }
+
+    // Filter by data source
+    if (filters.dataSource && filters.dataSource !== 'all') {
+      filtered = filtered.filter((tx) => tx.source === filters.dataSource);
     }
 
     // Filter by merchant (case-insensitive search)
@@ -724,25 +864,22 @@ export default function CustomTable({ filters }: CustomTableProps) {
           Data Source
         </Text>
       ),
-      cell: (info) => (
-        <Text fontSize="sm" py={0.5}>
-          {info.getValue() || '—'}
-        </Text>
-      ),
-      enableSorting: true,
-      meta: { align: 'left' },
-    }),
-    columnHelper.accessor('dataSourceIdentifier', {
-      header: () => (
-        <Text fontSize="xs" fontWeight="semibold" color="gray.600">
-          Data Source Identifier
-        </Text>
-      ),
-      cell: (info) => (
-        <Text fontSize="sm" fontFamily="mono" py={0.5}>
-          {info.getValue() || '—'}
-        </Text>
-      ),
+      cell: (info) => {
+        const source = info.getValue() || '—';
+        const identifier = info.row.original.dataSourceIdentifier;
+        
+        if (!identifier) {
+          return (
+            <Text fontSize="sm" py={0.5}>
+              {source}
+            </Text>
+          );
+        }
+        
+        return (
+          <DataSourceCell source={source} identifier={identifier} />
+        );
+      },
       enableSorting: true,
       meta: { align: 'left' },
     }),

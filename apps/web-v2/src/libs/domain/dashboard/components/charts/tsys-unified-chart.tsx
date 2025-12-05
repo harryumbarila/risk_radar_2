@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { Box, VStack, Text, HStack, Tooltip, Portal, Select, createListCollection, Button, Drawer, Badge, Table, CloseButton, SimpleGrid } from '@chakra-ui/react';
-import { Info, X, TrendingUp, TrendingDown, Minus, FileText } from 'lucide-react';
+import { Info, X, TrendingUp, TrendingDown, Minus, FileText, Check, Copy } from 'lucide-react';
 import BatchDrawer from '../../../auto-hold/components/batch-drawer/batch-drawer';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
 import {
@@ -18,6 +18,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 import type { FilterState } from '../filter-bar/filter-bar';
+import { generateDataSourceIdentifier, generateMID } from '../transactions/transactions';
 import {
   generateRuleParticipationData,
   generateTrendingData,
@@ -1200,10 +1201,149 @@ export default function TSYSUnifiedChart({
   );
 }
 
+// MID Cell Component with Copy Functionality
+function MIDCell({ mid }: { mid: string }) {
+  const [copied, setCopied] = React.useState(false);
+  
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent row click
+    try {
+      await navigator.clipboard.writeText(mid);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy MID:', err);
+    }
+  };
+  
+  return (
+    <Tooltip.Root>
+      <Tooltip.Trigger asChild>
+        <Box 
+          as="span" 
+          cursor="pointer"
+          onClick={handleCopy}
+          display="inline-flex"
+          alignItems="center"
+          gap={1}
+          _hover={{ opacity: 0.8 }}
+          transition="opacity 0.2s"
+          role="button"
+          aria-label={`Copy MID ${mid}`}
+        >
+          <Text fontSize="xs" color="gray.600" fontFamily="mono">
+            {mid}
+          </Text>
+          {copied ? (
+            <Check size={12} color="green" />
+          ) : (
+            <Copy size={12} color="gray" />
+          )}
+        </Box>
+      </Tooltip.Trigger>
+      <Portal>
+        <Tooltip.Positioner>
+          <Tooltip.Content
+            maxW="200px"
+            zIndex={2000}
+            bg="gray.900"
+            color="white"
+            px={3}
+            py={2}
+            borderRadius="md"
+            fontSize="sm"
+            boxShadow="lg"
+          >
+            <Tooltip.Arrow />
+            {copied ? 'Copied!' : 'Click to copy MID'}
+          </Tooltip.Content>
+        </Tooltip.Positioner>
+      </Portal>
+    </Tooltip.Root>
+  );
+}
+
+// Data Source Cell Component with Click to Copy Functionality
+function DataSourceCell({ source, identifier }: { source: string; identifier?: string }) {
+  const [copied, setCopied] = React.useState(false);
+  
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent row click
+    if (!identifier) return;
+    try {
+      await navigator.clipboard.writeText(identifier);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy identifier:', err);
+    }
+  };
+  
+  if (!identifier) {
+    return (
+      <Text fontSize="xs" color="gray.600">
+        {source || '—'}
+      </Text>
+    );
+  }
+  
+  return (
+    <Tooltip.Root>
+      <Tooltip.Trigger asChild>
+        <Box 
+          as="span" 
+          cursor="pointer"
+          onClick={handleCopy}
+          display="inline-flex"
+          alignItems="center"
+          gap={1}
+          _hover={{ opacity: 0.8 }}
+          transition="opacity 0.2s"
+        >
+          <Text fontSize="xs" color="gray.600">
+            {source || '—'}
+          </Text>
+          {copied ? (
+            <Check size={12} color="green" />
+          ) : (
+            <Copy size={12} color="gray" />
+          )}
+        </Box>
+      </Tooltip.Trigger>
+      <Portal>
+        <Tooltip.Positioner>
+          <Tooltip.Content
+            bg="gray.900"
+            color="white"
+            px={3}
+            py={2}
+            borderRadius="md"
+            fontSize="sm"
+            boxShadow="lg"
+            maxW="300px"
+          >
+            <Tooltip.Arrow />
+            <VStack align="stretch" gap={1}>
+              <Text fontWeight="semibold">Data Source Identifier:</Text>
+              <Text fontFamily="mono" fontSize="sm" color="gray.200">
+                {identifier}
+              </Text>
+              <Text fontSize="xs" color="gray.400" mt={1}>
+                Click to copy
+              </Text>
+            </VStack>
+          </Tooltip.Content>
+        </Tooltip.Positioner>
+      </Portal>
+    </Tooltip.Root>
+  );
+}
+
 // Mock transaction data generator with full fields
 function generateMockTransactions(count: number, date: string, ruleId: string): MerchantTransaction[] {
   const processors = ['TSYS', 'FSP'];
-  const sources = ['Talus Pay', 'Global365', 'SIT', 'SC Flow'];
+  // Data sources are: Auth, Capture, Settled, Returns
+  const dataSources: ('Auth' | 'Capture' | 'Settled' | 'Returns')[] = ['Auth', 'Capture', 'Settled', 'Returns'];
   const exceptions = ['High Amount', 'Rapid Volume', 'Unusual Pattern', 'Foreign Card', 'None'];
   const dbaNames = ['Acme Corp', 'Tech Solutions Inc', 'Global Retail', 'Digital Services', 'Commerce Hub', 'Trade Partners', 'Business Solutions'];
   
@@ -1218,7 +1358,7 @@ function generateMockTransactions(count: number, date: string, ruleId: string): 
     const merchantName = dbaNames[Math.floor(Math.random() * dbaNames.length)] || 'Unknown Merchant';
     const dbaName = dbaNames[Math.floor(Math.random() * dbaNames.length)] || 'Unknown DBA';
     const processor = processors[Math.floor(Math.random() * processors.length)] || 'TSYS';
-    const source = sources[Math.floor(Math.random() * sources.length)] || 'Talus Pay';
+    const dataSource = dataSources[Math.floor(Math.random() * dataSources.length)] || 'Auth';
     const exception = exceptions[Math.floor(Math.random() * exceptions.length)] || 'None';
     
     return {
@@ -1227,12 +1367,13 @@ function generateMockTransactions(count: number, date: string, ruleId: string): 
       dbaName: dbaName,
       amount: `$${(Math.random() * 10000 + 100).toFixed(2)}`,
       processor: processor,
-      mid: `MID-${Math.floor(Math.random() * 10000)}`,
+      mid: generateMID(i),
       exception: exception,
       date: txDate.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
       createdAt: txDate.toISOString(),
       status: 'Unreviewed' as const,
-      source: source,
+      source: dataSource, // Use data source type (Auth, Capture, Settled, Returns)
+      dataSourceIdentifier: generateDataSourceIdentifier(dataSource, txDate),
       ahRuleApplied: [ruleId],
     };
   });
@@ -1318,13 +1459,13 @@ function HeatmapCellDrawer({ isOpen, onClose, selectedCell, paymentStage, onTran
   const hasTransactions = allTransactions.length > 0;
 
   return (
-    <Drawer.Root open={isOpen} onOpenChange={(e) => !e.open && onClose()} placement="end" size="md">
+    <Drawer.Root open={isOpen} onOpenChange={(e) => !e.open && onClose()} placement="end" size="xl">
       <Portal>
         <Drawer.Backdrop bg="blackAlpha.600" backdropFilter="blur(4px)" />
         <Drawer.Positioner>
           <Drawer.Content
-            width={{ base: 'full', md: '45%', lg: '45%' }}
-            maxW={{ base: 'full', md: '800px' }}
+            width={{ base: 'full', md: '65%', lg: '70%' }}
+            maxW={{ base: 'full', md: '1200px', lg: '1400px' }}
             height="full"
             display="flex"
             flexDirection="column"
@@ -1412,16 +1553,10 @@ function HeatmapCellDrawer({ isOpen, onClose, selectedCell, paymentStage, onTran
                       <Table.Header position="sticky" top={0} zIndex={5} bg="white" borderBottomWidth="1px" borderBottomColor="gray.200">
                         <Table.Row>
                           <Table.ColumnHeader fontSize="xs" fontWeight="semibold" color="gray.600" py={2} px={4}>
-                            Transaction ID
-                          </Table.ColumnHeader>
-                          <Table.ColumnHeader fontSize="xs" fontWeight="semibold" color="gray.600" py={2} px={4}>
                             Merchant DBA
                           </Table.ColumnHeader>
                           <Table.ColumnHeader fontSize="xs" fontWeight="semibold" color="gray.600" py={2} px={4}>
                             MID
-                          </Table.ColumnHeader>
-                          <Table.ColumnHeader fontSize="xs" fontWeight="semibold" color="gray.600" py={2} px={4} textAlign="right">
-                            Amount
                           </Table.ColumnHeader>
                           <Table.ColumnHeader fontSize="xs" fontWeight="semibold" color="gray.600" py={2} px={4}>
                             Timestamp
@@ -1430,10 +1565,7 @@ function HeatmapCellDrawer({ isOpen, onClose, selectedCell, paymentStage, onTran
                             Processor
                           </Table.ColumnHeader>
                           <Table.ColumnHeader fontSize="xs" fontWeight="semibold" color="gray.600" py={2} px={4}>
-                            Source
-                          </Table.ColumnHeader>
-                          <Table.ColumnHeader fontSize="xs" fontWeight="semibold" color="gray.600" py={2} px={4}>
-                            Exception
+                            Data Source
                           </Table.ColumnHeader>
                         </Table.Row>
                       </Table.Header>
@@ -1447,24 +1579,12 @@ function HeatmapCellDrawer({ isOpen, onClose, selectedCell, paymentStage, onTran
                             onClick={() => setSelectedTransaction(tx)}
                           >
                             <Table.Cell py={2} px={4}>
-                              <Text fontSize="xs" fontFamily="mono" color="gray.700">
-                                {tx.id.substring(0, 12)}...
-                              </Text>
-                            </Table.Cell>
-                            <Table.Cell py={2} px={4}>
                               <Text fontSize="xs" fontWeight="medium" color="gray.900">
                                 {tx.dbaName || tx.merchant}
                               </Text>
                             </Table.Cell>
                             <Table.Cell py={2} px={4}>
-                              <Text fontSize="xs" color="gray.600">
-                                {tx.mid}
-                              </Text>
-                            </Table.Cell>
-                            <Table.Cell py={2} px={4} textAlign="right">
-                              <Text fontSize="xs" fontWeight="semibold" color="gray.900">
-                                {tx.amount}
-                              </Text>
+                              <MIDCell mid={tx.mid} />
                             </Table.Cell>
                             <Table.Cell py={2} px={4}>
                               <Text fontSize="xs" color="gray.600">
@@ -1477,20 +1597,10 @@ function HeatmapCellDrawer({ isOpen, onClose, selectedCell, paymentStage, onTran
                               </Badge>
                             </Table.Cell>
                             <Table.Cell py={2} px={4}>
-                              <Text fontSize="xs" color="gray.600">
-                                {tx.source || '—'}
-                              </Text>
-                            </Table.Cell>
-                            <Table.Cell py={2} px={4}>
-                              {tx.exception && tx.exception !== 'None' ? (
-                                <Badge colorPalette="orange" variant="subtle" fontSize="xs">
-                                  {tx.exception}
-                                </Badge>
-                              ) : (
-                                <Text fontSize="xs" color="gray.400">
-                                  —
-                                </Text>
-                              )}
+                              <DataSourceCell 
+                                source={tx.source || '—'} 
+                                identifier={tx.dataSourceIdentifier}
+                              />
                             </Table.Cell>
                           </Table.Row>
                         ))}

@@ -2,6 +2,7 @@
 import React from 'react';
 import { Box, VStack, Text, Table, Badge, HStack } from '@chakra-ui/react';
 import { Users } from 'lucide-react';
+import { generateMID } from '../../../dashboard/components/transactions/transactions';
 
 interface MatchedMerchant {
   merchantId: string;
@@ -19,19 +20,19 @@ export default function MatchTab({ merchantId, taxId = '12-3456789' }: MatchTabP
   // Mock data - merchants with same Tax ID
   const matchedMerchants: MatchedMerchant[] = [
     {
-      merchantId: 'MID123456',
+      merchantId: generateMID(10),
       merchantName: 'Global Tech Solutions',
       taxId: '12-3456789',
       status: 'Active',
     },
     {
-      merchantId: 'MID789012',
+      merchantId: generateMID(11),
       merchantName: 'Tech Global Inc',
       taxId: '12-3456789',
       status: 'Active',
     },
     {
-      merchantId: 'MID345678',
+      merchantId: generateMID(12),
       merchantName: 'Solutions Global Tech',
       taxId: '12-3456789',
       status: 'Suspended',

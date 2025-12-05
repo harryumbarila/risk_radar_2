@@ -14,7 +14,6 @@ import {
   createListCollection,
 } from '@chakra-ui/react';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
-import BatchSummary, { type BatchSummaryData } from '../batch-summary/batch-summary';
 import { toaster } from '@/ui/components/common/atoms/toaster/toaster';
 import { Check, Ban, ArrowLeft, TrendingUp } from 'lucide-react';
 import { Button } from '@chakra-ui/react';
@@ -32,75 +31,10 @@ interface BatchDrawerProps {
   trigger?: React.ReactNode;
 }
 
-// Generate mock batch data
-function generateBatchData(batch: MerchantTransaction[]): {
-  summary: BatchSummaryData;
-} {
-  // Calculate total amount
-  const totalAmount = batch.reduce((sum, tx) => {
-    const amount = parseFloat(tx.amount.replace(/[^0-9.]/g, ''));
-    return sum + amount;
-  }, 0);
-
-  // Extract exception types
-  const exceptionTypesSet = new Set<string>();
-  batch.forEach((tx) => {
-    const exceptions = tx.exception.split(',').map((e) => e.trim());
-    exceptions.forEach((e) => exceptionTypesSet.add(e));
-  });
-
-  // Get time window
-  const dates = batch
-    .map((tx) => {
-      const dateStr = tx.createdAt || tx.date;
-      return dateStr ? new Date(dateStr) : null;
-    })
-    .filter((d): d is Date => d !== null);
-  const startDate = dates.length > 0 ? new Date(Math.min(...dates.map((d) => d.getTime()))) : new Date();
-  const endDate = dates.length > 0 ? new Date(Math.max(...dates.map((d) => d.getTime()))) : new Date();
-
-  // Generate exception distribution counts for summary
-  const exceptionCounts: Record<string, number> = {};
-  batch.forEach((tx) => {
-    const exceptions = tx.exception.split(',').map((e) => e.trim());
-    exceptions.forEach((e) => {
-      exceptionCounts[e] = (exceptionCounts[e] || 0) + 1;
-    });
-  });
-
-  const summary: BatchSummaryData = {
-    totalTransactions: batch.length,
-    totalAmount: `$${totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-    timeWindow: {
-      start: startDate.toLocaleString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-      end: endDate.toLocaleString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-    },
-    cronJobSource: 'Daily Risk Batch Job',
-    exceptionTypes: Array.from(exceptionTypesSet),
-    exceptionCounts,
-  };
-
-  return { summary };
-}
 
 export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
   const [isLoading, setIsLoading] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState('transactions');
-
-  const { summary } = React.useMemo(
-    () => generateBatchData(batch),
-    [batch]
-  );
 
   // Get merchant info from first transaction
   const merchantInfo = batch[0];
@@ -256,9 +190,6 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
               py={6}
             >
               <VStack align="stretch" gap={6}>
-                {/* Batch Summary */}
-                <BatchSummary data={summary} />
-
                 {/* Volume Tab - Fixed below summary */}
                 <Box
                   bg="white"

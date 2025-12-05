@@ -80,8 +80,16 @@ class SeededRandom {
   }
 }
 
+// Generate MID: 16 digits starting with 5555 or 7777
 function generateMerchantId(index: number): string {
-  return `MID${String(index + 1).padStart(6, '0')}`;
+  // Use index to deterministically choose prefix (alternate between 5555 and 7777)
+  const prefix = index % 2 === 0 ? '5555' : '7777';
+  // Generate remaining 12 digits based on index for consistency
+  const random = new SeededRandom(index);
+  const remainingDigits = Array.from({ length: 12 }, () => 
+    Math.floor(random.next() * 10)
+  ).join('');
+  return `${prefix}${remainingDigits}`;
 }
 
 function pickWeighted<T>(items: T[], weights: number[], random: SeededRandom): T {

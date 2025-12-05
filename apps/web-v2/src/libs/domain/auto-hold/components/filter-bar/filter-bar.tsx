@@ -26,6 +26,7 @@ export interface AutoHoldFilterState {
   status: 'all' | 'Unreviewed' | 'In Progress' | 'Reviewed';
   processor: 'all' | string;
   source: 'all' | string;
+  dataSource: 'all' | 'Auth' | 'Capture' | 'Settled' | 'Returns';
   merchant: string;
   mid: string;
   ruleId: 'all' | string[];
@@ -80,6 +81,16 @@ export default function AutoHoldFilterBar({
     ],
   });
 
+  const dataSourceCollection = createListCollection({
+    items: [
+      { label: 'All Data Sources', value: 'all' },
+      { label: 'Auth', value: 'Auth' },
+      { label: 'Capture', value: 'Capture' },
+      { label: 'Settled', value: 'Settled' },
+      { label: 'Returns', value: 'Returns' },
+    ],
+  });
+
   const updateFilter = <K extends keyof AutoHoldFilterState>(
     key: K,
     value: AutoHoldFilterState[K]
@@ -99,6 +110,8 @@ export default function AutoHoldFilterBar({
       newFilters.processor = 'all';
     } else if (key === 'source') {
       newFilters.source = 'all';
+    } else if (key === 'dataSource') {
+      newFilters.dataSource = 'all';
     } else if (key === 'mid') {
       newFilters.mid = '';
     } else if (key === 'ruleId') {
@@ -115,6 +128,7 @@ export default function AutoHoldFilterBar({
       status: 'all',
       processor: 'all',
       source: 'all',
+      dataSource: 'all',
       merchant: '',
       mid: '',
       ruleId: 'all',
@@ -126,6 +140,7 @@ export default function AutoHoldFilterBar({
     filters.status !== 'all' ||
     filters.processor !== 'all' ||
     filters.source !== 'all' ||
+    filters.dataSource !== 'all' ||
     filters.mid !== '' ||
     (Array.isArray(filters.ruleId) ? filters.ruleId.length > 0 : filters.ruleId !== 'all') ||
     filters.customStartDate !== undefined ||
@@ -136,6 +151,7 @@ export default function AutoHoldFilterBar({
     filters.dateRange !== '7',
     filters.status !== 'all',
     filters.processor !== 'all',
+    filters.dataSource !== 'all',
     filters.source !== 'all',
     filters.mid !== '',
     (Array.isArray(filters.ruleId) ? filters.ruleId.length > 0 : filters.ruleId !== 'all'),
@@ -371,6 +387,44 @@ export default function AutoHoldFilterBar({
             </Select.Root>
           </VStack>
 
+          {/* Data Source Filter */}
+          <VStack align="start" gap={1}>
+            <Text fontSize="xs" color="gray.600">
+              Data Source
+            </Text>
+            <Select.Root
+              collection={dataSourceCollection}
+              value={[filters.dataSource || 'all']}
+              onValueChange={(e) => {
+                updateFilter('dataSource', (e.value[0] || 'all') as AutoHoldFilterState['dataSource']);
+              }}
+              size="sm"
+              width="150px"
+            >
+              <Select.HiddenSelect />
+              <Select.Control>
+                <Select.Trigger suppressHydrationWarning>
+                  <Select.ValueText />
+                </Select.Trigger>
+                <Select.IndicatorGroup>
+                  <Select.Indicator />
+                </Select.IndicatorGroup>
+              </Select.Control>
+              <Portal>
+                <Select.Positioner>
+                  <Select.Content>
+                    {dataSourceCollection.items.map((item) => (
+                      <Select.Item item={item} key={item.value}>
+                        {item.label}
+                        <Select.ItemIndicator />
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select.Positioner>
+              </Portal>
+            </Select.Root>
+          </VStack>
+
           {/* MID Search */}
           <VStack align="start" gap={1}>
             <Text fontSize="xs" color="gray.600">
@@ -585,6 +639,30 @@ export default function AutoHoldFilterBar({
                   size="xs"
                   variant="ghost"
                   onClick={() => clearFilter('source')}
+                  p={0}
+                  minW="auto"
+                  h="auto"
+                >
+                  <X size={12} />
+                </Button>
+              </Badge>
+            )}
+            {filters.dataSource !== 'all' && (
+              <Badge
+                colorPalette="blue"
+                variant="subtle"
+                px={2}
+                py={1}
+                borderRadius="md"
+                display="flex"
+                alignItems="center"
+                gap={1}
+              >
+                Data Source: {filters.dataSource}
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  onClick={() => clearFilter('dataSource')}
                   p={0}
                   minW="auto"
                   h="auto"

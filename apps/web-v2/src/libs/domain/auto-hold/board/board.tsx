@@ -7,6 +7,7 @@ import ManagerQueueView from '../components/manager-queue-view/manager-queue-vie
 import AutoHoldFilterBar, { AutoHoldFilterState } from '../components/filter-bar/filter-bar';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
 import { RULE_DEFINITIONS } from '@/libs/domain/dashboard/utils/ruleNames';
+import { generateDataSourceIdentifier, generateMID } from '../../dashboard/components/transactions/transactions';
 
 export default function AutoHoldBoardPage() {
   const [isLoading, setIsLoading] = React.useState(true);
@@ -16,6 +17,7 @@ export default function AutoHoldBoardPage() {
     status: 'all',
     processor: 'all',
     source: 'all',
+    dataSource: 'all',
     merchant: '',
     mid: '',
     ruleId: 'all',
@@ -41,45 +43,60 @@ export default function AutoHoldBoardPage() {
   // Mock: Group transactions into batches for manager view
   // In real app, this would come from API or be shared state
   const allBatches: MerchantTransaction[][] = React.useMemo(() => {
+    const baseDate = new Date();
+    const tx1Date = new Date('2025-04-08T09:15:00.000Z');
+    const tx2Date = new Date('2025-04-08T10:23:00.000Z');
+    const tx3Date = new Date('2025-04-08T11:05:00.000Z');
+    
     // Mock transactions grouped by batch (merchant + date)
-    const mockTransactions: MerchantTransaction[] = [
-      {
-        id: '1',
-        merchant: 'Global Tech Solutions',
-        amount: '$12,500.00',
-        exception: 'High-risk country, Unusual amount',
-        processor: 'TSYS',
-        mid: '8675309001',
-        date: 'Apr 8, 9:15 AM',
-        status: 'Unreviewed',
-        createdAt: '2025-04-08T09:15:00.000Z',
-        updatedAt: '2025-04-08T09:15:00.000Z',
-      },
-      {
-        id: '2',
-        merchant: 'Oceanview Logistics',
-        amount: '$8,750.50',
-        exception: 'New merchant, Pattern match anomaly',
-        processor: 'Fiserv',
-        mid: '8675309002',
-        date: 'Apr 8, 10:23 AM',
-        status: 'In Progress',
-        createdAt: '2025-04-08T10:23:00.000Z',
-        updatedAt: '2025-04-08T10:23:00.000Z',
-      },
-      {
-        id: '3',
-        merchant: 'Sunshine Pharmacy',
-        amount: '$456.78',
-        exception: 'Frequency anomaly',
-        processor: 'Worldpay',
-        mid: '8675309003',
-        date: 'Apr 8, 11:05 AM',
-        status: 'Unreviewed',
-        createdAt: '2025-04-08T11:05:00.000Z',
-        updatedAt: '2025-04-08T11:05:00.000Z',
-      },
+    const dataSources: ('Auth' | 'Capture' | 'Settled' | 'Returns')[] = ['Auth', 'Capture', 'Settled', 'Returns'];
+    const processors = ['TSYS', 'FSP'];
+    const statuses: ('Unreviewed' | 'In Progress' | 'Reviewed')[] = ['Unreviewed', 'In Progress', 'Reviewed'];
+    const merchants = [
+      'Global Tech Solutions',
+      'Oceanview Logistics',
+      'Sunshine Pharmacy',
+      'Digital Assets Exchange',
+      'City Supermarket',
+      'QuickWire Transfers',
+      'Business Equipment Pro',
+      'Luxury Boutique',
+      'Downtown Hotel',
+      'Global Shipping Co',
+      'Metro Financial Services',
+      'Coastal Trading Group',
     ];
+    const exceptions = [
+      'High-risk country, Unusual amount',
+      'New merchant, Pattern match anomaly',
+      'Frequency anomaly',
+      'High Amount',
+      'Rapid Volume',
+      'Unusual Pattern',
+      'Foreign Card',
+      'Manual review flag',
+    ];
+
+    const mockTransactions: MerchantTransaction[] = Array.from({ length: 12 }, (_, i) => {
+      const txDate = new Date(baseDate);
+      txDate.setDate(txDate.getDate() - Math.floor(i / 4));
+      txDate.setHours(9 + (i % 8), 15 + (i * 5) % 45, 0, 0);
+      
+      return {
+        id: String(i + 1),
+        merchant: merchants[i % merchants.length],
+        amount: `$${(Math.random() * 15000 + 100).toFixed(2)}`,
+        exception: exceptions[i % exceptions.length],
+        processor: processors[i % processors.length],
+        mid: generateMID(i),
+        date: txDate.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+        status: statuses[i % statuses.length],
+        createdAt: txDate.toISOString(),
+        updatedAt: txDate.toISOString(),
+        source: dataSources[i % dataSources.length],
+        dataSourceIdentifier: generateDataSourceIdentifier(dataSources[i % dataSources.length], txDate),
+      };
+    });
     
     // Group by merchant + date to create batches
     const batchMap = new Map<string, MerchantTransaction[]>();
