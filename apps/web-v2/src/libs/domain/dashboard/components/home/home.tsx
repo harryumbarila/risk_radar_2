@@ -16,7 +16,6 @@ import KpiCard from '../kpi-card/kpi-card';
 import RuleLabel from '../rule-label/rule-label';
 import TSYSUnifiedChart from '../charts/tsys-unified-chart';
 // Lazy load heavy chart components
-const TopRulesChart = React.lazy(() => import('../charts/top-rules-chart').then(m => ({ default: m.default })));
 const SourceDistributionChart = React.lazy(() => import('../charts/source-distribution-chart').then(m => ({ default: m.default })));
 const MerchantRanking = React.lazy(() => import('../charts/merchant-ranking').then(m => ({ default: m.default })));
 const ChargebackRateChart = React.lazy(() => import('../charts/chargeback-rate-chart').then(m => ({ default: m.default })));
@@ -192,10 +191,6 @@ export default function Home() {
     }
     return calculateKpis(filteredAlerts);
   }, [filteredAlerts]);
-
-  const handleRuleClick = (ruleId: string) => {
-    setFilters((prev) => ({ ...prev, ruleId: [ruleId] }));
-  };
 
   const handleSourceClick = (source: Source) => {
     // SourceDistributionChart shows processors, so filter by processor
@@ -443,13 +438,6 @@ export default function Home() {
 
         {/* Separator */}
         <Box borderTop="1px" borderColor="gray.200" mt={2} pt={4} />
-
-        {/* Charts Row 1: Top Rules */}
-        <SimpleGrid columns={{ base: 1, lg: 1 }} gap={6} role="region" aria-label="Risk Analysis Charts">
-          <React.Suspense fallback={<Skeleton height="400px" />}>
-            <TopRulesChart alerts={filteredAlerts} onRuleClick={handleRuleClick} />
-          </React.Suspense>
-        </SimpleGrid>
 
         {/* Charts Row 2: Source Distribution */}
         <SimpleGrid columns={{ base: 1, lg: 1 }} gap={6}>
