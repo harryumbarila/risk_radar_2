@@ -468,7 +468,7 @@ export function generateDataSourceIdentifier(source: string, date: Date): string
   // Select a random identifier from the appropriate category
   const identifiers = REAL_DATA_SOURCE_IDENTIFIERS[category];
   const randomIndex = Math.floor(Math.random() * identifiers.length);
-  return identifiers[randomIndex];
+  return identifiers[randomIndex] || identifiers[0] || 'TSYS ADF Auth 11252025_20251125_061057';
 }
 
 // Generate transactions with new fields
