@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
-import { Box, VStack, Text, Table, HStack, Select, createListCollection } from '@chakra-ui/react';
-import { BarChart3 } from 'lucide-react';
+import { Box, VStack, Text, Table, HStack, Select, createListCollection, Tooltip, Portal } from '@chakra-ui/react';
+import { BarChart3, Info } from 'lucide-react';
 
 interface MonthlyVolume {
   month: string; // Format: "Month - Year" e.g., "January - 2025"
@@ -190,13 +190,49 @@ export default function VolumeTab({ merchantId }: VolumeTabProps) {
             <Table.Header>
               <Table.Row bg="gray.50">
                 <Table.ColumnHeader>Month - Year</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="right"># Trans</Table.ColumnHeader>
                 <Table.ColumnHeader textAlign="right">Volume</Table.ColumnHeader>
                 <Table.ColumnHeader textAlign="right">Avg Ticket</Table.ColumnHeader>
-                <Table.ColumnHeader textAlign="right">CNP %</Table.ColumnHeader>
                 <Table.ColumnHeader textAlign="right">Highest Ticket</Table.ColumnHeader>
-                <Table.ColumnHeader textAlign="right">Total CB</Table.ColumnHeader>
-                <Table.ColumnHeader textAlign="right"># Trans</Table.ColumnHeader>
-                <Table.ColumnHeader textAlign="right">ICP</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="right">CNP %</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="right">
+                  <HStack gap={1} justify="flex-end" align="center" display="inline-flex">
+                    <Text>Total CB</Text>
+                    <Tooltip.Root openDelay={300} closeDelay={100}>
+                      <Tooltip.Trigger asChild>
+                        <Box
+                          as="span"
+                          color="gray.400"
+                          _hover={{ color: 'gray.600' }}
+                          cursor="help"
+                          display="inline-flex"
+                          alignItems="center"
+                          aria-label="Total CB information"
+                        >
+                          <Info size={12} />
+                        </Box>
+                      </Tooltip.Trigger>
+                      <Portal>
+                        <Tooltip.Positioner>
+                          <Tooltip.Content
+                            maxW="250px"
+                            zIndex={2000}
+                            bg="gray.900"
+                            color="white"
+                            px={3}
+                            py={2}
+                            borderRadius="md"
+                            fontSize="sm"
+                            boxShadow="lg"
+                          >
+                            <Tooltip.Arrow />
+                            Data source: Settled data
+                          </Tooltip.Content>
+                        </Tooltip.Positioner>
+                      </Portal>
+                    </Tooltip.Root>
+                  </HStack>
+                </Table.ColumnHeader>
               </Table.Row>
             </Table.Header>
             <Table.Body>
@@ -206,25 +242,57 @@ export default function VolumeTab({ merchantId }: VolumeTabProps) {
                     <Text fontWeight="semibold">{volume.month}</Text>
                   </Table.Cell>
                   <Table.Cell textAlign="right">
+                    {volume.numTrans.toLocaleString()}
+                  </Table.Cell>
+                  <Table.Cell textAlign="right">
                     <Text fontWeight="semibold">{formatCurrency(volume.volume)}</Text>
                   </Table.Cell>
                   <Table.Cell textAlign="right">
                     {formatCurrency(volume.avgTicket)}
                   </Table.Cell>
                   <Table.Cell textAlign="right">
-                    {formatPercent(volume.cnpPercent)}
-                  </Table.Cell>
-                  <Table.Cell textAlign="right">
                     {formatCurrency(volume.highestTicket)}
                   </Table.Cell>
                   <Table.Cell textAlign="right">
-                    {volume.totalCB}
+                    {formatPercent(volume.cnpPercent)}
                   </Table.Cell>
                   <Table.Cell textAlign="right">
-                    {volume.numTrans.toLocaleString()}
-                  </Table.Cell>
-                  <Table.Cell textAlign="right">
-                    {formatPercent(volume.icp)}
+                    <HStack gap={1} justify="flex-end" align="center" display="inline-flex">
+                      <Text>{volume.totalCB}</Text>
+                      <Tooltip.Root openDelay={300} closeDelay={100}>
+                        <Tooltip.Trigger asChild>
+                          <Box
+                            as="span"
+                            color="gray.400"
+                            _hover={{ color: 'gray.600' }}
+                            cursor="help"
+                            display="inline-flex"
+                            alignItems="center"
+                            aria-label="Total CB information"
+                          >
+                            <Info size={12} />
+                          </Box>
+                        </Tooltip.Trigger>
+                        <Portal>
+                          <Tooltip.Positioner>
+                            <Tooltip.Content
+                              maxW="250px"
+                              zIndex={2000}
+                              bg="gray.900"
+                              color="white"
+                              px={3}
+                              py={2}
+                              borderRadius="md"
+                              fontSize="sm"
+                              boxShadow="lg"
+                            >
+                              <Tooltip.Arrow />
+                              Data source: Settled data
+                            </Tooltip.Content>
+                          </Tooltip.Positioner>
+                        </Portal>
+                      </Tooltip.Root>
+                    </HStack>
                   </Table.Cell>
                 </Table.Row>
               ))}

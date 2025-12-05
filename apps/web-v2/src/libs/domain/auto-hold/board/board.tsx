@@ -20,6 +20,7 @@ export default function AutoHoldBoardPage() {
     dataSource: 'all',
     merchant: '',
     mid: '',
+    mcc: '',
     ruleId: 'all',
   });
 

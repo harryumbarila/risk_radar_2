@@ -29,6 +29,7 @@ export interface AutoHoldFilterState {
   dataSource: 'all' | 'Auth' | 'Capture' | 'Settled' | 'Returns';
   merchant: string;
   mid: string;
+  mcc: string;
   ruleId: 'all' | string[];
 }
 
@@ -114,6 +115,8 @@ export default function AutoHoldFilterBar({
       newFilters.dataSource = 'all';
     } else if (key === 'mid') {
       newFilters.mid = '';
+    } else if (key === 'mcc') {
+      newFilters.mcc = '';
     } else if (key === 'ruleId') {
       newFilters.ruleId = 'all';
     } else {
@@ -131,6 +134,7 @@ export default function AutoHoldFilterBar({
       dataSource: 'all',
       merchant: '',
       mid: '',
+      mcc: '',
       ruleId: 'all',
     });
   };
@@ -142,6 +146,7 @@ export default function AutoHoldFilterBar({
     filters.source !== 'all' ||
     filters.dataSource !== 'all' ||
     filters.mid !== '' ||
+    filters.mcc !== '' ||
     (Array.isArray(filters.ruleId) ? filters.ruleId.length > 0 : filters.ruleId !== 'all') ||
     filters.customStartDate !== undefined ||
     filters.customEndDate !== undefined;
@@ -154,6 +159,7 @@ export default function AutoHoldFilterBar({
     filters.dataSource !== 'all',
     filters.source !== 'all',
     filters.mid !== '',
+    filters.mcc !== '',
     (Array.isArray(filters.ruleId) ? filters.ruleId.length > 0 : filters.ruleId !== 'all'),
     filters.customStartDate !== undefined,
     filters.customEndDate !== undefined,
@@ -453,6 +459,34 @@ export default function AutoHoldFilterBar({
             </Box>
           </VStack>
 
+          {/* MCC Search */}
+          <VStack align="start" gap={1}>
+            <Text fontSize="xs" color="gray.600">
+              MCC
+            </Text>
+            <Box position="relative" width="150px">
+              <Box
+                position="absolute"
+                left={3}
+                top="50%"
+                transform="translateY(-50%)"
+                zIndex={1}
+                pointerEvents="none"
+                color="gray.400"
+              >
+                <Search size={16} />
+              </Box>
+              <Input
+                size="sm"
+                placeholder="Search MCC..."
+                value={filters.mcc || ''}
+                onChange={(e) => updateFilter('mcc', e.target.value)}
+                pl={10}
+                suppressHydrationWarning
+              />
+            </Box>
+          </VStack>
+
           {/* Rule Type - Multi Select */}
           {availableRules.length > 0 && (
             <VStack align="start" gap={1}>
@@ -687,6 +721,30 @@ export default function AutoHoldFilterBar({
                   size="xs"
                   variant="ghost"
                   onClick={() => clearFilter('mid')}
+                  p={0}
+                  minW="auto"
+                  h="auto"
+                >
+                  <X size={12} />
+                </Button>
+              </Badge>
+            )}
+            {filters.mcc && (
+              <Badge
+                colorPalette="blue"
+                variant="subtle"
+                px={2}
+                py={1}
+                borderRadius="md"
+                display="flex"
+                alignItems="center"
+                gap={1}
+              >
+                MCC: {filters.mcc}
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  onClick={() => clearFilter('mcc')}
                   p={0}
                   minW="auto"
                   h="auto"
