@@ -47,32 +47,46 @@ export default function Home() {
 
   // Generate mock data on mount - optimized to prevent blocking
   React.useEffect(() => {
+    let isMounted = true;
+    
     // Simulate data loading with timeout (matches other modules)
     const timer = setTimeout(() => {
+      if (!isMounted) return;
+      
       try {
         // Reduce initial data size for faster initial load
         const alerts = generateMockAlerts(500);
-        setAllAlerts(alerts);
-        setIsLoading(false);
+        if (isMounted) {
+          setAllAlerts(alerts);
+          setIsLoading(false);
+        }
         
         // Load remaining data asynchronously after initial render
         setTimeout(() => {
+          if (!isMounted) return;
           try {
             const remainingAlerts = generateMockAlerts(2000);
-            setAllAlerts((prev) => [...prev, ...remainingAlerts]);
+            if (isMounted) {
+              setAllAlerts((prev) => [...prev, ...remainingAlerts]);
+            }
           } catch (error) {
             console.warn('Error loading additional mock data:', error);
           }
         }, 1000);
       } catch (error) {
         console.error('Error generating mock alerts:', error);
-        setError(error instanceof Error ? error : new Error(String(error)));
-        setAllAlerts([]);
-        setIsLoading(false);
+        if (isMounted) {
+          setError(error instanceof Error ? error : new Error(String(error)));
+          setAllAlerts([]);
+          setIsLoading(false);
+        }
       }
     }, 800); // 800ms to match other modules
     
-    return () => clearTimeout(timer);
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
   }, []);
 
   // Filter alerts based on current filters
