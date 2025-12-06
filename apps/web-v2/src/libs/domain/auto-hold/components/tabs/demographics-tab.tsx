@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { Box, VStack, Text, HStack, Badge, SimpleGrid } from '@chakra-ui/react';
-import { MapPin, Building2, DollarSign, Calendar, CreditCard, TrendingUp } from 'lucide-react';
+import { MapPin, Building2, DollarSign, Calendar, CreditCard, TrendingUp, TrendingDown } from 'lucide-react';
 
 interface DemographicsTabProps {
   merchantId: string;
@@ -66,7 +66,7 @@ export default function DemographicsTab({ merchantId, merchantName }: Demographi
         borderColor="gray.200"
         borderTopWidth="0"
       >
-        <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
+        <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
           {/* Location Section */}
           <Box
             p={3}
@@ -82,7 +82,7 @@ export default function DemographicsTab({ merchantId, merchantName }: Demographi
               </Text>
             </HStack>
             <VStack align="start" gap={2}>
-              <HStack gap={3}>
+              <HStack gap={4} flexWrap="wrap">
                 <VStack align="start" gap={0.5}>
                   <Text fontSize="xs" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
                     City
@@ -126,7 +126,7 @@ export default function DemographicsTab({ merchantId, merchantName }: Demographi
               </Text>
             </HStack>
             <VStack align="start" gap={2.5}>
-              <HStack gap={2} flexWrap="wrap">
+              <HStack gap={3} flexWrap="wrap">
                 <VStack align="start" gap={0.5}>
                   <Text fontSize="xs" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
                     Merchant Type
@@ -135,8 +135,8 @@ export default function DemographicsTab({ merchantId, merchantName }: Demographi
                     colorPalette="blue" 
                     variant="subtle" 
                     fontSize="xs"
-                    px={2}
-                    py={0.5}
+                    px={2.5}
+                    py={1}
                     borderRadius="full"
                   >
                     {demographicsData.merchantType}
@@ -150,15 +150,15 @@ export default function DemographicsTab({ merchantId, merchantName }: Demographi
                     colorPalette="purple" 
                     variant="subtle" 
                     fontSize="xs"
-                    px={2}
-                    py={0.5}
+                    px={2.5}
+                    py={1}
                     borderRadius="full"
                   >
                     {demographicsData.ownership}
                   </Badge>
                 </VStack>
               </HStack>
-              <HStack gap={2} flexWrap="wrap">
+              <HStack gap={3} flexWrap="wrap">
                 <VStack align="start" gap={0.5}>
                   <HStack gap={1} align="center">
                     <Box color="#6B7280">
@@ -180,8 +180,8 @@ export default function DemographicsTab({ merchantId, merchantName }: Demographi
                     colorPalette="gray" 
                     variant="solid" 
                     fontSize="xs"
-                    px={2}
-                    py={0.5}
+                    px={2.5}
+                    py={1}
                     borderRadius="full"
                     fontWeight="semibold"
                   >
@@ -197,7 +197,6 @@ export default function DemographicsTab({ merchantId, merchantName }: Demographi
             p={3}
             bg="#F8F9FC"
             borderRadius="md"
-            gridColumn={{ base: '1', md: 'span 2' }}
           >
             <HStack gap={2} mb={2.5} align="center">
               <Box color="#6B7280">
@@ -207,7 +206,7 @@ export default function DemographicsTab({ merchantId, merchantName }: Demographi
                 Financial Snapshot
               </Text>
             </HStack>
-            <HStack gap={6} flexWrap="wrap">
+            <HStack gap={6} flexWrap="wrap" align="start">
               <VStack align="start" gap={0.5}>
                 <HStack gap={1} align="center">
                   <Box color="#6B7280">
@@ -222,14 +221,15 @@ export default function DemographicsTab({ merchantId, merchantName }: Demographi
                     {demographicsData.netBalance}
                   </Text>
                   <HStack gap={0.5} align="center">
-                    <Box color={isPositiveTrend ? 'green.600' : 'red.600'}>
-                      <TrendingUp 
-                        size={14} 
-                        style={{ 
-                          transform: isPositiveTrend ? 'none' : 'rotate(180deg)',
-                        }} 
-                      />
-                    </Box>
+                    {isPositiveTrend ? (
+                      <Box color="green.600">
+                        <TrendingUp size={14} />
+                      </Box>
+                    ) : (
+                      <Box color="red.600">
+                        <TrendingDown size={14} />
+                      </Box>
+                    )}
                     <Text 
                       fontSize="xs" 
                       fontWeight="semibold" 
