@@ -302,8 +302,6 @@ export default function ManagerQueueFilters({
             >
               Date: {filters.dateRange === 'custom'
                 ? `${filters.customStartDate ? new Date(filters.customStartDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : ''} - ${filters.customEndDate ? new Date(filters.customEndDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : ''}`
-                : filters.dateRange === 'today'
-                ? 'Today'
                 : `Last ${filters.dateRange} days`}
               <Button
                 size="xs"
