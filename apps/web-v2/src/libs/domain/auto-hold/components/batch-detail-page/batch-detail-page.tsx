@@ -36,7 +36,7 @@ export default function BatchDetailPage({ batch }: BatchDetailPageProps) {
   const [activeTab, setActiveTab] = React.useState('transactions');
   
   // Check if we came from Manager Queue
-  const sourceParam = searchParams.get('source');
+  const sourceParam = searchParams?.get('source');
   const isFromManagerQueue = sourceParam === 'manager-queue';
 
   // Get merchant info from first transaction
