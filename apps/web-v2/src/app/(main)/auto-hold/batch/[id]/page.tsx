@@ -53,6 +53,17 @@ function getBatchById(id: string): MerchantTransaction[] {
 
 export default function BatchDetailPageRoute() {
   const params = useParams();
+  
+  if (!params || !params.id) {
+    return (
+      <Box p={6} textAlign="center">
+        <Text fontSize="lg" color="gray.600">
+          Batch ID not found
+        </Text>
+      </Box>
+    );
+  }
+  
   const batchId = params.id as string;
   
   // Fetch batch data
