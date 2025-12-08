@@ -35,10 +35,10 @@ export default function ManagerOverviewCards({
 
     // Mock trend calculations (vs previous week)
     const trends = {
-      pendingReviews: { value: 12.5, direction: 'up' as const },
-      escalations: { value: 8.3, direction: 'down' as const },
-      unassigned: { value: 5.2, direction: 'up' as const },
-      highestLoad: { value: 15.0, direction: 'up' as const },
+      pendingReviews: { value: 12.5, direction: 'up' as 'up' | 'down' | 'neutral' },
+      escalations: { value: 8.3, direction: 'down' as 'up' | 'down' | 'neutral' },
+      unassigned: { value: 5.2, direction: 'up' as 'up' | 'down' | 'neutral' },
+      highestLoad: { value: 15.0, direction: 'up' as 'up' | 'down' | 'neutral' },
     };
 
     return [
