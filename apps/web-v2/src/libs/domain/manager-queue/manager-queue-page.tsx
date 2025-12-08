@@ -148,17 +148,24 @@ function generateMockQueueItems(): ManagerQueueItem[] {
     const shuffledRules = [...ruleIds].sort(() => Math.random() - 0.5);
     const triggeredRules = shuffledRules.slice(0, exceptionsCount);
     
+    const merchantIndex = i % merchants.length;
+    const reasonIndex = i % reasons.length;
+    const riskIndex = i % riskLevels.length;
+    const analystIndex = i % analysts.length;
+    const processorIndex = i % processors.length;
+    const statusIndex = i % statuses.length;
+    
     return {
       id: `MQ-${i + 1}`,
-      dbaName: merchants[i % merchants.length],
+      dbaName: merchants[merchantIndex] || 'Unknown Merchant',
       mid: generateMID(i),
-      reasonForReview: reasons[i % reasons.length],
-      riskLevel: riskLevels[i % riskLevels.length] as any,
-      assignedAnalyst: analysts[i % analysts.length],
-      processor: processors[i % processors.length],
+      reasonForReview: reasons[reasonIndex] || 'Unknown reason',
+      riskLevel: (riskLevels[riskIndex] || 'Low') as 'Low' | 'Medium' | 'High' | 'Critical',
+      assignedAnalyst: analysts[analystIndex] || null,
+      processor: processors[processorIndex] || 'TSYS',
       exceptionsTriggered: exceptionsCount,
       triggeredRules,
-      status: statuses[i % statuses.length] as any,
+      status: (statuses[statusIndex] || 'Pending') as 'Pending' | 'In-Review' | 'Completed',
       submittedOn: baseDate.toISOString(),
       lastActivity: new Date(baseDate.getTime() + Math.random() * 86400000).toISOString(),
       mcc: String(Math.floor(Math.random() * 9000) + 1000),
