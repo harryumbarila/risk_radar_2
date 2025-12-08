@@ -19,6 +19,37 @@ import { X, ChevronDown } from 'lucide-react';
 import { getRuleName } from '../../utils/ruleNames';
 import RuleLabel from '../rule-label/rule-label';
 
+// Helper functions to format dates between YYYY-MM-DD (internal) and MM/DD/YYYY (display)
+const formatDateForDisplay = (dateString: string | undefined): string => {
+  if (!dateString) return '';
+  // If already in MM/DD/YYYY format, return as is
+  if (dateString.includes('/')) return dateString;
+  // Convert from YYYY-MM-DD to MM/DD/YYYY
+  const [year, month, day] = dateString.split('-');
+  if (year && month && day) {
+    return `${month}/${day}/${year}`;
+  }
+  return dateString;
+};
+
+const formatDateForStorage = (dateString: string): string => {
+  if (!dateString) return '';
+  // If already in YYYY-MM-DD format, return as is
+  if (dateString.includes('-') && dateString.length === 10) return dateString;
+  // Convert from MM/DD/YYYY to YYYY-MM-DD
+  const parts = dateString.split('/');
+  if (parts.length === 3) {
+    const [month, day, year] = parts;
+    if (month && day && year) {
+      // Pad with zeros if needed
+      const paddedMonth = month.padStart(2, '0');
+      const paddedDay = day.padStart(2, '0');
+      return `${year}-${paddedMonth}-${paddedDay}`;
+    }
+  }
+  return dateString;
+};
+
 export interface FilterState {
   dateRange: '7' | '14' | '30' | 'custom';
   customStartDate?: string;
@@ -74,7 +105,7 @@ export default function FilterBar({
     items: [
       { label: 'Authorization', value: 'Authorization' },
       { label: 'Capture', value: 'Capture' },
-      { label: 'Settlement', value: 'Settlement' },
+      { label: 'Settlement (CB)', value: 'Settlement' },
       { label: 'ACH Returns', value: 'ACH Returns' },
     ],
   });
@@ -239,11 +270,15 @@ export default function FilterBar({
                   From
                 </Text>
                 <Input
-                  type="date"
+                  type="text"
                   size="sm"
                   width="150px"
-                  value={filters.customStartDate || ''}
-                  onChange={(e) => updateFilter('customStartDate', e.target.value)}
+                  value={formatDateForDisplay(filters.customStartDate)}
+                  onChange={(e) => {
+                    const formatted = formatDateForStorage(e.target.value);
+                    updateFilter('customStartDate', formatted);
+                  }}
+                  placeholder="MM/DD/YYYY"
                 />
               </VStack>
               <VStack align="start" gap={1}>
@@ -251,11 +286,15 @@ export default function FilterBar({
                   To
                 </Text>
                 <Input
-                  type="date"
+                  type="text"
                   size="sm"
                   width="150px"
-                  value={filters.customEndDate || ''}
-                  onChange={(e) => updateFilter('customEndDate', e.target.value)}
+                  value={formatDateForDisplay(filters.customEndDate)}
+                  onChange={(e) => {
+                    const formatted = formatDateForStorage(e.target.value);
+                    updateFilter('customEndDate', formatted);
+                  }}
+                  placeholder="MM/DD/YYYY"
                 />
               </VStack>
             </>

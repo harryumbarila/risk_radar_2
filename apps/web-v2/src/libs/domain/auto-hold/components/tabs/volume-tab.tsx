@@ -9,7 +9,8 @@ interface MonthlyVolume {
   avgTicket: number; // Average ticket amount
   cnpPercent: number; // CNP percentage
   highestTicket: number; // Highest ticket amount
-  totalCB: number; // Total chargebacks
+  totalCB: number; // Total chargebacks count
+  cbTotalAmount: number; // Total chargeback amount
   numTrans: number; // Number of transactions
   icp: number; // ICP percentage based on transaction volume
 }
@@ -27,6 +28,7 @@ const generateAuthData = (): MonthlyVolume[] => [
     cnpPercent: 85.5,
     highestTicket: 1250.00,
     totalCB: 12,
+    cbTotalAmount: 12500.00,
     numTrans: 1250,
     icp: 0.96,
   },
@@ -37,6 +39,7 @@ const generateAuthData = (): MonthlyVolume[] => [
     cnpPercent: 87.2,
     highestTicket: 1450.00,
     totalCB: 15,
+    cbTotalAmount: 15750.00,
     numTrans: 1380,
     icp: 1.09,
   },
@@ -47,6 +50,7 @@ const generateAuthData = (): MonthlyVolume[] => [
     cnpPercent: 88.1,
     highestTicket: 1680.00,
     totalCB: 18,
+    cbTotalAmount: 18900.00,
     numTrans: 1520,
     icp: 1.18,
   },
@@ -57,6 +61,7 @@ const generateAuthData = (): MonthlyVolume[] => [
     cnpPercent: 86.8,
     highestTicket: 1620.00,
     totalCB: 16,
+    cbTotalAmount: 16800.00,
     numTrans: 1480,
     icp: 1.08,
   },
@@ -70,6 +75,7 @@ const generateCaptureData = (): MonthlyVolume[] => [
     cnpPercent: 82.3,
     highestTicket: 1180.00,
     totalCB: 10,
+    cbTotalAmount: 10500.00,
     numTrans: 1242,
     icp: 0.81,
   },
@@ -80,6 +86,7 @@ const generateCaptureData = (): MonthlyVolume[] => [
     cnpPercent: 84.1,
     highestTicket: 1325.00,
     totalCB: 13,
+    cbTotalAmount: 13650.00,
     numTrans: 1345,
     icp: 0.97,
   },
@@ -90,6 +97,7 @@ const generateCaptureData = (): MonthlyVolume[] => [
     cnpPercent: 85.7,
     highestTicket: 1523.00,
     totalCB: 15,
+    cbTotalAmount: 15750.00,
     numTrans: 1490,
     icp: 1.01,
   },
@@ -100,6 +108,7 @@ const generateCaptureData = (): MonthlyVolume[] => [
     cnpPercent: 84.9,
     highestTicket: 1486.00,
     totalCB: 14,
+    cbTotalAmount: 14700.00,
     numTrans: 1464,
     icp: 0.96,
   },
@@ -257,42 +266,47 @@ export default function VolumeTab({ merchantId }: VolumeTabProps) {
                     {formatPercent(volume.cnpPercent)}
                   </Table.Cell>
                   <Table.Cell textAlign="right">
-                    <HStack gap={1} justify="flex-end" align="center" display="inline-flex">
-                      <Text>{volume.totalCB}</Text>
-                      <Tooltip.Root openDelay={300} closeDelay={100}>
-                        <Tooltip.Trigger asChild>
-                          <Box
-                            as="span"
-                            color="gray.400"
-                            _hover={{ color: 'gray.600' }}
-                            cursor="help"
-                            display="inline-flex"
-                            alignItems="center"
-                            aria-label="Total CB information"
-                          >
-                            <Info size={12} />
-                          </Box>
-                        </Tooltip.Trigger>
-                        <Portal>
-                          <Tooltip.Positioner>
-                            <Tooltip.Content
-                              maxW="250px"
-                              zIndex={2000}
-                              bg="gray.900"
-                              color="white"
-                              px={3}
-                              py={2}
-                              borderRadius="md"
-                              fontSize="sm"
-                              boxShadow="lg"
+                    <VStack gap={0.5} align="flex-end">
+                      <HStack gap={1} justify="flex-end" align="center" display="inline-flex">
+                        <Text>{volume.totalCB}</Text>
+                        <Tooltip.Root openDelay={300} closeDelay={100}>
+                          <Tooltip.Trigger asChild>
+                            <Box
+                              as="span"
+                              color="gray.400"
+                              _hover={{ color: 'gray.600' }}
+                              cursor="help"
+                              display="inline-flex"
+                              alignItems="center"
+                              aria-label="Total CB information"
                             >
-                              <Tooltip.Arrow />
-                              Data source: Settled data
-                            </Tooltip.Content>
-                          </Tooltip.Positioner>
-                        </Portal>
-                      </Tooltip.Root>
-                    </HStack>
+                              <Info size={12} />
+                            </Box>
+                          </Tooltip.Trigger>
+                          <Portal>
+                            <Tooltip.Positioner>
+                              <Tooltip.Content
+                                maxW="250px"
+                                zIndex={2000}
+                                bg="gray.900"
+                                color="white"
+                                px={3}
+                                py={2}
+                                borderRadius="md"
+                                fontSize="sm"
+                                boxShadow="lg"
+                              >
+                                <Tooltip.Arrow />
+                                Data source: Settled data
+                              </Tooltip.Content>
+                            </Tooltip.Positioner>
+                          </Portal>
+                        </Tooltip.Root>
+                      </HStack>
+                      <Text fontSize="xs" color="gray.600" fontWeight="medium">
+                        {formatCurrency(volume.cbTotalAmount)}
+                      </Text>
+                    </VStack>
                   </Table.Cell>
                 </Table.Row>
               ))}

@@ -40,6 +40,11 @@ export default function AuthHeader(): React.JSX.Element {
   const { isCollapsed } = useSidebar();
   const sidebarWidth = isCollapsed ? '80px' : '260px';
   const [isWikiDrawerOpen, setIsWikiDrawerOpen] = React.useState(false);
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const segments = pathname?.split('/').filter(Boolean) || [];
 
@@ -259,51 +264,61 @@ export default function AuthHeader(): React.JSX.Element {
               <MdNotifications size={20} />
             </IconButton>
             <ColorModeButton />
-            <Popover.Root>
-              <Popover.Trigger asChild>
-                <IconButton
-                  aria-label="Settings"
-                  variant="ghost"
-                  color="gray.fg"
-                  suppressHydrationWarning
-                >
-                  <MdSettings size={20} />
-                </IconButton>
-              </Popover.Trigger>
-              <Portal>
-                <Popover.Positioner>
-                  <Popover.Content suppressHydrationWarning>
-                    <Popover.Arrow />
-                    <Popover.Body>
-                      <Popover.Title fontWeight="medium">
-                        Settings
-                      </Popover.Title>
+            {isMounted ? (
+              <Popover.Root>
+                <Popover.Trigger asChild>
+                  <IconButton
+                    aria-label="Settings"
+                    variant="ghost"
+                    color="gray.fg"
+                  >
+                    <MdSettings size={20} />
+                  </IconButton>
+                </Popover.Trigger>
+                <Portal>
+                  <Popover.Positioner>
+                    <Popover.Content>
+                      <Popover.Arrow />
+                      <Popover.Body>
+                        <Popover.Title fontWeight="medium">
+                          Settings
+                        </Popover.Title>
 
-                      <VStack align="stretch" gap={2} divideX="2px">
-                        {/* <Text>{user?.email}</Text> */}
-                        <Button
-                          variant="ghost"
-                          justifyContent="flex-start"
-                          onClick={() => console.log('Go to Profile')}
-                        >
-                          <MdPerson />
-                          Profile
-                        </Button>
+                        <VStack align="stretch" gap={2} divideX="2px">
+                          {/* <Text>{user?.email}</Text> */}
+                          <Button
+                            variant="ghost"
+                            justifyContent="flex-start"
+                            onClick={() => console.log('Go to Profile')}
+                          >
+                            <MdPerson />
+                            Profile
+                          </Button>
 
-                        <Button
-                          variant="plain"
-                          color="red"
-                          onClick={handleSignOut}
-                        >
-                          <MdLogout />
-                          Logout
-                        </Button>
-                      </VStack>
-                    </Popover.Body>
-                  </Popover.Content>
-                </Popover.Positioner>
-              </Portal>
-            </Popover.Root>
+                          <Button
+                            variant="plain"
+                            color="red"
+                            onClick={handleSignOut}
+                          >
+                            <MdLogout />
+                            Logout
+                          </Button>
+                        </VStack>
+                      </Popover.Body>
+                    </Popover.Content>
+                  </Popover.Positioner>
+                </Portal>
+              </Popover.Root>
+            ) : (
+              <IconButton
+                aria-label="Settings"
+                variant="ghost"
+                color="gray.fg"
+                suppressHydrationWarning
+              >
+                <MdSettings size={20} />
+              </IconButton>
+            )}
           </HStack>
         </HStack>
       </Flex>

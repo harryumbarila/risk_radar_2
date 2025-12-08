@@ -1004,8 +1004,8 @@ export default function CustomTable({ filters }: CustomTableProps) {
             <> in the last <b>{filters.dateRange} days</b></>
           )}
           {filters?.dateRange === 'custom' && filters.customStartDate && filters.customEndDate && (
-            <> between <b>{new Date(filters.customStartDate).toLocaleDateString()}</b> and{' '}
-            <b>{new Date(filters.customEndDate).toLocaleDateString()}</b></>
+            <> between <b>{new Date(filters.customStartDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}</b> and{' '}
+            <b>{new Date(filters.customEndDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}</b></>
           )}
         </Text>
       </VStack>

@@ -1,17 +1,28 @@
 'use client';
 import React from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Box, HStack, Tabs, Text, VStack, Skeleton, SimpleGrid } from '@chakra-ui/react';
 import { UserCog, List } from 'lucide-react';
 import CustomTable from '@/libs/domain/dashboard/components/transactions/transactions';
-import ManagerQueueView from '../components/manager-queue-view/manager-queue-view';
+import ManagerQueuePage from '@/libs/domain/manager-queue/manager-queue-page';
 import AutoHoldFilterBar, { AutoHoldFilterState } from '../components/filter-bar/filter-bar';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
 import { RULE_DEFINITIONS } from '@/libs/domain/dashboard/utils/ruleNames';
 import { generateDataSourceIdentifier, generateMID } from '../../dashboard/components/transactions/transactions';
 
 export default function AutoHoldBoardPage() {
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = React.useState(true);
-  const [viewMode, setViewMode] = React.useState<'analyst' | 'manager'>('analyst');
+  
+  // Check if tab is specified in URL, default to 'analyst'
+  const initialTab = (searchParams?.get('tab') as 'analyst' | 'manager') || 'analyst';
+  const [viewMode, setViewMode] = React.useState<'analyst' | 'manager'>(initialTab);
+  
+  // Update viewMode when URL param changes
+  React.useEffect(() => {
+    const tab = (searchParams?.get('tab') as 'analyst' | 'manager') || 'analyst';
+    setViewMode(tab);
+  }, [searchParams]);
   const [filters, setFilters] = React.useState<AutoHoldFilterState>({
     dateRange: '7',
     status: 'all',
@@ -181,7 +192,9 @@ export default function AutoHoldBoardPage() {
           </Tabs.Content>
 
           <Tabs.Content value="manager">
-            <ManagerQueueView allBatches={allBatches} />
+            <Box mt={4}>
+              <ManagerQueuePage />
+            </Box>
           </Tabs.Content>
         </Tabs.Root>
       </Box>

@@ -1,8 +1,8 @@
 'use client';
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { Box, VStack, Text, HStack, Tooltip, Portal, Select, createListCollection, Button, Drawer, Badge, Table, CloseButton, SimpleGrid } from '@chakra-ui/react';
 import { Info, X, TrendingUp, TrendingDown, Minus, FileText, Check, Copy } from 'lucide-react';
-import BatchDrawer from '../../../auto-hold/components/batch-drawer/batch-drawer';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
 import {
   AreaChart,
@@ -1342,10 +1342,23 @@ function DataSourceCell({ source, identifier }: { source: string; identifier?: s
 // Mock transaction data generator with full fields
 function generateMockTransactions(count: number, date: string, ruleId: string): MerchantTransaction[] {
   const processors = ['TSYS', 'FSP'];
-  // Data sources are: Auth, Capture, Settled, Returns
-  const dataSources: ('Auth' | 'Capture' | 'Settled' | 'Returns')[] = ['Auth', 'Capture', 'Settled', 'Returns'];
   const exceptions = ['High Amount', 'Rapid Volume', 'Unusual Pattern', 'Foreign Card', 'None'];
   const dbaNames = ['Acme Corp', 'Tech Solutions Inc', 'Global Retail', 'Digital Services', 'Commerce Hub', 'Trade Partners', 'Business Solutions'];
+  
+  // Get the payment stage for this rule
+  const ruleStages = RULE_STAGE_MAP[ruleId] || ['Authorization'];
+  const activeStage = ruleStages[0] || 'Authorization';
+  
+  // Map PaymentStage to data source consistently
+  const stageToDataSource: Record<PaymentStage, 'Auth' | 'Capture' | 'Settled' | 'Returns'> = {
+    'Authorization': 'Auth',
+    'Capture': 'Capture',
+    'Settlement': 'Settled',
+    'ACH Returns': 'Returns',
+  };
+  
+  // Use the data source that matches the rule's payment stage
+  const dataSource = stageToDataSource[activeStage] || 'Auth';
   
   const baseDate = new Date(date);
   
@@ -1358,7 +1371,6 @@ function generateMockTransactions(count: number, date: string, ruleId: string): 
     const merchantName = dbaNames[Math.floor(Math.random() * dbaNames.length)] || 'Unknown Merchant';
     const dbaName = dbaNames[Math.floor(Math.random() * dbaNames.length)] || 'Unknown DBA';
     const processor = processors[Math.floor(Math.random() * processors.length)] || 'TSYS';
-    const dataSource = dataSources[Math.floor(Math.random() * dataSources.length)] || 'Auth';
     const exception = exceptions[Math.floor(Math.random() * exceptions.length)] || 'None';
     
     return {
@@ -1372,7 +1384,7 @@ function generateMockTransactions(count: number, date: string, ruleId: string): 
       date: txDate.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
       createdAt: txDate.toISOString(),
       status: 'Unreviewed' as const,
-      source: dataSource, // Use data source type (Auth, Capture, Settled, Returns)
+      source: dataSource, // Use data source consistent with rule's payment stage
       dataSourceIdentifier: generateDataSourceIdentifier(dataSource, txDate),
       ahRuleApplied: [ruleId],
     };
@@ -1718,43 +1730,20 @@ function HeatmapCellDrawer({ isOpen, onClose, selectedCell, paymentStage, onTran
   );
 }
 
-// Wrapper component that manages both the heatmap drawer and transaction batch drawer
+// Wrapper component that manages both the heatmap drawer and transaction batch navigation
 function HeatmapCellDrawerWrapper(props: Omit<HeatmapCellDrawerProps, 'onTransactionClick'>) {
-  const [selectedTransaction, setSelectedTransaction] = React.useState<MerchantTransaction | null>(null);
-  const triggerRef = React.useRef<HTMLButtonElement>(null);
+  const router = useRouter();
   
-  React.useEffect(() => {
-    if (selectedTransaction && triggerRef.current) {
-      // Small delay to ensure the button is rendered
-      setTimeout(() => {
-        triggerRef.current?.click();
-        setSelectedTransaction(null); // Reset after opening
-      }, 100);
-    }
-  }, [selectedTransaction]);
+  const handleTransactionClick = React.useCallback((tx: MerchantTransaction) => {
+    const batchId = tx.mid || tx.id || 'unknown';
+    router.push(`/auto-hold/batch/${encodeURIComponent(batchId)}`);
+  }, [router]);
   
   return (
-    <>
-      <HeatmapCellDrawer
-        {...props}
-        onTransactionClick={setSelectedTransaction}
-      />
-      {selectedTransaction && (
-        <Box position="absolute" left="-9999px" opacity={0} pointerEvents="none" aria-hidden="true">
-          <BatchDrawer
-            batch={[selectedTransaction]}
-            trigger={
-              <Button
-                ref={triggerRef}
-                aria-hidden="true"
-              >
-                Open Transaction
-              </Button>
-            }
-          />
-        </Box>
-      )}
-    </>
+    <HeatmapCellDrawer
+      {...props}
+      onTransactionClick={handleTransactionClick}
+    />
   );
 }
 

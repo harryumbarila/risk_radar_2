@@ -19,6 +19,37 @@ import { X, Search, ChevronDown } from 'lucide-react';
 import { getRuleName } from '@/libs/domain/dashboard/utils/ruleNames';
 import RuleLabel from '@/libs/domain/dashboard/components/rule-label/rule-label';
 
+// Helper functions to format dates between YYYY-MM-DD (internal) and MM/DD/YYYY (display)
+const formatDateForDisplay = (dateString: string | undefined): string => {
+  if (!dateString) return '';
+  // If already in MM/DD/YYYY format, return as is
+  if (dateString.includes('/')) return dateString;
+  // Convert from YYYY-MM-DD to MM/DD/YYYY
+  const [year, month, day] = dateString.split('-');
+  if (year && month && day) {
+    return `${month}/${day}/${year}`;
+  }
+  return dateString;
+};
+
+const formatDateForStorage = (dateString: string): string => {
+  if (!dateString) return '';
+  // If already in YYYY-MM-DD format, return as is
+  if (dateString.includes('-') && dateString.length === 10) return dateString;
+  // Convert from MM/DD/YYYY to YYYY-MM-DD
+  const parts = dateString.split('/');
+  if (parts.length === 3) {
+    const [month, day, year] = parts;
+    if (month && day && year) {
+      // Pad with zeros if needed
+      const paddedMonth = month.padStart(2, '0');
+      const paddedDay = day.padStart(2, '0');
+      return `${year}-${paddedMonth}-${paddedDay}`;
+    }
+  }
+  return dateString;
+};
+
 export interface AutoHoldFilterState {
   dateRange: '7' | '14' | '30' | 'custom';
   customStartDate?: string;
@@ -251,13 +282,15 @@ export default function AutoHoldFilterBar({
                   Start Date
                 </Text>
                 <Input
-                  type="date"
+                  type="text"
                   size="sm"
                   width="150px"
-                  value={filters.customStartDate || ''}
-                  onChange={(e) =>
-                    updateFilter('customStartDate', e.target.value)
-                  }
+                  value={formatDateForDisplay(filters.customStartDate)}
+                  onChange={(e) => {
+                    const formatted = formatDateForStorage(e.target.value);
+                    updateFilter('customStartDate', formatted);
+                  }}
+                  placeholder="MM/DD/YYYY"
                   suppressHydrationWarning
                 />
               </VStack>
@@ -266,13 +299,15 @@ export default function AutoHoldFilterBar({
                   End Date
                 </Text>
                 <Input
-                  type="date"
+                  type="text"
                   size="sm"
                   width="150px"
-                  value={filters.customEndDate || ''}
-                  onChange={(e) =>
-                    updateFilter('customEndDate', e.target.value)
-                  }
+                  value={formatDateForDisplay(filters.customEndDate)}
+                  onChange={(e) => {
+                    const formatted = formatDateForStorage(e.target.value);
+                    updateFilter('customEndDate', formatted);
+                  }}
+                  placeholder="MM/DD/YYYY"
                   suppressHydrationWarning
                 />
               </VStack>
@@ -595,7 +630,7 @@ export default function AutoHoldFilterBar({
                 gap={1}
               >
                 Date: {filters.dateRange === 'custom'
-                  ? `${filters.customStartDate || ''} - ${filters.customEndDate || ''}`
+                  ? `${filters.customStartDate ? new Date(filters.customStartDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : ''} - ${filters.customEndDate ? new Date(filters.customEndDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : ''}`
                   : `Last ${filters.dateRange} days`}
                 <Button
                   size="xs"

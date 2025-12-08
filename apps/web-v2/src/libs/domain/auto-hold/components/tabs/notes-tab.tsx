@@ -11,7 +11,7 @@ import {
   Checkbox,
   IconButton,
 } from '@chakra-ui/react';
-import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, Pin, PinOff } from 'lucide-react';
 
 interface Note {
   id: string;
@@ -19,6 +19,7 @@ interface Note {
   dateCreated: string;
   createdBy: string;
   pushToIris: boolean;
+  pinned: boolean;
 }
 
 interface NotesTabProps {
@@ -33,6 +34,7 @@ export default function NotesTab({ merchantId }: NotesTabProps) {
       dateCreated: '2025-04-01',
       createdBy: 'John Doe',
       pushToIris: true,
+      pinned: true,
     },
     {
       id: '2',
@@ -40,6 +42,7 @@ export default function NotesTab({ merchantId }: NotesTabProps) {
       dateCreated: '2025-04-05',
       createdBy: 'Jane Smith',
       pushToIris: false,
+      pinned: false,
     },
     {
       id: '3',
@@ -47,14 +50,26 @@ export default function NotesTab({ merchantId }: NotesTabProps) {
       dateCreated: '2025-04-08',
       createdBy: 'John Doe',
       pushToIris: true,
+      pinned: false,
     },
   ]);
   const [newNote, setNewNote] = React.useState('');
   const [currentPage, setCurrentPage] = React.useState(1);
   const itemsPerPage = 5;
 
-  const totalPages = Math.ceil(notes.length / itemsPerPage);
-  const paginatedNotes = notes.slice(
+  // Sort notes: pinned first, then by date (newest first)
+  const sortedNotes = React.useMemo(() => {
+    return [...notes].sort((a, b) => {
+      // Pinned notes first
+      if (a.pinned && !b.pinned) return -1;
+      if (!a.pinned && b.pinned) return 1;
+      // Then sort by date (newest first)
+      return new Date(b.dateCreated).getTime() - new Date(a.dateCreated).getTime();
+    });
+  }, [notes]);
+
+  const totalPages = Math.ceil(sortedNotes.length / itemsPerPage);
+  const paginatedNotes = sortedNotes.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -68,6 +83,7 @@ export default function NotesTab({ merchantId }: NotesTabProps) {
       dateCreated: new Date().toISOString().substring(0, 10),
       createdBy: 'Current User', // In real app, get from auth context
       pushToIris: false,
+      pinned: false,
     };
 
     setNotes([note, ...notes]);
@@ -83,6 +99,17 @@ export default function NotesTab({ merchantId }: NotesTabProps) {
           : note
       )
     );
+  };
+
+  const handleTogglePin = (noteId: string) => {
+    setNotes(
+      notes.map((note) =>
+        note.id === noteId
+          ? { ...note, pinned: !note.pinned }
+          : note
+      )
+    );
+    setCurrentPage(1); // Reset to first page after pinning
   };
 
   return (
@@ -131,6 +158,7 @@ export default function NotesTab({ merchantId }: NotesTabProps) {
           <Table.Root size="sm">
             <Table.Header>
               <Table.Row bg="gray.50">
+                <Table.ColumnHeader width="40px"></Table.ColumnHeader>
                 <Table.ColumnHeader>Note</Table.ColumnHeader>
                 <Table.ColumnHeader>Date Created</Table.ColumnHeader>
                 <Table.ColumnHeader>Created By</Table.ColumnHeader>
@@ -142,7 +170,7 @@ export default function NotesTab({ merchantId }: NotesTabProps) {
             <Table.Body>
               {paginatedNotes.length === 0 ? (
                 <Table.Row>
-                  <Table.Cell colSpan={4} textAlign="center" py={8}>
+                  <Table.Cell colSpan={5} textAlign="center" py={8}>
                     <Text fontSize="sm" color="gray.600">
                       No notes found.
                     </Text>
@@ -150,11 +178,38 @@ export default function NotesTab({ merchantId }: NotesTabProps) {
                 </Table.Row>
               ) : (
                 paginatedNotes.map((note) => (
-                  <Table.Row key={note.id}>
+                  <Table.Row 
+                    key={note.id}
+                    bg={note.pinned ? 'yellow.50' : 'white'}
+                    borderLeft={note.pinned ? '3px solid' : 'none'}
+                    borderLeftColor={note.pinned ? 'yellow.400' : 'transparent'}
+                  >
                     <Table.Cell>
-                      <Text fontSize="sm" color="gray.800">
-                        {note.note}
-                      </Text>
+                      <IconButton
+                        size="xs"
+                        variant="ghost"
+                        onClick={() => handleTogglePin(note.id)}
+                        aria-label={note.pinned ? 'Unpin note' : 'Pin note'}
+                        colorPalette={note.pinned ? 'yellow' : 'gray'}
+                      >
+                        {note.pinned ? (
+                          <Pin size={16} fill="currentColor" />
+                        ) : (
+                          <PinOff size={16} />
+                        )}
+                      </IconButton>
+                    </Table.Cell>
+                    <Table.Cell>
+                      <HStack gap={2} align="center">
+                        {note.pinned && (
+                          <Text fontSize="xs" color="yellow.600" fontWeight="semibold">
+                            PINNED
+                          </Text>
+                        )}
+                        <Text fontSize="sm" color="gray.800" fontWeight={note.pinned ? 'semibold' : 'normal'}>
+                          {note.note}
+                        </Text>
+                      </HStack>
                     </Table.Cell>
                     <Table.Cell>{note.dateCreated}</Table.Cell>
                     <Table.Cell>{note.createdBy}</Table.Cell>
