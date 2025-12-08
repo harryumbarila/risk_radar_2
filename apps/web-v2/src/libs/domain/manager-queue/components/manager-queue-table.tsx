@@ -205,7 +205,6 @@ export default function ManagerQueueTable({ items }: ManagerQueueTableProps) {
               <Table.Row>
                 <Table.ColumnHeader>DBA Name</Table.ColumnHeader>
                 <Table.ColumnHeader>MID</Table.ColumnHeader>
-                <Table.ColumnHeader>Reason for Review</Table.ColumnHeader>
                 <Table.ColumnHeader>Analyst Assigned</Table.ColumnHeader>
                 <Table.ColumnHeader>Processor</Table.ColumnHeader>
                 <Table.ColumnHeader textAlign="right">Exceptions</Table.ColumnHeader>
@@ -256,20 +255,6 @@ export default function ManagerQueueTable({ items }: ManagerQueueTableProps) {
                         </Portal>
                       </Tooltip.Root>
                     </HStack>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <Text 
-                      fontSize="sm" 
-                      color="gray.700"
-                      style={{
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                        maxWidth: '200px',
-                      }}
-                    >
-                      {item.reasonForReview}
-                    </Text>
                   </Table.Cell>
                   <Table.Cell>
                     {item.assignedAnalyst ? (
