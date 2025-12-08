@@ -258,7 +258,16 @@ export default function ManagerQueueTable({ items }: ManagerQueueTableProps) {
                     </HStack>
                   </Table.Cell>
                   <Table.Cell>
-                    <Text fontSize="sm" color="gray.700" noOfLines={1}>
+                    <Text 
+                      fontSize="sm" 
+                      color="gray.700"
+                      style={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        maxWidth: '200px',
+                      }}
+                    >
                       {item.reasonForReview}
                     </Text>
                   </Table.Cell>
