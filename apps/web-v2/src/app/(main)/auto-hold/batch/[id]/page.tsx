@@ -53,8 +53,15 @@ function getBatchById(id: string): MerchantTransaction[] {
 
 export default function BatchDetailPageRoute() {
   const params = useParams();
+  const batchId = params?.id as string | undefined;
   
-  if (!params || !params.id) {
+  // Fetch batch data - always call the hook, even if batchId is undefined
+  const batch = React.useMemo(() => {
+    if (!batchId) return [];
+    return getBatchById(batchId);
+  }, [batchId]);
+  
+  if (!params || !batchId) {
     return (
       <Box p={6} textAlign="center">
         <Text fontSize="lg" color="gray.600">
@@ -63,13 +70,6 @@ export default function BatchDetailPageRoute() {
       </Box>
     );
   }
-  
-  const batchId = params.id as string;
-  
-  // Fetch batch data
-  const batch = React.useMemo(() => {
-    return getBatchById(batchId);
-  }, [batchId]);
 
   if (!batch || batch.length === 0) {
     return (
