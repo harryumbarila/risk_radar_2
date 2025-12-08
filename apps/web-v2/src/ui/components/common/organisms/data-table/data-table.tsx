@@ -45,7 +45,7 @@ const DataTable = <Entry extends BaseModel>(
 ): React.ReactElement => {
   const {
     columns,
-    // onSelectRow,
+    onSelectRow,
     pagination,
     onSetPagination,
     data,
@@ -142,6 +142,7 @@ const DataTable = <Entry extends BaseModel>(
               row={row}
               colSpan={columns.length}
               CollapsibleBody={CollapsibleBody}
+              onSelectRow={onSelectRow}
             />
           ))}
         </Table.Body>

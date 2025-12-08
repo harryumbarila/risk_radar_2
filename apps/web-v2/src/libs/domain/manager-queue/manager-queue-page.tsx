@@ -17,14 +17,14 @@ import { RULE_DEFINITIONS } from '@/libs/domain/dashboard/utils/ruleNames';
 
 export default function ManagerQueuePage() {
   const [isLoading, setIsLoading] = React.useState(true);
-  const [filters, setFilters] = React.useState<FilterState>({
-    dateRange: '7',
-    analyst: 'all',
-    queueType: 'all',
-    processor: 'all',
-    mcc: '',
-    mid: '',
-  });
+      const [filters, setFilters] = React.useState<FilterState>({
+        dateRange: 'today',
+        analyst: 'all',
+        queueType: 'all',
+        processor: 'all',
+        mcc: '',
+        mid: '',
+      });
 
   // Mock data - will be replaced with API calls
   const [queueItems, setQueueItems] = React.useState<ManagerQueueItem[]>([]);
@@ -47,8 +47,52 @@ export default function ManagerQueuePage() {
   const filteredQueueItems = React.useMemo(() => {
     let filtered = [...queueItems];
 
+    // Filter by date range
+    if (filters.dateRange) {
+      const now = new Date();
+      let startDate: Date;
+      let endDate: Date;
+
+      if (filters.dateRange === 'custom') {
+        if (filters.customStartDate) {
+          startDate = new Date(filters.customStartDate);
+          startDate.setHours(0, 0, 0, 0);
+        } else {
+          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          startDate.setHours(0, 0, 0, 0);
+        }
+        endDate = filters.customEndDate
+          ? new Date(filters.customEndDate)
+          : now;
+        if (endDate !== now) {
+          endDate.setHours(23, 59, 59, 999);
+        }
+      } else if (filters.dateRange === 'today') {
+        // Filter for today only
+        startDate = new Date(now);
+        startDate.setHours(0, 0, 0, 0);
+        endDate = new Date(now);
+        endDate.setHours(23, 59, 59, 999);
+      } else {
+        const days = parseInt(filters.dateRange);
+        startDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+        startDate.setHours(0, 0, 0, 0);
+        endDate = now;
+      }
+
+      filtered = filtered.filter((item) => {
+        if (!item.submittedOn) return false;
+        const itemDate = new Date(item.submittedOn);
+        return itemDate >= startDate && itemDate <= endDate;
+      });
+    }
+
     if (filters.analyst !== 'all') {
-      filtered = filtered.filter((item) => item.assignedAnalyst === filters.analyst);
+      filtered = filtered.filter((item) =>
+        filters.analyst === 'unassigned'
+          ? !item.assignedAnalyst
+          : item.assignedAnalyst === filters.analyst
+      );
     }
 
     if (filters.queueType !== 'all') {
@@ -141,7 +185,14 @@ function generateMockQueueItems(): ManagerQueueItem[] {
   
   return Array.from({ length: 25 }, (_, i) => {
     const baseDate = new Date();
-    baseDate.setDate(baseDate.getDate() - Math.floor(i / 5));
+    // Ensure at least 2 items have today's date (first 2 items)
+    if (i < 2) {
+      // Today's date
+      baseDate.setHours(Math.floor(Math.random() * 24), Math.floor(Math.random() * 60), 0, 0);
+    } else {
+      // Previous dates
+      baseDate.setDate(baseDate.getDate() - Math.floor((i - 1) / 5));
+    }
     
     const exceptionsCount = Math.floor(Math.random() * 5) + 1;
     // Generate random rule IDs for triggered rules

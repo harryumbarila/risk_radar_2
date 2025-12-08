@@ -16,15 +16,24 @@ export default function DataRow<Entry extends BaseModel>({
   row,
   colSpan,
   CollapsibleBody,
+  onSelectRow,
 }: DataRowProps<Entry>): React.JSX.Element {
   const collapsible = useCollapsible();
+
+  const handleRowClick = () => {
+    if (CollapsibleBody) {
+      collapsible.setOpen(!collapsible.open);
+    } else if (onSelectRow) {
+      onSelectRow(row.original);
+    }
+  };
 
   return (
     <>
       <Table.Row
-        onClick={() =>
-          CollapsibleBody && collapsible.setOpen(!collapsible.open)
-        }
+        onClick={handleRowClick}
+        cursor={onSelectRow || CollapsibleBody ? 'pointer' : undefined}
+        _hover={onSelectRow || CollapsibleBody ? { bg: 'gray.50' } : undefined}
       >
         {row.getVisibleCells().map((cell) => {
           const align = (cell.column.columnDef?.meta as Record<string, unknown>)

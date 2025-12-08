@@ -27,6 +27,7 @@ export default function ManagerQueueFilters({
 }: ManagerQueueFiltersProps) {
   const dateRangeCollection = createListCollection({
     items: [
+      { label: 'Today', value: 'today' },
       { label: 'Last 7 days', value: '7' },
       { label: 'Last 14 days', value: '14' },
       { label: 'Last 30 days', value: '30' },
@@ -68,7 +69,7 @@ export default function ManagerQueueFilters({
 
   const clearFilter = (key: keyof FilterState) => {
     const defaultValues: Partial<FilterState> = {
-      dateRange: '7',
+      dateRange: 'today',
       analyst: 'all',
       queueType: 'all',
       processor: 'all',
@@ -79,6 +80,7 @@ export default function ManagerQueueFilters({
   };
 
   const hasActiveFilters = 
+    filters.dateRange !== 'today' ||
     filters.analyst !== 'all' ||
     filters.queueType !== 'all' ||
     filters.processor !== 'all' ||
@@ -270,7 +272,7 @@ export default function ManagerQueueFilters({
             variant="ghost"
             onClick={() => {
               onFiltersChange({
-                dateRange: '7',
+                dateRange: 'today',
                 analyst: 'all',
                 queueType: 'all',
                 processor: 'all',
@@ -287,6 +289,34 @@ export default function ManagerQueueFilters({
       {/* Active Filter Chips */}
       {hasActiveFilters && (
         <HStack gap={2} mt={3} flexWrap="wrap">
+          {filters.dateRange !== 'today' && (
+            <Badge
+              colorPalette="blue"
+              variant="subtle"
+              px={2}
+              py={1}
+              borderRadius="md"
+              display="flex"
+              alignItems="center"
+              gap={1}
+            >
+              Date: {filters.dateRange === 'custom'
+                ? `${filters.customStartDate ? new Date(filters.customStartDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : ''} - ${filters.customEndDate ? new Date(filters.customEndDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : ''}`
+                : filters.dateRange === 'today'
+                ? 'Today'
+                : `Last ${filters.dateRange} days`}
+              <Button
+                size="xs"
+                variant="ghost"
+                onClick={() => clearFilter('dateRange')}
+                minW="auto"
+                h="auto"
+                p={0}
+              >
+                <X size={12} />
+              </Button>
+            </Badge>
+          )}
           {filters.analyst !== 'all' && (
             <Badge
               colorPalette="blue"

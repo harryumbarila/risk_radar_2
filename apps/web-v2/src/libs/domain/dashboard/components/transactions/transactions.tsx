@@ -15,6 +15,7 @@ import {
 } from '@chakra-ui/react';
 import { Check, Circle, Copy } from 'lucide-react';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
+import { useRouter } from 'next/navigation';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
 import { statusColor } from '@/libs/utils/utils';
 import { DataTable } from '@/ui/components/common/organisms/data-table';
@@ -480,6 +481,13 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
   const solutionConsultants = ['SC Alpha', 'SC Beta', null];
   const dataSources = ['Auth', 'Capture', 'Settled', 'Returns'];
   
+  // Today's dates (at least 2 transactions for today)
+  const todayDate1 = new Date(baseDate);
+  todayDate1.setHours(9, 30, 0, 0); // Morning transaction
+  
+  const todayDate2 = new Date(baseDate);
+  todayDate2.setHours(14, 45, 0, 0); // Afternoon transaction
+  
   const tx1Date = new Date(baseDate.getTime() - 1 * 24 * 60 * 60 * 1000);
   const tx2Date = new Date(baseDate.getTime() - 0.5 * 24 * 60 * 60 * 1000);
   const tx3Date = new Date(baseDate.getTime() - 1 * 24 * 60 * 60 * 1000);
@@ -487,6 +495,64 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
   const tx5Date = new Date(baseDate.getTime() - 2 * 24 * 60 * 60 * 1000);
   
   return [
+    // Today's transactions (at least 2)
+    {
+      id: 'today-1',
+      merchant: 'QuickWire Transfers',
+      dbaName: 'QuickWire Inc.',
+      amount: '$3,250.75',
+      exception: 'High transaction volume today',
+      processor: 'TSYS',
+      mid: generateMID(10),
+      date: formatDate(todayDate1),
+      uwDate: formatUWDate(new Date(baseDate.getTime() - 5 * 24 * 60 * 60 * 1000)),
+      status: 'Unreviewed',
+      createdAt: baseDate.toISOString(),
+      updatedAt: baseDate.toISOString(),
+      ruleId: 'AH001',
+      channel: channels[0],
+      reseller: resellers[0] || undefined,
+      riskWatch: true,
+      newAccount: false,
+      divert: true,
+      nextDayFunding: 'Yes',
+      netDivertBalance: '$3,250.75',
+      source: dataSources[0] || 'Auth',
+      dataSourceIdentifier: generateDataSourceIdentifier(dataSources[0] || 'Auth', todayDate1),
+      ahRuleApplied: ['AH001', 'AH002'],
+      autoHoldRuleApplied: ['AH001'],
+      createdBatchTrigger: 'Daily Batch',
+      createdBatchDate: baseDate.toISOString(),
+    } as MerchantTransaction & { ruleId?: string },
+    {
+      id: 'today-2',
+      merchant: 'Business Equipment Pro',
+      dbaName: 'BEP Solutions',
+      amount: '$5,890.20',
+      exception: 'New account high batch amount',
+      processor: 'FSP',
+      mid: generateMID(11),
+      date: formatDate(todayDate2),
+      uwDate: formatUWDate(new Date(baseDate.getTime() - 3 * 24 * 60 * 60 * 1000)),
+      status: 'In Progress',
+      createdAt: baseDate.toISOString(),
+      updatedAt: baseDate.toISOString(),
+      ruleId: 'AH012',
+      channel: channels[1],
+      referralPartner: referralPartners[0] || undefined,
+      riskWatch: false,
+      newAccount: true,
+      divert: false,
+      nextDayFunding: 'No',
+      netDivertBalance: '$0.00',
+      source: dataSources[1] || 'Capture',
+      dataSourceIdentifier: generateDataSourceIdentifier(dataSources[1] || 'Capture', todayDate2),
+      ahRuleApplied: ['AH012', 'AH013'],
+      autoHoldRuleApplied: ['AH012'],
+      createdBatchTrigger: 'Manual',
+      createdBatchDate: baseDate.toISOString(),
+    } as MerchantTransaction & { ruleId?: string },
+    // Previous transactions
     {
       id: '1',
       merchant: 'Global Tech Solutions',
@@ -632,6 +698,14 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
 const ALL_TRANSACTIONS: (MerchantTransaction & { ruleId?: string })[] = generateTransactions();
 
 export default function CustomTable({ filters }: CustomTableProps) {
+  const router = useRouter();
+
+  // Handle row click to navigate to batch detail
+  const handleRowClick = (transaction: MerchantTransaction) => {
+    const batchId = transaction.mid || transaction.id || 'unknown';
+    router.push(`/auto-hold/batch/${encodeURIComponent(batchId)}`);
+  };
+
   // Filter transactions based on filters
   const transactions = React.useMemo(() => {
     if (!filters) return ALL_TRANSACTIONS;
@@ -692,21 +766,34 @@ export default function CustomTable({ filters }: CustomTableProps) {
     if (filters.dateRange) {
       const now = new Date();
       let startDate: Date;
+      let endDate: Date;
 
       if (filters.dateRange === 'custom') {
         if (filters.customStartDate) {
           startDate = new Date(filters.customStartDate);
+          startDate.setHours(0, 0, 0, 0);
         } else {
           startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          startDate.setHours(0, 0, 0, 0);
         }
+        endDate = filters.customEndDate
+          ? new Date(filters.customEndDate)
+          : now;
+        if (endDate !== now) {
+          endDate.setHours(23, 59, 59, 999);
+        }
+      } else if (filters.dateRange === 'today') {
+        // Filter for today only
+        startDate = new Date(now);
+        startDate.setHours(0, 0, 0, 0);
+        endDate = new Date(now);
+        endDate.setHours(23, 59, 59, 999);
       } else {
         const days = parseInt(filters.dateRange);
         startDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+        startDate.setHours(0, 0, 0, 0);
+        endDate = now;
       }
-
-      const endDate = filters.dateRange === 'custom' && filters.customEndDate
-        ? new Date(filters.customEndDate)
-        : now;
 
       filtered = filtered.filter((tx) => {
         if (!tx.createdAt) return false;
@@ -967,7 +1054,13 @@ export default function CustomTable({ filters }: CustomTableProps) {
         const batchTransactions = [transaction];
         
         return (
-          <Box py={0.5} display="flex" justifyContent="center" alignItems="center">
+          <Box 
+            py={0.5} 
+            display="flex" 
+            justifyContent="center" 
+            alignItems="center"
+            onClick={(e) => e.stopPropagation()}
+          >
             <BatchDrawer
               batch={batchTransactions}
               trigger={
@@ -1041,6 +1134,7 @@ export default function CustomTable({ filters }: CustomTableProps) {
           }}
           isLoading={false}
           columns={columns}
+          onSelectRow={handleRowClick}
         />
       </Box>
 

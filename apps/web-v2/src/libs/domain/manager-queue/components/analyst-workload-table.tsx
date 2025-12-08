@@ -40,11 +40,9 @@ export default function AnalystWorkloadTable({
   const analystCollection = React.useMemo(
     () =>
       createListCollection({
-        items: analysts
-          .filter((a) => a !== reassignAnalyst)
-          .map((analyst) => ({ label: analyst, value: analyst })),
+        items: analysts.map((analyst) => ({ label: analyst, value: analyst })),
       }),
-    [reassignAnalyst]
+    []
   );
 
   const sortedWorkloads = React.useMemo(() => {
@@ -84,7 +82,7 @@ export default function AnalystWorkloadTable({
 
   const handleReassignClick = (analyst: string) => {
     setReassignAnalyst(analyst);
-    setSelectedAnalyst('');
+    setSelectedAnalyst(analyst); // Pre-fill with current analyst
     setIsReassignDialogOpen(true);
   };
 

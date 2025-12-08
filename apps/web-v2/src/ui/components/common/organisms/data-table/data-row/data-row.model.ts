@@ -5,4 +5,5 @@ export interface DataRowProps<Entry extends BaseModel> {
   row: Row<Entry>;
   colSpan?: number;
   CollapsibleBody?: React.ComponentType<{ row: Row<Entry> }>;
+  onSelectRow?: (entry: Entry) => void;
 }

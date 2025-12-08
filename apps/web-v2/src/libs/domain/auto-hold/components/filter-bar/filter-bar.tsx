@@ -51,7 +51,7 @@ const formatDateForStorage = (dateString: string): string => {
 };
 
 export interface AutoHoldFilterState {
-  dateRange: '7' | '14' | '30' | 'custom';
+  dateRange: 'today' | '7' | '14' | '30' | 'custom';
   customStartDate?: string;
   customEndDate?: string;
   status: 'all' | 'Unreviewed' | 'In Progress' | 'Reviewed';
@@ -79,6 +79,7 @@ export default function AutoHoldFilterBar({
   // Create collections for Select components
   const dateRangeCollection = createListCollection({
     items: [
+      { label: 'Today', value: 'today' },
       { label: 'Last 7 days', value: '7' },
       { label: 'Last 14 days', value: '14' },
       { label: 'Last 30 days', value: '30' },
@@ -133,7 +134,7 @@ export default function AutoHoldFilterBar({
   const clearFilter = (key: keyof AutoHoldFilterState) => {
     const newFilters = { ...filters };
     if (key === 'dateRange') {
-      newFilters.dateRange = '7';
+      newFilters.dateRange = 'today';
       delete newFilters.customStartDate;
       delete newFilters.customEndDate;
     } else if (key === 'status') {
@@ -158,7 +159,7 @@ export default function AutoHoldFilterBar({
 
   const clearAll = () => {
     onFiltersChange({
-      dateRange: '7',
+      dateRange: 'today',
       status: 'all',
       processor: 'all',
       source: 'all',
@@ -171,7 +172,7 @@ export default function AutoHoldFilterBar({
   };
 
   const hasActiveFilters =
-    filters.dateRange !== '7' ||
+    filters.dateRange !== 'today' ||
     filters.status !== 'all' ||
     filters.processor !== 'all' ||
     filters.source !== 'all' ||
@@ -184,7 +185,7 @@ export default function AutoHoldFilterBar({
 
   // Count active filters
   const activeFilterCount = [
-    filters.dateRange !== '7',
+    filters.dateRange !== 'today',
     filters.status !== 'all',
     filters.processor !== 'all',
     filters.dataSource !== 'all',
@@ -238,9 +239,9 @@ export default function AutoHoldFilterBar({
             </Text>
             <Select.Root
               collection={dateRangeCollection}
-              value={[filters.dateRange || '7']}
+              value={[filters.dateRange || 'today']}
               onValueChange={(e) => {
-                const value = (e.value[0] || '7') as AutoHoldFilterState['dateRange'];
+                const value = (e.value[0] || 'today') as AutoHoldFilterState['dateRange'];
                 const newFilters = { ...filters, dateRange: value };
                 if (value !== 'custom') {
                   delete newFilters.customStartDate;
@@ -618,7 +619,7 @@ export default function AutoHoldFilterBar({
         {/* Active Filter Chips */}
         {hasActiveFilters && (
           <HStack gap={2} mt={2} flexWrap="wrap" align="center">
-            {filters.dateRange !== '7' && (
+            {filters.dateRange !== 'today' && (
               <Badge
                 colorPalette="blue"
                 variant="subtle"
@@ -631,6 +632,8 @@ export default function AutoHoldFilterBar({
               >
                 Date: {filters.dateRange === 'custom'
                   ? `${filters.customStartDate ? new Date(filters.customStartDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : ''} - ${filters.customEndDate ? new Date(filters.customEndDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : ''}`
+                  : filters.dateRange === 'today'
+                  ? 'Today'
                   : `Last ${filters.dateRange} days`}
                 <Button
                   size="xs"

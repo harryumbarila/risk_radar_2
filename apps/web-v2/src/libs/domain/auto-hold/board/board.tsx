@@ -24,7 +24,7 @@ export default function AutoHoldBoardPage() {
     setViewMode(tab);
   }, [searchParams]);
   const [filters, setFilters] = React.useState<AutoHoldFilterState>({
-    dateRange: '7',
+    dateRange: 'today',
     status: 'all',
     processor: 'all',
     source: 'all',

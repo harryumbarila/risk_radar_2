@@ -24,7 +24,7 @@ export interface AnalystWorkload {
 }
 
 export interface ManagerQueueFilters {
-  dateRange: '7' | '14' | '30' | 'custom';
+  dateRange: 'today' | '7' | '14' | '30' | 'custom';
   customStartDate?: string;
   customEndDate?: string;
   analyst: 'all' | string;
