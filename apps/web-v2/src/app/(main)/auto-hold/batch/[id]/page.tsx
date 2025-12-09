@@ -4,51 +4,21 @@ import { useParams } from 'next/navigation';
 import { Box, Text } from '@chakra-ui/react';
 import BatchDetailPage from '@/libs/domain/auto-hold/components/batch-detail-page/batch-detail-page';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
+import { getBatchByMID } from '@/libs/domain/dashboard/components/transactions/transactions';
 
-// Mock function to fetch batch data by ID
-// In a real app, this would be an API call
+// Function to fetch batch data by MID
+// Uses the same data source as the transactions table
 function getBatchById(id: string): MerchantTransaction[] {
-  // This is a mock - in reality you'd fetch from an API
-  // For now, we'll generate mock data based on the ID
-  // In production, you'd use the ID to fetch the actual batch data
+  // Use the exported function to get batch by MID
+  const batch = getBatchByMID(id);
   
-  // Generate mock transactions
-  const mockTransactions: MerchantTransaction[] = [
-    {
-      id: `TXN-${id}-1`,
-      merchant: 'Acme Corp',
-      dbaName: 'Acme Corp DBA',
-      amount: '$1250.00',
-      processor: 'TSYS',
-      mid: id,
-      exception: 'High Amount',
-      date: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-      createdAt: new Date().toISOString(),
-      status: 'Unreviewed' as const,
-      source: 'Auth',
-      dataSourceIdentifier: 'TSYS ADF Auth 11252025_20251125_061057',
-      ahRuleApplied: ['AH001'],
-      riskWatch: false,
-    },
-    {
-      id: `TXN-${id}-2`,
-      merchant: 'Acme Corp',
-      dbaName: 'Acme Corp DBA',
-      amount: '$980.50',
-      processor: 'TSYS',
-      mid: id,
-      exception: 'Rapid Volume',
-      date: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-      createdAt: new Date().toISOString(),
-      status: 'Unreviewed' as const,
-      source: 'Capture',
-      dataSourceIdentifier: 'TSYS DFT256 Capture 20251125_031528_24',
-      ahRuleApplied: ['AH002'],
-      riskWatch: false,
-    },
-  ];
+  // If batch found, return it
+  if (batch.length > 0) {
+    return batch;
+  }
   
-  return mockTransactions;
+  // If no batch found, return empty array (will show "Batch not found" message)
+  return [];
 }
 
 export default function BatchDetailPageRoute() {

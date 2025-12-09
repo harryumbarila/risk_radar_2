@@ -697,6 +697,20 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
 
 const ALL_TRANSACTIONS: (MerchantTransaction & { ruleId?: string })[] = generateTransactions();
 
+// Export function to get batch by MID
+export function getBatchByMID(mid: string): MerchantTransaction[] {
+  // Find all transactions with the same MID
+  const batchTransactions = ALL_TRANSACTIONS.filter(tx => tx.mid === mid);
+  
+  // If no transactions found, return empty array
+  if (batchTransactions.length === 0) {
+    return [];
+  }
+  
+  // Return as MerchantTransaction[] (without ruleId)
+  return batchTransactions.map(({ ruleId, ...tx }) => tx);
+}
+
 export default function CustomTable({ filters }: CustomTableProps) {
   const router = useRouter();
 

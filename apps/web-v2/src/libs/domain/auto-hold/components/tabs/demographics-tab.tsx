@@ -9,9 +9,10 @@ interface DemographicsTabProps {
 }
 
 export default function DemographicsTab({ merchantId, merchantName }: DemographicsTabProps) {
-  // Mock data
+  // Use merchantName (which should be dbaName) as the dbaName
+  // merchantName prop is actually passed as dbaName from batch-detail-page
   const demographicsData = {
-    dbaName: 'Global Tech Solutions Inc.',
+    dbaName: merchantName || 'Unknown Merchant',
     address: {
       city: 'New York',
       state: 'NY',

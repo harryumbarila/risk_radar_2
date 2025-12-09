@@ -217,7 +217,7 @@ export default function BatchDetailPage({ batch }: BatchDetailPageProps) {
           >
             <DemographicsTab
               merchantId={merchantInfo?.mid || ''}
-              merchantName={merchantInfo?.merchant || ''}
+              merchantName={merchantInfo?.dbaName || merchantInfo?.merchant || ''}
             />
           </Box>
 
