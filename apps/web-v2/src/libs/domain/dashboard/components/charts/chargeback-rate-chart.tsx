@@ -93,6 +93,9 @@ export default function ChargebackRateChart({ dateRange }: ChargebackRateChartPr
       }
       return 30;
     }
+    if (dateRange.dateRange === 'today') {
+      return 1;
+    }
     return parseInt(dateRange.dateRange) || 30;
   }, [dateRange]);
 

@@ -51,7 +51,7 @@ const formatDateForStorage = (dateString: string): string => {
 };
 
 export interface FilterState {
-  dateRange: '7' | '14' | '30' | 'custom';
+  dateRange: 'today' | '7' | '14' | '30' | 'custom';
   customStartDate?: string;
   customEndDate?: string;
   processor: 'all' | 'TSYS' | 'FSP';
@@ -76,6 +76,7 @@ export default function FilterBar({
   // Create collections for Select components
   const dateRangeCollection = createListCollection({
     items: [
+      { label: 'Today', value: 'today' },
       { label: 'Last 7 days', value: '7' },
       { label: 'Last 14 days', value: '14' },
       { label: 'Last 30 days', value: '30' },
@@ -166,7 +167,7 @@ export default function FilterBar({
   const selectedRules = Array.isArray(filters.ruleId) ? filters.ruleId : (filters.ruleId === 'all' ? [] : [filters.ruleId]);
   
   const hasActiveFilters =
-    filters.dateRange !== '7' ||
+    filters.dateRange !== 'today' ||
     filters.processor !== 'all' ||
     filters.source !== 'all' ||
     (Array.isArray(filters.ruleId) ? filters.ruleId.length > 0 : filters.ruleId !== 'all') ||
@@ -176,7 +177,7 @@ export default function FilterBar({
 
   // Count active filters
   const activeFilterCount = [
-    filters.dateRange !== '7',
+    filters.dateRange !== 'today',
     filters.processor !== 'all',
     filters.source !== 'all',
     (Array.isArray(filters.ruleId) ? filters.ruleId.length > 0 : filters.ruleId !== 'all'),
@@ -226,9 +227,9 @@ export default function FilterBar({
             </Text>
             <Select.Root
               collection={dateRangeCollection}
-              value={[filters.dateRange || '7']}
+              value={[filters.dateRange || 'today']}
               onValueChange={(e) => {
-                const value = (e.value[0] || '7') as FilterState['dateRange'];
+                const value = (e.value[0] || 'today') as FilterState['dateRange'];
                 const newFilters = { ...filters, dateRange: value };
                 if (value !== 'custom') {
                   delete newFilters.customStartDate;
@@ -580,7 +581,7 @@ export default function FilterBar({
         {/* Active Filter Badges */}
         {hasActiveFilters && (
           <HStack gap={2} flexWrap="wrap">
-            {filters.dateRange !== '7' && (
+            {filters.dateRange !== 'today' && (
               <Badge
                 colorPalette="blue"
                 variant="subtle"
@@ -590,6 +591,8 @@ export default function FilterBar({
               >
                 {filters.dateRange === 'custom'
                   ? `Custom`
+                  : filters.dateRange === 'today'
+                  ? `Today`
                   : `Last ${filters.dateRange} days`}
                 <Button
                   size="xs"

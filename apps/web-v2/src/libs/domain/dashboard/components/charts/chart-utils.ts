@@ -68,6 +68,9 @@ export const getDaysFromDateRange = (filters: FilterState): number => {
     }
     return 7; // Default to 7 days if custom dates not set
   }
+  if (filters.dateRange === 'today') {
+    return 1;
+  }
   return parseInt(filters.dateRange) || 7;
 };
 

@@ -1107,7 +1107,10 @@ export default function CustomTable({ filters }: CustomTableProps) {
         </Text>
         <Text color="gray.600" fontSize="sm">
           {transactions.length} batch{transactions.length !== 1 ? 'es' : ''} flagged for review
-          {filters?.dateRange && filters.dateRange !== 'custom' && (
+          {filters?.dateRange === 'today' && (
+            <> <b>today</b></>
+          )}
+          {filters?.dateRange && filters.dateRange !== 'custom' && filters.dateRange !== 'today' && (
             <> in the last <b>{filters.dateRange} days</b></>
           )}
           {filters?.dateRange === 'custom' && filters.customStartDate && filters.customEndDate && (

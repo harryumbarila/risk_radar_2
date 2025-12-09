@@ -250,9 +250,9 @@ export default function TSYSUnifiedChart({
   // Determine chart type: auto-switch to heatmap if 12+ rules
   const effectiveChartType = React.useMemo(() => {
     if (manualChartType) return manualChartType;
-    if (contributorFilteredRules.length >= 12) return 'heatmap';
-    return 'stacked-area';
-  }, [manualChartType, contributorFilteredRules.length]);
+    // Default to heatmap
+    return 'heatmap';
+  }, [manualChartType]);
 
   // For trending chart, respect Top Contributors filter
   const trendingRules = React.useMemo(() => {
@@ -672,14 +672,14 @@ export default function TSYSUnifiedChart({
       borderWidth="1px"
       borderColor="gray.200"
       role="region"
-      aria-label="TSYS Performance Overview Chart"
+      aria-label="Auto-Hold Rules Overview Chart"
     >
       <VStack align="stretch" gap={4}>
         <HStack justify="space-between" align="flex-start" flexWrap="wrap" gap={4}>
           <VStack align="start" gap={1} flex={1}>
             <HStack gap={2} align="center">
               <Text fontSize="xl" fontWeight="bold">
-                TSYS Performance Overview
+                Auto-Hold Rules Overview
               </Text>
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
@@ -709,7 +709,7 @@ export default function TSYSUnifiedChart({
                       boxShadow="lg"
                     >
                       <Tooltip.Arrow />
-                      Rule participation across payment stages over time for TSYS transactions.
+                      Rule participation across payment stages over time for auto-hold transactions.
                     </Tooltip.Content>
                   </Tooltip.Positioner>
                 </Portal>

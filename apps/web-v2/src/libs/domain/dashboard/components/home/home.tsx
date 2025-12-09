@@ -50,7 +50,7 @@ export default function Home() {
     // Initialize with all 30 defined rules selected
     const allRuleIds = Object.keys(RULE_DEFINITIONS).sort();
     return {
-      dateRange: '7',
+      dateRange: 'today',
       processor: 'all',
       source: 'all',
       ruleId: allRuleIds, // All 30 rules selected by default
@@ -122,6 +122,17 @@ export default function Home() {
           }
         );
       }
+    } else if (filters.dateRange === 'today') {
+      // Filter for today only
+      const startDate = new Date(today);
+      startDate.setHours(0, 0, 0, 0);
+      const endDate = new Date(today);
+      endDate.setHours(23, 59, 59, 999);
+      
+      filtered = filtered.filter((a) => {
+        const alertDate = new Date(a.date);
+        return alertDate >= startDate && alertDate <= endDate;
+      });
     } else {
       const days = parseInt(filters.dateRange);
       if (!isNaN(days) && days > 0) {
@@ -313,7 +324,7 @@ export default function Home() {
           availableRules={availableRules}
         />
 
-        {/* TSYS Performance Overview Section */}
+        {/* Auto-Hold Rules Overview Section */}
         <TSYSUnifiedChart 
           dateRange={filters} 
           paymentStage={filters.paymentStage}
