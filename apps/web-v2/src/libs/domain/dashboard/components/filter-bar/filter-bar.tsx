@@ -591,8 +591,6 @@ export default function FilterBar({
               >
                 {filters.dateRange === 'custom'
                   ? `Custom`
-                  : filters.dateRange === 'today'
-                  ? `Today`
                   : `Last ${filters.dateRange} days`}
                 <Button
                   size="xs"
