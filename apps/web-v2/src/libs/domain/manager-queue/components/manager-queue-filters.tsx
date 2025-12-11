@@ -325,9 +325,15 @@ export default function ManagerQueueFilters({
               alignItems="center"
               gap={1}
             >
-              Date: {filters.dateRange === 'custom'
-                ? `Custom${filters.customStartDate && filters.customEndDate ? ` (${formatDateForDisplay(filters.customStartDate)} - ${formatDateForDisplay(filters.customEndDate)})` : ''}`
-                : filters.dateRange === 'today' ? 'Today' : `Last ${filters.dateRange} days`}
+              Date: {(() => {
+                if (filters.dateRange === 'custom') {
+                  return `Custom${filters.customStartDate && filters.customEndDate ? ` (${formatDateForDisplay(filters.customStartDate)} - ${formatDateForDisplay(filters.customEndDate)})` : ''}`;
+                }
+                if (filters.dateRange === 'today') {
+                  return 'Today';
+                }
+                return `Last ${filters.dateRange} days`;
+              })()}
               <Button
                 size="xs"
                 variant="ghost"
