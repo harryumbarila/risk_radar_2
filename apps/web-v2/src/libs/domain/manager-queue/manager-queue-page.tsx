@@ -183,7 +183,7 @@ function generateMockQueueItems(): ManagerQueueItem[] {
     }
     
     // Use actual MID from transactions if available, otherwise generate
-    const actualMID: string = i < uniqueMIDs.length ? uniqueMIDs[i] : generateMID(i);
+    const actualMID: string = (i < uniqueMIDs.length ? uniqueMIDs[i] : null) ?? generateMID(i);
     const transaction = midToTransaction.get(actualMID);
     
     const exceptionsCount = Math.floor(Math.random() * 5) + 1;
