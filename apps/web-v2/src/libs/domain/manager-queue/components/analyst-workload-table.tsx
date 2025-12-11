@@ -13,6 +13,7 @@ import {
   VStack,
   Select,
   createListCollection,
+  Tooltip,
 } from '@chakra-ui/react';
 import { Eye, UserCog } from 'lucide-react';
 import { AnalystWorkload } from '../types';
@@ -189,7 +190,40 @@ export default function AnalystWorkloadTable({
                 </HStack>
               </Table.ColumnHeader>
               <Table.ColumnHeader textAlign="right">On-Hold Items</Table.ColumnHeader>
-              <Table.ColumnHeader textAlign="right">SLA Breaches</Table.ColumnHeader>
+              <Table.ColumnHeader textAlign="right">
+                <Tooltip.Root openDelay={300} closeDelay={100}>
+                  <Tooltip.Trigger asChild>
+                    <Box display="inline-block" cursor="help">
+                      SLA Breaches
+                    </Box>
+                  </Tooltip.Trigger>
+                  <Portal>
+                    <Tooltip.Positioner>
+                      <Tooltip.Content
+                        maxW="300px"
+                        p={3}
+                        bg="white"
+                        borderWidth="1px"
+                        borderColor="gray.200"
+                        boxShadow="lg"
+                      >
+                        <Tooltip.Arrow />
+                        <VStack align="start" gap={2}>
+                          <Text fontSize="sm" fontWeight="bold" color="gray.900">
+                            SLA Breaches
+                          </Text>
+                          <Text fontSize="xs" color="gray.600">
+                            The number of items that have exceeded the Service Level Agreement (SLA) review time limit. Items with SLA breaches require immediate attention as they have not been reviewed within the agreed time frame.
+                          </Text>
+                          <Text fontSize="xs" color="gray.500" fontStyle="italic">
+                            Color coding: Green (0 breaches), Yellow (1-2 breaches), Red (3+ breaches)
+                          </Text>
+                        </VStack>
+                      </Tooltip.Content>
+                    </Tooltip.Positioner>
+                  </Portal>
+                </Tooltip.Root>
+              </Table.ColumnHeader>
               <Table.ColumnHeader textAlign="center">Actions</Table.ColumnHeader>
             </Table.Row>
           </Table.Header>

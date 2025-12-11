@@ -117,25 +117,14 @@ export default function ManagerQueueTable({ items }: ManagerQueueTableProps) {
     }
   };
 
-  const getStatusBadgeColor = (status: string) => {
-    switch (status) {
-      case 'Completed':
-        return 'green';
-      case 'In-Review':
-        return 'blue';
-      case 'Pending':
-        return 'gray';
-      default:
-        return 'gray';
-    }
-  };
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleString('en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
@@ -208,7 +197,6 @@ export default function ManagerQueueTable({ items }: ManagerQueueTableProps) {
                 <Table.ColumnHeader>Analyst Assigned</Table.ColumnHeader>
                 <Table.ColumnHeader>Processor</Table.ColumnHeader>
                 <Table.ColumnHeader textAlign="right">Exceptions</Table.ColumnHeader>
-                <Table.ColumnHeader>Status</Table.ColumnHeader>
                 <Table.ColumnHeader textAlign="center">Actions</Table.ColumnHeader>
               </Table.Row>
             </Table.Header>
@@ -330,14 +318,6 @@ export default function ManagerQueueTable({ items }: ManagerQueueTableProps) {
                         </Tooltip.Positioner>
                       </Portal>
                     </Tooltip.Root>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <Badge
-                      colorPalette={getStatusBadgeColor(item.status)}
-                      variant="subtle"
-                    >
-                      {item.status}
-                    </Badge>
                   </Table.Cell>
                   <Table.Cell textAlign="center" onClick={(e) => e.stopPropagation()}>
                     <HStack gap={1} justify="center">

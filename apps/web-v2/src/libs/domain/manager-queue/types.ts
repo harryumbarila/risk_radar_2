@@ -28,7 +28,6 @@ export interface ManagerQueueFilters {
   customStartDate?: string;
   customEndDate?: string;
   analyst: 'all' | string;
-  queueType: 'all' | 'needs-review' | 'escalations' | 'pending-assignment';
   processor: 'all' | 'TSYS' | 'FSP';
   mcc: string;
   mid: string;

@@ -2,9 +2,10 @@
 import React from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Box, HStack, Tabs, Text, VStack, Skeleton, SimpleGrid } from '@chakra-ui/react';
-import { UserCog, List } from 'lucide-react';
+import { UserCog, List, Lock } from 'lucide-react';
 import CustomTable from '@/libs/domain/dashboard/components/transactions/transactions';
 import ManagerQueuePage from '@/libs/domain/manager-queue/manager-queue-page';
+import MerchantHoldsPage from '@/libs/domain/merchant-holds/merchant-holds-page';
 import AutoHoldFilterBar, { AutoHoldFilterState } from '../components/filter-bar/filter-bar';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
 import { RULE_DEFINITIONS } from '@/libs/domain/dashboard/utils/ruleNames';
@@ -15,17 +16,17 @@ export default function AutoHoldBoardPage() {
   const [isLoading, setIsLoading] = React.useState(true);
   
   // Check if tab is specified in URL, default to 'analyst'
-  const initialTab = (searchParams?.get('tab') as 'analyst' | 'manager') || 'analyst';
-  const [viewMode, setViewMode] = React.useState<'analyst' | 'manager'>(initialTab);
+  const initialTab = (searchParams?.get('tab') as 'analyst' | 'manager' | 'merchant-holds') || 'analyst';
+  const [viewMode, setViewMode] = React.useState<'analyst' | 'manager' | 'merchant-holds'>(initialTab);
   
   // Update viewMode when URL param changes
   React.useEffect(() => {
-    const tab = (searchParams?.get('tab') as 'analyst' | 'manager') || 'analyst';
+    const tab = (searchParams?.get('tab') as 'analyst' | 'manager' | 'merchant-holds') || 'analyst';
     setViewMode(tab);
   }, [searchParams]);
   const [filters, setFilters] = React.useState<AutoHoldFilterState>({
     dateRange: 'today',
-    status: 'all',
+    status: 'Unreviewed',
     processor: 'all',
     source: 'all',
     dataSource: 'all',
@@ -166,7 +167,14 @@ export default function AutoHoldBoardPage() {
       <Box bg="white" p={6} borderRadius="xl" boxShadow="sm">
         <Tabs.Root
           value={viewMode}
-          onValueChange={(e) => setViewMode(e.value as 'analyst' | 'manager')}
+          onValueChange={(e) => {
+            const newTab = e.value as 'analyst' | 'manager' | 'merchant-holds';
+            setViewMode(newTab);
+            // Update URL without page reload
+            const url = new URL(window.location.href);
+            url.searchParams.set('tab', newTab);
+            window.history.pushState({}, '', url);
+          }}
         >
           <HStack justify="space-between" mb={6}>
             <Tabs.List>
@@ -182,6 +190,12 @@ export default function AutoHoldBoardPage() {
                   <Text>Manager Queue</Text>
                 </HStack>
               </Tabs.Trigger>
+              <Tabs.Trigger value="merchant-holds" suppressHydrationWarning>
+                <HStack gap={2}>
+                  <Lock size={16} />
+                  <Text>Merchant Holds</Text>
+                </HStack>
+              </Tabs.Trigger>
               <Tabs.Indicator />
             </Tabs.List>
           </HStack>
@@ -194,6 +208,12 @@ export default function AutoHoldBoardPage() {
           <Tabs.Content value="manager">
             <Box mt={4}>
               <ManagerQueuePage />
+            </Box>
+          </Tabs.Content>
+
+          <Tabs.Content value="merchant-holds">
+            <Box mt={4}>
+              <MerchantHoldsPage />
             </Box>
           </Tabs.Content>
         </Tabs.Root>

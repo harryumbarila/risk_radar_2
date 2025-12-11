@@ -1,12 +1,115 @@
 'use client';
 import React from 'react';
-import { Box, VStack, Text, Table, Badge, HStack, Tooltip, Portal } from '@chakra-ui/react';
-import { CreditCard, Info } from 'lucide-react';
+import { Box, VStack, Text, Table, Badge, HStack, Tooltip, Portal, Dialog, Button, CloseButton } from '@chakra-ui/react';
+import { CreditCard, Info, AlertCircle } from 'lucide-react';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
 
 interface TransactionsTabProps {
   transactions: MerchantTransaction[];
 }
+
+// Deterministic random number generator based on seed
+const seededRandom = (seed: number) => {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+};
+
+// MCC definitions mapping
+const getMCCDefinition = (mcc: string): string => {
+  const mccDefinitions: Record<string, string> = {
+    '5655': 'Clothing Stores',
+    '5411': 'Grocery Stores, Supermarkets',
+    '5812': 'Eating Places, Restaurants',
+    '5999': 'Miscellaneous and Specialty Retail Stores',
+    '5311': 'Department Stores',
+    '5541': 'Service Stations (with or without ancillary services)',
+    '5734': 'Computer Software Stores',
+    '5814': 'Fast Food Restaurants',
+    '5942': 'Book Stores',
+    '5970': 'Arts and Crafts Stores',
+    '5995': 'Pet Shops, Pet Food, and Supplies Stores',
+    '7230': 'Beauty and Barber Shops',
+    '7299': 'Miscellaneous Personal Services',
+    '7372': 'Computer Programming, Data Processing, and Integrated Systems Design Services',
+    '7399': 'Business Services, Not Elsewhere Classified',
+    '7512': 'Automobile Rental Agency',
+    '7519': 'Motor Home and Recreational Vehicle Rental',
+    '7531': 'Automotive Body Repair and Paint Shops',
+    '7534': 'Tire Retreading and Repair Shops',
+    '7535': 'Automotive Paint Shops',
+    '7538': 'Automotive Service Shops (Non-Dealer)',
+    '7542': 'Car Washes',
+    '7549': 'Towing Services',
+    '7622': 'Radio Repair Shops',
+    '7623': 'Air Conditioning and Refrigeration Repair Shops',
+    '7629': 'Electrical and Small Appliance Repair Shops',
+    '7631': 'Watch, Clock, and Jewelry Repair',
+    '7641': 'Furniture Repair, Refinishing, and Reupholstery',
+    '7692': 'Welding Repair',
+    '7699': 'Miscellaneous Repair Shops and Related Services',
+    '7832': 'Motion Picture Theaters',
+    '7841': 'Video Tape Rental Stores',
+    '7911': 'Dance Halls, Studios, and Schools',
+    '7922': 'Theatrical Ticket Agencies',
+    '7929': 'Bands, Orchestras, and Miscellaneous Entertainers',
+    '7932': 'Billiard and Pool Establishments',
+    '7933': 'Bowling Alleys',
+    '7941': 'Commercial Sports, Athletic Fields, Recreation Facilities, and Public Golf Courses',
+    '7991': 'Tourist Attractions and Exhibits',
+    '7992': 'Public Golf Courses',
+    '7993': 'Video Amusement Game Supplies',
+    '7994': 'Video Game Arcades',
+    '7995': 'Betting, Including Lottery Tickets, Casino Gaming Chips, Off-Track Betting, and Wagers',
+    '7996': 'Amusement Parks, Circuses, Carnivals, and Fortune Tellers',
+    '7997': 'Membership Clubs (Sports, Recreation, Athletic), Country Clubs, and Private Golf Courses',
+    '7998': 'Aquariums, Seaquariums, Dolphinariums',
+    '7999': 'Recreation Services, Not Elsewhere Classified',
+    '8011': 'Doctors',
+    '8021': 'Dentists and Orthodontists',
+    '8031': 'Osteopathic Physicians',
+    '8041': 'Chiropractors',
+    '8042': 'Optometrists and Ophthalmologists',
+    '8043': 'Opticians, Opticians Goods and Eyeglasses',
+    '8049': 'Podiatrists and Chiropodists',
+    '8050': 'Nursing and Personal Care Facilities',
+    '8062': 'Hospitals',
+    '8071': 'Medical and Dental Laboratories',
+    '8099': 'Medical Services and Health Practitioners, Not Elsewhere Classified',
+    '8111': 'Legal Services and Attorneys',
+    '8211': 'Elementary and Secondary Schools',
+    '8220': 'Colleges, Universities, Professional Schools, and Junior Colleges',
+    '8241': 'Correspondence Schools',
+    '8244': 'Business and Secretarial Schools',
+    '8249': 'Vocational and Trade Schools',
+    '8299': 'Schools and Educational Services, Not Elsewhere Classified',
+    '8351': 'Child Care Services',
+    '8398': 'Charitable and Social Service Organizations',
+    '8641': 'Civic, Social, and Fraternal Associations',
+    '8651': 'Political Organizations',
+    '8661': 'Religious Organizations',
+    '8675': 'Automobile Associations',
+    '8699': 'Membership Organizations, Not Elsewhere Classified',
+    '8734': 'Testing Laboratories (Non-Medical)',
+    '8911': 'Architectural, Engineering, and Surveying Services',
+    '8931': 'Accounting, Auditing, and Bookkeeping Services',
+    '8999': 'Professional Services, Not Elsewhere Classified',
+    '9211': 'Court Costs, Including Alimony and Child Support',
+    '9222': 'Fines',
+    '9223': 'Bail and Bond Payments',
+    '9311': 'Tax Payments',
+    '9399': 'Government Services, Not Elsewhere Classified',
+    '9402': 'Postal Services - Government Only',
+    '9405': 'Intra-Government Purchases - Government Only',
+    '9700': 'Visa Credential Service',
+    '9701': 'Visa T&E E-Commerce Transaction',
+    '9702': 'GCAS Emergency Services',
+    '9751': 'UK Supermarkets, Electronic',
+    '9752': 'UK Petrol Stations',
+    '9950': 'Intra-Company Purchases',
+  };
+  
+  return mccDefinitions[mcc] || `MCC ${mcc} - Merchant Category Code`;
+};
 
 // Helper function to generate mock data based on transaction
 const generateAuthData = (tx: MerchantTransaction, index: number) => {
@@ -23,8 +126,13 @@ const generateAuthData = (tx: MerchantTransaction, index: number) => {
   const avsCodes = ['Y - Street and 5-digit postal match', 'Z - Postal matches, street does not', 'N - No match'];
   const fundingSources = ['D - Debit', 'P - Prepaid', ''];
   
-  const cardF6 = String(Math.floor(Math.random() * 900000) + 100000);
-  const cardL4 = String(Math.floor(Math.random() * 9000) + 1000).padStart(4, '0');
+  // Use transaction ID and index as seed for deterministic values
+  const seed1 = (tx.id?.charCodeAt(0) || 0) + index * 1000;
+  const seed2 = (tx.id?.charCodeAt(1) || 0) + index * 2000;
+  const seed3 = (tx.id?.charCodeAt(2) || 0) + index * 3000;
+  
+  const cardF6 = String(Math.floor(seededRandom(seed1) * 900000) + 100000);
+  const cardL4 = String(Math.floor(seededRandom(seed2) * 9000) + 1000).padStart(4, '0');
   const cardType: string = cardTypes[index % cardTypes.length] || cardTypes[0] || '';
   const posEntryMode: string = posEntryModes[index % posEntryModes.length] || posEntryModes[0] || '';
   const calcEntryType = posEntryMode.includes('Manual') ? 'Keyed' : posEntryMode.includes('Chip') ? 'Chip' : 'Contactless';
@@ -35,7 +143,7 @@ const generateAuthData = (tx: MerchantTransaction, index: number) => {
   const messageType = messageTypes[0] || '';
   const avsCode = avsCodes[index % avsCodes.length] || avsCodes[0];
   const fundingSource = fundingSources[index % fundingSources.length] || fundingSources[0];
-  const apprCode = String(Math.floor(Math.random() * 900000) + 100000);
+  const apprCode = String(Math.floor(seededRandom(seed3) * 900000) + 100000);
   
   return {
     transDate: tx.date,
@@ -62,15 +170,20 @@ const generateCaptureData = (tx: MerchantTransaction, index: number) => {
   const cardTypes = ['American Express', 'Visa', 'Mastercard'];
   const posEntryModes = ['01 - Manual key entry', '05 - Chip read', '07 - Contactless'];
   
-  const cardF6 = String(Math.floor(Math.random() * 900000) + 100000);
-  const cardL4 = String(Math.floor(Math.random() * 9000) + 1000).padStart(4, '0');
+  // Use transaction ID and index as seed for deterministic values
+  const seed1 = (tx.id?.charCodeAt(0) || 0) + index * 1000;
+  const seed2 = (tx.id?.charCodeAt(1) || 0) + index * 2000;
+  const seed3 = (tx.id?.charCodeAt(2) || 0) + index * 3000;
+  
+  const cardF6 = String(Math.floor(seededRandom(seed1) * 900000) + 100000);
+  const cardL4 = String(Math.floor(seededRandom(seed2) * 9000) + 1000).padStart(4, '0');
   const cardType: string = cardTypes[index % cardTypes.length] || cardTypes[0] || '';
   const posEntryMode: string = posEntryModes[index % posEntryModes.length] || posEntryModes[0] || '';
   const calcEntryType = posEntryMode.includes('Manual') ? 'Keyed' : posEntryMode.includes('Chip') ? 'Chip' : 'Contactless';
   const cardNotPresent = posEntryMode.includes('Manual') ? 'Yes' : 'No';
-  const authCode = String(Math.floor(Math.random() * 900000) + 100000);
+  const authCode = String(Math.floor(seededRandom(seed3) * 900000) + 100000);
   
-  // Use transaction date for both transmission and transaction date
+  // Use transaction date for both transmission and transaction date (deterministic based on index)
   const txDate = new Date();
   txDate.setDate(txDate.getDate() - (index % 3));
   
@@ -91,10 +204,17 @@ const generateCaptureData = (tx: MerchantTransaction, index: number) => {
 const generateSettledData = (tx: MerchantTransaction, index: number) => {
   const mccs = ['5655', '5411', '5812', '5999', '5311'];
   const mcc = mccs[index % mccs.length] || mccs[0];
-  const chargebackCount = Math.floor(Math.random() * 50) + 10;
-  const chargebackVol = (Math.random() * 10000 + 5000).toFixed(2);
-  const salesCount = Math.floor(Math.random() * 500) + 200;
-  const salesVol = (Math.random() * 50000 + 20000).toFixed(2);
+  
+  // Use transaction ID and index as seed for deterministic values
+  const seed1 = (tx.id?.charCodeAt(0) || 0) + index * 1000;
+  const seed2 = (tx.id?.charCodeAt(1) || 0) + index * 2000;
+  const seed3 = (tx.id?.charCodeAt(2) || 0) + index * 3000;
+  const seed4 = (tx.id?.charCodeAt(3) || 0) + index * 4000;
+  
+  const chargebackCount = Math.floor(seededRandom(seed1) * 50) + 10;
+  const chargebackVol = (seededRandom(seed2) * 10000 + 5000).toFixed(2);
+  const salesCount = Math.floor(seededRandom(seed3) * 500) + 200;
+  const salesVol = (seededRandom(seed4) * 50000 + 20000).toFixed(2);
   const percentageVol = ((parseFloat(chargebackVol) / parseFloat(salesVol)) * 100).toFixed(2);
   const percentageCount = ((chargebackCount / salesCount) * 100).toFixed(2);
   
@@ -113,10 +233,15 @@ const generateSettledData = (tx: MerchantTransaction, index: number) => {
 const generateReturnsData = (tx: MerchantTransaction, index: number) => {
   const returnCodes = ['R01', 'R02', 'R03', 'R04', 'R05'];
   const crDb = ['D', 'C'];
-  const returnDate = new Date();
-  returnDate.setDate(returnDate.getDate() - (index % 5));
   
-  const returnAmt = (Math.random() * 10 + 0.01).toFixed(2);
+  // Use transaction ID and index as seed for deterministic date
+  const seed = (tx.id?.charCodeAt(0) || 0) + index * 1000;
+  const daysOffset = Math.floor(seededRandom(seed) * 5);
+  const returnDate = new Date();
+  returnDate.setDate(returnDate.getDate() - daysOffset);
+  
+  // Use seed for deterministic amount
+  const returnAmt = (seededRandom(seed + 1000) * 10 + 0.01).toFixed(2);
   
   return {
     mid: tx.mid,
@@ -127,9 +252,73 @@ const generateReturnsData = (tx: MerchantTransaction, index: number) => {
   };
 };
 
+// Interface for card history transaction
+interface CardHistoryTransaction {
+  mid: string;
+  transactionDate: string;
+  amount: string;
+  posAvsResult: string;
+  authCode: string;
+  cardNumber: string;
+  dbNet: string;
+  transmissionDate: string;
+  netDepositAmount: string;
+  isHighRisk: boolean;
+}
+
+// Generate mock card history data
+const generateCardHistory = (cardF6: string, cardL4: string, baseMid: string): CardHistoryTransaction[] => {
+  const transactions: CardHistoryTransaction[] = [];
+  const baseDate = new Date();
+  
+  // Generate 25-30 transactions for pagination testing
+  const count = 25 + Math.floor(Math.random() * 6);
+  
+  for (let i = 0; i < count; i++) {
+    const txDate = new Date(baseDate);
+    txDate.setDate(txDate.getDate() - Math.floor(i / 3));
+    txDate.setHours(9 + (i % 12), 15 + (i * 5) % 45, 0, 0);
+    
+    const transDate = txDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const transTime = txDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const transmissionDate = txDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    
+    const amount = (Math.random() * 5000 + 100).toFixed(2);
+    const netDeposit = (parseFloat(amount) * 0.97).toFixed(2);
+    const dbNet = (Math.random() * 100 - 50).toFixed(2);
+    
+    const posAvsResults = ['Y - Match', 'Z - Partial', 'N - No Match', 'A - Address Match'];
+    const authCodes = ['000000', '123456', '789012', '345678'];
+    
+    // Mark some transactions as high risk (about 20%)
+    const isHighRisk = Math.random() < 0.2;
+    
+    transactions.push({
+      mid: baseMid,
+      transactionDate: `${transDate} ${transTime}`,
+      amount: `$${parseFloat(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      posAvsResult: posAvsResults[i % posAvsResults.length],
+      authCode: authCodes[i % authCodes.length],
+      cardNumber: `${cardF6} •••• ${cardL4}`,
+      dbNet: `$${parseFloat(dbNet).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      transmissionDate,
+      netDepositAmount: `$${parseFloat(netDeposit).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      isHighRisk,
+    });
+  }
+  
+  return transactions;
+};
+
 export default function TransactionsTab({ transactions }: TransactionsTabProps) {
   // Determine data source from first transaction (all transactions in a batch should have same source)
   const dataSource = transactions[0]?.source || 'Auth';
+  
+  // Card History modal state
+  const [isCardHistoryOpen, setIsCardHistoryOpen] = React.useState(false);
+  const [selectedCard, setSelectedCard] = React.useState<{ cardF6: string; cardL4: string } | null>(null);
+  const [cardHistoryPage, setCardHistoryPage] = React.useState(1);
+  const itemsPerPage = 10;
   
   // Generate appropriate data based on data source
   const tableData = React.useMemo(() => {
@@ -169,8 +358,7 @@ export default function TransactionsTab({ transactions }: TransactionsTabProps) 
             <Table.ColumnHeader>Trans date</Table.ColumnHeader>
             <Table.ColumnHeader textAlign="right">Auth amt</Table.ColumnHeader>
             <Table.ColumnHeader>Appr code</Table.ColumnHeader>
-            <Table.ColumnHeader>Card F6</Table.ColumnHeader>
-            <Table.ColumnHeader>Card L4</Table.ColumnHeader>
+            <Table.ColumnHeader>Card F6 / L4</Table.ColumnHeader>
             <Table.ColumnHeader>
               <HStack gap={1} align="center">
                 <Text>Card Type</Text>
@@ -248,10 +436,42 @@ export default function TransactionsTab({ transactions }: TransactionsTabProps) 
                 <Text fontSize="xs" fontFamily="mono">{row.apprCode}</Text>
               </Table.Cell>
               <Table.Cell>
-                <Text fontSize="xs" fontFamily="mono">{row.cardF6}</Text>
-              </Table.Cell>
-              <Table.Cell>
-                <Text fontSize="xs" fontFamily="mono">{row.cardL4}</Text>
+                <Tooltip.Root openDelay={300}>
+                  <Tooltip.Trigger asChild>
+                    <Box
+                      as="button"
+                      onClick={() => {
+                        setSelectedCard({ cardF6: row.cardF6, cardL4: row.cardL4 });
+                        setIsCardHistoryOpen(true);
+                        setCardHistoryPage(1);
+                      }}
+                      px={2}
+                      py={1}
+                      borderRadius="full"
+                      bg="gray.100"
+                      _hover={{ bg: 'gray.200' }}
+                      transition="all 0.2s"
+                      cursor="pointer"
+                      display="inline-flex"
+                      alignItems="center"
+                      gap={1}
+                      suppressHydrationWarning
+                    >
+                      <CreditCard size={12} />
+                      <Text fontSize="xs" fontFamily="mono">
+                        {row.cardF6} •••• {row.cardL4}
+                      </Text>
+                    </Box>
+                  </Tooltip.Trigger>
+                  <Portal>
+                    <Tooltip.Positioner>
+                      <Tooltip.Content maxW="200px" zIndex={2000} bg="gray.900" color="white" px={2} py={1} borderRadius="md" fontSize="xs">
+                        <Tooltip.Arrow />
+                        View card history
+                      </Tooltip.Content>
+                    </Tooltip.Positioner>
+                  </Portal>
+                </Tooltip.Root>
               </Table.Cell>
               <Table.Cell>
                 <Text fontSize="xs">{row.cardType}</Text>
@@ -322,8 +542,7 @@ export default function TransactionsTab({ transactions }: TransactionsTabProps) 
             <Table.ColumnHeader>Transaction date</Table.ColumnHeader>
             <Table.ColumnHeader textAlign="right">Transaction Amt</Table.ColumnHeader>
             <Table.ColumnHeader>Auth code</Table.ColumnHeader>
-            <Table.ColumnHeader>Card # F6</Table.ColumnHeader>
-            <Table.ColumnHeader>Card # L4</Table.ColumnHeader>
+            <Table.ColumnHeader>Card # F6 / L4</Table.ColumnHeader>
             <Table.ColumnHeader>Card type</Table.ColumnHeader>
             <Table.ColumnHeader>POS entry mode</Table.ColumnHeader>
             <Table.ColumnHeader>POS entry mode Calculated</Table.ColumnHeader>
@@ -346,10 +565,42 @@ export default function TransactionsTab({ transactions }: TransactionsTabProps) 
                 <Text fontSize="sm" fontFamily="mono">{row.authCode}</Text>
               </Table.Cell>
               <Table.Cell>
-                <Text fontSize="sm" fontFamily="mono">{row.cardF6}</Text>
-              </Table.Cell>
-              <Table.Cell>
-                <Text fontSize="sm" fontFamily="mono">{row.cardL4}</Text>
+                <Tooltip.Root openDelay={300}>
+                  <Tooltip.Trigger asChild>
+                    <Box
+                      as="button"
+                      onClick={() => {
+                        setSelectedCard({ cardF6: row.cardF6, cardL4: row.cardL4 });
+                        setIsCardHistoryOpen(true);
+                        setCardHistoryPage(1);
+                      }}
+                      px={2}
+                      py={1}
+                      borderRadius="full"
+                      bg="gray.100"
+                      _hover={{ bg: 'gray.200' }}
+                      transition="all 0.2s"
+                      cursor="pointer"
+                      display="inline-flex"
+                      alignItems="center"
+                      gap={1}
+                      suppressHydrationWarning
+                    >
+                      <CreditCard size={12} />
+                      <Text fontSize="sm" fontFamily="mono">
+                        {row.cardF6} •••• {row.cardL4}
+                      </Text>
+                    </Box>
+                  </Tooltip.Trigger>
+                  <Portal>
+                    <Tooltip.Positioner>
+                      <Tooltip.Content maxW="200px" zIndex={2000} bg="gray.900" color="white" px={2} py={1} borderRadius="md" fontSize="xs">
+                        <Tooltip.Arrow />
+                        View card history
+                      </Tooltip.Content>
+                    </Tooltip.Positioner>
+                  </Portal>
+                </Tooltip.Root>
               </Table.Cell>
               <Table.Cell>
                 <Text fontSize="sm">{row.cardType}</Text>
@@ -395,7 +646,22 @@ export default function TransactionsTab({ transactions }: TransactionsTabProps) 
                 <Text fontSize="sm" fontFamily="mono">{row.mid}</Text>
               </Table.Cell>
               <Table.Cell>
-                <Text fontSize="sm" fontWeight="semibold">{row.mcc}</Text>
+                <Tooltip.Root openDelay={300}>
+                  <Tooltip.Trigger asChild>
+                    <Box as="span" display="inline-flex" alignItems="center" cursor="help">
+                      <Text fontSize="sm" fontWeight="semibold">{row.mcc}</Text>
+                    </Box>
+                  </Tooltip.Trigger>
+                  <Portal>
+                    <Tooltip.Positioner>
+                      <Tooltip.Content maxW="300px" zIndex={2000} bg="gray.900" color="white" px={3} py={2} borderRadius="md" fontSize="sm">
+                        <Tooltip.Arrow />
+                        <Text fontWeight="semibold" mb={1}>MCC {row.mcc}</Text>
+                        <Text>{getMCCDefinition(row.mcc)}</Text>
+                      </Tooltip.Content>
+                    </Tooltip.Positioner>
+                  </Portal>
+                </Tooltip.Root>
               </Table.Cell>
               <Table.Cell textAlign="right">
                 <Text fontSize="sm">{row.chargebackCountLast30Days}</Text>
@@ -508,6 +774,200 @@ export default function TransactionsTab({ transactions }: TransactionsTabProps) 
       >
         {renderTable()}
       </Box>
+
+      {/* Card History Modal */}
+      <Dialog.Root
+        open={isCardHistoryOpen}
+        onOpenChange={(e) => {
+          if (!e.open) {
+            setIsCardHistoryOpen(false);
+            setSelectedCard(null);
+            setCardHistoryPage(1);
+          }
+        }}
+        size="xl"
+      >
+        <Portal>
+          <Dialog.Backdrop bg="blackAlpha.600" backdropFilter="blur(4px)" />
+          <Dialog.Positioner>
+            <Dialog.Content
+              maxW="90vw"
+              w="1200px"
+              maxH="90vh"
+              display="flex"
+              flexDirection="column"
+              bg="white"
+              boxShadow="xl"
+            >
+              <Dialog.Header borderBottomWidth="1px" borderColor="gray.200" pb={4}>
+                <HStack justify="space-between" align="center">
+                  <VStack align="start" gap={0}>
+                    <Text fontSize="lg" fontWeight="semibold" color="gray.900">
+                      Card History
+                    </Text>
+                    {selectedCard && (
+                      <Text fontSize="sm" color="gray.600" fontFamily="mono">
+                        {selectedCard.cardF6} •••• {selectedCard.cardL4}
+                      </Text>
+                    )}
+                  </VStack>
+                  <CloseButton onClick={() => {
+                    setIsCardHistoryOpen(false);
+                    setSelectedCard(null);
+                    setCardHistoryPage(1);
+                  }} />
+                </HStack>
+                
+                {/* Issuer Information */}
+                {selectedCard && (
+                  <HStack gap={6} mt={4} pt={4} borderTopWidth="1px" borderColor="gray.200">
+                    <VStack align="start" gap={1}>
+                      <Text fontSize="xs" color="gray.500" fontWeight="medium">
+                        Issuer Bank
+                      </Text>
+                      <Text fontSize="sm" color="gray.900">
+                        {selectedCard.cardF6.startsWith('4') ? 'Chase Bank' : selectedCard.cardF6.startsWith('5') ? 'Bank of America' : 'American Express'}
+                      </Text>
+                    </VStack>
+                    <VStack align="start" gap={1}>
+                      <Text fontSize="xs" color="gray.500" fontWeight="medium">
+                        Issuer Country
+                      </Text>
+                      <Text fontSize="sm" color="gray.900">
+                        USA
+                      </Text>
+                    </VStack>
+                    <VStack align="start" gap={1}>
+                      <Text fontSize="xs" color="gray.500" fontWeight="medium">
+                        Issuer Phone
+                      </Text>
+                      <Text fontSize="sm" color="gray.900">
+                        {selectedCard.cardF6.startsWith('4') ? '1-800-935-9935' : selectedCard.cardF6.startsWith('5') ? '1-800-432-1000' : '1-800-528-4800'}
+                      </Text>
+                    </VStack>
+                  </HStack>
+                )}
+              </Dialog.Header>
+
+              <Dialog.Body flex={1} overflowY="auto" p={0}>
+                {selectedCard && (() => {
+                  const allHistory = generateCardHistory(selectedCard.cardF6, selectedCard.cardL4, transactions[0]?.mid || '');
+                  const totalPages = Math.ceil(allHistory.length / itemsPerPage);
+                  const startIndex = (cardHistoryPage - 1) * itemsPerPage;
+                  const endIndex = startIndex + itemsPerPage;
+                  const paginatedHistory = allHistory.slice(startIndex, endIndex);
+
+                  return (
+                    <VStack align="stretch" gap={0}>
+                      <Table.ScrollArea>
+                        <Table.Root size="sm" stickyHeader>
+                          <Table.Header>
+                            <Table.Row bg="gray.50">
+                              <Table.ColumnHeader>MID</Table.ColumnHeader>
+                              <Table.ColumnHeader>Transaction Date</Table.ColumnHeader>
+                              <Table.ColumnHeader textAlign="right">Amount</Table.ColumnHeader>
+                              <Table.ColumnHeader>POS/AVS Result</Table.ColumnHeader>
+                              <Table.ColumnHeader>Auth Code</Table.ColumnHeader>
+                              <Table.ColumnHeader>Card #</Table.ColumnHeader>
+                              <Table.ColumnHeader textAlign="right">DB Net</Table.ColumnHeader>
+                              <Table.ColumnHeader>Transmission Date</Table.ColumnHeader>
+                              <Table.ColumnHeader textAlign="right">Net Deposit Amount</Table.ColumnHeader>
+                            </Table.Row>
+                          </Table.Header>
+                          <Table.Body>
+                            {paginatedHistory.map((tx, index) => (
+                              <Table.Row key={index} bg={tx.isHighRisk ? 'red.50' : 'white'}>
+                                <Table.Cell>
+                                  <HStack gap={2}>
+                                    {tx.isHighRisk && (
+                                      <Box
+                                        w={2}
+                                        h={2}
+                                        borderRadius="full"
+                                        bg="red.500"
+                                        flexShrink={0}
+                                      />
+                                    )}
+                                    <Text fontSize="sm" fontFamily="mono">{tx.mid}</Text>
+                                  </HStack>
+                                </Table.Cell>
+                                <Table.Cell>
+                                  <Text fontSize="sm">{tx.transactionDate}</Text>
+                                </Table.Cell>
+                                <Table.Cell textAlign="right">
+                                  <Text fontSize="sm" fontWeight="semibold">{tx.amount}</Text>
+                                </Table.Cell>
+                                <Table.Cell>
+                                  <Text fontSize="sm">{tx.posAvsResult}</Text>
+                                </Table.Cell>
+                                <Table.Cell>
+                                  <Text fontSize="sm" fontFamily="mono">{tx.authCode}</Text>
+                                </Table.Cell>
+                                <Table.Cell>
+                                  <Text fontSize="sm" fontFamily="mono">{tx.cardNumber}</Text>
+                                </Table.Cell>
+                                <Table.Cell textAlign="right">
+                                  <Text fontSize="sm" color={parseFloat(tx.dbNet) < 0 ? 'red.600' : 'green.600'}>
+                                    {tx.dbNet}
+                                  </Text>
+                                </Table.Cell>
+                                <Table.Cell>
+                                  <Text fontSize="sm">{tx.transmissionDate}</Text>
+                                </Table.Cell>
+                                <Table.Cell textAlign="right">
+                                  <Text fontSize="sm" fontWeight="semibold">{tx.netDepositAmount}</Text>
+                                </Table.Cell>
+                              </Table.Row>
+                            ))}
+                          </Table.Body>
+                        </Table.Root>
+                      </Table.ScrollArea>
+
+                      {/* Pagination */}
+                      {totalPages > 1 && (
+                        <Box
+                          borderTopWidth="1px"
+                          borderColor="gray.200"
+                          px={6}
+                          py={4}
+                          bg="gray.50"
+                        >
+                          <HStack justify="space-between" align="center">
+                            <Text fontSize="sm" color="gray.600">
+                              Showing {startIndex + 1}-{Math.min(endIndex, allHistory.length)} of {allHistory.length} transactions
+                            </Text>
+                            <HStack gap={2}>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setCardHistoryPage(Math.max(1, cardHistoryPage - 1))}
+                                disabled={cardHistoryPage === 1}
+                              >
+                                Previous
+                              </Button>
+                              <Text fontSize="sm" color="gray.600" minW="80px" textAlign="center">
+                                Page {cardHistoryPage} of {totalPages}
+                              </Text>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setCardHistoryPage(Math.min(totalPages, cardHistoryPage + 1))}
+                                disabled={cardHistoryPage === totalPages}
+                              >
+                                Next
+                              </Button>
+                            </HStack>
+                          </HStack>
+                        </Box>
+                      )}
+                    </VStack>
+                  );
+                })()}
+              </Dialog.Body>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
     </VStack>
   );
 }

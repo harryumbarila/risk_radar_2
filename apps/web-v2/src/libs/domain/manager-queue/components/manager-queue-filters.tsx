@@ -16,6 +16,37 @@ import {
 import { X, ChevronDown } from 'lucide-react';
 import { ManagerQueueFilters as FilterState } from '../types';
 
+// Helper functions to format dates between YYYY-MM-DD (internal) and MM/DD/YYYY (display)
+const formatDateForDisplay = (dateString: string | undefined): string => {
+  if (!dateString) return '';
+  // If already in MM/DD/YYYY format, return as is
+  if (dateString.includes('/')) return dateString;
+  // Convert from YYYY-MM-DD to MM/DD/YYYY
+  const [year, month, day] = dateString.split('-');
+  if (year && month && day) {
+    return `${month}/${day}/${year}`;
+  }
+  return dateString;
+};
+
+const formatDateForStorage = (dateString: string): string => {
+  if (!dateString) return '';
+  // If already in YYYY-MM-DD format, return as is
+  if (dateString.includes('-') && dateString.length === 10) return dateString;
+  // Convert from MM/DD/YYYY to YYYY-MM-DD
+  const parts = dateString.split('/');
+  if (parts.length === 3) {
+    const [month, day, year] = parts;
+    if (month && day && year) {
+      // Pad with zeros if needed
+      const paddedMonth = month.padStart(2, '0');
+      const paddedDay = day.padStart(2, '0');
+      return `${year}-${paddedMonth}-${paddedDay}`;
+    }
+  }
+  return dateString;
+};
+
 interface ManagerQueueFiltersProps {
   filters: FilterState;
   onFiltersChange: (filters: FilterState) => void;
@@ -46,15 +77,6 @@ export default function ManagerQueueFilters({
     ],
   });
 
-  const queueTypeCollection = createListCollection({
-    items: [
-      { label: 'All', value: 'all' },
-      { label: 'Needs Review', value: 'needs-review' },
-      { label: 'Escalations', value: 'escalations' },
-      { label: 'Pending Assignment', value: 'pending-assignment' },
-    ],
-  });
-
   const processorCollection = createListCollection({
     items: [
       { label: 'All Processors', value: 'all' },
@@ -64,14 +86,19 @@ export default function ManagerQueueFilters({
   });
 
   const updateFilter = (key: keyof FilterState, value: any) => {
-    onFiltersChange({ ...filters, [key]: value });
+    const newFilters = { ...filters, [key]: value };
+    // If changing dateRange away from custom, clear custom dates
+    if (key === 'dateRange' && value !== 'custom') {
+      delete newFilters.customStartDate;
+      delete newFilters.customEndDate;
+    }
+    onFiltersChange(newFilters);
   };
 
   const clearFilter = (key: keyof FilterState) => {
     const defaultValues: Partial<FilterState> = {
       dateRange: 'today',
       analyst: 'all',
-      queueType: 'all',
       processor: 'all',
       mcc: '',
       mid: '',
@@ -82,7 +109,6 @@ export default function ManagerQueueFilters({
   const hasActiveFilters = 
     filters.dateRange !== 'today' ||
     filters.analyst !== 'all' ||
-    filters.queueType !== 'all' ||
     filters.processor !== 'all' ||
     filters.mcc !== '' ||
     filters.mid !== '';
@@ -132,6 +158,41 @@ export default function ManagerQueueFilters({
           </Select.Root>
         </VStack>
 
+        {filters.dateRange === 'custom' && (
+          <>
+            <VStack align="start" gap={1} minW="150px">
+              <Text fontSize="xs" color="gray.600">
+                From
+              </Text>
+              <Input
+                type="text"
+                size="sm"
+                value={formatDateForDisplay(filters.customStartDate)}
+                onChange={(e) => {
+                  const formatted = formatDateForStorage(e.target.value);
+                  updateFilter('customStartDate', formatted);
+                }}
+                placeholder="MM/DD/YYYY"
+              />
+            </VStack>
+            <VStack align="start" gap={1} minW="150px">
+              <Text fontSize="xs" color="gray.600">
+                To
+              </Text>
+              <Input
+                type="text"
+                size="sm"
+                value={formatDateForDisplay(filters.customEndDate)}
+                onChange={(e) => {
+                  const formatted = formatDateForStorage(e.target.value);
+                  updateFilter('customEndDate', formatted);
+                }}
+                placeholder="MM/DD/YYYY"
+              />
+            </VStack>
+          </>
+        )}
+
         {/* Analyst */}
         <VStack align="start" gap={1} minW="150px">
           <Text fontSize="xs" color="gray.600">
@@ -156,41 +217,6 @@ export default function ManagerQueueFilters({
               <Select.Positioner>
                 <Select.Content>
                   {analystCollection.items.map((item) => (
-                    <Select.Item item={item} key={item.value}>
-                      {item.label}
-                      <Select.ItemIndicator />
-                    </Select.Item>
-                  ))}
-                </Select.Content>
-              </Select.Positioner>
-            </Portal>
-          </Select.Root>
-        </VStack>
-
-        {/* Queue Type */}
-        <VStack align="start" gap={1} minW="150px">
-          <Text fontSize="xs" color="gray.600">
-            Queue Type
-          </Text>
-          <Select.Root
-            collection={queueTypeCollection}
-            value={[filters.queueType]}
-            onValueChange={(e) => updateFilter('queueType', e.value[0])}
-            size="sm"
-          >
-            <Select.HiddenSelect />
-            <Select.Control>
-              <Select.Trigger>
-                <Select.ValueText />
-              </Select.Trigger>
-              <Select.IndicatorGroup>
-                <Select.Indicator />
-              </Select.IndicatorGroup>
-            </Select.Control>
-            <Portal>
-              <Select.Positioner>
-                <Select.Content>
-                  {queueTypeCollection.items.map((item) => (
                     <Select.Item item={item} key={item.value}>
                       {item.label}
                       <Select.ItemIndicator />
@@ -274,7 +300,6 @@ export default function ManagerQueueFilters({
               onFiltersChange({
                 dateRange: 'today',
                 analyst: 'all',
-                queueType: 'all',
                 processor: 'all',
                 mcc: '',
                 mid: '',
@@ -301,8 +326,8 @@ export default function ManagerQueueFilters({
               gap={1}
             >
               Date: {filters.dateRange === 'custom'
-                ? `${filters.customStartDate ? new Date(filters.customStartDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : ''} - ${filters.customEndDate ? new Date(filters.customEndDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : ''}`
-                : `Last ${filters.dateRange} days`}
+                ? `Custom${filters.customStartDate && filters.customEndDate ? ` (${formatDateForDisplay(filters.customStartDate)} - ${formatDateForDisplay(filters.customEndDate)})` : ''}`
+                : filters.dateRange === 'today' ? 'Today' : `Last ${filters.dateRange} days`}
               <Button
                 size="xs"
                 variant="ghost"
@@ -331,30 +356,6 @@ export default function ManagerQueueFilters({
                 size="xs"
                 variant="ghost"
                 onClick={() => clearFilter('analyst')}
-                minW="auto"
-                h="auto"
-                p={0}
-              >
-                <X size={12} />
-              </Button>
-            </Badge>
-          )}
-          {filters.queueType !== 'all' && (
-            <Badge
-              colorPalette="blue"
-              variant="subtle"
-              px={2}
-              py={1}
-              borderRadius="md"
-              display="flex"
-              alignItems="center"
-              gap={1}
-            >
-              Queue: {queueTypeCollection.items.find(i => i.value === filters.queueType)?.label}
-              <Button
-                size="xs"
-                variant="ghost"
-                onClick={() => clearFilter('queueType')}
                 minW="auto"
                 h="auto"
                 p={0}

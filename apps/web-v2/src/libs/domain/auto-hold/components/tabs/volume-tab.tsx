@@ -13,6 +13,8 @@ interface MonthlyVolume {
   cbTotalAmount: number; // Total chargeback amount
   numTrans: number; // Number of transactions
   icp: number; // ICP percentage based on transaction volume
+  totalRefunds: number; // Total refunds count
+  refundAmount: number; // Total refund amount
 }
 
 interface VolumeTabProps {
@@ -31,6 +33,8 @@ const generateAuthData = (): MonthlyVolume[] => [
     cbTotalAmount: 12500.00,
     numTrans: 1250,
     icp: 0.96,
+    totalRefunds: 8,
+    refundAmount: 3200.00,
   },
   {
     month: 'February - 2025',
@@ -42,6 +46,8 @@ const generateAuthData = (): MonthlyVolume[] => [
     cbTotalAmount: 15750.00,
     numTrans: 1380,
     icp: 1.09,
+    totalRefunds: 12,
+    refundAmount: 4850.00,
   },
   {
     month: 'March - 2025',
@@ -53,6 +59,8 @@ const generateAuthData = (): MonthlyVolume[] => [
     cbTotalAmount: 18900.00,
     numTrans: 1520,
     icp: 1.18,
+    totalRefunds: 15,
+    refundAmount: 6200.00,
   },
   {
     month: 'April - 2025',
@@ -64,6 +72,8 @@ const generateAuthData = (): MonthlyVolume[] => [
     cbTotalAmount: 16800.00,
     numTrans: 1480,
     icp: 1.08,
+    totalRefunds: 10,
+    refundAmount: 4100.00,
   },
 ];
 
@@ -78,6 +88,8 @@ const generateCaptureData = (): MonthlyVolume[] => [
     cbTotalAmount: 10500.00,
     numTrans: 1242,
     icp: 0.81,
+    totalRefunds: 6,
+    refundAmount: 2850.00,
   },
   {
     month: 'February - 2025',
@@ -89,6 +101,8 @@ const generateCaptureData = (): MonthlyVolume[] => [
     cbTotalAmount: 13650.00,
     numTrans: 1345,
     icp: 0.97,
+    totalRefunds: 9,
+    refundAmount: 3650.00,
   },
   {
     month: 'March - 2025',
@@ -100,6 +114,8 @@ const generateCaptureData = (): MonthlyVolume[] => [
     cbTotalAmount: 15750.00,
     numTrans: 1490,
     icp: 1.01,
+    totalRefunds: 11,
+    refundAmount: 4850.00,
   },
   {
     month: 'April - 2025',
@@ -111,11 +127,19 @@ const generateCaptureData = (): MonthlyVolume[] => [
     cbTotalAmount: 14700.00,
     numTrans: 1464,
     icp: 0.96,
+    totalRefunds: 8,
+    refundAmount: 3200.00,
   },
 ];
 
 export default function VolumeTab({ merchantId }: VolumeTabProps) {
   const [selectedType, setSelectedType] = React.useState<'Auth' | 'Capture'>('Auth');
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  // Ensure component is mounted on client to avoid hydration issues
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const typeCollection = React.useMemo(
     () =>
@@ -152,37 +176,52 @@ export default function VolumeTab({ merchantId }: VolumeTabProps) {
           </Text>
         </HStack>
         <Box minW="150px">
-          <Select.Root
-            collection={typeCollection}
-            value={[selectedType]}
-            onValueChange={(details) => {
-              const newValue = details.value[0];
-              if (newValue === 'Auth' || newValue === 'Capture') {
-                setSelectedType(newValue);
-              }
-            }}
-            size="sm"
-          >
-            <Select.HiddenSelect />
-            <Select.Control>
-              <Select.Trigger>
-                <Select.ValueText />
-              </Select.Trigger>
-              <Select.IndicatorGroup>
-                <Select.Indicator />
-              </Select.IndicatorGroup>
-            </Select.Control>
-            <Select.Positioner>
-              <Select.Content>
-                {typeCollection.items.map((item) => (
-                  <Select.Item item={item} key={item.value}>
-                    {item.label}
-                    <Select.ItemIndicator />
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Positioner>
-          </Select.Root>
+          {isMounted ? (
+            <Select.Root
+              collection={typeCollection}
+              value={[selectedType]}
+              onValueChange={(details) => {
+                const newValue = details.value[0];
+                if (newValue === 'Auth' || newValue === 'Capture') {
+                  setSelectedType(newValue);
+                }
+              }}
+              size="sm"
+            >
+              <Select.HiddenSelect />
+              <Select.Control>
+                <Select.Trigger>
+                  <Select.ValueText />
+                </Select.Trigger>
+                <Select.IndicatorGroup>
+                  <Select.Indicator />
+                </Select.IndicatorGroup>
+              </Select.Control>
+              <Select.Positioner>
+                <Select.Content>
+                  {typeCollection.items.map((item) => (
+                    <Select.Item item={item} key={item.value}>
+                      {item.label}
+                      <Select.ItemIndicator />
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Positioner>
+            </Select.Root>
+          ) : (
+            <Box
+              h="32px"
+              bg="gray.100"
+              borderRadius="md"
+              display="flex"
+              alignItems="center"
+              px={3}
+            >
+              <Text fontSize="sm" color="gray.600">
+                {selectedType}
+              </Text>
+            </Box>
+          )}
         </Box>
       </HStack>
 
@@ -242,6 +281,7 @@ export default function VolumeTab({ merchantId }: VolumeTabProps) {
                     </Tooltip.Root>
                   </HStack>
                 </Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="right">Total Refunds</Table.ColumnHeader>
               </Table.Row>
             </Table.Header>
             <Table.Body>
@@ -305,6 +345,14 @@ export default function VolumeTab({ merchantId }: VolumeTabProps) {
                       </HStack>
                       <Text fontSize="xs" color="gray.600" fontWeight="medium">
                         {formatCurrency(volume.cbTotalAmount)}
+                      </Text>
+                    </VStack>
+                  </Table.Cell>
+                  <Table.Cell textAlign="right">
+                    <VStack gap={0.5} align="flex-end">
+                      <Text>{volume.totalRefunds}</Text>
+                      <Text fontSize="xs" color="gray.600" fontWeight="medium">
+                        {formatCurrency(volume.refundAmount)}
                       </Text>
                     </VStack>
                   </Table.Cell>

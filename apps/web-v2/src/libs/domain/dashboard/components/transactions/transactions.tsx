@@ -21,6 +21,7 @@ import { statusColor } from '@/libs/utils/utils';
 import { DataTable } from '@/ui/components/common/organisms/data-table';
 import BatchDrawer from '@/libs/domain/auto-hold/components/batch-drawer/batch-drawer';
 import { AutoHoldFilterState } from '@/libs/domain/auto-hold/components/filter-bar/filter-bar';
+import { getRuleName } from '../../utils/ruleNames';
 
 const columnHelper = createColumnHelper<MerchantTransaction>();
 
@@ -294,14 +295,14 @@ function RuleChips({
   const allRulesText = rules.join(', ');
 
   return (
-    <Tooltip.Root>
-      <Tooltip.Trigger asChild>
-        <HStack gap={0.5} flexWrap="wrap" alignItems="center" justifyContent="flex-start">
-          {visibleRules.map((rule) => {
-            const colorToken = getSeverityColorToken(rule);
-            return (
+    <HStack gap={0.5} flexWrap="wrap" alignItems="center" justifyContent="flex-start">
+      {visibleRules.map((rule) => {
+        const colorToken = getSeverityColorToken(rule);
+        const ruleName = getRuleName(rule);
+        return (
+          <Tooltip.Root key={rule}>
+            <Tooltip.Trigger asChild>
               <Badge
-                key={rule}
                 bg={colorToken.bg}
                 color={colorToken.text}
                 fontSize="xs"
@@ -310,12 +311,38 @@ function RuleChips({
                 py={0.5}
                 borderRadius="sm"
                 borderWidth="0"
+                cursor="help"
               >
                 {rule}
               </Badge>
-            );
-          })}
-          {remainingCount > 0 && (
+            </Tooltip.Trigger>
+            <Portal>
+              <Tooltip.Positioner>
+                <Tooltip.Content
+                  maxW="300px"
+                  zIndex={2000}
+                  bg="gray.900"
+                  color="white"
+                  px={3}
+                  py={2}
+                  borderRadius="md"
+                  fontSize="sm"
+                  boxShadow="lg"
+                >
+                  <Tooltip.Arrow />
+                  <VStack align="start" gap={1}>
+                    <Text fontWeight="bold">{rule}</Text>
+                    <Text>{ruleName}</Text>
+                  </VStack>
+                </Tooltip.Content>
+              </Tooltip.Positioner>
+            </Portal>
+          </Tooltip.Root>
+        );
+      })}
+      {remainingCount > 0 && (
+        <Tooltip.Root>
+          <Tooltip.Trigger asChild>
             <Badge
               bg="gray.100"
               color="gray.600"
@@ -325,33 +352,39 @@ function RuleChips({
               py={0.5}
               borderRadius="sm"
               borderWidth="0"
+              cursor="help"
             >
               +{remainingCount}
             </Badge>
-          )}
-        </HStack>
-      </Tooltip.Trigger>
-      {remainingCount > 0 && (
-        <Portal>
-          <Tooltip.Positioner>
-            <Tooltip.Content
-              maxW="300px"
-              zIndex={2000}
-              bg="gray.900"
-              color="white"
-              px={3}
-              py={2}
-              borderRadius="md"
-              fontSize="sm"
-              boxShadow="lg"
-            >
-              <Tooltip.Arrow />
-              All rules: {allRulesText}
-            </Tooltip.Content>
-          </Tooltip.Positioner>
-        </Portal>
+          </Tooltip.Trigger>
+          <Portal>
+            <Tooltip.Positioner>
+              <Tooltip.Content
+                maxW="300px"
+                zIndex={2000}
+                bg="gray.900"
+                color="white"
+                px={3}
+                py={2}
+                borderRadius="md"
+                fontSize="sm"
+                boxShadow="lg"
+              >
+                <Tooltip.Arrow />
+                <VStack align="start" gap={1}>
+                  <Text fontWeight="bold">All rules ({rules.length})</Text>
+                  {rules.slice(maxVisible).map((rule) => (
+                    <Text key={rule} fontSize="xs">
+                      {rule}: {getRuleName(rule)}
+                    </Text>
+                  ))}
+                </VStack>
+              </Tooltip.Content>
+            </Tooltip.Positioner>
+          </Portal>
+        </Tooltip.Root>
       )}
-    </Tooltip.Root>
+    </HStack>
   );
 }
 
@@ -692,10 +725,97 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       createdBatchTrigger: 'Daily Batch',
       createdBatchDate: getDateInLast7Days(2),
     } as MerchantTransaction & { ruleId?: string },
+    // Additional Reviewed batches
+    {
+      id: '6',
+      merchant: 'Metro Financial Services',
+      dbaName: 'Metro Financial',
+      amount: '$2,340.00',
+      exception: 'High transaction volume',
+      processor: 'TSYS',
+      mid: generateMID(5),
+      date: formatDate(new Date(baseDate.getTime() - 3 * 24 * 60 * 60 * 1000)),
+      uwDate: formatUWDate(new Date(baseDate.getTime() - 40 * 24 * 60 * 60 * 1000)),
+      status: 'Reviewed',
+      createdAt: getDateInLast7Days(3),
+      updatedAt: getDateInLast7Days(3),
+      ruleId: 'AH006',
+      channel: channels[0],
+      riskWatch: false,
+      newAccount: false,
+      divert: false,
+      nextDayFunding: 'No',
+      netDivertBalance: '$0.00',
+      source: dataSources[0] || 'Auth',
+      dataSourceIdentifier: generateDataSourceIdentifier(dataSources[0] || 'Auth', new Date(baseDate.getTime() - 3 * 24 * 60 * 60 * 1000)),
+      ahRuleApplied: ['AH006', 'AH007'],
+      autoHoldRuleApplied: ['AH006'],
+      createdBatchTrigger: 'Daily Batch',
+      createdBatchDate: getDateInLast7Days(3),
+    } as MerchantTransaction & { ruleId?: string },
+    {
+      id: '7',
+      merchant: 'Coastal Trading Group',
+      dbaName: 'Coastal Trading',
+      amount: '$1,890.50',
+      exception: 'Pattern match anomaly',
+      processor: 'FSP',
+      mid: generateMID(6),
+      date: formatDate(new Date(baseDate.getTime() - 4 * 24 * 60 * 60 * 1000)),
+      uwDate: formatUWDate(new Date(baseDate.getTime() - 35 * 24 * 60 * 60 * 1000)),
+      status: 'Reviewed',
+      createdAt: getDateInLast7Days(4),
+      updatedAt: getDateInLast7Days(4),
+      ruleId: 'AH007',
+      channel: channels[1],
+      referralPartner: referralPartners[1] || undefined,
+      riskWatch: false,
+      newAccount: true,
+      divert: false,
+      nextDayFunding: 'No',
+      netDivertBalance: '$0.00',
+      source: dataSources[1] || 'Capture',
+      dataSourceIdentifier: generateDataSourceIdentifier(dataSources[1] || 'Capture', new Date(baseDate.getTime() - 4 * 24 * 60 * 60 * 1000)),
+      ahRuleApplied: ['AH007', 'AH008'],
+      autoHoldRuleApplied: ['AH007'],
+      createdBatchTrigger: 'Manual',
+      createdBatchDate: getDateInLast7Days(4),
+    } as MerchantTransaction & { ruleId?: string },
+    {
+      id: '8',
+      merchant: 'Luxury Boutique',
+      dbaName: 'Luxury Boutique Inc.',
+      amount: '$890.25',
+      exception: 'Frequency anomaly',
+      processor: 'TSYS',
+      mid: generateMID(7),
+      date: formatDate(new Date(baseDate.getTime() - 5 * 24 * 60 * 60 * 1000)),
+      uwDate: formatUWDate(new Date(baseDate.getTime() - 28 * 24 * 60 * 60 * 1000)),
+      status: 'Reviewed',
+      createdAt: getDateInLast7Days(5),
+      updatedAt: getDateInLast7Days(5),
+      ruleId: 'AH008',
+      channel: channels[2],
+      solutionConsultant: solutionConsultants[1] || undefined,
+      riskWatch: true,
+      newAccount: false,
+      divert: true,
+      nextDayFunding: 'Yes',
+      netDivertBalance: '$890.25',
+      source: dataSources[2] || 'Settled',
+      dataSourceIdentifier: generateDataSourceIdentifier(dataSources[2] || 'Settled', new Date(baseDate.getTime() - 5 * 24 * 60 * 60 * 1000)),
+      ahRuleApplied: ['AH008', 'AH009'],
+      autoHoldRuleApplied: ['AH008'],
+      createdBatchTrigger: 'Daily Batch',
+      createdBatchDate: getDateInLast7Days(5),
+    } as MerchantTransaction & { ruleId?: string },
   ];
 };
 
 const ALL_TRANSACTIONS: (MerchantTransaction & { ruleId?: string })[] = generateTransactions();
+
+// Export ALL_TRANSACTIONS for use in other modules
+export { ALL_TRANSACTIONS };
 
 // Export function to get batch by MID
 export function getBatchByMID(mid: string): MerchantTransaction[] {
@@ -728,7 +848,12 @@ export default function CustomTable({ filters }: CustomTableProps) {
 
     // Filter by status
     if (filters.status && filters.status !== 'all') {
-      filtered = filtered.filter((tx) => tx.status === filters.status);
+      filtered = filtered.filter((tx) => {
+        const txStatus = tx.status || 'Unreviewed';
+        // Map 'In Progress' to 'Unreviewed' for filtering to match display
+        const normalizedStatus = txStatus === 'In Progress' ? 'Unreviewed' : txStatus;
+        return normalizedStatus === filters.status;
+      });
     }
 
     // Filter by processor
@@ -1034,10 +1159,12 @@ export default function CustomTable({ filters }: CustomTableProps) {
         try {
           const date = new Date(dateValue);
           if (!isNaN(date.getTime())) {
-            formattedDate = date.toLocaleDateString('en-US', { 
+            formattedDate = date.toLocaleString('en-US', { 
               month: 'short', 
               day: 'numeric', 
-              year: 'numeric' 
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
             });
           }
         } catch (e) {
@@ -1053,39 +1180,37 @@ export default function CustomTable({ filters }: CustomTableProps) {
       enableSorting: true,
       meta: { align: 'left' },
     }),
-    columnHelper.display({
-      id: 'actions',
+    columnHelper.accessor('status', {
       header: () => (
         <Text fontSize="xs" fontWeight="semibold" color="gray.600" textAlign="center">
-          Actions
+          Batch Status
         </Text>
       ),
       cell: (info) => {
-        const transaction = info.row.original;
-        // Group transactions by batch (using createdBatchDate as batch identifier)
-        // For now, we'll use the single transaction as the batch
-        // In a real scenario, you'd group by batch ID or date
-        const batchTransactions = [transaction];
+        const originalStatus = info.getValue() || 'Unreviewed';
+        // Map 'In Progress' to 'Unreviewed' for display purposes
+        const displayStatus = originalStatus === 'In Progress' ? 'Unreviewed' : originalStatus;
+        // Only show 'Unreviewed' or 'Reviewed'
+        const normalizedStatus = displayStatus === 'Reviewed' ? 'Reviewed' : 'Unreviewed';
+        const statusColor = normalizedStatus === 'Reviewed' ? 'green' : 'gray';
         
         return (
-          <Box 
-            py={0.5} 
-            display="flex" 
-            justifyContent="center" 
-            alignItems="center"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <BatchDrawer
-              batch={batchTransactions}
-              trigger={
-                <Button size="xs" variant="outline" colorPalette="blue">
-                  View Batch
-                </Button>
-              }
-            />
+          <Box display="flex" justifyContent="center" alignItems="center" py={0.5}>
+            <Badge
+              colorPalette={statusColor}
+              variant="subtle"
+              px={2}
+              py={1}
+              borderRadius="md"
+              fontSize="xs"
+              fontWeight="medium"
+            >
+              {normalizedStatus}
+            </Badge>
           </Box>
         );
       },
+      enableSorting: true,
       meta: { align: 'center' },
     }),
   ] as ColumnDef<MerchantTransaction>[], []);

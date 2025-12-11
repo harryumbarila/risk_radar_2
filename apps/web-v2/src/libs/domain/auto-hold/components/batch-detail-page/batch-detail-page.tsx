@@ -9,10 +9,17 @@ import {
   HStack,
   Select,
   createListCollection,
+  Dialog,
+  Textarea,
+  Portal,
+  Tooltip,
+  Drawer,
+  Input,
+  CloseButton,
 } from '@chakra-ui/react';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
 import { toaster } from '@/ui/components/common/atoms/toaster/toaster';
-import { Check, Ban, ArrowLeft, TrendingUp } from 'lucide-react';
+import { Check, ArrowLeft, TrendingUp, Pause, Mail, Play } from 'lucide-react';
 import { Button } from '@chakra-ui/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import ContactTab from '../tabs/contact-tab';
@@ -34,13 +41,133 @@ export default function BatchDetailPage({ batch }: BatchDetailPageProps) {
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState('transactions');
+  const [isOnHold, setIsOnHold] = React.useState(true);
+  const [isHoldModalOpen, setIsHoldModalOpen] = React.useState(false);
+  const [holdNote, setHoldNote] = React.useState('');
+  const [isConfirmingHold, setIsConfirmingHold] = React.useState(false);
+  const [isEmailDrawerOpen, setIsEmailDrawerOpen] = React.useState(false);
+  const [selectedTemplate, setSelectedTemplate] = React.useState<string>('');
+  const [emailSubject, setEmailSubject] = React.useState('');
+  const [emailBody, setEmailBody] = React.useState('');
+  const [isSendingEmail, setIsSendingEmail] = React.useState(false);
+  const [isEscalateModalOpen, setIsEscalateModalOpen] = React.useState(false);
+  const [isReviewedModalOpen, setIsReviewedModalOpen] = React.useState(false);
+  const [isEmailConfirmModalOpen, setIsEmailConfirmModalOpen] = React.useState(false);
   
   // Check if we came from Manager Queue
   const sourceParam = searchParams?.get('source');
   const isFromManagerQueue = sourceParam === 'manager-queue';
 
-  // Get merchant info from first transaction
+  // Get merchant info from first transaction (must be defined before useMemo hooks)
   const merchantInfo = batch[0];
+  
+  // Get first owner email (mock - in real app would come from API)
+  const firstOwnerEmail = React.useMemo(() => {
+    // Mock: Get first owner email from contact tab data
+    // In real app, this would come from merchant contact API
+    const owners = [
+      {
+        name: 'John Smith',
+        email: 'john.smith@example.com',
+        phone: '+1 (555) 123-4567',
+        title: 'CEO',
+        role: 'Primary Owner',
+      },
+      {
+        name: 'Jane Doe',
+        email: 'jane.doe@example.com',
+        phone: '+1 (555) 987-6543',
+        title: 'CFO',
+        role: 'Secondary Owner',
+      },
+    ];
+    return owners[0]?.email || 'contact@example.com';
+  }, []);
+
+  // Mock merchant email (fallback)
+  const merchantEmail = React.useMemo(() => {
+    return firstOwnerEmail;
+  }, [firstOwnerEmail]);
+  
+  // Email templates
+  const emailTemplates = React.useMemo(() => {
+    return {
+      'Missing Documentation Request': {
+        subject: 'Missing Documentation Request - Action Required',
+        body: `Dear ${merchantInfo?.merchant || 'Merchant'},
+
+We are writing to request additional documentation for your account. This information is required to complete our review process.
+
+Please provide the following documents:
+- Business license
+- Bank statements (last 3 months)
+- Proof of address
+
+Please submit these documents within 7 business days.
+
+If you have any questions, please contact our support team.
+
+Best regards,
+Risk Management Team`,
+      },
+      'Unusual Activity Notification': {
+        subject: 'Unusual Activity Notification - Account Review',
+        body: `Dear ${merchantInfo?.merchant || 'Merchant'},
+
+We have detected unusual activity on your account that requires our attention. Our automated risk monitoring system has flagged certain transactions for review.
+
+We are currently reviewing the following:
+- Transaction patterns
+- Volume changes
+- Risk indicators
+
+This is a standard review process. We will contact you if any additional information is needed.
+
+Thank you for your understanding.
+
+Best regards,
+Risk Management Team`,
+      },
+      'Follow-Up: Auto-Hold Review': {
+        subject: 'Follow-Up: Auto-Hold Review - Action Required',
+        body: `Dear ${merchantInfo?.merchant || 'Merchant'},
+
+This is a follow-up regarding the auto-hold review for your account. We need to discuss the current status and next steps.
+
+Please review the following:
+- Current account status
+- Pending transactions
+- Required actions
+
+We recommend scheduling a call to discuss this matter in detail. Please contact us at your earliest convenience.
+
+Best regards,
+Risk Management Team`,
+      },
+    };
+  }, [merchantInfo?.merchant]);
+  
+  const templateCollection = React.useMemo(
+    () =>
+      createListCollection({
+        items: [
+          { label: 'Missing Documentation Request', value: 'Missing Documentation Request' },
+          { label: 'Unusual Activity Notification', value: 'Unusual Activity Notification' },
+          { label: 'Follow-Up: Auto-Hold Review', value: 'Follow-Up: Auto-Hold Review' },
+        ],
+      }),
+    []
+  );
+  
+  // Handle template selection
+  React.useEffect(() => {
+    if (selectedTemplate && emailTemplates[selectedTemplate as keyof typeof emailTemplates]) {
+      const template = emailTemplates[selectedTemplate as keyof typeof emailTemplates];
+      setEmailSubject(template.subject);
+      setEmailBody(template.body);
+    }
+  }, [selectedTemplate, emailTemplates]);
+
   const status = merchantInfo?.status || 'Unreviewed';
   
   // Mock data for demographics
@@ -67,7 +194,12 @@ export default function BatchDetailPage({ batch }: BatchDetailPageProps) {
     [batch.length, notesCount]
   );
 
-  const handleMarkAsReviewed = async () => {
+  const handleMarkAsReviewed = () => {
+    setIsReviewedModalOpen(true);
+  };
+
+  const handleConfirmMarkAsReviewed = async () => {
+    setIsReviewedModalOpen(false);
     setIsLoading(true);
     try {
       // Simulate API call
@@ -87,14 +219,12 @@ export default function BatchDetailPage({ batch }: BatchDetailPageProps) {
     }
   };
 
-  const handleDivertCase = () => {
-      toaster.create({
-        title: 'Case diverted',
-        description: 'This batch has been diverted for further review.',
-      });
+  const handleEscalate = () => {
+    setIsEscalateModalOpen(true);
   };
 
-  const handleEscalate = () => {
+  const handleConfirmEscalate = () => {
+    setIsEscalateModalOpen(false);
     setIsLoading(true);
     try {
       // Simulate API call
@@ -111,6 +241,90 @@ export default function BatchDetailPage({ batch }: BatchDetailPageProps) {
         description: 'Failed to escalate batch.',
       });
       setIsLoading(false);
+    }
+  };
+
+  const handlePutOnHold = () => {
+    setIsHoldModalOpen(true);
+  };
+
+  const handleConfirmHold = async () => {
+    setIsConfirmingHold(true);
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      if (isOnHold) {
+        // Removing hold
+        setIsOnHold(false);
+        setIsHoldModalOpen(false);
+        setHoldNote('');
+        toaster.success({
+          title: 'Merchant hold removed',
+          description: 'The merchant hold has been removed. Automated actions will resume.',
+        });
+      } else {
+        // Placing on hold
+        setIsOnHold(true);
+        setIsHoldModalOpen(false);
+        setHoldNote('');
+        toaster.success({
+          title: 'Merchant placed on hold',
+          description: 'The merchant has been placed on hold. No automated actions will be taken.',
+        });
+      }
+    } catch (error) {
+      toaster.error({
+        title: 'Error',
+        description: isOnHold 
+          ? 'Failed to remove merchant hold.'
+          : 'Failed to place merchant on hold.',
+      });
+    } finally {
+      setIsConfirmingHold(false);
+    }
+  };
+
+  const handleCancelHold = () => {
+    setIsHoldModalOpen(false);
+    setHoldNote('');
+  };
+
+  const handleOpenEmailDrawer = () => {
+    setIsEmailDrawerOpen(true);
+    setSelectedTemplate('');
+    setEmailSubject('');
+    setEmailBody('');
+  };
+
+  const handleCloseEmailDrawer = () => {
+    setIsEmailDrawerOpen(false);
+    setSelectedTemplate('');
+    setEmailSubject('');
+    setEmailBody('');
+  };
+
+  const handleSendEmail = () => {
+    setIsEmailConfirmModalOpen(true);
+  };
+
+  const handleConfirmSendEmail = async () => {
+    setIsEmailConfirmModalOpen(false);
+    setIsSendingEmail(true);
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      toaster.success({
+        title: 'Email sent successfully (mock)',
+        description: `Email sent to ${firstOwnerEmail}`,
+      });
+      handleCloseEmailDrawer();
+    } catch (error) {
+      toaster.error({
+        title: 'Error',
+        description: 'Failed to send email.',
+      });
+    } finally {
+      setIsSendingEmail(false);
     }
   };
 
@@ -137,15 +351,60 @@ export default function BatchDetailPage({ batch }: BatchDetailPageProps) {
         <VStack align="stretch" gap={3}>
           <HStack justify="space-between" align="center">
             <VStack align="start" gap={1}>
-              <Text fontSize="xl" fontWeight="bold">
-                {merchantInfo?.merchant || 'Batch Details'}
-              </Text>
+              <HStack gap={2} align="center">
+                <Text fontSize="xl" fontWeight="bold">
+                  {merchantInfo?.merchant || 'Batch Details'}
+                </Text>
+                {isOnHold && (
+                  <Tooltip.Root>
+                    <Tooltip.Trigger asChild>
+                      <Badge
+                        colorPalette="amber"
+                        variant="solid"
+                        px={3}
+                        py={1}
+                        borderRadius="full"
+                        fontSize="xs"
+                        fontWeight="medium"
+                      >
+                        On Hold
+                      </Badge>
+                    </Tooltip.Trigger>
+                    <Portal>
+                      <Tooltip.Positioner>
+                        <Tooltip.Content
+                          maxW="250px"
+                          zIndex={1100}
+                          bg="gray.900"
+                          color="white"
+                          px={3}
+                          py={2}
+                          borderRadius="md"
+                          fontSize="sm"
+                          boxShadow="lg"
+                        >
+                          <Tooltip.Arrow />
+                          Merchant was placed on hold by analyst.
+                        </Tooltip.Content>
+                      </Tooltip.Positioner>
+                    </Portal>
+                  </Tooltip.Root>
+                )}
+              </HStack>
               <Text fontSize="sm" color="gray.600">
                 {batch.length} transactions in this batch
               </Text>
             </VStack>
           </HStack>
           <HStack gap={4} flexWrap="wrap">
+            <HStack gap={2}>
+              <Text fontSize="xs" color="gray.600" textTransform="uppercase">
+                MID:
+              </Text>
+              <Text fontSize="sm" fontWeight="semibold" color="gray.900" fontFamily="mono">
+                {merchantInfo?.mid || 'N/A'}
+              </Text>
+            </HStack>
             <HStack gap={2}>
               <Text fontSize="xs" color="gray.600" textTransform="uppercase">
                 Processor:
@@ -237,8 +496,9 @@ export default function BatchDetailPage({ batch }: BatchDetailPageProps) {
                 p={1}
                 flexWrap="wrap"
                 display={{ base: 'none', md: 'flex' }}
+                suppressHydrationWarning
               >
-                <Tabs.Trigger value="transactions">
+                <Tabs.Trigger value="transactions" suppressHydrationWarning>
                   <HStack gap={2}>
                     <Text>Transactions</Text>
                     <Badge
@@ -253,12 +513,12 @@ export default function BatchDetailPage({ batch }: BatchDetailPageProps) {
                     </Badge>
                   </HStack>
                 </Tabs.Trigger>
-                <Tabs.Trigger value="contact">Contact</Tabs.Trigger>
-                <Tabs.Trigger value="chargebacks">Chargebacks</Tabs.Trigger>
-                <Tabs.Trigger value="match">Match</Tabs.Trigger>
-                <Tabs.Trigger value="underwriting">Underwriting</Tabs.Trigger>
-                <Tabs.Trigger value="net-settlement">Net Settlement</Tabs.Trigger>
-                <Tabs.Trigger value="notes">
+                <Tabs.Trigger value="contact" suppressHydrationWarning>Contact</Tabs.Trigger>
+                <Tabs.Trigger value="chargebacks" suppressHydrationWarning>Chargebacks</Tabs.Trigger>
+                <Tabs.Trigger value="match" suppressHydrationWarning>Match</Tabs.Trigger>
+                <Tabs.Trigger value="underwriting" suppressHydrationWarning>Underwriting</Tabs.Trigger>
+                <Tabs.Trigger value="net-settlement" suppressHydrationWarning>Net Settlement</Tabs.Trigger>
+                <Tabs.Trigger value="notes" suppressHydrationWarning>
                   <HStack gap={2}>
                     <Text>Notes</Text>
                     <Badge
@@ -281,6 +541,7 @@ export default function BatchDetailPage({ batch }: BatchDetailPageProps) {
                   collection={tabCollection}
                   value={[activeTab]}
                   onValueChange={(e) => setActiveTab(e.value[0] || 'transactions')}
+                  suppressHydrationWarning
                 >
                   <Select.HiddenSelect />
                   <Select.Control>
@@ -367,6 +628,7 @@ export default function BatchDetailPage({ batch }: BatchDetailPageProps) {
             variant="ghost"
             disabled={isLoading}
             aria-label="Back to Queue"
+            suppressHydrationWarning
             onClick={() => {
               if (isFromManagerQueue) {
                 // Navigate back to Auto Hold with manager tab active
@@ -379,24 +641,50 @@ export default function BatchDetailPage({ batch }: BatchDetailPageProps) {
             <ArrowLeft size={16} />
             Back to Queue
           </Button>
+          {isOnHold ? (
+            <Button
+              colorPalette="green"
+              variant="outline"
+              onClick={handlePutOnHold}
+              disabled={isLoading}
+              aria-label="Remove Merchant Hold"
+              suppressHydrationWarning
+            >
+              <Play size={16} />
+              Remove Merchant Hold
+            </Button>
+          ) : (
+            <Button
+              colorPalette="red"
+              variant="outline"
+              onClick={handlePutOnHold}
+              disabled={isLoading}
+              aria-label="Put Merchant On Hold"
+              suppressHydrationWarning
+            >
+              <Pause size={16} />
+              Put Merchant On Hold
+            </Button>
+          )}
+          <Button
+            variant="outline"
+            onClick={handleOpenEmailDrawer}
+            disabled={isLoading}
+            aria-label="Email Merchant"
+            suppressHydrationWarning
+          >
+            <Mail size={16} />
+            Email Merchant
+          </Button>
           <Button
             variant="outline"
             onClick={handleEscalate}
             disabled={isLoading}
             aria-label="Escalate"
+            suppressHydrationWarning
           >
             <TrendingUp size={16} />
             Escalate
-          </Button>
-          <Button
-            colorPalette="red"
-            variant="outline"
-            onClick={handleDivertCase}
-            disabled={isLoading}
-            aria-label="Divert Case"
-          >
-            <Ban size={16} />
-            Divert Case
           </Button>
           <Button
             colorPalette="blue"
@@ -404,12 +692,368 @@ export default function BatchDetailPage({ batch }: BatchDetailPageProps) {
             loading={isLoading}
             disabled={isLoading}
             aria-label="Mark as Reviewed"
+            suppressHydrationWarning
           >
             <Check size={16} />
             Mark as Reviewed
           </Button>
         </HStack>
       </Box>
+
+      {/* Put On Hold Confirmation Modal */}
+      <Dialog.Root
+        open={isHoldModalOpen}
+        onOpenChange={(e) => {
+          if (!e.open) {
+            handleCancelHold();
+          }
+        }}
+      >
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content maxW="500px">
+              <Dialog.Header>
+                <Dialog.Title>
+                  {isOnHold ? 'Remove Merchant Hold?' : 'Put Merchant On Hold?'}
+                </Dialog.Title>
+                <Dialog.Description>
+                  {isOnHold
+                    ? 'This will remove the hold on the merchant. Automated actions will resume for this merchant.'
+                    : 'This will mark the merchant as On Hold in the Auto-Hold workflow. No automated actions will be taken while the merchant remains on hold.'}
+                </Dialog.Description>
+              </Dialog.Header>
+              <Dialog.Body>
+                <VStack align="stretch" gap={4}>
+                  <Box>
+                    <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={2}>
+                      Internal Note (Optional)
+                    </Text>
+                    <Textarea
+                      placeholder={isOnHold 
+                        ? 'Add an internal note about why this merchant hold is being removed...'
+                        : 'Add an internal note about why this merchant is being placed on hold...'}
+                      value={holdNote}
+                      onChange={(e) => setHoldNote(e.target.value)}
+                      rows={4}
+                      resize="vertical"
+                    />
+                  </Box>
+                </VStack>
+              </Dialog.Body>
+              <Dialog.Footer>
+                <HStack gap={3} w="full" justify="flex-end">
+                  <Button
+                    variant="outline"
+                    onClick={handleCancelHold}
+                    disabled={isConfirmingHold}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    colorPalette={isOnHold ? 'green' : 'blue'}
+                    onClick={handleConfirmHold}
+                    loading={isConfirmingHold}
+                    disabled={isConfirmingHold}
+                  >
+                    {isOnHold ? 'Remove Hold' : 'Confirm Hold'}
+                  </Button>
+                </HStack>
+              </Dialog.Footer>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
+
+      {/* Email Merchant Drawer */}
+      <Drawer.Root
+        open={isEmailDrawerOpen}
+        onOpenChange={(e) => !e.open && handleCloseEmailDrawer()}
+        placement="end"
+        size="md"
+      >
+        <Portal>
+          <Drawer.Backdrop bg="blackAlpha.600" backdropFilter="blur(4px)" />
+          <Drawer.Positioner>
+            <Drawer.Content
+              width={{ base: '100%', md: '480px' }}
+              height="full"
+              display="flex"
+              flexDirection="column"
+              bg="white"
+              boxShadow="lg"
+            >
+              {/* Header */}
+              <Drawer.Header
+                position="sticky"
+                top={0}
+                zIndex={10}
+                bg="white"
+                borderBottomWidth="1px"
+                borderColor="gray.200"
+                px={6}
+                py={4}
+              >
+                <HStack justify="space-between" align="center">
+                  <VStack align="start" gap={0}>
+                    <Text fontSize="lg" fontWeight="semibold" color="gray.900">
+                      Email Merchant
+                    </Text>
+                    <Text fontSize="sm" color="gray.600">
+                      {firstOwnerEmail}
+                    </Text>
+                    <Text fontSize="xs" color="gray.500" fontStyle="italic">
+                      (First Owner)
+                    </Text>
+                  </VStack>
+                  <CloseButton onClick={handleCloseEmailDrawer} />
+                </HStack>
+              </Drawer.Header>
+
+              {/* Body */}
+              <Drawer.Body flex={1} overflowY="auto" px={6} py={6}>
+                <VStack align="stretch" gap={4}>
+                  {/* Template Selector */}
+                  <Box>
+                    <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={2}>
+                      Select Template
+                    </Text>
+                    <Select.Root
+                      collection={templateCollection}
+                      value={selectedTemplate ? [selectedTemplate] : undefined}
+                      onValueChange={(e) => {
+                        const newValue = e.value[0] || '';
+                        setSelectedTemplate(newValue);
+                      }}
+                      suppressHydrationWarning
+                    >
+                      <Select.HiddenSelect />
+                      <Select.Control>
+                        <Select.Trigger suppressHydrationWarning>
+                          <Select.ValueText placeholder="Select Template" />
+                        </Select.Trigger>
+                        <Select.IndicatorGroup>
+                          <Select.Indicator />
+                        </Select.IndicatorGroup>
+                      </Select.Control>
+                      <Portal>
+                        <Select.Positioner zIndex={10000}>
+                          <Select.Content zIndex={10000} maxH="200px" overflowY="auto" minW="200px">
+                            {templateCollection.items.map((item) => (
+                              <Select.Item item={item} key={item.value}>
+                                {item.label}
+                                <Select.ItemIndicator />
+                              </Select.Item>
+                            ))}
+                          </Select.Content>
+                        </Select.Positioner>
+                      </Portal>
+                    </Select.Root>
+                  </Box>
+
+                  {/* Subject */}
+                  <Box>
+                    <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={2}>
+                      Subject
+                    </Text>
+                    <Input
+                      value={emailSubject}
+                      onChange={(e) => setEmailSubject(e.target.value)}
+                      placeholder="Email subject"
+                    />
+                  </Box>
+
+                  {/* Body */}
+                  <Box>
+                    <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={2}>
+                      Body
+                    </Text>
+                    <Textarea
+                      value={emailBody}
+                      onChange={(e) => setEmailBody(e.target.value)}
+                      placeholder="Email body"
+                      rows={12}
+                      resize="vertical"
+                    />
+                  </Box>
+                </VStack>
+              </Drawer.Body>
+
+              {/* Footer */}
+              <Drawer.Footer
+                position="sticky"
+                bottom={0}
+                bg="white"
+                borderTopWidth="1px"
+                borderColor="gray.200"
+                px={6}
+                py={4}
+              >
+                <HStack gap={3} w="full" justify="flex-end">
+                  <Button
+                    variant="outline"
+                    onClick={handleCloseEmailDrawer}
+                    disabled={isSendingEmail}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    colorPalette="blue"
+                    onClick={handleSendEmail}
+                    loading={isSendingEmail}
+                    disabled={isSendingEmail || !emailSubject || !emailBody}
+                  >
+                    Send Email
+                  </Button>
+                </HStack>
+              </Drawer.Footer>
+            </Drawer.Content>
+          </Drawer.Positioner>
+        </Portal>
+      </Drawer.Root>
+
+      {/* Email Confirmation Modal */}
+      <Dialog.Root
+        open={isEmailConfirmModalOpen}
+        onOpenChange={(e) => {
+          if (!e.open) {
+            setIsEmailConfirmModalOpen(false);
+          }
+        }}
+      >
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content maxW="500px">
+              <Dialog.Header>
+                <Dialog.Title>Confirm Email Send</Dialog.Title>
+                <Dialog.Description>
+                  Are you sure you want to send this email?
+                </Dialog.Description>
+              </Dialog.Header>
+              <Dialog.Body>
+                <VStack align="stretch" gap={3}>
+                  <VStack align="start" gap={1}>
+                    <Text fontSize="xs" color="gray.600" fontWeight="medium">
+                      Recipient Email:
+                    </Text>
+                    <Text fontSize="sm" fontWeight="semibold" color="gray.900">
+                      {firstOwnerEmail}
+                    </Text>
+                    <Text fontSize="xs" color="gray.500" fontStyle="italic">
+                      (First Owner)
+                    </Text>
+                  </VStack>
+                  <VStack align="start" gap={1}>
+                    <Text fontSize="xs" color="gray.600" fontWeight="medium">
+                      Subject:
+                    </Text>
+                    <Text fontSize="sm" color="gray.700">
+                      {emailSubject}
+                    </Text>
+                  </VStack>
+                </VStack>
+              </Dialog.Body>
+              <Dialog.Footer>
+                <HStack gap={3} w="full" justify="flex-end">
+                  <Button variant="outline" onClick={() => setIsEmailConfirmModalOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button colorPalette="blue" onClick={handleConfirmSendEmail}>
+                    Confirm Send
+                  </Button>
+                </HStack>
+              </Dialog.Footer>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
+
+      {/* Escalate Confirmation Modal */}
+      <Dialog.Root
+        open={isEscalateModalOpen}
+        onOpenChange={(e) => {
+          if (!e.open) {
+            setIsEscalateModalOpen(false);
+          }
+        }}
+      >
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content maxW="500px">
+              <Dialog.Header>
+                <Dialog.Title>Escalate Batch?</Dialog.Title>
+                <Dialog.Description>
+                  This batch will be escalated for priority review by a manager. Are you sure you want to proceed?
+                </Dialog.Description>
+              </Dialog.Header>
+              <Dialog.Footer>
+                <HStack gap={3} w="full" justify="flex-end">
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsEscalateModalOpen(false)}
+                    disabled={isLoading}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    colorPalette="blue"
+                    onClick={handleConfirmEscalate}
+                    loading={isLoading}
+                    disabled={isLoading}
+                  >
+                    Confirm Escalate
+                  </Button>
+                </HStack>
+              </Dialog.Footer>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
+
+      {/* Mark as Reviewed Confirmation Modal */}
+      <Dialog.Root
+        open={isReviewedModalOpen}
+        onOpenChange={(e) => {
+          if (!e.open) {
+            setIsReviewedModalOpen(false);
+          }
+        }}
+      >
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content maxW="500px">
+              <Dialog.Header>
+                <Dialog.Title>Mark Batch as Reviewed?</Dialog.Title>
+                <Dialog.Description>
+                  This will mark all {batch.length} transactions in this batch as reviewed. This action cannot be undone. Are you sure you want to proceed?
+                </Dialog.Description>
+              </Dialog.Header>
+              <Dialog.Footer>
+                <HStack gap={3} w="full" justify="flex-end">
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsReviewedModalOpen(false)}
+                    disabled={isLoading}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    colorPalette="blue"
+                    onClick={handleConfirmMarkAsReviewed}
+                    loading={isLoading}
+                    disabled={isLoading}
+                  >
+                    Confirm Review
+                  </Button>
+                </HStack>
+              </Dialog.Footer>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
     </Box>
   );
 }

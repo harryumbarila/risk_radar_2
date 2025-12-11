@@ -54,7 +54,7 @@ export interface AutoHoldFilterState {
   dateRange: 'today' | '7' | '14' | '30' | 'custom';
   customStartDate?: string;
   customEndDate?: string;
-  status: 'all' | 'Unreviewed' | 'In Progress' | 'Reviewed';
+  status: 'all' | 'Unreviewed' | 'Reviewed';
   processor: 'all' | string;
   source: 'all' | string;
   dataSource: 'all' | 'Auth' | 'Capture' | 'Settled' | 'Returns';
@@ -91,7 +91,6 @@ export default function AutoHoldFilterBar({
     items: [
       { label: 'All Statuses', value: 'all' },
       { label: 'Unreviewed', value: 'Unreviewed' },
-      { label: 'In Progress', value: 'In Progress' },
       { label: 'Reviewed', value: 'Reviewed' },
     ],
   });
@@ -138,7 +137,7 @@ export default function AutoHoldFilterBar({
       delete newFilters.customStartDate;
       delete newFilters.customEndDate;
     } else if (key === 'status') {
-      newFilters.status = 'all';
+      newFilters.status = 'Unreviewed';
     } else if (key === 'processor') {
       newFilters.processor = 'all';
     } else if (key === 'source') {
@@ -160,7 +159,7 @@ export default function AutoHoldFilterBar({
   const clearAll = () => {
     onFiltersChange({
       dateRange: 'today',
-      status: 'all',
+      status: 'Unreviewed',
       processor: 'all',
       source: 'all',
       dataSource: 'all',
@@ -173,7 +172,7 @@ export default function AutoHoldFilterBar({
 
   const hasActiveFilters =
     filters.dateRange !== 'today' ||
-    filters.status !== 'all' ||
+    filters.status !== 'Unreviewed' ||
     filters.processor !== 'all' ||
     filters.source !== 'all' ||
     filters.dataSource !== 'all' ||
@@ -186,7 +185,7 @@ export default function AutoHoldFilterBar({
   // Count active filters
   const activeFilterCount = [
     filters.dateRange !== 'today',
-    filters.status !== 'all',
+    filters.status !== 'Unreviewed',
     filters.processor !== 'all',
     filters.dataSource !== 'all',
     filters.source !== 'all',

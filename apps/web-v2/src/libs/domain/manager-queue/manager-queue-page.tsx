@@ -14,13 +14,13 @@ import AnalystWorkloadTable from './components/analyst-workload-table';
 import ManagerQueueTable from './components/manager-queue-table';
 import { ManagerQueueItem, ManagerQueueFilters as FilterState, AnalystWorkload } from './types';
 import { RULE_DEFINITIONS } from '@/libs/domain/dashboard/utils/ruleNames';
+import { generateMID, ALL_TRANSACTIONS } from '@/libs/domain/dashboard/components/transactions/transactions';
 
 export default function ManagerQueuePage() {
   const [isLoading, setIsLoading] = React.useState(true);
       const [filters, setFilters] = React.useState<FilterState>({
         dateRange: 'today',
         analyst: 'all',
-        queueType: 'all',
         processor: 'all',
         mcc: '',
         mid: '',
@@ -95,20 +95,6 @@ export default function ManagerQueuePage() {
       );
     }
 
-    if (filters.queueType !== 'all') {
-      switch (filters.queueType) {
-        case 'needs-review':
-          filtered = filtered.filter((item) => item.status === 'Pending');
-          break;
-        case 'escalations':
-          filtered = filtered.filter((item) => item.reasonForReview.includes('Escalation'));
-          break;
-        case 'pending-assignment':
-          filtered = filtered.filter((item) => !item.assignedAnalyst);
-          break;
-      }
-    }
-
     if (filters.processor !== 'all') {
       filtered = filtered.filter((item) => item.processor === filters.processor);
     }
@@ -170,20 +156,22 @@ function generateMockQueueItems(): ManagerQueueItem[] {
     'High-risk merchant',
     'Multiple chargebacks',
   ];
-  const merchants = [
-    'Global Tech Solutions',
-    'Oceanview Logistics',
-    'Sunshine Pharmacy',
-    'Digital Assets Exchange',
-    'City Supermarket',
-    'QuickWire Transfers',
-    'Business Equipment Pro',
-    'Luxury Boutique',
-  ];
 
   const ruleIds = Object.keys(RULE_DEFINITIONS);
   
-  return Array.from({ length: 25 }, (_, i) => {
+  // Get unique MIDs from ALL_TRANSACTIONS to ensure they exist
+  const uniqueMIDs = Array.from(new Set(ALL_TRANSACTIONS.map(tx => tx.mid)));
+  const midToTransaction = new Map<string, typeof ALL_TRANSACTIONS[0]>();
+  ALL_TRANSACTIONS.forEach(tx => {
+    if (!midToTransaction.has(tx.mid)) {
+      midToTransaction.set(tx.mid, tx);
+    }
+  });
+  
+  // Use up to 25 MIDs from actual transactions, or generate if we need more
+  const itemsToGenerate = Math.min(25, uniqueMIDs.length);
+  
+  return Array.from({ length: itemsToGenerate }, (_, i) => {
     const baseDate = new Date();
     // Ensure at least 2 items have today's date (first 2 items)
     if (i < 2) {
@@ -194,12 +182,15 @@ function generateMockQueueItems(): ManagerQueueItem[] {
       baseDate.setDate(baseDate.getDate() - Math.floor((i - 1) / 5));
     }
     
+    // Use actual MID from transactions if available, otherwise generate
+    const actualMID = i < uniqueMIDs.length ? uniqueMIDs[i] : generateMID(i);
+    const transaction = midToTransaction.get(actualMID);
+    
     const exceptionsCount = Math.floor(Math.random() * 5) + 1;
     // Generate random rule IDs for triggered rules
     const shuffledRules = [...ruleIds].sort(() => Math.random() - 0.5);
     const triggeredRules = shuffledRules.slice(0, exceptionsCount);
     
-    const merchantIndex = i % merchants.length;
     const reasonIndex = i % reasons.length;
     const riskIndex = i % riskLevels.length;
     const analystIndex = i % analysts.length;
@@ -208,18 +199,18 @@ function generateMockQueueItems(): ManagerQueueItem[] {
     
     return {
       id: `MQ-${i + 1}`,
-      dbaName: merchants[merchantIndex] || 'Unknown Merchant',
-      mid: generateMID(i),
+      dbaName: transaction?.dbaName || transaction?.merchant || 'Unknown Merchant',
+      mid: actualMID,
       reasonForReview: reasons[reasonIndex] || 'Unknown reason',
       riskLevel: (riskLevels[riskIndex] || 'Low') as 'Low' | 'Medium' | 'High' | 'Critical',
       assignedAnalyst: analysts[analystIndex] || null,
-      processor: processors[processorIndex] || 'TSYS',
+      processor: transaction?.processor || processors[processorIndex] || 'TSYS',
       exceptionsTriggered: exceptionsCount,
       triggeredRules,
       status: (statuses[statusIndex] || 'Pending') as 'Pending' | 'In-Review' | 'Completed',
       submittedOn: baseDate.toISOString(),
       lastActivity: new Date(baseDate.getTime() + Math.random() * 86400000).toISOString(),
-      mcc: String(Math.floor(Math.random() * 9000) + 1000),
+      mcc: transaction?.mcc || String(Math.floor(Math.random() * 9000) + 1000),
     };
   });
 }
@@ -237,9 +228,4 @@ function generateMockAnalystWorkloads(): AnalystWorkload[] {
   }));
 }
 
-function generateMID(index: number): string {
-  const prefix = index % 2 === 0 ? '5555' : '7777';
-  const randomDigits = String(Math.floor(Math.random() * 100000000000)).padStart(12, '0');
-  return `${prefix}${randomDigits}`;
-}
 
