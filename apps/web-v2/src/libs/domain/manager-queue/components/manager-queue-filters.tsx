@@ -326,13 +326,17 @@ export default function ManagerQueueFilters({
               gap={1}
             >
               Date: {(() => {
-                if (filters.dateRange === 'custom') {
+                const dateRange = filters.dateRange;
+                if (dateRange === 'custom') {
                   return `Custom${filters.customStartDate && filters.customEndDate ? ` (${formatDateForDisplay(filters.customStartDate)} - ${formatDateForDisplay(filters.customEndDate)})` : ''}`;
                 }
-                if (filters.dateRange === 'today') {
+                if (dateRange === 'today') {
                   return 'Today';
                 }
-                return `Last ${filters.dateRange} days`;
+                if (dateRange === '7' || dateRange === '14' || dateRange === '30') {
+                  return `Last ${dateRange} days`;
+                }
+                return dateRange;
               })()}
               <Button
                 size="xs"
