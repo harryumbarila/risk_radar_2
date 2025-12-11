@@ -305,8 +305,8 @@ Risk Management Team`,
                   onClick={handleSendEmail}
                   loading={isSendingEmail}
                   disabled={isSendingEmail || !emailSubject || !emailBody}
-                  leftIcon={<Mail size={16} />}
                 >
+                  <Mail size={16} />
                   Send Email
                 </Button>
               </HStack>
