@@ -171,8 +171,8 @@ export default function MerchantHoldDetailDrawer({
                           variant="outline"
                           size="sm"
                           onClick={onReleaseHold}
-                          leftIcon={<Unlock size={16} />}
                         >
+                          <Unlock size={16} />
                           Release Hold
                         </Button>
                       )}
@@ -362,16 +362,16 @@ export default function MerchantHoldDetailDrawer({
                   <Button
                     variant="outline"
                     onClick={() => setIsEmailDrawerOpen(true)}
-                    leftIcon={<Mail size={16} />}
                   >
+                    <Mail size={16} />
                     Email Merchant
                   </Button>
                   {hold.holdStatus === 'Active' && (
                     <Button
                       colorPalette="red"
                       onClick={() => setIsReleaseConfirmOpen(true)}
-                      leftIcon={<Unlock size={16} />}
                     >
+                      <Unlock size={16} />
                       Release Hold
                     </Button>
                   )}

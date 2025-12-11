@@ -144,8 +144,8 @@ export default function MerchantHoldsPage() {
         <Button
           colorPalette="red"
           onClick={() => setIsPlaceHoldModalOpen(true)}
-          leftIcon={<Plus size={16} />}
         >
+          <Plus size={16} />
           Put Merchant on Hold
         </Button>
       </HStack>
