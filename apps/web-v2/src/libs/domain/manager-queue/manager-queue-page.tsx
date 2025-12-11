@@ -160,10 +160,10 @@ function generateMockQueueItems(): ManagerQueueItem[] {
   const ruleIds = Object.keys(RULE_DEFINITIONS);
   
   // Get unique MIDs from ALL_TRANSACTIONS to ensure they exist
-  const uniqueMIDs = Array.from(new Set(ALL_TRANSACTIONS.map(tx => tx.mid)));
+  const uniqueMIDs = Array.from(new Set(ALL_TRANSACTIONS.map(tx => tx.mid).filter((mid): mid is string => Boolean(mid))));
   const midToTransaction = new Map<string, typeof ALL_TRANSACTIONS[0]>();
   ALL_TRANSACTIONS.forEach(tx => {
-    if (!midToTransaction.has(tx.mid)) {
+    if (tx.mid && !midToTransaction.has(tx.mid)) {
       midToTransaction.set(tx.mid, tx);
     }
   });
@@ -183,7 +183,7 @@ function generateMockQueueItems(): ManagerQueueItem[] {
     }
     
     // Use actual MID from transactions if available, otherwise generate
-    const actualMID = i < uniqueMIDs.length ? uniqueMIDs[i] : generateMID(i);
+    const actualMID: string = i < uniqueMIDs.length ? uniqueMIDs[i] : generateMID(i);
     const transaction = midToTransaction.get(actualMID);
     
     const exceptionsCount = Math.floor(Math.random() * 5) + 1;
