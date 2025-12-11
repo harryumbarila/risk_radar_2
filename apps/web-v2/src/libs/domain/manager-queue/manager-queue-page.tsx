@@ -210,7 +210,7 @@ function generateMockQueueItems(): ManagerQueueItem[] {
       status: (statuses[statusIndex] || 'Pending') as 'Pending' | 'In-Review' | 'Completed',
       submittedOn: baseDate.toISOString(),
       lastActivity: new Date(baseDate.getTime() + Math.random() * 86400000).toISOString(),
-      mcc: transaction?.mcc || String(Math.floor(Math.random() * 9000) + 1000),
+      mcc: String(Math.floor(Math.random() * 9000) + 1000),
     };
   });
 }
