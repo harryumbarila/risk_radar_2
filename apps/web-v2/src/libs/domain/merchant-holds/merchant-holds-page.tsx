@@ -3,18 +3,16 @@ import React from 'react';
 import { Box, VStack, HStack, Text, Button, Badge } from '@chakra-ui/react';
 import { Lock, Plus } from 'lucide-react';
 import MerchantHoldsTable from './components/merchant-holds-table';
-import MerchantHoldsFilterBar from './components/merchant-holds-filter-bar';
+import MerchantHoldsFilterBar, { MerchantHoldsFilterState } from './components/merchant-holds-filter-bar';
 import PlaceHoldModal from './components/place-hold-modal';
 import { MerchantHold } from './types';
 import { generateMID } from '@/libs/domain/dashboard/components/transactions/transactions';
 
 export default function MerchantHoldsPage() {
-  const [filters, setFilters] = React.useState({
-    dateRange: 'all' as 'all' | 'today' | '7' | '14' | '30' | 'custom',
-    customStartDate: undefined as string | undefined,
-    customEndDate: undefined as string | undefined,
-    holdType: 'all' as 'all' | 'Manual' | 'Auto-Hold',
-    source: 'all' as 'all' | 'analyst' | 'system',
+  const [filters, setFilters] = React.useState<MerchantHoldsFilterState>({
+    dateRange: 'all',
+    holdType: 'all',
+    source: 'all',
     search: '',
   });
   
