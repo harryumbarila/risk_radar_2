@@ -95,6 +95,19 @@ export default function ManagerQueueFilters({
     onFiltersChange(newFilters);
   };
 
+  const getDateRangeLabel = (dateRange: FilterState['dateRange']): string => {
+    if (dateRange === 'custom') {
+      return `Custom${filters.customStartDate && filters.customEndDate ? ` (${formatDateForDisplay(filters.customStartDate)} - ${formatDateForDisplay(filters.customEndDate)})` : ''}`;
+    }
+    if (dateRange === 'today') {
+      return 'Today';
+    }
+    if (dateRange === '7' || dateRange === '14' || dateRange === '30') {
+      return `Last ${dateRange} days`;
+    }
+    return dateRange;
+  };
+
   const clearFilter = (key: keyof FilterState) => {
     const defaultValues: Partial<FilterState> = {
       dateRange: 'today',
