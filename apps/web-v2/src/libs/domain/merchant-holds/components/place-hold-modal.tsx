@@ -11,6 +11,7 @@ import {
   createListCollection,
   Button,
   Textarea,
+  Box,
 } from '@chakra-ui/react';
 import { PlaceHoldData } from '../types';
 import { ALL_TRANSACTIONS } from '@/libs/domain/dashboard/components/transactions/transactions';
