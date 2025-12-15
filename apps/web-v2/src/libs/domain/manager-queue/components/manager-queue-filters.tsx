@@ -178,14 +178,12 @@ export default function ManagerQueueFilters({
                 From
               </Text>
               <Input
-                type="text"
+                type="date"
                 size="sm"
-                value={formatDateForDisplay(filters.customStartDate)}
+                value={filters.customStartDate || ''}
                 onChange={(e) => {
-                  const formatted = formatDateForStorage(e.target.value);
-                  updateFilter('customStartDate', formatted);
+                  updateFilter('customStartDate', e.target.value);
                 }}
-                placeholder="MM/DD/YYYY"
               />
             </VStack>
             <VStack align="start" gap={1} minW="150px">
@@ -193,14 +191,12 @@ export default function ManagerQueueFilters({
                 To
               </Text>
               <Input
-                type="text"
+                type="date"
                 size="sm"
-                value={formatDateForDisplay(filters.customEndDate)}
+                value={filters.customEndDate || ''}
                 onChange={(e) => {
-                  const formatted = formatDateForStorage(e.target.value);
-                  updateFilter('customEndDate', formatted);
+                  updateFilter('customEndDate', e.target.value);
                 }}
-                placeholder="MM/DD/YYYY"
               />
             </VStack>
           </>

@@ -13,10 +13,12 @@ import {
   SimpleGrid,
   CloseButton,
   Dialog,
+  Tabs,
 } from '@chakra-ui/react';
 import { Unlock, Mail, Clock, User, AlertCircle } from 'lucide-react';
 import { MerchantHold, HoldHistoryEntry } from '../types';
 import EmailComposerDrawer from './email-composer-drawer';
+import ActivityTab from './tabs/activity-tab';
 
 interface MerchantHoldDetailDrawerProps {
   hold: MerchantHold;
@@ -33,6 +35,14 @@ export default function MerchantHoldDetailDrawer({
 }: MerchantHoldDetailDrawerProps) {
   const [isEmailDrawerOpen, setIsEmailDrawerOpen] = React.useState(false);
   const [isReleaseConfirmOpen, setIsReleaseConfirmOpen] = React.useState(false);
+  const [activeTab, setActiveTab] = React.useState('overview');
+
+  // Reset to overview tab when drawer opens
+  React.useEffect(() => {
+    if (isOpen) {
+      setActiveTab('overview');
+    }
+  }, [isOpen]);
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString('en-US', {
@@ -98,17 +108,33 @@ export default function MerchantHoldDetailDrawer({
 
   return (
     <>
-      <Drawer.Root open={isOpen} onOpenChange={(e) => !e.open && onClose()} placement="end" size="lg">
+      <Drawer.Root 
+        open={isOpen} 
+        onOpenChange={(e) => {
+          if (!e.open) {
+            setActiveTab('overview');
+            onClose();
+          }
+        }} 
+        placement="end" 
+        size="lg"
+      >
         <Portal>
           <Drawer.Backdrop bg="blackAlpha.600" backdropFilter="blur(4px)" />
           <Drawer.Positioner>
             <Drawer.Content
-              width={{ base: '100%', md: '600px' }}
+              width={{ 
+                base: '100%', 
+                md: activeTab === 'activity' ? '95%' : '600px',
+                lg: activeTab === 'activity' ? '90%' : '600px'
+              }}
+              maxW={{ base: '100%', md: activeTab === 'activity' ? '1400px' : '600px' }}
               height="full"
               display="flex"
               flexDirection="column"
               bg="white"
               boxShadow="xl"
+              transition="width 0.2s ease-in-out"
             >
               {/* Header */}
               <Drawer.Header
@@ -136,7 +162,21 @@ export default function MerchantHoldDetailDrawer({
 
               {/* Body */}
               <Drawer.Body flex={1} overflowY="auto" px={6} py={6}>
-                <VStack align="stretch" gap={6}>
+                <Tabs.Root value={activeTab} onValueChange={(e) => setActiveTab(e.value || 'overview')}>
+                  <Tabs.List
+                    bg="gray.50"
+                    rounded="lg"
+                    p={1}
+                    mb={6}
+                    flexWrap="wrap"
+                  >
+                    <Tabs.Trigger value="overview">Overview</Tabs.Trigger>
+                    <Tabs.Trigger value="activity">Activity</Tabs.Trigger>
+                    <Tabs.Indicator />
+                  </Tabs.List>
+
+                  <Tabs.Content value="overview" pt={0}>
+                    <VStack align="stretch" gap={6}>
                   {/* Hold Status */}
                   <Box
                     p={4}
@@ -342,7 +382,13 @@ export default function MerchantHoldDetailDrawer({
                       ))}
                     </VStack>
                   </VStack>
-                </VStack>
+                    </VStack>
+                  </Tabs.Content>
+
+                  <Tabs.Content value="activity" pt={0}>
+                    <ActivityTab holdId={hold.id} mid={hold.mid} />
+                  </Tabs.Content>
+                </Tabs.Root>
               </Drawer.Body>
 
               {/* Footer */}

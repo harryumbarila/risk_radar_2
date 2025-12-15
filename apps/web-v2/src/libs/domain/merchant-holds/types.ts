@@ -31,3 +31,18 @@ export interface PlaceHoldData {
   expirationDate?: Date;
 }
 
+export interface ActivityEntry {
+  id: string;
+  transmissionDate: string;
+  transactionDate: string;
+  transactionAmt: string;
+  authCode: string;
+  cardF6: string;
+  cardL4: string;
+  cardType: string;
+  posEntryMode: string;
+  posEntryModeCalculated: string;
+  cardNotPresent: 'Yes' | 'No';
+  timestamp: Date; // For sorting and filtering
+}
+
