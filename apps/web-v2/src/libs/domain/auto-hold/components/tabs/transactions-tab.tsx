@@ -371,9 +371,13 @@ const generateCardHistory = (cardF6: string, cardL4: string, baseMid: string): C
     const authCodes = ['000000', '123456', '789012', '345678'];
     
     // Select MID from variations (70% baseMid, 30% others)
-    const selectedMid = Math.random() < 0.7 
-      ? midVariations[0] 
-      : midVariations[Math.floor(Math.random() * (midVariations.length - 1)) + 1];
+    let selectedMid: string;
+    if (Math.random() < 0.7) {
+      selectedMid = midVariations[0] || baseMid;
+    } else {
+      const randomIndex = Math.floor(Math.random() * (midVariations.length - 1)) + 1;
+      selectedMid = midVariations[randomIndex] || baseMid;
+    }
     
     // Mark some transactions as high risk (about 20%)
     const isHighRisk = Math.random() < 0.2;
