@@ -127,7 +127,7 @@ const generateCaptureTransaction = (
   const cardF6 = String(Math.floor(seededRandom(seed1) * 900000) + 100000);
   const cardL4 = String(Math.floor(seededRandom(seed2) * 9000) + 1000).padStart(4, '0');
   const cardType = cardTypes[index % cardTypes.length] || cardTypes[0];
-  const posEntryMode = posEntryModes[index % posEntryModes.length] || posEntryModes[0];
+  const posEntryMode = posEntryModes[index % posEntryModes.length] || posEntryModes[0] || 'Chip';
   const calcEntryType = posEntryMode.includes('Manual') 
     ? 'Keyed' 
     : posEntryMode.includes('Chip') 
