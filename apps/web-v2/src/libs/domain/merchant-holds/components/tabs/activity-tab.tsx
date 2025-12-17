@@ -180,7 +180,6 @@ interface CardHistoryTransaction {
   dbNet: string;
   transmissionDate: string;
   netDepositAmount: string;
-  isHighRisk: boolean;
   timestamp: Date;
 }
 
@@ -227,9 +226,6 @@ const generateCardHistory = (cardF6: string, cardL4: string, baseMid: string): C
       selectedMid = midVariations[randomIndex] || baseMid;
     }
     
-    // Mark some transactions as high risk (about 20%)
-    const isHighRisk = seededRandom(seed + 2000) < 0.2;
-    
     transactions.push({
       mid: selectedMid,
       transactionDate: `${transDate} ${transTime}`,
@@ -240,7 +236,6 @@ const generateCardHistory = (cardF6: string, cardL4: string, baseMid: string): C
       dbNet: `$${parseFloat(dbNet).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       transmissionDate,
       netDepositAmount: `$${parseFloat(netDeposit).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-      isHighRisk,
       timestamp: txDate, // Add timestamp for date filtering
     });
   }
@@ -259,7 +254,7 @@ export default function ActivityTab({ holdId, mid }: ActivityTabProps) {
   const [cardHistoryPage, setCardHistoryPage] = React.useState(1);
   const [cardHistoryDateRange, setCardHistoryDateRange] = React.useState<DateRangeState>({ preset: '30' });
   const [cardHistoryMidFilter, setCardHistoryMidFilter] = React.useState<string>('');
-  const [cardHistorySortColumn, setCardHistorySortColumn] = React.useState<'transactionDate' | 'transmissionDate' | null>(null);
+  const [cardHistorySortColumn, setCardHistorySortColumn] = React.useState<'mid' | 'transactionDate' | 'transmissionDate' | null>(null);
   const [cardHistorySortDirection, setCardHistorySortDirection] = React.useState<'asc' | 'desc'>('desc');
   const itemsPerPage = 10;
 
@@ -957,7 +952,17 @@ export default function ActivityTab({ holdId, mid }: ActivityTabProps) {
                   }
 
                   // Apply sorting
-                  if (cardHistorySortColumn === 'transactionDate') {
+                  if (cardHistorySortColumn === 'mid') {
+                    filteredHistory.sort((a, b) => {
+                      const midA = a.mid.toLowerCase();
+                      const midB = b.mid.toLowerCase();
+                      if (cardHistorySortDirection === 'asc') {
+                        return midA.localeCompare(midB);
+                      } else {
+                        return midB.localeCompare(midA);
+                      }
+                    });
+                  } else if (cardHistorySortColumn === 'transactionDate') {
                     filteredHistory.sort((a, b) => {
                       // Use timestamp for accurate sorting
                       const dateA = a.timestamp.getTime();
@@ -972,8 +977,18 @@ export default function ActivityTab({ holdId, mid }: ActivityTabProps) {
                       return cardHistorySortDirection === 'asc' ? dateA - dateB : dateB - dateA;
                     });
                   } else {
-                    // Default: sort by timestamp (most recent first)
-                    filteredHistory.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+                    // Default: sort by MID (current MID first), then by timestamp (most recent first)
+                    filteredHistory.sort((a, b) => {
+                      const aIsCurrentMid = a.mid === mid;
+                      const bIsCurrentMid = b.mid === mid;
+                      
+                      // If one is current MID and the other isn't, current MID comes first
+                      if (aIsCurrentMid && !bIsCurrentMid) return -1;
+                      if (!aIsCurrentMid && bIsCurrentMid) return 1;
+                      
+                      // If both are same type (both current MID or both not), sort by timestamp (most recent first)
+                      return b.timestamp.getTime() - a.timestamp.getTime();
+                    });
                   }
 
                   const totalPages = Math.ceil(filteredHistory.length / itemsPerPage);
@@ -987,7 +1002,32 @@ export default function ActivityTab({ holdId, mid }: ActivityTabProps) {
                         <Table.Root size="sm" stickyHeader>
                           <Table.Header>
                             <Table.Row bg="gray.50">
-                              <Table.ColumnHeader>MID</Table.ColumnHeader>
+                              <Table.ColumnHeader
+                                cursor="pointer"
+                                onClick={() => {
+                                  if (cardHistorySortColumn === 'mid') {
+                                    setCardHistorySortDirection(cardHistorySortDirection === 'asc' ? 'desc' : 'asc');
+                                  } else {
+                                    setCardHistorySortColumn('mid');
+                                    setCardHistorySortDirection('asc');
+                                  }
+                                  setCardHistoryPage(1);
+                                }}
+                                _hover={{ bg: 'gray.100' }}
+                              >
+                                <HStack gap={1}>
+                                  <Text>MID</Text>
+                                  {cardHistorySortColumn === 'mid' ? (
+                                    cardHistorySortDirection === 'asc' ? (
+                                      <ArrowUp size={14} />
+                                    ) : (
+                                      <ArrowDown size={14} />
+                                    )
+                                  ) : (
+                                    <ArrowUpDown size={14} color="gray.400" />
+                                  )}
+                                </HStack>
+                              </Table.ColumnHeader>
                               <Table.ColumnHeader
                                 cursor="pointer"
                                 onClick={() => {
@@ -1050,20 +1090,9 @@ export default function ActivityTab({ holdId, mid }: ActivityTabProps) {
                           </Table.Header>
                           <Table.Body>
                             {paginatedHistory.map((tx, index) => (
-                              <Table.Row key={index} bg={tx.isHighRisk ? 'red.50' : 'white'}>
+                              <Table.Row key={index}>
                                 <Table.Cell>
-                                  <HStack gap={2}>
-                                    {tx.isHighRisk && (
-                                      <Box
-                                        w={2}
-                                        h={2}
-                                        borderRadius="full"
-                                        bg="red.500"
-                                        flexShrink={0}
-                                      />
-                                    )}
-                                    <MIDCell mid={tx.mid} />
-                                  </HStack>
+                                  <MIDCell mid={tx.mid} />
                                 </Table.Cell>
                                 <Table.Cell>
                                   <Text fontSize="sm">{tx.transactionDate}</Text>
@@ -1124,7 +1153,6 @@ export default function ActivityTab({ holdId, mid }: ActivityTabProps) {
                                   'DB Net',
                                   'Transmission Date',
                                   'Net Deposit Amount',
-                                  'High Risk',
                                 ];
                                 const rows = filteredHistory.map((tx) => [
                                   tx.mid,
@@ -1136,7 +1164,6 @@ export default function ActivityTab({ holdId, mid }: ActivityTabProps) {
                                   tx.dbNet,
                                   tx.transmissionDate,
                                   tx.netDepositAmount,
-                                  tx.isHighRisk ? 'Yes' : 'No',
                                 ]);
 
                                 const csvContent = [
