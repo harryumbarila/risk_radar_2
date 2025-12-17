@@ -17,7 +17,7 @@ import {
   Dialog,
   CloseButton,
 } from '@chakra-ui/react';
-import { Download, CreditCard, Copy, Check } from 'lucide-react';
+import { Download, CreditCard, Copy, Check, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { ActivityEntry } from '../../types';
 import { format } from 'date-fns';
 
@@ -259,6 +259,8 @@ export default function ActivityTab({ holdId, mid }: ActivityTabProps) {
   const [cardHistoryPage, setCardHistoryPage] = React.useState(1);
   const [cardHistoryDateRange, setCardHistoryDateRange] = React.useState<DateRangeState>({ preset: '30' });
   const [cardHistoryMidFilter, setCardHistoryMidFilter] = React.useState<string>('');
+  const [cardHistorySortColumn, setCardHistorySortColumn] = React.useState<'transactionDate' | 'transmissionDate' | null>(null);
+  const [cardHistorySortDirection, setCardHistorySortDirection] = React.useState<'asc' | 'desc'>('desc');
   const itemsPerPage = 10;
 
   // Generate mock transactions based on MID
@@ -744,6 +746,8 @@ export default function ActivityTab({ holdId, mid }: ActivityTabProps) {
                     setCardHistoryPage(1);
                     setCardHistoryDateRange({ preset: '30' });
                     setCardHistoryMidFilter('');
+                    setCardHistorySortColumn(null);
+                    setCardHistorySortDirection('desc');
                   }} />
                 </Box>
                 <VStack align="start" gap={1} pr={10}>
@@ -952,8 +956,25 @@ export default function ActivityTab({ holdId, mid }: ActivityTabProps) {
                     );
                   }
 
-                  // Sort by most recent first
-                  filteredHistory.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+                  // Apply sorting
+                  if (cardHistorySortColumn === 'transactionDate') {
+                    filteredHistory.sort((a, b) => {
+                      // Use timestamp for accurate sorting
+                      const dateA = a.timestamp.getTime();
+                      const dateB = b.timestamp.getTime();
+                      return cardHistorySortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+                    });
+                  } else if (cardHistorySortColumn === 'transmissionDate') {
+                    filteredHistory.sort((a, b) => {
+                      // Use timestamp for accurate sorting
+                      const dateA = a.timestamp.getTime();
+                      const dateB = b.timestamp.getTime();
+                      return cardHistorySortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+                    });
+                  } else {
+                    // Default: sort by timestamp (most recent first)
+                    filteredHistory.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+                  }
 
                   const totalPages = Math.ceil(filteredHistory.length / itemsPerPage);
                   const startIndex = (cardHistoryPage - 1) * itemsPerPage;
@@ -967,13 +988,63 @@ export default function ActivityTab({ holdId, mid }: ActivityTabProps) {
                           <Table.Header>
                             <Table.Row bg="gray.50">
                               <Table.ColumnHeader>MID</Table.ColumnHeader>
-                              <Table.ColumnHeader>Transaction Date</Table.ColumnHeader>
+                              <Table.ColumnHeader
+                                cursor="pointer"
+                                onClick={() => {
+                                  if (cardHistorySortColumn === 'transactionDate') {
+                                    setCardHistorySortDirection(cardHistorySortDirection === 'asc' ? 'desc' : 'asc');
+                                  } else {
+                                    setCardHistorySortColumn('transactionDate');
+                                    setCardHistorySortDirection('desc');
+                                  }
+                                  setCardHistoryPage(1);
+                                }}
+                                _hover={{ bg: 'gray.100' }}
+                              >
+                                <HStack gap={1}>
+                                  <Text>Transaction Date</Text>
+                                  {cardHistorySortColumn === 'transactionDate' ? (
+                                    cardHistorySortDirection === 'asc' ? (
+                                      <ArrowUp size={14} />
+                                    ) : (
+                                      <ArrowDown size={14} />
+                                    )
+                                  ) : (
+                                    <ArrowUpDown size={14} color="gray.400" />
+                                  )}
+                                </HStack>
+                              </Table.ColumnHeader>
                               <Table.ColumnHeader textAlign="right">Amount</Table.ColumnHeader>
                               <Table.ColumnHeader>POS/AVS Result</Table.ColumnHeader>
                               <Table.ColumnHeader>Auth Code</Table.ColumnHeader>
                               <Table.ColumnHeader>Card #</Table.ColumnHeader>
                               <Table.ColumnHeader textAlign="right">DB Net</Table.ColumnHeader>
-                              <Table.ColumnHeader>Transmission Date</Table.ColumnHeader>
+                              <Table.ColumnHeader
+                                cursor="pointer"
+                                onClick={() => {
+                                  if (cardHistorySortColumn === 'transmissionDate') {
+                                    setCardHistorySortDirection(cardHistorySortDirection === 'asc' ? 'desc' : 'asc');
+                                  } else {
+                                    setCardHistorySortColumn('transmissionDate');
+                                    setCardHistorySortDirection('desc');
+                                  }
+                                  setCardHistoryPage(1);
+                                }}
+                                _hover={{ bg: 'gray.100' }}
+                              >
+                                <HStack gap={1}>
+                                  <Text>Transmission Date</Text>
+                                  {cardHistorySortColumn === 'transmissionDate' ? (
+                                    cardHistorySortDirection === 'asc' ? (
+                                      <ArrowUp size={14} />
+                                    ) : (
+                                      <ArrowDown size={14} />
+                                    )
+                                  ) : (
+                                    <ArrowUpDown size={14} color="gray.400" />
+                                  )}
+                                </HStack>
+                              </Table.ColumnHeader>
                               <Table.ColumnHeader textAlign="right">Net Deposit Amount</Table.ColumnHeader>
                             </Table.Row>
                           </Table.Header>
