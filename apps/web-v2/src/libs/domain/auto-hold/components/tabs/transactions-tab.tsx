@@ -519,7 +519,12 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
           {tableData.map((row: any, index) => (
             <Table.Row 
               key={index}
-              onClick={() => onTransactionClick?.(transactions[index])}
+              onClick={() => {
+                const transaction = transactions[index];
+                if (transaction && onTransactionClick) {
+                  onTransactionClick(transaction);
+                }
+              }}
               cursor={onTransactionClick ? 'pointer' : 'default'}
               _hover={onTransactionClick ? { bg: 'gray.50' } : {}}
             >
@@ -650,7 +655,12 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
           {tableData.map((row: any, index) => (
             <Table.Row 
               key={index}
-              onClick={() => onTransactionClick?.(transactions[index])}
+              onClick={() => {
+                const transaction = transactions[index];
+                if (transaction && onTransactionClick) {
+                  onTransactionClick(transaction);
+                }
+              }}
               cursor={onTransactionClick ? 'pointer' : 'default'}
               _hover={onTransactionClick ? { bg: 'gray.50' } : {}}
             >
@@ -745,7 +755,12 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
           {tableData.map((row: any, index) => (
             <Table.Row 
               key={index}
-              onClick={() => onTransactionClick?.(transactions[index])}
+              onClick={() => {
+                const transaction = transactions[index];
+                if (transaction && onTransactionClick) {
+                  onTransactionClick(transaction);
+                }
+              }}
               cursor={onTransactionClick ? 'pointer' : 'default'}
               _hover={onTransactionClick ? { bg: 'gray.50' } : {}}
             >
@@ -812,7 +827,12 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
           {tableData.map((row: any, index) => (
             <Table.Row 
               key={index}
-              onClick={() => onTransactionClick?.(transactions[index])}
+              onClick={() => {
+                const transaction = transactions[index];
+                if (transaction && onTransactionClick) {
+                  onTransactionClick(transaction);
+                }
+              }}
               cursor={onTransactionClick ? 'pointer' : 'default'}
               _hover={onTransactionClick ? { bg: 'gray.50' } : {}}
             >
