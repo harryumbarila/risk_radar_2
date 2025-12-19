@@ -12,6 +12,7 @@ export interface ManagerQueueItem {
   submittedOn: string;
   lastActivity: string;
   mcc?: string;
+  batchAmount?: string; // Total amount of the batch
 }
 
 export interface AnalystWorkload {

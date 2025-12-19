@@ -197,6 +197,15 @@ const generateAuthData = (tx: MerchantTransaction, index: number) => {
   const avsCodes = ['Y - Street and 5-digit postal match', 'Z - Postal matches, street does not', 'N - No match'];
   const fundingSources = ['D - Debit', 'P - Prepaid', ''];
   
+  // Determine if this transaction should be declined based on MID
+  // Specific MID that should always have declined transactions
+  const declinedMIDs = ['5555058266493083'];
+  let isDeclined = false;
+  if (tx.mid && declinedMIDs.includes(tx.mid)) {
+    // For the specific MID, make ~33% of transactions declined (every 3rd transaction)
+    isDeclined = index % 3 === 0;
+  }
+  
   // Use transaction ID and index as seed for deterministic values
   const seed1 = (tx.id?.charCodeAt(0) || 0) + index * 1000;
   const seed2 = (tx.id?.charCodeAt(1) || 0) + index * 2000;
@@ -210,15 +219,20 @@ const generateAuthData = (tx: MerchantTransaction, index: number) => {
   const calcCNP = posEntryMode.includes('Manual') || posEntryMode.includes('Mail') ? 'Yes' : 'No';
   const posConditionCode = posConditionCodes[index % posConditionCodes.length] || posConditionCodes[0];
   const processingCode = processingCodes[0] || '';
-  const authResponse = authResponses[0] || '';
+  
+  // For declined transactions: empty response and AVS, amount = 0
+  const authResponse = isDeclined ? '' : (authResponses[0] || '');
   const messageType = messageTypes[0] || '';
-  const avsCode = avsCodes[index % avsCodes.length] || avsCodes[0];
+  const avsCode = isDeclined ? '' : (avsCodes[index % avsCodes.length] || avsCodes[0]);
   const fundingSource = fundingSources[index % fundingSources.length] || fundingSources[0];
-  const apprCode = String(Math.floor(seededRandom(seed3) * 900000) + 100000);
+  const apprCode = isDeclined ? '' : String(Math.floor(seededRandom(seed3) * 900000) + 100000);
+  
+  // For declined transactions, amount should be 0
+  const authAmt = isDeclined ? '$0.00' : tx.amount;
   
   return {
     transDate: tx.date,
-    authAmt: tx.amount,
+    authAmt,
     apprCode,
     cardF6,
     cardL4,
@@ -331,6 +345,7 @@ interface CardHistoryTransaction {
   posAvsResult: string;
   authCode: string;
   cardNumber: string;
+  cardType: 'Foreign' | 'Prepaid'; // Foreign or Prepaid only
   dbNet: string;
   transmissionDate: string;
   netDepositAmount: string;
@@ -379,6 +394,12 @@ const generateCardHistory = (cardF6: string, cardL4: string, baseMid: string): C
       selectedMid = midVariations[randomIndex] || baseMid;
     }
     
+    // Determine card type (Foreign or Prepaid) based on deterministic seed
+    const cardTypeSeed = (cardF6.charCodeAt(0) || 0) + i * 100;
+    const cardTypeRandom = seededRandom(cardTypeSeed);
+    // 50/50 distribution between Foreign and Prepaid
+    const cardType: 'Foreign' | 'Prepaid' = cardTypeRandom < 0.5 ? 'Foreign' : 'Prepaid';
+    
     transactions.push({
       mid: selectedMid,
       transactionDate: `${transDate} ${transTime}`,
@@ -386,6 +407,7 @@ const generateCardHistory = (cardF6: string, cardL4: string, baseMid: string): C
       posAvsResult: posAvsResults[i % posAvsResults.length] || 'N - No Match',
       authCode: authCodes[i % authCodes.length] || '000000',
       cardNumber: `${cardF6} •••• ${cardL4}`,
+      cardType,
       dbNet: `$${parseFloat(dbNet).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       transmissionDate,
       netDepositAmount: `$${parseFloat(netDeposit).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
@@ -542,7 +564,8 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
                   <Tooltip.Trigger asChild>
                     <Box
                       as="button"
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent row click from triggering
                         setSelectedCard({ cardF6: row.cardF6, cardL4: row.cardL4 });
                         setIsCardHistoryOpen(true);
                         setCardHistoryPage(1);
@@ -681,7 +704,8 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
                   <Tooltip.Trigger asChild>
                     <Box
                       as="button"
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent row click from triggering
                         setSelectedCard({ cardF6: row.cardF6, cardL4: row.cardL4 });
                         setIsCardHistoryOpen(true);
                         setCardHistoryPage(1);
@@ -1011,8 +1035,8 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
           <Dialog.Backdrop bg="blackAlpha.600" backdropFilter="blur(4px)" />
           <Dialog.Positioner>
             <Dialog.Content
-              maxW="90vw"
-              w="1200px"
+              maxW="95vw"
+              w={{ base: '95vw', md: '1400px', lg: '1600px' }}
               maxH="90vh"
               display="flex"
               flexDirection="column"
@@ -1360,6 +1384,7 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
                               <Table.ColumnHeader>POS/AVS Result</Table.ColumnHeader>
                               <Table.ColumnHeader>Auth Code</Table.ColumnHeader>
                               <Table.ColumnHeader>Card #</Table.ColumnHeader>
+                              <Table.ColumnHeader>Foreign/Prepaid</Table.ColumnHeader>
                               <Table.ColumnHeader textAlign="right">DB Net</Table.ColumnHeader>
                               <Table.ColumnHeader
                                 cursor="pointer"
@@ -1411,6 +1436,18 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
                                 <Table.Cell>
                                   <Text fontSize="sm" fontFamily="mono">{tx.cardNumber}</Text>
                                 </Table.Cell>
+                                <Table.Cell>
+                                  <Badge
+                                    colorPalette={tx.cardType === 'Foreign' ? 'orange' : 'purple'}
+                                    variant="subtle"
+                                    fontSize="xs"
+                                    px={2}
+                                    py={0.5}
+                                    borderRadius="full"
+                                  >
+                                    {tx.cardType}
+                                  </Badge>
+                                </Table.Cell>
                                 <Table.Cell textAlign="right">
                                   <Text fontSize="sm" color={parseFloat(tx.dbNet) < 0 ? 'red.600' : 'green.600'}>
                                     {tx.dbNet}
@@ -1452,6 +1489,7 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
                                   'POS/AVS Result',
                                   'Auth Code',
                                   'Card #',
+                                  'Foreign/Prepaid',
                                   'DB Net',
                                   'Transmission Date',
                                   'Net Deposit Amount',
@@ -1463,6 +1501,7 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
                                   tx.posAvsResult,
                                   tx.authCode,
                                   tx.cardNumber,
+                                  tx.cardType,
                                   tx.dbNet,
                                   tx.transmissionDate,
                                   tx.netDepositAmount,

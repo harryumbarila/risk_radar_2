@@ -514,12 +514,27 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
   const solutionConsultants = ['SC Alpha', 'SC Beta', null];
   const dataSources = ['Auth', 'Capture', 'Settled', 'Returns'];
   
-  // Today's dates (at least 2 transactions for today)
+  // Today's dates - multiple transactions throughout the day
   const todayDate1 = new Date(baseDate);
-  todayDate1.setHours(9, 30, 0, 0); // Morning transaction
+  todayDate1.setHours(8, 15, 0, 0); // Early morning
   
   const todayDate2 = new Date(baseDate);
-  todayDate2.setHours(14, 45, 0, 0); // Afternoon transaction
+  todayDate2.setHours(9, 30, 0, 0); // Morning transaction
+  
+  const todayDate3 = new Date(baseDate);
+  todayDate3.setHours(11, 0, 0, 0); // Late morning
+  
+  const todayDate4 = new Date(baseDate);
+  todayDate4.setHours(13, 20, 0, 0); // Early afternoon
+  
+  const todayDate5 = new Date(baseDate);
+  todayDate5.setHours(14, 45, 0, 0); // Afternoon transaction
+  
+  const todayDate6 = new Date(baseDate);
+  todayDate6.setHours(16, 30, 0, 0); // Late afternoon
+  
+  const todayDate7 = new Date(baseDate);
+  todayDate7.setHours(18, 0, 0, 0); // Evening
   
   const tx1Date = new Date(baseDate.getTime() - 1 * 24 * 60 * 60 * 1000);
   const tx2Date = new Date(baseDate.getTime() - 0.5 * 24 * 60 * 60 * 1000);
@@ -540,8 +555,8 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       date: formatDate(todayDate1),
       uwDate: formatUWDate(new Date(baseDate.getTime() - 5 * 24 * 60 * 60 * 1000)),
       status: 'Unreviewed',
-      createdAt: baseDate.toISOString(),
-      updatedAt: baseDate.toISOString(),
+      createdAt: todayDate1.toISOString(),
+      updatedAt: todayDate1.toISOString(),
       ruleId: 'AH001',
       channel: channels[0],
       reseller: resellers[0] || undefined,
@@ -555,7 +570,7 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       ahRuleApplied: ['AH001', 'AH002'],
       autoHoldRuleApplied: ['AH001'],
       createdBatchTrigger: 'Daily Batch',
-      createdBatchDate: baseDate.toISOString(),
+      createdBatchDate: todayDate1.toISOString(),
     } as MerchantTransaction & { ruleId?: string },
     {
       id: 'today-2',
@@ -568,22 +583,163 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       date: formatDate(todayDate2),
       uwDate: formatUWDate(new Date(baseDate.getTime() - 3 * 24 * 60 * 60 * 1000)),
       status: 'In Progress',
-      createdAt: baseDate.toISOString(),
-      updatedAt: baseDate.toISOString(),
+      createdAt: todayDate2.toISOString(),
+      updatedAt: todayDate2.toISOString(),
       ruleId: 'AH012',
       channel: channels[1],
       referralPartner: referralPartners[0] || undefined,
       riskWatch: false,
       newAccount: true,
-      divert: false,
+      // If has ahRuleApplied, must have divert and netDivertBalance
+      divert: true,
       nextDayFunding: 'No',
-      netDivertBalance: '$0.00',
+      netDivertBalance: '$5,890.20',
       source: dataSources[1] || 'Capture',
       dataSourceIdentifier: generateDataSourceIdentifier(dataSources[1] || 'Capture', todayDate2),
       ahRuleApplied: ['AH012', 'AH013'],
       autoHoldRuleApplied: ['AH012'],
       createdBatchTrigger: 'Manual',
-      createdBatchDate: baseDate.toISOString(),
+      createdBatchDate: todayDate2.toISOString(),
+    } as MerchantTransaction & { ruleId?: string },
+    {
+      id: 'today-3',
+      merchant: 'Premium Retail Network',
+      dbaName: 'PRN Stores',
+      amount: '$1,450.80',
+      exception: 'High transaction frequency',
+      processor: 'TSYS',
+      mid: generateMID(12),
+      date: formatDate(todayDate3),
+      uwDate: formatUWDate(new Date(baseDate.getTime() - 7 * 24 * 60 * 60 * 1000)),
+      status: 'Unreviewed',
+      createdAt: todayDate3.toISOString(),
+      updatedAt: todayDate3.toISOString(),
+      ruleId: 'AH003',
+      channel: channels[2],
+      solutionConsultant: solutionConsultants[0] || undefined,
+      riskWatch: true,
+      newAccount: false,
+      divert: true,
+      nextDayFunding: 'Yes',
+      netDivertBalance: '$1,450.80',
+      source: dataSources[2] || 'Settled',
+      dataSourceIdentifier: generateDataSourceIdentifier(dataSources[2] || 'Settled', todayDate3),
+      ahRuleApplied: ['AH003', 'AH004'],
+      autoHoldRuleApplied: ['AH003'],
+      createdBatchTrigger: 'Daily Batch',
+      createdBatchDate: todayDate3.toISOString(),
+    } as MerchantTransaction & { ruleId?: string },
+    {
+      id: 'today-4',
+      merchant: 'Secure Payment Systems',
+      dbaName: 'SPS Corp',
+      amount: '$7,200.50',
+      exception: 'Unusual amount pattern',
+      processor: 'FSP',
+      mid: generateMID(13),
+      date: formatDate(todayDate4),
+      uwDate: formatUWDate(new Date(baseDate.getTime() - 10 * 24 * 60 * 60 * 1000)),
+      status: 'Unreviewed',
+      createdAt: todayDate4.toISOString(),
+      updatedAt: todayDate4.toISOString(),
+      ruleId: 'AH005',
+      channel: channels[0],
+      reseller: resellers[1] || undefined,
+      riskWatch: false,
+      newAccount: true,
+      divert: false,
+      nextDayFunding: 'No',
+      netDivertBalance: '$0.00',
+      source: dataSources[0] || 'Auth',
+      dataSourceIdentifier: generateDataSourceIdentifier(dataSources[0] || 'Auth', todayDate4),
+      ahRuleApplied: ['AH005', 'AH006'],
+      autoHoldRuleApplied: ['AH005'],
+      createdBatchTrigger: 'Daily Batch',
+      createdBatchDate: todayDate4.toISOString(),
+    } as MerchantTransaction & { ruleId?: string },
+    {
+      id: 'today-5',
+      merchant: 'Tech Solutions Hub',
+      dbaName: 'TSH Inc.',
+      amount: '$2,890.25',
+      exception: 'Pattern match anomaly',
+      processor: 'TSYS',
+      mid: generateMID(14),
+      date: formatDate(todayDate5),
+      uwDate: formatUWDate(new Date(baseDate.getTime() - 12 * 24 * 60 * 60 * 1000)),
+      status: 'In Progress',
+      createdAt: todayDate5.toISOString(),
+      updatedAt: todayDate5.toISOString(),
+      ruleId: 'AH007',
+      channel: channels[1],
+      referralPartner: referralPartners[1] || undefined,
+      riskWatch: true,
+      newAccount: false,
+      divert: true,
+      nextDayFunding: 'Yes',
+      netDivertBalance: '$2,890.25',
+      source: dataSources[1] || 'Capture',
+      dataSourceIdentifier: generateDataSourceIdentifier(dataSources[1] || 'Capture', todayDate5),
+      ahRuleApplied: ['AH007', 'AH008'],
+      autoHoldRuleApplied: ['AH007'],
+      createdBatchTrigger: 'Manual',
+      createdBatchDate: todayDate5.toISOString(),
+    } as MerchantTransaction & { ruleId?: string },
+    {
+      id: 'today-6',
+      merchant: 'Global Commerce Group',
+      dbaName: 'GCG International',
+      amount: '$4,560.00',
+      exception: 'High-risk country transaction',
+      processor: 'FSP',
+      mid: generateMID(15),
+      date: formatDate(todayDate6),
+      uwDate: formatUWDate(new Date(baseDate.getTime() - 8 * 24 * 60 * 60 * 1000)),
+      status: 'Unreviewed',
+      createdAt: todayDate6.toISOString(),
+      updatedAt: todayDate6.toISOString(),
+      ruleId: 'AH009',
+      channel: channels[3],
+      reseller: resellers[0] || undefined,
+      riskWatch: false,
+      newAccount: true,
+      divert: false,
+      nextDayFunding: 'No',
+      netDivertBalance: '$0.00',
+      source: dataSources[3] || 'Returns',
+      dataSourceIdentifier: generateDataSourceIdentifier(dataSources[3] || 'Returns', todayDate6),
+      ahRuleApplied: ['AH009', 'AH010'],
+      autoHoldRuleApplied: ['AH009'],
+      createdBatchTrigger: 'Daily Batch',
+      createdBatchDate: todayDate6.toISOString(),
+    } as MerchantTransaction & { ruleId?: string },
+    {
+      id: 'today-7',
+      merchant: 'Metro Financial Services',
+      dbaName: 'Metro Financial',
+      amount: '$950.75',
+      exception: 'Frequency anomaly detected',
+      processor: 'TSYS',
+      mid: generateMID(16),
+      date: formatDate(todayDate7),
+      uwDate: formatUWDate(new Date(baseDate.getTime() - 15 * 24 * 60 * 60 * 1000)),
+      status: 'Unreviewed',
+      createdAt: todayDate7.toISOString(),
+      updatedAt: todayDate7.toISOString(),
+      ruleId: 'AH011',
+      channel: channels[2],
+      solutionConsultant: solutionConsultants[1] || undefined,
+      riskWatch: true,
+      newAccount: false,
+      divert: true,
+      nextDayFunding: 'Yes',
+      netDivertBalance: '$950.75',
+      source: dataSources[2] || 'Settled',
+      dataSourceIdentifier: generateDataSourceIdentifier(dataSources[2] || 'Settled', todayDate7),
+      ahRuleApplied: ['AH011', 'AH012'],
+      autoHoldRuleApplied: ['AH011'],
+      createdBatchTrigger: 'Daily Batch',
+      createdBatchDate: todayDate7.toISOString(),
     } as MerchantTransaction & { ruleId?: string },
     // Previous transactions
     {
@@ -687,9 +843,10 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       channel: channels[0],
       riskWatch: false,
       newAccount: true,
-      divert: false,
+      // If has ahRuleApplied, must have divert and netDivertBalance
+      divert: true,
       nextDayFunding: 'No',
-      netDivertBalance: '$0.00',
+      netDivertBalance: '$25,000.00',
       source: dataSources[3] || 'Returns',
       dataSourceIdentifier: generateDataSourceIdentifier(dataSources[3] || 'Returns', tx4Date),
       ahRuleApplied: ['AH004', 'AH005'],
@@ -1232,16 +1389,28 @@ export default function CustomTable({ filters }: CustomTableProps) {
       cell: (info) => {
         const value = info.getValue();
         const netDivertBalance = info.row.original.netDivertBalance;
-        const isFlagged = value === true;
+        const ahRuleApplied = info.row.original.ahRuleApplied || [];
+        
+        // If batch has ahRuleApplied, it must be divert and have funds on hold
+        const hasAhRule = ahRuleApplied.length > 0;
+        const isFlagged = hasAhRule ? true : (value === true);
+        
+        // If has ahRuleApplied but no netDivertBalance, calculate from amount
+        let displayBalance = netDivertBalance;
+        if (hasAhRule && (!netDivertBalance || netDivertBalance === '$0.00')) {
+          // Use transaction amount as netDivertBalance if not set
+          const amount = info.row.original.amount || '$0.00';
+          displayBalance = amount;
+        }
         
         return (
           <VStack align="center" gap={0.5} py={0.5} minH="20px">
             <Box display="flex" justifyContent="center" alignItems="center">
               <BooleanIcon value={isFlagged} label="Divert Enabled" />
             </Box>
-            {isFlagged && netDivertBalance && (
+            {isFlagged && displayBalance && (
               <Text fontSize="xs" color="gray.600" fontWeight="medium">
-                {netDivertBalance}
+                {displayBalance}
               </Text>
             )}
           </VStack>

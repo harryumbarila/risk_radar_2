@@ -196,6 +196,7 @@ export default function ManagerQueueTable({ items }: ManagerQueueTableProps) {
                 <Table.ColumnHeader>MID</Table.ColumnHeader>
                 <Table.ColumnHeader>Analyst Assigned</Table.ColumnHeader>
                 <Table.ColumnHeader>Processor</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="right">Batch Amount</Table.ColumnHeader>
                 <Table.ColumnHeader textAlign="right">Exceptions</Table.ColumnHeader>
                 <Table.ColumnHeader textAlign="center">Actions</Table.ColumnHeader>
               </Table.Row>
@@ -258,6 +259,11 @@ export default function ManagerQueueTable({ items }: ManagerQueueTableProps) {
                   <Table.Cell>
                     <Text fontSize="sm" color="gray.700">
                       {item.processor}
+                    </Text>
+                  </Table.Cell>
+                  <Table.Cell textAlign="right">
+                    <Text fontSize="sm" fontWeight="semibold" color="gray.900">
+                      {item.batchAmount || '$0.00'}
                     </Text>
                   </Table.Cell>
                   <Table.Cell textAlign="right">

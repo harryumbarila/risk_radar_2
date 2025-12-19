@@ -177,6 +177,7 @@ interface CardHistoryTransaction {
   posAvsResult: string;
   authCode: string;
   cardNumber: string;
+  cardType: 'Foreign' | 'Prepaid'; // Foreign or Prepaid only
   dbNet: string;
   transmissionDate: string;
   netDepositAmount: string;
@@ -226,6 +227,12 @@ const generateCardHistory = (cardF6: string, cardL4: string, baseMid: string): C
       selectedMid = midVariations[randomIndex] || baseMid;
     }
     
+    // Determine card type (Foreign or Prepaid) based on deterministic seed
+    const cardTypeSeed = (cardF6.charCodeAt(0) || 0) + i * 100;
+    const cardTypeRandom = seededRandom(cardTypeSeed);
+    // 50/50 distribution between Foreign and Prepaid
+    const cardType: 'Foreign' | 'Prepaid' = cardTypeRandom < 0.5 ? 'Foreign' : 'Prepaid';
+    
     transactions.push({
       mid: selectedMid,
       transactionDate: `${transDate} ${transTime}`,
@@ -233,6 +240,7 @@ const generateCardHistory = (cardF6: string, cardL4: string, baseMid: string): C
       posAvsResult: posAvsResults[i % posAvsResults.length] || 'N - No Match',
       authCode: authCodes[i % authCodes.length] || '000000',
       cardNumber: `${cardF6} •••• ${cardL4}`,
+      cardType,
       dbNet: `$${parseFloat(dbNet).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       transmissionDate,
       netDepositAmount: `$${parseFloat(netDeposit).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
@@ -725,8 +733,8 @@ export default function ActivityTab({ holdId, mid }: ActivityTabProps) {
           <Dialog.Backdrop bg="blackAlpha.600" backdropFilter="blur(4px)" />
           <Dialog.Positioner>
             <Dialog.Content
-              maxW="90vw"
-              w="1200px"
+              maxW="95vw"
+              w={{ base: '95vw', md: '1400px', lg: '1600px' }}
               maxH="90vh"
               display="flex"
               flexDirection="column"
@@ -1058,6 +1066,7 @@ export default function ActivityTab({ holdId, mid }: ActivityTabProps) {
                               <Table.ColumnHeader>POS/AVS Result</Table.ColumnHeader>
                               <Table.ColumnHeader>Auth Code</Table.ColumnHeader>
                               <Table.ColumnHeader>Card #</Table.ColumnHeader>
+                              <Table.ColumnHeader>Foreign/Prepaid</Table.ColumnHeader>
                               <Table.ColumnHeader textAlign="right">DB Net</Table.ColumnHeader>
                               <Table.ColumnHeader
                                 cursor="pointer"
@@ -1109,6 +1118,18 @@ export default function ActivityTab({ holdId, mid }: ActivityTabProps) {
                                 <Table.Cell>
                                   <Text fontSize="sm" fontFamily="mono">{tx.cardNumber}</Text>
                                 </Table.Cell>
+                                <Table.Cell>
+                                  <Badge
+                                    colorPalette={tx.cardType === 'Foreign' ? 'orange' : 'purple'}
+                                    variant="subtle"
+                                    fontSize="xs"
+                                    px={2}
+                                    py={0.5}
+                                    borderRadius="full"
+                                  >
+                                    {tx.cardType}
+                                  </Badge>
+                                </Table.Cell>
                                 <Table.Cell textAlign="right">
                                   <Text fontSize="sm" color={parseFloat(tx.dbNet) < 0 ? 'red.600' : 'green.600'}>
                                     {tx.dbNet}
@@ -1150,6 +1171,7 @@ export default function ActivityTab({ holdId, mid }: ActivityTabProps) {
                                   'POS/AVS Result',
                                   'Auth Code',
                                   'Card #',
+                                  'Foreign/Prepaid',
                                   'DB Net',
                                   'Transmission Date',
                                   'Net Deposit Amount',
@@ -1161,6 +1183,7 @@ export default function ActivityTab({ holdId, mid }: ActivityTabProps) {
                                   tx.posAvsResult,
                                   tx.authCode,
                                   tx.cardNumber,
+                                  tx.cardType,
                                   tx.dbNet,
                                   tx.transmissionDate,
                                   tx.netDepositAmount,

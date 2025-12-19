@@ -34,6 +34,7 @@ import NotesTab from '../tabs/notes-tab';
 import TransactionsTab from '../tabs/transactions-tab';
 import UnderwritingTab from '../tabs/underwriting-tab';
 import NetSettlementTab from '../tabs/net-settlement-tab';
+import SharedAttachmentsTab from '../tabs/shared-attachments-tab';
 
 interface BatchDetailPageProps {
   batch: MerchantTransaction[];
@@ -107,6 +108,39 @@ export default function BatchDetailPage({ batch }: BatchDetailPageProps) {
 
   // Get merchant info from first transaction (must be defined before useMemo hooks)
   const merchantInfo = batch[0];
+
+  // Mock account status (Open/Closed) based on MID
+  // In real app, this would come from API
+  // Using deterministic logic based on MID hash to ensure consistency
+  const getAccountStatus = React.useCallback((mid: string | undefined): 'Open' | 'Closed' => {
+    if (!mid) return 'Open';
+    // Mock: Use MID hash to deterministically assign status
+    // This ensures the same MID always gets the same status
+    const midHash = mid.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    // ~15% of accounts are closed
+    return (midHash % 7 === 0) ? 'Closed' : 'Open';
+  }, []);
+
+  // Mock Amex program status based on MID
+  // In real app, this would come from API
+  // Using deterministic logic based on MID hash to ensure consistency
+  const getAmexProgram = React.useCallback((mid: string | undefined): 'Opt Blue' | 'EASI' | null => {
+    if (!mid) return null;
+    // Mock: Use MID hash to deterministically assign programs
+    // This ensures the same MID always gets the same program
+    const midHash = mid.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const programIndex = midHash % 10;
+    
+    // Assign Opt Blue to ~30% of MIDs
+    if (programIndex < 3) return 'Opt Blue';
+    // Assign EASI to ~20% of MIDs
+    if (programIndex >= 3 && programIndex < 5) return 'EASI';
+    // Rest have no Amex program
+    return null;
+  }, []);
+
+  const accountStatus = getAccountStatus(merchantInfo?.mid);
+  const amexProgram = getAmexProgram(merchantInfo?.mid);
   
   // Get first owner email (mock - in real app would come from API)
   const firstOwnerEmail = React.useMemo(() => {
@@ -224,6 +258,9 @@ Risk Management Team`,
   // Mock notes count
   const notesCount = 3;
 
+  // Mock shared attachments count
+  const sharedAttachmentsCount = 5;
+
   // Create collection for mobile tab select
   const tabCollection = React.useMemo(
     () =>
@@ -237,9 +274,10 @@ Risk Management Team`,
           { label: 'Net Settlement', value: 'net-settlement' },
           { label: `Notes (${notesCount})`, value: 'notes' },
           { label: `Sent Emails (${sentEmails.length})`, value: 'sent-emails' },
+          { label: `Shared Attachments (${sharedAttachmentsCount})`, value: 'shared-attachments' },
         ],
       }),
-    [batch.length, notesCount, sentEmails.length]
+    [batch.length, notesCount, sentEmails.length, sharedAttachmentsCount]
   );
 
   const handleMarkAsReviewed = () => {
@@ -533,7 +571,34 @@ Risk Management Team`;
               <Text fontSize="sm" fontWeight="semibold" color="gray.900" fontFamily="mono">
                 {merchantInfo?.mid || 'N/A'}
               </Text>
+              <Badge
+                colorPalette={accountStatus === 'Open' ? 'green' : 'red'}
+                variant="subtle"
+                px={2}
+                py={0.5}
+                fontSize="xs"
+                fontWeight="medium"
+              >
+                {accountStatus}
+              </Badge>
             </HStack>
+            {amexProgram && (
+              <HStack gap={2}>
+                <Text fontSize="xs" color="gray.600" textTransform="uppercase">
+                  Amex Program:
+                </Text>
+                <Badge
+                  colorPalette="blue"
+                  variant="subtle"
+                  px={2}
+                  py={0.5}
+                  fontSize="xs"
+                  fontWeight="medium"
+                >
+                  {amexProgram}
+                </Badge>
+              </HStack>
+            )}
             <HStack gap={2}>
               <Text fontSize="xs" color="gray.600" textTransform="uppercase">
                 Processor:
@@ -677,6 +742,21 @@ Risk Management Team`;
                     </Badge>
                   </HStack>
                 </Tabs.Trigger>
+                <Tabs.Trigger value="shared-attachments" suppressHydrationWarning>
+                  <HStack gap={2}>
+                    <Text>Shared Attachments</Text>
+                    <Badge
+                      colorPalette="purple"
+                      variant="solid"
+                      px={2}
+                      py={0.5}
+                      borderRadius="full"
+                      fontSize="xs"
+                    >
+                      {sharedAttachmentsCount}
+                    </Badge>
+                  </HStack>
+                </Tabs.Trigger>
                 <Tabs.Indicator />
               </Tabs.List>
               {/* Mobile: Dropdown select for tabs */}
@@ -812,6 +892,10 @@ Risk Management Team`;
                     )}
                   </VStack>
                 </Box>
+              </Tabs.Content>
+
+              <Tabs.Content value="shared-attachments" pt={4}>
+                <SharedAttachmentsTab merchantId={merchantInfo?.mid || ''} />
               </Tabs.Content>
             </Tabs.Root>
           </Box>

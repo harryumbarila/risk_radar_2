@@ -123,6 +123,13 @@ export default function DemographicsTab({ merchantId, merchantName }: Demographi
     mcc: '5655',
     merchantType: 'E-commerce',
     cardPresent: 45.8,
+    // Financial Snapshot additional fields
+    approvedVolume: '$98,750.00',
+    highTicket: '$2,500.00',
+    swipeRate: 65.2, // percentage
+    ndf: 'Yes', // Next Day Funding
+    avgTicket: '$125.50',
+    transCountDailyApproved: 785,
   };
 
   const formatDate = (dateString: string) => {
@@ -165,135 +172,142 @@ export default function DemographicsTab({ merchantId, merchantName }: Demographi
         borderColor="gray.200"
         borderTopWidth="0"
       >
-        <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
-          {/* Location Section */}
-          <Box
-            p={3}
-            bg="#F8F9FC"
-            borderRadius="md"
-          >
-            <HStack gap={2} mb={2.5} align="center">
-              <Box color="#6B7280">
-                <MapPin size={14} />
-              </Box>
-              <Text fontSize="xs" fontWeight="semibold" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
-                Location
-              </Text>
-            </HStack>
-            <VStack align="start" gap={2}>
-              <VStack align="start" gap={0.5}>
-                <Text fontSize="sm" fontWeight="semibold" color="#111827">
-                  {demographicsData.address.street}
-                </Text>
-                <Text fontSize="sm" color="#111827">
-                  {demographicsData.address.city}, {demographicsData.address.state} {demographicsData.address.zip}
-                </Text>
-              </VStack>
-            </VStack>
-          </Box>
-
-          {/* Business Profile Section */}
-          <Box
-            p={3}
-            bg="#F8F9FC"
-            borderRadius="md"
-          >
-            <HStack gap={2} mb={2.5} align="center">
-              <Box color="#6B7280">
-                <Building2 size={14} />
-              </Box>
-              <Text fontSize="xs" fontWeight="semibold" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
-                Business Profile
-              </Text>
-            </HStack>
-            <VStack align="start" gap={2.5}>
-              <HStack gap={3} flexWrap="wrap">
-                <VStack align="start" gap={0.5}>
-                  <Text fontSize="xs" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
-                    Merchant Type
+        <HStack align="start" gap={4} flexWrap={{ base: 'wrap', md: 'nowrap' }}>
+          {/* Left Half: Location and Business Profile */}
+          <Box flex={{ base: '1 1 100%', md: '1 1 50%' }}>
+            <SimpleGrid columns={2} gap={4}>
+              {/* Location Section */}
+              <Box
+                p={3}
+                bg="#F8F9FC"
+                borderRadius="md"
+              >
+                <HStack gap={2} mb={2.5} align="center">
+                  <Box color="#6B7280">
+                    <MapPin size={14} />
+                  </Box>
+                  <Text fontSize="xs" fontWeight="semibold" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
+                    Location
                   </Text>
-                  <Badge 
-                    colorPalette="blue" 
-                    variant="subtle" 
-                    fontSize="xs"
-                    px={2.5}
-                    py={1}
-                    borderRadius="full"
-                  >
-                    {demographicsData.merchantType}
-                  </Badge>
-                </VStack>
-                <VStack align="start" gap={0.5}>
-                  <Text fontSize="xs" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
-                    Ownership
-                  </Text>
-                  <Badge 
-                    colorPalette="purple" 
-                    variant="subtle" 
-                    fontSize="xs"
-                    px={2.5}
-                    py={1}
-                    borderRadius="full"
-                  >
-                    {demographicsData.ownership}
-                  </Badge>
-                </VStack>
-              </HStack>
-              <HStack gap={3} flexWrap="wrap">
-                <VStack align="start" gap={0.5}>
-                  <HStack gap={1} align="center">
-                    <Box color="#6B7280">
-                      <CreditCard size={12} />
-                    </Box>
-                    <Text fontSize="xs" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
-                      Card Present
+                </HStack>
+                <VStack align="start" gap={2}>
+                  <VStack align="start" gap={0.5}>
+                    <Text fontSize="sm" fontWeight="semibold" color="#111827">
+                      {demographicsData.address.street}
                     </Text>
+                    <Text fontSize="sm" color="#111827">
+                      {demographicsData.address.city}, {demographicsData.address.state} {demographicsData.address.zip}
+                    </Text>
+                  </VStack>
+                </VStack>
+              </Box>
+
+              {/* Business Profile Section */}
+              <Box
+                p={3}
+                bg="#F8F9FC"
+                borderRadius="md"
+              >
+                <HStack gap={2} mb={2.5} align="center">
+                  <Box color="#6B7280">
+                    <Building2 size={14} />
+                  </Box>
+                  <Text fontSize="xs" fontWeight="semibold" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
+                    Business Profile
+                  </Text>
+                </HStack>
+                <VStack align="start" gap={2.5}>
+                  <HStack gap={3} flexWrap="wrap">
+                    <VStack align="start" gap={0.5}>
+                      <Text fontSize="xs" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
+                        Merchant Type
+                      </Text>
+                      <Badge 
+                        colorPalette="blue" 
+                        variant="subtle" 
+                        fontSize="xs"
+                        px={2.5}
+                        py={1}
+                        borderRadius="full"
+                      >
+                        {demographicsData.merchantType}
+                      </Badge>
+                    </VStack>
+                    <VStack align="start" gap={0.5}>
+                      <Text fontSize="xs" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
+                        Ownership
+                      </Text>
+                      <Badge 
+                        colorPalette="purple" 
+                        variant="subtle" 
+                        fontSize="xs"
+                        px={2.5}
+                        py={1}
+                        borderRadius="full"
+                      >
+                        {demographicsData.ownership}
+                      </Badge>
+                    </VStack>
                   </HStack>
-                  <Text fontSize="sm" fontWeight="semibold" color="#111827">
-                    {demographicsData.cardPresent}%
-                  </Text>
+                  <HStack gap={3} flexWrap="wrap">
+                    <VStack align="start" gap={0.5}>
+                      <HStack gap={1} align="center">
+                        <Box color="#6B7280">
+                          <CreditCard size={12} />
+                        </Box>
+                        <Text fontSize="xs" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
+                          Card Present
+                        </Text>
+                      </HStack>
+                      <Text fontSize="sm" fontWeight="semibold" color="#111827">
+                        {demographicsData.cardPresent}%
+                      </Text>
+                    </VStack>
+                    <VStack align="start" gap={0.5}>
+                      <Text fontSize="xs" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
+                        MCC
+                      </Text>
+                      <Tooltip.Root openDelay={300}>
+                        <Tooltip.Trigger asChild>
+                          <Box as="span" display="inline-flex" alignItems="center" cursor="help">
+                            <Badge 
+                              colorPalette="gray" 
+                              variant="solid" 
+                              fontSize="xs"
+                              px={2.5}
+                              py={1}
+                              borderRadius="full"
+                              fontWeight="semibold"
+                            >
+                              {demographicsData.mcc}
+                            </Badge>
+                          </Box>
+                        </Tooltip.Trigger>
+                        <Portal>
+                          <Tooltip.Positioner>
+                            <Tooltip.Content maxW="300px" zIndex={2000} bg="gray.900" color="white" px={3} py={2} borderRadius="md" fontSize="sm">
+                              <Tooltip.Arrow />
+                              <Text fontWeight="semibold" mb={1}>MCC {demographicsData.mcc}</Text>
+                              <Text>{getMCCDefinition(demographicsData.mcc)}</Text>
+                            </Tooltip.Content>
+                          </Tooltip.Positioner>
+                        </Portal>
+                      </Tooltip.Root>
+                    </VStack>
+                  </HStack>
                 </VStack>
-                <VStack align="start" gap={0.5}>
-                  <Text fontSize="xs" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
-                    MCC
-                  </Text>
-                  <Tooltip.Root openDelay={300}>
-                    <Tooltip.Trigger asChild>
-                      <Box as="span" display="inline-flex" alignItems="center" cursor="help">
-                        <Badge 
-                          colorPalette="gray" 
-                          variant="solid" 
-                          fontSize="xs"
-                          px={2.5}
-                          py={1}
-                          borderRadius="full"
-                          fontWeight="semibold"
-                        >
-                          {demographicsData.mcc}
-                        </Badge>
-                      </Box>
-                    </Tooltip.Trigger>
-                    <Portal>
-                      <Tooltip.Positioner>
-                        <Tooltip.Content maxW="300px" zIndex={2000} bg="gray.900" color="white" px={3} py={2} borderRadius="md" fontSize="sm">
-                          <Tooltip.Arrow />
-                          <Text fontWeight="semibold" mb={1}>MCC {demographicsData.mcc}</Text>
-                          <Text>{getMCCDefinition(demographicsData.mcc)}</Text>
-                        </Tooltip.Content>
-                      </Tooltip.Positioner>
-                    </Portal>
-                  </Tooltip.Root>
-                </VStack>
-              </HStack>
-            </VStack>
+              </Box>
+            </SimpleGrid>
           </Box>
 
-          {/* Financial Snapshot Section */}
-          <Box
-            p={3}
-            bg="#F8F9FC"
-            borderRadius="md"
-          >
+          {/* Right Half: Financial Snapshot Section */}
+          <Box flex={{ base: '1 1 100%', md: '1 1 50%' }}>
+            <Box
+              p={3}
+              bg="#F8F9FC"
+              borderRadius="md"
+              h="full"
+            >
             <HStack gap={2} mb={2.5} align="center">
               <Box color="#6B7280">
                 <DollarSign size={14} />
@@ -302,7 +316,8 @@ export default function DemographicsTab({ merchantId, merchantName }: Demographi
                 Financial Snapshot
               </Text>
             </HStack>
-            <HStack gap={6} flexWrap="wrap" align="start">
+            <SimpleGrid columns={{ base: 2, md: 4 }} gap={4}>
+              {/* Net Balance - Featured */}
               <VStack align="start" gap={0.5}>
                 <HStack gap={1} align="center">
                   <Box color="#6B7280">
@@ -312,7 +327,7 @@ export default function DemographicsTab({ merchantId, merchantName }: Demographi
                     Net Balance
                   </Text>
                 </HStack>
-                <HStack gap={2} align="baseline">
+                <HStack gap={2} align="baseline" flexWrap="wrap">
                   <Text fontSize="lg" fontWeight="semibold" color="#111827">
                     {demographicsData.netBalance}
                   </Text>
@@ -336,6 +351,104 @@ export default function DemographicsTab({ merchantId, merchantName }: Demographi
                   </HStack>
                 </HStack>
               </VStack>
+              
+              {/* Approved Volume */}
+              <VStack align="start" gap={0.5}>
+                <HStack gap={1} align="center">
+                  <Box color="#6B7280">
+                    <DollarSign size={12} />
+                  </Box>
+                  <Text fontSize="xs" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
+                    Approved Volume
+                  </Text>
+                </HStack>
+                <Text fontSize="sm" fontWeight="semibold" color="#111827">
+                  {demographicsData.approvedVolume}
+                </Text>
+              </VStack>
+              
+              {/* High Ticket */}
+              <VStack align="start" gap={0.5}>
+                <HStack gap={1} align="center">
+                  <Box color="#6B7280">
+                    <DollarSign size={12} />
+                  </Box>
+                  <Text fontSize="xs" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
+                    High Ticket
+                  </Text>
+                </HStack>
+                <Text fontSize="sm" fontWeight="semibold" color="#111827">
+                  {demographicsData.highTicket}
+                </Text>
+              </VStack>
+              
+              {/* Avg Ticket */}
+              <VStack align="start" gap={0.5}>
+                <HStack gap={1} align="center">
+                  <Box color="#6B7280">
+                    <DollarSign size={12} />
+                  </Box>
+                  <Text fontSize="xs" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
+                    Avg Ticket
+                  </Text>
+                </HStack>
+                <Text fontSize="sm" fontWeight="semibold" color="#111827">
+                  {demographicsData.avgTicket}
+                </Text>
+              </VStack>
+              
+              {/* Swipe Rate */}
+              <VStack align="start" gap={0.5}>
+                <HStack gap={1} align="center">
+                  <Box color="#6B7280">
+                    <CreditCard size={12} />
+                  </Box>
+                  <Text fontSize="xs" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
+                    Swipe Rate
+                  </Text>
+                </HStack>
+                <Text fontSize="sm" fontWeight="semibold" color="#111827">
+                  {demographicsData.swipeRate}%
+                </Text>
+              </VStack>
+              
+              {/* NDF */}
+              <VStack align="start" gap={0.5}>
+                <HStack gap={1} align="center">
+                  <Box color="#6B7280">
+                    <Calendar size={12} />
+                  </Box>
+                  <Text fontSize="xs" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
+                    NDF
+                  </Text>
+                </HStack>
+                <Badge
+                  colorPalette={demographicsData.ndf === 'Yes' ? 'green' : 'gray'}
+                  variant="subtle"
+                  fontSize="xs"
+                  px={2}
+                  py={0.5}
+                >
+                  {demographicsData.ndf}
+                </Badge>
+              </VStack>
+              
+              {/* Trans Count Daily Approved */}
+              <VStack align="start" gap={0.5}>
+                <HStack gap={1} align="center">
+                  <Box color="#6B7280">
+                    <CreditCard size={12} />
+                  </Box>
+                  <Text fontSize="xs" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
+                    Trans Count Daily Approved
+                  </Text>
+                </HStack>
+                <Text fontSize="sm" fontWeight="semibold" color="#111827">
+                  {demographicsData.transCountDailyApproved.toLocaleString()}
+                </Text>
+              </VStack>
+              
+              {/* Activated Date */}
               <VStack align="start" gap={0.5}>
                 <HStack gap={1} align="center">
                   <Box color="#6B7280">
@@ -349,9 +462,10 @@ export default function DemographicsTab({ merchantId, merchantName }: Demographi
                   {formatDate(demographicsData.activatedDate)}
                 </Text>
               </VStack>
-            </HStack>
+            </SimpleGrid>
+            </Box>
           </Box>
-        </SimpleGrid>
+        </HStack>
       </Box>
     </VStack>
   );

@@ -186,6 +186,15 @@ function generateMockQueueItems(): ManagerQueueItem[] {
     const actualMID: string = (i < uniqueMIDs.length ? uniqueMIDs[i] : null) ?? generateMID(i);
     const transaction = midToTransaction.get(actualMID);
     
+    // Calculate batch amount by summing all transactions for this MID
+    const batchTransactions = ALL_TRANSACTIONS.filter(tx => tx.mid === actualMID);
+    const batchAmount = batchTransactions.reduce((sum, tx) => {
+      // Extract numeric value from amount string (e.g., "$1,234.56" -> 1234.56)
+      const amountStr = tx.amount?.replace(/[^0-9.-]/g, '') || '0';
+      return sum + parseFloat(amountStr) || 0;
+    }, 0);
+    const formattedBatchAmount = `$${batchAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    
     const exceptionsCount = Math.floor(Math.random() * 5) + 1;
     // Generate random rule IDs for triggered rules
     const shuffledRules = [...ruleIds].sort(() => Math.random() - 0.5);
@@ -211,6 +220,7 @@ function generateMockQueueItems(): ManagerQueueItem[] {
       submittedOn: baseDate.toISOString(),
       lastActivity: new Date(baseDate.getTime() + Math.random() * 86400000).toISOString(),
       mcc: String(Math.floor(Math.random() * 9000) + 1000),
+      batchAmount: formattedBatchAmount,
     };
   });
 }
