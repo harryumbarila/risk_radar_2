@@ -62,6 +62,7 @@ export interface AutoHoldFilterState {
   mid: string;
   mcc: string;
   ruleId: 'all' | string[];
+  batchType: 'auto-hold' | 'no-hold' | 'all';
 }
 
 interface AutoHoldFilterBarProps {
@@ -123,6 +124,14 @@ export default function AutoHoldFilterBar({
     ],
   });
 
+  const batchTypeCollection = createListCollection({
+    items: [
+      { label: 'Auto-Hold', value: 'auto-hold' },
+      { label: 'No-Hold', value: 'no-hold' },
+      { label: 'All', value: 'all' },
+    ],
+  });
+
   const updateFilter = <K extends keyof AutoHoldFilterState>(
     key: K,
     value: AutoHoldFilterState[K]
@@ -150,6 +159,8 @@ export default function AutoHoldFilterBar({
       newFilters.mcc = '';
     } else if (key === 'ruleId') {
       newFilters.ruleId = 'all';
+    } else if (key === 'batchType') {
+      newFilters.batchType = 'auto-hold';
     } else {
       delete newFilters[key];
     }
@@ -167,6 +178,7 @@ export default function AutoHoldFilterBar({
       mid: '',
       mcc: '',
       ruleId: 'all',
+      batchType: 'auto-hold',
     });
   };
 
@@ -179,6 +191,7 @@ export default function AutoHoldFilterBar({
     filters.mid !== '' ||
     filters.mcc !== '' ||
     (Array.isArray(filters.ruleId) ? filters.ruleId.length > 0 : filters.ruleId !== 'all') ||
+    filters.batchType !== 'auto-hold' ||
     filters.customStartDate !== undefined ||
     filters.customEndDate !== undefined;
 
@@ -192,6 +205,7 @@ export default function AutoHoldFilterBar({
     filters.mid !== '',
     filters.mcc !== '',
     (Array.isArray(filters.ruleId) ? filters.ruleId.length > 0 : filters.ruleId !== 'all'),
+    filters.batchType !== 'auto-hold',
     filters.customStartDate !== undefined,
     filters.customEndDate !== undefined,
   ].filter(Boolean).length;
@@ -279,35 +293,31 @@ export default function AutoHoldFilterBar({
             <>
               <VStack align="start" gap={1}>
                 <Text fontSize="xs" color="gray.600">
-                  Start Date
+                  From
                 </Text>
                 <Input
-                  type="text"
+                  type="date"
                   size="sm"
                   width="150px"
-                  value={formatDateForDisplay(filters.customStartDate)}
+                  value={filters.customStartDate || ''}
                   onChange={(e) => {
-                    const formatted = formatDateForStorage(e.target.value);
-                    updateFilter('customStartDate', formatted);
+                    updateFilter('customStartDate', e.target.value);
                   }}
-                  placeholder="MM/DD/YYYY"
                   suppressHydrationWarning
                 />
               </VStack>
               <VStack align="start" gap={1}>
                 <Text fontSize="xs" color="gray.600">
-                  End Date
+                  To
                 </Text>
                 <Input
-                  type="text"
+                  type="date"
                   size="sm"
                   width="150px"
-                  value={formatDateForDisplay(filters.customEndDate)}
+                  value={filters.customEndDate || ''}
                   onChange={(e) => {
-                    const formatted = formatDateForStorage(e.target.value);
-                    updateFilter('customEndDate', formatted);
+                    updateFilter('customEndDate', e.target.value);
                   }}
-                  placeholder="MM/DD/YYYY"
                   suppressHydrationWarning
                 />
               </VStack>
@@ -455,6 +465,44 @@ export default function AutoHoldFilterBar({
                 <Select.Positioner>
                   <Select.Content>
                     {dataSourceCollection.items.map((item) => (
+                      <Select.Item item={item} key={item.value}>
+                        {item.label}
+                        <Select.ItemIndicator />
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select.Positioner>
+              </Portal>
+            </Select.Root>
+          </VStack>
+
+          {/* Type of Batch Filter */}
+          <VStack align="start" gap={1}>
+            <Text fontSize="xs" color="gray.600">
+              Type of Batch
+            </Text>
+            <Select.Root
+              collection={batchTypeCollection}
+              value={[filters.batchType || 'auto-hold']}
+              onValueChange={(e) => {
+                updateFilter('batchType', (e.value[0] || 'auto-hold') as AutoHoldFilterState['batchType']);
+              }}
+              size="sm"
+              width="150px"
+            >
+              <Select.HiddenSelect />
+              <Select.Control>
+                <Select.Trigger suppressHydrationWarning>
+                  <Select.ValueText />
+                </Select.Trigger>
+                <Select.IndicatorGroup>
+                  <Select.Indicator />
+                </Select.IndicatorGroup>
+              </Select.Control>
+              <Portal>
+                <Select.Positioner>
+                  <Select.Content>
+                    {batchTypeCollection.items.map((item) => (
                       <Select.Item item={item} key={item.value}>
                         {item.label}
                         <Select.ItemIndicator />
@@ -732,6 +780,30 @@ export default function AutoHoldFilterBar({
                   size="xs"
                   variant="ghost"
                   onClick={() => clearFilter('dataSource')}
+                  p={0}
+                  minW="auto"
+                  h="auto"
+                >
+                  <X size={12} />
+                </Button>
+              </Badge>
+            )}
+            {filters.batchType !== 'auto-hold' && (
+              <Badge
+                colorPalette="blue"
+                variant="subtle"
+                px={2}
+                py={1}
+                borderRadius="md"
+                display="flex"
+                alignItems="center"
+                gap={1}
+              >
+                Type: {filters.batchType === 'no-hold' ? 'No-Hold' : filters.batchType === 'all' ? 'All' : 'Auto-Hold'}
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  onClick={() => clearFilter('batchType')}
                   p={0}
                   minW="auto"
                   h="auto"

@@ -34,6 +34,7 @@ export default function AutoHoldBoardPage() {
     mid: '',
     mcc: '',
     ruleId: 'all',
+    batchType: 'auto-hold',
   });
 
   // Get available rules from RULE_DEFINITIONS (all 30 rules)

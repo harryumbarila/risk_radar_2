@@ -16,10 +16,13 @@ import {
   Drawer,
   Input,
   CloseButton,
+  Table,
 } from '@chakra-ui/react';
+import { X, Plus } from 'lucide-react';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
 import { toaster } from '@/ui/components/common/atoms/toaster/toaster';
 import { Check, ArrowLeft, TrendingUp, Pause, Mail, Play } from 'lucide-react';
+import { format } from 'date-fns';
 import { Button } from '@chakra-ui/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import ContactTab from '../tabs/contact-tab';
@@ -53,10 +56,54 @@ export default function BatchDetailPage({ batch }: BatchDetailPageProps) {
   const [isEscalateModalOpen, setIsEscalateModalOpen] = React.useState(false);
   const [isReviewedModalOpen, setIsReviewedModalOpen] = React.useState(false);
   const [isEmailConfirmModalOpen, setIsEmailConfirmModalOpen] = React.useState(false);
+  const [emailRecipients, setEmailRecipients] = React.useState<string[]>([]);
+  const [newRecipient, setNewRecipient] = React.useState('');
+  const [sentEmails, setSentEmails] = React.useState<Array<{
+    id: string;
+    timestamp: Date;
+    recipients: string[];
+    subject: string;
+    body: string;
+    transactionId?: string;
+  }>>([]);
+  const [selectedTransaction, setSelectedTransaction] = React.useState<MerchantTransaction | null>(null);
+  const [autoNotes, setAutoNotes] = React.useState<Array<{
+    id: string;
+    note: string;
+    dateCreated: string;
+    createdBy: string;
+    pushToIris: boolean;
+    pinned: boolean;
+  }>>([]);
   
   // Check if we came from Manager Queue
   const sourceParam = searchParams?.get('source');
   const isFromManagerQueue = sourceParam === 'manager-queue';
+
+  // Function to add automatic note
+  // createdBy defaults to 'System' for automated actions, but can be overridden for manual actions
+  const addAutoNote = React.useCallback((noteText: string, createdBy?: string) => {
+    const newNote = {
+      id: `auto-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      note: noteText,
+      dateCreated: new Date().toISOString().substring(0, 10),
+      createdBy: createdBy || 'System', // Use provided user or default to 'System' for automated actions
+      pushToIris: false,
+      pinned: false,
+    };
+    setAutoNotes((prev) => [newNote, ...prev]);
+  }, []);
+
+  // Get current user name (mock - in real app, get from auth context)
+  // TODO: Replace with actual auth context when available
+  const getCurrentUserName = React.useCallback(() => {
+    // In real app: const { user } = useAuth(); return user?.name || 'Unknown User';
+    return 'Current User'; // Mock user name
+  }, []);
+
+  // TODO: Add whitelist functionality
+  // When whitelist is implemented, add this note:
+  // addAutoNote(`Account whitelisted. Merchant ${merchantInfo?.merchant || merchantInfo?.dbaName} (MID: ${merchantInfo?.mid}) has been added to the whitelist.`);
 
   // Get merchant info from first transaction (must be defined before useMemo hooks)
   const merchantInfo = batch[0];
@@ -189,9 +236,10 @@ Risk Management Team`,
           { label: 'Underwriting', value: 'underwriting' },
           { label: 'Net Settlement', value: 'net-settlement' },
           { label: `Notes (${notesCount})`, value: 'notes' },
+          { label: `Sent Emails (${sentEmails.length})`, value: 'sent-emails' },
         ],
       }),
-    [batch.length, notesCount]
+    [batch.length, notesCount, sentEmails.length]
   );
 
   const handleMarkAsReviewed = () => {
@@ -233,6 +281,8 @@ Risk Management Team`,
           title: 'Batch escalated',
           description: 'This batch has been escalated for priority review.',
         });
+        // Add automatic note with current user name
+        addAutoNote('Batch escalated to Manager Queue for priority review.', getCurrentUserName());
         setIsLoading(false);
       }, 1000);
     } catch (error) {
@@ -257,20 +307,30 @@ Risk Management Team`,
         // Removing hold
         setIsOnHold(false);
         setIsHoldModalOpen(false);
+        const noteText = holdNote 
+          ? `Merchant hold removed. Internal note: ${holdNote}`
+          : 'Merchant hold removed. Automated actions will resume.';
         setHoldNote('');
         toaster.success({
           title: 'Merchant hold removed',
           description: 'The merchant hold has been removed. Automated actions will resume.',
         });
+        // Add automatic note with current user name
+        addAutoNote(noteText, getCurrentUserName());
       } else {
         // Placing on hold
         setIsOnHold(true);
         setIsHoldModalOpen(false);
+        const noteText = holdNote 
+          ? `Merchant placed on hold. Internal note: ${holdNote}`
+          : 'Merchant placed on hold. No automated actions will be taken.';
         setHoldNote('');
         toaster.success({
           title: 'Merchant placed on hold',
           description: 'The merchant has been placed on hold. No automated actions will be taken.',
         });
+        // Add automatic note with current user name
+        addAutoNote(noteText, getCurrentUserName());
       }
     } catch (error) {
       toaster.error({
@@ -294,6 +354,8 @@ Risk Management Team`,
     setSelectedTemplate('');
     setEmailSubject('');
     setEmailBody('');
+    setEmailRecipients([firstOwnerEmail]);
+    setNewRecipient('');
   };
 
   const handleCloseEmailDrawer = () => {
@@ -301,6 +363,31 @@ Risk Management Team`,
     setSelectedTemplate('');
     setEmailSubject('');
     setEmailBody('');
+    setEmailRecipients([]);
+    setNewRecipient('');
+    setSelectedTransaction(null);
+  };
+
+  const handleAddRecipient = () => {
+    const email = newRecipient.trim();
+    if (email && email.includes('@') && !emailRecipients.includes(email)) {
+      setEmailRecipients([...emailRecipients, email]);
+      setNewRecipient('');
+    } else if (emailRecipients.includes(email)) {
+      toaster.warning({
+        title: 'Duplicate email',
+        description: 'This email is already in the recipient list.',
+      });
+    } else {
+      toaster.warning({
+        title: 'Invalid email',
+        description: 'Please enter a valid email address.',
+      });
+    }
+  };
+
+  const handleRemoveRecipient = (email: string) => {
+    setEmailRecipients(emailRecipients.filter((r) => r !== email));
   };
 
   const handleSendEmail = () => {
@@ -313,11 +400,31 @@ Risk Management Team`,
     try {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 800));
+      
+      // Save email to sent emails list
+      const newEmail = {
+        id: `email-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        timestamp: new Date(),
+        recipients: emailRecipients,
+        subject: emailSubject,
+        body: emailBody,
+        transactionId: selectedTransaction?.id,
+      };
+      setSentEmails((prev) => [newEmail, ...prev]);
+      
+      // Add automatic note with current user name
+      const recipientsList = emailRecipients.join(', ');
+      const emailNote = selectedTransaction
+        ? `Email sent to ${recipientsList}. Subject: "${emailSubject}". Related to transaction ${selectedTransaction.id}.`
+        : `Email sent to ${recipientsList}. Subject: "${emailSubject}".`;
+      addAutoNote(emailNote, getCurrentUserName());
+      
       toaster.success({
         title: 'Email sent successfully (mock)',
-        description: `Email sent to ${firstOwnerEmail}`,
+        description: `Email sent to ${emailRecipients.length} recipient${emailRecipients.length !== 1 ? 's' : ''}`,
       });
       handleCloseEmailDrawer();
+      setSelectedTransaction(null);
     } catch (error) {
       toaster.error({
         title: 'Error',
@@ -326,6 +433,28 @@ Risk Management Team`,
     } finally {
       setIsSendingEmail(false);
     }
+  };
+
+  const handleTransactionClick = (transaction: MerchantTransaction) => {
+    setSelectedTransaction(transaction);
+    // Pre-fill email with transaction details
+    const transactionDetails = `
+Transaction Details:
+- MID: ${transaction.mid}
+- Amount: ${transaction.amount}
+- Date: ${transaction.date}
+- Merchant: ${transaction.merchant || transaction.dbaName}
+- Status: ${transaction.status}
+
+Please review this transaction and take appropriate action.
+
+Best regards,
+Risk Management Team`;
+    setEmailSubject(`Transaction Review Required - ${transaction.mid}`);
+    setEmailBody(transactionDetails);
+    setEmailRecipients([firstOwnerEmail]);
+    setNewRecipient('');
+    setIsEmailDrawerOpen(true);
   };
 
   return (
@@ -533,6 +662,21 @@ Risk Management Team`,
                     </Badge>
                   </HStack>
                 </Tabs.Trigger>
+                <Tabs.Trigger value="sent-emails" suppressHydrationWarning>
+                  <HStack gap={2}>
+                    <Text>Sent Emails</Text>
+                    <Badge
+                      colorPalette="blue"
+                      variant="solid"
+                      px={2}
+                      py={0.5}
+                      borderRadius="full"
+                      fontSize="xs"
+                    >
+                      {sentEmails.length}
+                    </Badge>
+                  </HStack>
+                </Tabs.Trigger>
                 <Tabs.Indicator />
               </Tabs.List>
               {/* Mobile: Dropdown select for tabs */}
@@ -566,7 +710,7 @@ Risk Management Team`,
               </Box>
 
               <Tabs.Content value="transactions" pt={4}>
-                <TransactionsTab transactions={batch} />
+                <TransactionsTab transactions={batch} onTransactionClick={handleTransactionClick} />
               </Tabs.Content>
 
               <Tabs.Content value="contact" pt={4}>
@@ -593,7 +737,81 @@ Risk Management Team`,
               </Tabs.Content>
 
               <Tabs.Content value="notes" pt={4}>
-                <NotesTab merchantId={merchantInfo?.mid || ''} />
+                <NotesTab 
+                  merchantId={merchantInfo?.mid || ''} 
+                  externalNotes={autoNotes}
+                />
+              </Tabs.Content>
+
+              <Tabs.Content value="sent-emails" pt={4}>
+                <Box
+                  bg="white"
+                  borderRadius="xl"
+                  boxShadow="0 2px 8px rgba(0,0,0,0.05)"
+                  borderWidth="1px"
+                  borderColor="gray.200"
+                  p={6}
+                >
+                  <VStack align="stretch" gap={4}>
+                    {sentEmails.length === 0 ? (
+                      <Box textAlign="center" py={12}>
+                        <Text fontSize="md" color="gray.500">
+                          No emails sent yet
+                        </Text>
+                        <Text fontSize="sm" color="gray.400" mt={2}>
+                          Emails sent from this batch will appear here
+                        </Text>
+                      </Box>
+                    ) : (
+                      <Table.Root size="sm">
+                        <Table.Header>
+                          <Table.Row>
+                            <Table.ColumnHeader>Sent Date</Table.ColumnHeader>
+                            <Table.ColumnHeader>Recipients</Table.ColumnHeader>
+                            <Table.ColumnHeader>Subject</Table.ColumnHeader>
+                            <Table.ColumnHeader>Transaction</Table.ColumnHeader>
+                          </Table.Row>
+                        </Table.Header>
+                        <Table.Body>
+                          {sentEmails.map((email) => (
+                            <Table.Row key={email.id}>
+                              <Table.Cell>
+                                <Text fontSize="sm">
+                                  {format(email.timestamp, 'MMM dd, yyyy HH:mm')}
+                                </Text>
+                              </Table.Cell>
+                              <Table.Cell>
+                                <VStack align="start" gap={1}>
+                                  {email.recipients.map((recipient, idx) => (
+                                    <Text key={idx} fontSize="sm" color="gray.700">
+                                      {recipient}
+                                    </Text>
+                                  ))}
+                                </VStack>
+                              </Table.Cell>
+                              <Table.Cell>
+                                <Text fontSize="sm" fontWeight="medium">
+                                  {email.subject}
+                                </Text>
+                              </Table.Cell>
+                              <Table.Cell>
+                                {email.transactionId ? (
+                                  <Badge colorPalette="blue" variant="subtle">
+                                    {email.transactionId.substring(0, 8)}...
+                                  </Badge>
+                                ) : (
+                                  <Text fontSize="sm" color="gray.400">
+                                    N/A
+                                  </Text>
+                                )}
+                              </Table.Cell>
+                            </Table.Row>
+                          ))}
+                        </Table.Body>
+                      </Table.Root>
+                    )}
+                  </VStack>
+                </Box>
               </Tabs.Content>
             </Tabs.Root>
           </Box>
@@ -813,6 +1031,65 @@ Risk Management Team`,
               {/* Body */}
               <Drawer.Body flex={1} overflowY="auto" px={6} py={6}>
                 <VStack align="stretch" gap={4}>
+                  {/* Recipients */}
+                  <Box>
+                    <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={2}>
+                      Recipients
+                    </Text>
+                    <VStack align="stretch" gap={2}>
+                      {/* Recipient badges */}
+                      {emailRecipients.length > 0 && (
+                        <HStack flexWrap="wrap" gap={2}>
+                          {emailRecipients.map((email) => (
+                            <Badge
+                              key={email}
+                              colorPalette="blue"
+                              variant="subtle"
+                              px={3}
+                              py={1}
+                              borderRadius="md"
+                              display="flex"
+                              alignItems="center"
+                              gap={2}
+                            >
+                              <Text fontSize="xs">{email}</Text>
+                              <Box
+                                as="button"
+                                onClick={() => handleRemoveRecipient(email)}
+                                _hover={{ opacity: 0.7 }}
+                                cursor="pointer"
+                                aria-label={`Remove ${email}`}
+                              >
+                                <X size={12} />
+                              </Box>
+                            </Badge>
+                          ))}
+                        </HStack>
+                      )}
+                      {/* Add recipient input */}
+                      <HStack gap={2}>
+                        <Input
+                          value={newRecipient}
+                          onChange={(e) => setNewRecipient(e.target.value)}
+                          placeholder="Add recipient email"
+                          type="email"
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              handleAddRecipient();
+                            }
+                          }}
+                        />
+                        <Button
+                          size="sm"
+                          onClick={handleAddRecipient}
+                          disabled={!newRecipient.trim()}
+                        >
+                          <Plus size={16} />
+                        </Button>
+                      </HStack>
+                    </VStack>
+                  </Box>
+
                   {/* Template Selector */}
                   <Box>
                     <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={2}>
@@ -901,7 +1178,7 @@ Risk Management Team`,
                     colorPalette="blue"
                     onClick={handleSendEmail}
                     loading={isSendingEmail}
-                    disabled={isSendingEmail || !emailSubject || !emailBody}
+                    disabled={isSendingEmail || !emailSubject || !emailBody || emailRecipients.length === 0}
                   >
                     Send Email
                   </Button>
@@ -931,29 +1208,30 @@ Risk Management Team`,
                   Are you sure you want to send this email?
                 </Dialog.Description>
               </Dialog.Header>
-              <Dialog.Body>
-                <VStack align="stretch" gap={3}>
-                  <VStack align="start" gap={1}>
-                    <Text fontSize="xs" color="gray.600" fontWeight="medium">
-                      Recipient Email:
-                    </Text>
-                    <Text fontSize="sm" fontWeight="semibold" color="gray.900">
-                      {firstOwnerEmail}
-                    </Text>
-                    <Text fontSize="xs" color="gray.500" fontStyle="italic">
-                      (First Owner)
-                    </Text>
-                  </VStack>
-                  <VStack align="start" gap={1}>
-                    <Text fontSize="xs" color="gray.600" fontWeight="medium">
-                      Subject:
-                    </Text>
-                    <Text fontSize="sm" color="gray.700">
-                      {emailSubject}
-                    </Text>
+            <Dialog.Body>
+              <VStack align="stretch" gap={3}>
+                <VStack align="start" gap={1}>
+                  <Text fontSize="xs" color="gray.600" fontWeight="medium">
+                    Recipients ({emailRecipients.length}):
+                  </Text>
+                  <VStack align="start" gap={1} w="full">
+                    {emailRecipients.map((email) => (
+                      <Text key={email} fontSize="sm" fontWeight="semibold" color="gray.900">
+                        {email}
+                      </Text>
+                    ))}
                   </VStack>
                 </VStack>
-              </Dialog.Body>
+                <VStack align="start" gap={1}>
+                  <Text fontSize="xs" color="gray.600" fontWeight="medium">
+                    Subject:
+                  </Text>
+                  <Text fontSize="sm" color="gray.700">
+                    {emailSubject}
+                  </Text>
+                </VStack>
+              </VStack>
+            </Dialog.Body>
               <Dialog.Footer>
                 <HStack gap={3} w="full" justify="flex-end">
                   <Button variant="outline" onClick={() => setIsEmailConfirmModalOpen(false)}>

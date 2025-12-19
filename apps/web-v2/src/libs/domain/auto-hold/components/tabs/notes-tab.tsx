@@ -24,9 +24,11 @@ interface Note {
 
 interface NotesTabProps {
   merchantId: string;
+  onAddNote?: (note: Omit<Note, 'id'>) => void;
+  externalNotes?: Note[];
 }
 
-export default function NotesTab({ merchantId }: NotesTabProps) {
+export default function NotesTab({ merchantId, onAddNote, externalNotes }: NotesTabProps) {
   const [notes, setNotes] = React.useState<Note[]>([
     {
       id: '1',
@@ -53,20 +55,32 @@ export default function NotesTab({ merchantId }: NotesTabProps) {
       pinned: false,
     },
   ]);
+
+  // Merge external notes (auto-generated) with local notes
+  const allNotes = React.useMemo(() => {
+    const external = externalNotes || [];
+    const local = notes;
+    // Combine and deduplicate by id
+    const combined = [...external, ...local];
+    const unique = combined.filter((note, index, self) => 
+      index === self.findIndex((n) => n.id === note.id)
+    );
+    return unique;
+  }, [notes, externalNotes]);
   const [newNote, setNewNote] = React.useState('');
   const [currentPage, setCurrentPage] = React.useState(1);
   const itemsPerPage = 5;
 
   // Sort notes: pinned first, then by date (newest first)
   const sortedNotes = React.useMemo(() => {
-    return [...notes].sort((a, b) => {
+    return [...allNotes].sort((a, b) => {
       // Pinned notes first
       if (a.pinned && !b.pinned) return -1;
       if (!a.pinned && b.pinned) return 1;
       // Then sort by date (newest first)
       return new Date(b.dateCreated).getTime() - new Date(a.dateCreated).getTime();
     });
-  }, [notes]);
+  }, [allNotes]);
 
   const totalPages = Math.ceil(sortedNotes.length / itemsPerPage);
   const paginatedNotes = sortedNotes.slice(

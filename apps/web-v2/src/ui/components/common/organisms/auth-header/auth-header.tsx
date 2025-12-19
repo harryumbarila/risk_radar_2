@@ -93,7 +93,7 @@ export default function AuthHeader(): React.JSX.Element {
     : pathname === '/auto-hold'
     ? [
         {
-          label: 'Auto Hold',
+          label: '360 Hold Module',
           href: '/auto-hold',
           menu: [],
           isCurrent: true,
@@ -140,7 +140,7 @@ export default function AuthHeader(): React.JSX.Element {
           </Heading>
         ) : pathname === '/auto-hold' ? (
           <Heading size="xl" fontWeight="bold" color="gray.900">
-            Auto Hold
+            360 Hold Module
           </Heading>
         ) : pathname === '/risk-rules' ? (
           <Heading size="xl" fontWeight="bold" color="gray.900">

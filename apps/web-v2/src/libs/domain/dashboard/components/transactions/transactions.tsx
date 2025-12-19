@@ -809,6 +809,175 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       createdBatchTrigger: 'Daily Batch',
       createdBatchDate: getDateInLast7Days(5),
     } as MerchantTransaction & { ruleId?: string },
+    // No-Hold transactions (same MID's as auto-hold to show same MID in different batches)
+    // These transactions have NO auto-hold rules applied
+    {
+      id: 'no-hold-1',
+      merchant: 'Global Tech Solutions',
+      dbaName: 'GTS Inc.',
+      amount: '$2,100.00',
+      exception: 'Normal transaction',
+      processor: 'TSYS',
+      mid: generateMID(0), // Same MID as auto-hold transaction id: '1'
+      date: formatDate(new Date(baseDate.getTime() - 0.5 * 24 * 60 * 60 * 1000)),
+      uwDate: formatUWDate(new Date(baseDate.getTime() - 30 * 24 * 60 * 60 * 1000)),
+      status: 'Unreviewed',
+      createdAt: new Date(baseDate.getTime() - 0.5 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(baseDate.getTime() - 0.5 * 24 * 60 * 60 * 1000).toISOString(),
+      channel: channels[0],
+      reseller: resellers[0] || undefined,
+      riskWatch: false,
+      newAccount: false,
+      divert: false,
+      nextDayFunding: 'No',
+      netDivertBalance: '$0.00',
+      source: dataSources[0] || 'Auth',
+      dataSourceIdentifier: generateDataSourceIdentifier(dataSources[0] || 'Auth', new Date(baseDate.getTime() - 0.5 * 24 * 60 * 60 * 1000)),
+      // NO ahRuleApplied or autoHoldRuleApplied - this is a no-hold transaction
+      ahRuleApplied: [],
+      autoHoldRuleApplied: [],
+      createdBatchTrigger: 'Daily Batch',
+      createdBatchDate: new Date(baseDate.getTime() - 0.5 * 24 * 60 * 60 * 1000).toISOString(),
+    } as MerchantTransaction & { ruleId?: string },
+    {
+      id: 'no-hold-2',
+      merchant: 'Oceanview Logistics',
+      dbaName: 'Oceanview LLC',
+      amount: '$1,450.30',
+      exception: 'Standard processing',
+      processor: 'FSP',
+      mid: generateMID(1), // Same MID as auto-hold transaction id: '2'
+      date: formatDate(new Date(baseDate.getTime() - 1.5 * 24 * 60 * 60 * 1000)),
+      uwDate: formatUWDate(new Date(baseDate.getTime() - 25 * 24 * 60 * 60 * 1000)),
+      status: 'Reviewed',
+      createdAt: new Date(baseDate.getTime() - 1.5 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(baseDate.getTime() - 1.5 * 24 * 60 * 60 * 1000).toISOString(),
+      channel: channels[1],
+      referralPartner: referralPartners[0] || undefined,
+      riskWatch: false,
+      newAccount: false,
+      divert: false,
+      nextDayFunding: 'No',
+      netDivertBalance: '$0.00',
+      source: dataSources[1] || 'Capture',
+      dataSourceIdentifier: generateDataSourceIdentifier(dataSources[1] || 'Capture', new Date(baseDate.getTime() - 1.5 * 24 * 60 * 60 * 1000)),
+      // NO ahRuleApplied or autoHoldRuleApplied - this is a no-hold transaction
+      ahRuleApplied: [],
+      autoHoldRuleApplied: [],
+      createdBatchTrigger: 'Daily Batch',
+      createdBatchDate: new Date(baseDate.getTime() - 1.5 * 24 * 60 * 60 * 1000).toISOString(),
+    } as MerchantTransaction & { ruleId?: string },
+    {
+      id: 'no-hold-3',
+      merchant: 'Sunshine Pharmacy',
+      dbaName: 'Sunshine Pharma',
+      amount: '$325.90',
+      exception: 'Regular transaction',
+      processor: 'TSYS',
+      mid: generateMID(2), // Same MID as auto-hold transaction id: '3'
+      date: formatDate(new Date(baseDate.getTime() - 2.5 * 24 * 60 * 60 * 1000)),
+      uwDate: formatUWDate(new Date(baseDate.getTime() - 20 * 24 * 60 * 60 * 1000)),
+      status: 'Unreviewed',
+      createdAt: new Date(baseDate.getTime() - 2.5 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(baseDate.getTime() - 2.5 * 24 * 60 * 60 * 1000).toISOString(),
+      channel: channels[2],
+      solutionConsultant: solutionConsultants[0] || undefined,
+      riskWatch: false,
+      newAccount: false,
+      divert: false,
+      nextDayFunding: 'No',
+      netDivertBalance: '$0.00',
+      source: dataSources[2] || 'Settled',
+      dataSourceIdentifier: generateDataSourceIdentifier(dataSources[2] || 'Settled', new Date(baseDate.getTime() - 2.5 * 24 * 60 * 60 * 1000)),
+      // NO ahRuleApplied or autoHoldRuleApplied - this is a no-hold transaction
+      ahRuleApplied: [],
+      autoHoldRuleApplied: [],
+      createdBatchTrigger: 'Daily Batch',
+      createdBatchDate: new Date(baseDate.getTime() - 2.5 * 24 * 60 * 60 * 1000).toISOString(),
+    } as MerchantTransaction & { ruleId?: string },
+    {
+      id: 'no-hold-4',
+      merchant: 'Digital Assets Exchange',
+      dbaName: 'DAE Corp',
+      amount: '$3,500.00',
+      exception: 'Normal business activity',
+      processor: 'FSP',
+      mid: generateMID(3), // Same MID as auto-hold transaction id: '4'
+      date: formatDate(new Date(baseDate.getTime() - 3.5 * 24 * 60 * 60 * 1000)),
+      uwDate: formatUWDate(new Date(baseDate.getTime() - 15 * 24 * 60 * 60 * 1000)),
+      status: 'Reviewed',
+      createdAt: new Date(baseDate.getTime() - 3.5 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(baseDate.getTime() - 3.5 * 24 * 60 * 60 * 1000).toISOString(),
+      channel: channels[0],
+      riskWatch: false,
+      newAccount: false,
+      divert: false,
+      nextDayFunding: 'No',
+      netDivertBalance: '$0.00',
+      source: dataSources[3] || 'Returns',
+      dataSourceIdentifier: generateDataSourceIdentifier(dataSources[3] || 'Returns', new Date(baseDate.getTime() - 3.5 * 24 * 60 * 60 * 1000)),
+      // NO ahRuleApplied or autoHoldRuleApplied - this is a no-hold transaction
+      ahRuleApplied: [],
+      autoHoldRuleApplied: [],
+      createdBatchTrigger: 'Daily Batch',
+      createdBatchDate: new Date(baseDate.getTime() - 3.5 * 24 * 60 * 60 * 1000).toISOString(),
+    } as MerchantTransaction & { ruleId?: string },
+    {
+      id: 'no-hold-5',
+      merchant: 'City Supermarket',
+      dbaName: 'City Market',
+      amount: '$89.50',
+      exception: 'Standard purchase',
+      processor: 'TSYS',
+      mid: generateMID(4), // Same MID as auto-hold transaction id: '5'
+      date: formatDate(new Date(baseDate.getTime() - 4.5 * 24 * 60 * 60 * 1000)),
+      uwDate: formatUWDate(new Date(baseDate.getTime() - 10 * 24 * 60 * 60 * 1000)),
+      status: 'Unreviewed',
+      createdAt: new Date(baseDate.getTime() - 4.5 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(baseDate.getTime() - 4.5 * 24 * 60 * 60 * 1000).toISOString(),
+      channel: channels[3],
+      reseller: resellers[1] || undefined,
+      riskWatch: false,
+      newAccount: false,
+      divert: false,
+      nextDayFunding: 'No',
+      netDivertBalance: '$0.00',
+      source: dataSources[0] || 'Auth',
+      dataSourceIdentifier: generateDataSourceIdentifier(dataSources[0] || 'Auth', new Date(baseDate.getTime() - 4.5 * 24 * 60 * 60 * 1000)),
+      // NO ahRuleApplied or autoHoldRuleApplied - this is a no-hold transaction
+      ahRuleApplied: [],
+      autoHoldRuleApplied: [],
+      createdBatchTrigger: 'Daily Batch',
+      createdBatchDate: new Date(baseDate.getTime() - 4.5 * 24 * 60 * 60 * 1000).toISOString(),
+    } as MerchantTransaction & { ruleId?: string },
+    {
+      id: 'no-hold-6',
+      merchant: 'QuickWire Transfers',
+      dbaName: 'QuickWire Inc.',
+      amount: '$1,200.00',
+      exception: 'Normal transaction',
+      processor: 'TSYS',
+      mid: generateMID(10), // Same MID as auto-hold transaction id: 'today-1'
+      date: formatDate(new Date(baseDate.getTime() - 0.25 * 24 * 60 * 60 * 1000)),
+      uwDate: formatUWDate(new Date(baseDate.getTime() - 5 * 24 * 60 * 60 * 1000)),
+      status: 'Unreviewed',
+      createdAt: new Date(baseDate.getTime() - 0.25 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(baseDate.getTime() - 0.25 * 24 * 60 * 60 * 1000).toISOString(),
+      channel: channels[0],
+      reseller: resellers[0] || undefined,
+      riskWatch: false,
+      newAccount: false,
+      divert: false,
+      nextDayFunding: 'No',
+      netDivertBalance: '$0.00',
+      source: dataSources[0] || 'Auth',
+      dataSourceIdentifier: generateDataSourceIdentifier(dataSources[0] || 'Auth', new Date(baseDate.getTime() - 0.25 * 24 * 60 * 60 * 1000)),
+      // NO ahRuleApplied or autoHoldRuleApplied - this is a no-hold transaction
+      ahRuleApplied: [],
+      autoHoldRuleApplied: [],
+      createdBatchTrigger: 'Daily Batch',
+      createdBatchDate: new Date(baseDate.getTime() - 0.25 * 24 * 60 * 60 * 1000).toISOString(),
+    } as MerchantTransaction & { ruleId?: string },
   ];
 };
 
@@ -898,6 +1067,21 @@ export default function CustomTable({ filters }: CustomTableProps) {
         return (txRuleId && ruleIds.includes(txRuleId)) ||
                ahRules.some(r => ruleIds.includes(r)) ||
                autoHoldRules.some(r => ruleIds.includes(r));
+      });
+    }
+
+    // Filter by batch type
+    if (filters.batchType && filters.batchType !== 'all') {
+      filtered = filtered.filter((tx) => {
+        const hasAutoHoldRules = (tx.ahRuleApplied && tx.ahRuleApplied.length > 0) ||
+                                 (tx.autoHoldRuleApplied && tx.autoHoldRuleApplied.length > 0);
+        
+        if (filters.batchType === 'auto-hold') {
+          return hasAutoHoldRules;
+        } else if (filters.batchType === 'no-hold') {
+          return !hasAutoHoldRules;
+        }
+        return true;
       });
     }
 

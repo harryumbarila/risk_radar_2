@@ -7,6 +7,7 @@ import { MerchantTransaction } from '@/data/interfaces/transaction';
 
 interface TransactionsTabProps {
   transactions: MerchantTransaction[];
+  onTransactionClick?: (transaction: MerchantTransaction) => void;
 }
 
 // MID Cell Component with Copy Functionality
@@ -395,7 +396,7 @@ const generateCardHistory = (cardF6: string, cardL4: string, baseMid: string): C
   return transactions;
 };
 
-export default function TransactionsTab({ transactions }: TransactionsTabProps) {
+export default function TransactionsTab({ transactions, onTransactionClick }: TransactionsTabProps) {
   // Determine data source from first transaction (all transactions in a batch should have same source)
   const dataSource = transactions[0]?.source || 'Auth';
   
@@ -516,7 +517,12 @@ export default function TransactionsTab({ transactions }: TransactionsTabProps) 
         </Table.Header>
         <Table.Body>
           {tableData.map((row: any, index) => (
-            <Table.Row key={index}>
+            <Table.Row 
+              key={index}
+              onClick={() => onTransactionClick?.(transactions[index])}
+              cursor={onTransactionClick ? 'pointer' : 'default'}
+              _hover={onTransactionClick ? { bg: 'gray.50' } : {}}
+            >
               <Table.Cell>
                 <Text fontSize="xs">{row.transDate}</Text>
               </Table.Cell>
@@ -642,7 +648,12 @@ export default function TransactionsTab({ transactions }: TransactionsTabProps) 
         </Table.Header>
         <Table.Body>
           {tableData.map((row: any, index) => (
-            <Table.Row key={index}>
+            <Table.Row 
+              key={index}
+              onClick={() => onTransactionClick?.(transactions[index])}
+              cursor={onTransactionClick ? 'pointer' : 'default'}
+              _hover={onTransactionClick ? { bg: 'gray.50' } : {}}
+            >
               <Table.Cell>
                 <Text fontSize="sm">{row.transmissionDate}</Text>
               </Table.Cell>
@@ -732,7 +743,12 @@ export default function TransactionsTab({ transactions }: TransactionsTabProps) 
         </Table.Header>
         <Table.Body>
           {tableData.map((row: any, index) => (
-            <Table.Row key={index}>
+            <Table.Row 
+              key={index}
+              onClick={() => onTransactionClick?.(transactions[index])}
+              cursor={onTransactionClick ? 'pointer' : 'default'}
+              _hover={onTransactionClick ? { bg: 'gray.50' } : {}}
+            >
               <Table.Cell>
                 <Text fontSize="sm" fontFamily="mono">{row.mid}</Text>
               </Table.Cell>
@@ -794,7 +810,12 @@ export default function TransactionsTab({ transactions }: TransactionsTabProps) 
         </Table.Header>
         <Table.Body>
           {tableData.map((row: any, index) => (
-            <Table.Row key={index}>
+            <Table.Row 
+              key={index}
+              onClick={() => onTransactionClick?.(transactions[index])}
+              cursor={onTransactionClick ? 'pointer' : 'default'}
+              _hover={onTransactionClick ? { bg: 'gray.50' } : {}}
+            >
               <Table.Cell>
                 <Text fontSize="sm" fontFamily="mono">{row.mid}</Text>
               </Table.Cell>
@@ -836,6 +857,82 @@ export default function TransactionsTab({ transactions }: TransactionsTabProps) 
     }
   };
 
+  const handleExportCSV = () => {
+    // Get headers based on data source
+    let headers: string[] = [];
+    let rows: string[][] = [];
+    
+    if (dataSource === 'Auth') {
+      headers = ['MID', 'Transaction Date', 'Amount', 'Approval Code', 'Card F6', 'Card L4', 'Card Type', 'POS Entry Mode', 'Entry Type', 'Card Not Present', 'POS Condition Code', 'AVS Result', 'Funding Source'];
+      rows = tableData.map((tx: any) => [
+        transactions[tableData.indexOf(tx)]?.mid || '',
+        tx.transDate || '',
+        tx.authAmt || '',
+        tx.apprCode || '',
+        tx.cardF6 || '',
+        tx.cardL4 || '',
+        tx.cardType || '',
+        tx.posEntryMode1 || '',
+        tx.calcEntryType || '',
+        tx.calcCNP || '',
+        tx.posConditionCode || '',
+        tx.avsResultCode || '',
+        tx.acctFundingSource || '',
+      ]);
+    } else if (dataSource === 'Capture') {
+      headers = ['MID', 'Transmission Date', 'Transaction Date', 'Amount', 'Auth Code', 'Card F6', 'Card L4', 'Card Type', 'POS Entry Mode', 'POS Entry Mode Calculated', 'Card Not Present'];
+      rows = tableData.map((tx: any) => [
+        transactions[tableData.indexOf(tx)]?.mid || '',
+        tx.transmissionDate || '',
+        tx.transactionDate || '',
+        tx.transactionAmt || '',
+        tx.authCode || '',
+        tx.cardF6 || '',
+        tx.cardL4 || '',
+        tx.cardType || '',
+        tx.posEntryMode || '',
+        tx.posEntryModeCalculated || '',
+        tx.cardNotPresent || '',
+      ]);
+    } else if (dataSource === 'Settled') {
+      headers = ['MID', 'MCC', 'Chargeback Count (30d)', 'Chargeback Volume (30d)', 'Sales Count (30d)', 'Sales Volume (30d)', 'Chargeback % Volume', 'Chargeback % Count'];
+      rows = tableData.map((tx: any) => [
+        tx.mid || '',
+        tx.mcc || '',
+        tx.chargebackCountLast30Days?.toString() || '',
+        tx.chargebackVolLast30Days || '',
+        tx.salesCountLast30Days?.toString() || '',
+        tx.salesVolLast30Days || '',
+        tx.percentageVol || '',
+        tx.percentageCount || '',
+      ]);
+    } else if (dataSource === 'Returns') {
+      headers = ['MID', 'ACH Return Date', 'ACH Return Amount', 'ACH Return Code', 'CR/DB'];
+      rows = tableData.map((tx: any) => [
+        tx.mid || '',
+        tx.achReturnDate || '',
+        tx.achReturnAmt || '',
+        tx.achReturnCode || '',
+        tx.crDb || '',
+      ]);
+    }
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')),
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `transactions-${dataSource.toLowerCase()}-${format(new Date(), 'yyyy-MM-dd')}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <VStack align="stretch" gap={4}>
       <HStack gap={2} mb={2} justify="space-between">
@@ -850,9 +947,21 @@ export default function TransactionsTab({ transactions }: TransactionsTabProps) 
             {dataSource}
           </Badge>
         </HStack>
-        <Text fontSize="sm" color="gray.500">
-          {transactions.length} transaction{transactions.length !== 1 ? 's' : ''}
-        </Text>
+        <HStack gap={3} suppressHydrationWarning>
+          <Text fontSize="sm" color="gray.500" suppressHydrationWarning>
+            {transactions.length} transaction{transactions.length !== 1 ? 's' : ''}
+          </Text>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportCSV}
+            disabled={transactions.length === 0}
+            suppressHydrationWarning
+          >
+            <Download size={16} />
+            Export CSV
+          </Button>
+        </HStack>
       </HStack>
 
       <Box

@@ -11,7 +11,7 @@ import AutoHoldBoardPage from '@/libs/domain/auto-hold/board/board';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Auto Hold',
+  title: '360 Hold Module',
 };
 
 export default async function AutoHoldPage(): Promise<React.JSX.Element> {

@@ -14,8 +14,9 @@ import {
   createListCollection,
   CloseButton,
   Dialog,
+  Badge,
 } from '@chakra-ui/react';
-import { Mail } from 'lucide-react';
+import { Mail, X, Plus } from 'lucide-react';
 import { toaster } from '@/ui/components/common/atoms/toaster/toaster';
 
 interface EmailComposerDrawerProps {
@@ -23,6 +24,9 @@ interface EmailComposerDrawerProps {
   onClose: () => void;
   merchantName: string;
   merchantEmail: string;
+  initialRecipients?: string[];
+  initialSubject?: string;
+  initialBody?: string;
 }
 
 export default function EmailComposerDrawer({
@@ -30,12 +34,17 @@ export default function EmailComposerDrawer({
   onClose,
   merchantName,
   merchantEmail,
+  initialRecipients,
+  initialSubject,
+  initialBody,
 }: EmailComposerDrawerProps) {
   const [selectedTemplate, setSelectedTemplate] = React.useState<string>('');
-  const [emailSubject, setEmailSubject] = React.useState('');
-  const [emailBody, setEmailBody] = React.useState('');
+  const [emailSubject, setEmailSubject] = React.useState(initialSubject || '');
+  const [emailBody, setEmailBody] = React.useState(initialBody || '');
   const [isSendingEmail, setIsSendingEmail] = React.useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = React.useState(false);
+  const [newRecipient, setNewRecipient] = React.useState('');
+  const [recipients, setRecipients] = React.useState<string[]>([]);
 
   // Get first owner email (mock - in real app would come from API)
   const firstOwnerEmail = React.useMemo(() => {
@@ -59,6 +68,45 @@ export default function EmailComposerDrawer({
     ];
     return owners[0]?.email || merchantEmail;
   }, [merchantEmail]);
+
+  // Initialize recipients when drawer opens
+  React.useEffect(() => {
+    if (isOpen) {
+      if (initialRecipients && initialRecipients.length > 0) {
+        setRecipients([...initialRecipients]);
+      } else {
+        setRecipients([firstOwnerEmail]);
+      }
+      if (initialSubject) {
+        setEmailSubject(initialSubject);
+      }
+      if (initialBody) {
+        setEmailBody(initialBody);
+      }
+    }
+  }, [isOpen, initialRecipients, initialSubject, initialBody, firstOwnerEmail]);
+
+  const handleAddRecipient = () => {
+    const email = newRecipient.trim();
+    if (email && email.includes('@') && !recipients.includes(email)) {
+      setRecipients([...recipients, email]);
+      setNewRecipient('');
+    } else if (recipients.includes(email)) {
+      toaster.warning({
+        title: 'Duplicate email',
+        description: 'This email is already in the recipient list.',
+      });
+    } else {
+      toaster.warning({
+        title: 'Invalid email',
+        description: 'Please enter a valid email address.',
+      });
+    }
+  };
+
+  const handleRemoveRecipient = (email: string) => {
+    setRecipients(recipients.filter((r) => r !== email));
+  };
 
   // Email templates (same as Auto-Hold module)
   const emailTemplates = React.useMemo(() => {
@@ -143,6 +191,8 @@ Risk Management Team`,
     setSelectedTemplate('');
     setEmailSubject('');
     setEmailBody('');
+    setRecipients([]);
+    setNewRecipient('');
     onClose();
   };
 
@@ -158,7 +208,7 @@ Risk Management Team`,
       await new Promise((resolve) => setTimeout(resolve, 1000));
       toaster.success({
         title: 'Email sent successfully (mock)',
-        description: `Email sent to ${firstOwnerEmail}`,
+        description: `Email sent to ${recipients.length} recipient${recipients.length !== 1 ? 's' : ''}`,
       });
       handleClose();
     } catch (error) {
@@ -207,10 +257,7 @@ Risk Management Team`,
                     Email Merchant
                   </Text>
                   <Text fontSize="sm" color="gray.600">
-                    {firstOwnerEmail}
-                  </Text>
-                  <Text fontSize="xs" color="gray.500" fontStyle="italic">
-                    (First Owner)
+                    {merchantName || 'Merchant'}
                   </Text>
                 </VStack>
                 <CloseButton onClick={handleClose} />
@@ -220,6 +267,65 @@ Risk Management Team`,
             {/* Body */}
             <Drawer.Body flex={1} overflowY="auto" px={6} py={6}>
               <VStack align="stretch" gap={4}>
+                {/* Recipients */}
+                <Box>
+                  <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={2}>
+                    Recipients
+                  </Text>
+                  <VStack align="stretch" gap={2}>
+                    {/* Recipient badges */}
+                    {recipients.length > 0 && (
+                      <HStack flexWrap="wrap" gap={2}>
+                        {recipients.map((email) => (
+                          <Badge
+                            key={email}
+                            colorPalette="blue"
+                            variant="subtle"
+                            px={3}
+                            py={1}
+                            borderRadius="md"
+                            display="flex"
+                            alignItems="center"
+                            gap={2}
+                          >
+                            <Text fontSize="xs">{email}</Text>
+                            <Box
+                              as="button"
+                              onClick={() => handleRemoveRecipient(email)}
+                              _hover={{ opacity: 0.7 }}
+                              cursor="pointer"
+                              aria-label={`Remove ${email}`}
+                            >
+                              <X size={12} />
+                            </Box>
+                          </Badge>
+                        ))}
+                      </HStack>
+                    )}
+                    {/* Add recipient input */}
+                    <HStack gap={2}>
+                      <Input
+                        value={newRecipient}
+                        onChange={(e) => setNewRecipient(e.target.value)}
+                        placeholder="Add recipient email"
+                        type="email"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            handleAddRecipient();
+                          }
+                        }}
+                      />
+                      <Button
+                        size="sm"
+                        onClick={handleAddRecipient}
+                        disabled={!newRecipient.trim()}
+                      >
+                        <Plus size={16} />
+                      </Button>
+                    </HStack>
+                  </VStack>
+                </Box>
+
                 {/* Template Selector */}
                 <Box>
                   <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={2}>
@@ -304,7 +410,7 @@ Risk Management Team`,
                   colorPalette="blue"
                   onClick={handleSendEmail}
                   loading={isSendingEmail}
-                  disabled={isSendingEmail || !emailSubject || !emailBody}
+                  disabled={isSendingEmail || !emailSubject || !emailBody || recipients.length === 0}
                 >
                   <Mail size={16} />
                   Send Email
@@ -339,14 +445,15 @@ Risk Management Team`,
               <VStack align="stretch" gap={3}>
                 <VStack align="start" gap={1}>
                   <Text fontSize="xs" color="gray.600" fontWeight="medium">
-                    Recipient Email:
+                    Recipients ({recipients.length}):
                   </Text>
-                  <Text fontSize="sm" fontWeight="semibold" color="gray.900">
-                    {firstOwnerEmail}
-                  </Text>
-                  <Text fontSize="xs" color="gray.500" fontStyle="italic">
-                    (First Owner)
-                  </Text>
+                  <VStack align="start" gap={1} w="full">
+                    {recipients.map((email) => (
+                      <Text key={email} fontSize="sm" fontWeight="semibold" color="gray.900">
+                        {email}
+                      </Text>
+                    ))}
+                  </VStack>
                 </VStack>
                 <VStack align="start" gap={1}>
                   <Text fontSize="xs" color="gray.600" fontWeight="medium">
