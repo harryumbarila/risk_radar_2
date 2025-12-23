@@ -170,84 +170,314 @@ export default function BatchDetailPage({ batch }: BatchDetailPageProps) {
     return firstOwnerEmail;
   }, [firstOwnerEmail]);
   
+  // Helper function to extract last 4 digits from card number
+  const extractCardLastFour = (cardNumber?: string, cardLastFour?: string): string => {
+    if (cardLastFour) {
+      return cardLastFour;
+    }
+    if (cardNumber) {
+      // Extract last 4 digits from various formats:
+      // "****1234" -> "1234"
+      // "123456 •••• 7890" -> "7890"
+      // "1234567890123456" -> "3456"
+      const match = cardNumber.match(/(\d{4})[^\d]*$/);
+      if (match && match[1]) {
+        return match[1];
+      }
+      // Try to extract from middle format "123456 •••• 7890"
+      const middleMatch = cardNumber.match(/•{4}\s*(\d{4})/);
+      if (middleMatch && middleMatch[1]) {
+        return middleMatch[1];
+      }
+    }
+    return '';
+  };
+
+  // Helper function to extract AVS code
+  const extractAVSCode = (avsCode?: string, avsResult?: string): string => {
+    if (avsCode) {
+      return avsCode;
+    }
+    if (avsResult) {
+      // Extract code from formats like "Y - Match" or "Y"
+      const match = avsResult.match(/^([YNZA])/);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+    return '';
+  };
+
+  // Helper function to replace placeholders in email templates
+  const replaceTemplatePlaceholders = (
+    template: string,
+    transaction?: MerchantTransaction | null,
+    merchantName?: string,
+    contactName?: string
+  ): string => {
+    let result = template;
+    
+    // Merchant info
+    result = result.replace(/\{\{MERCHANT_NAME\}\}/g, merchantName || merchantInfo?.merchant || 'Merchant');
+    result = result.replace(/\{\{CONTACT_NAME\}\}/g, contactName || 'Contact');
+    result = result.replace(/\{\{MERCHANT_ID\}\}/g, merchantInfo?.mid || '');
+    
+    // Transaction info (only if transaction is provided)
+    if (transaction) {
+      result = result.replace(/\{\{TRANSACTION_DATE\}\}/g, transaction.date || 'N/A');
+      result = result.replace(/\{\{TRANSACTION_AMOUNT\}\}/g, transaction.amount || 'N/A');
+      
+      // Extract and format card number (last 4 digits)
+      const cardLastFour = extractCardLastFour(transaction.cardNumber, transaction.cardLastFour);
+      const cardMasked = cardLastFour ? `****${cardLastFour}` : (transaction.cardNumber || 'N/A');
+      result = result.replace(/\{\{CARD_MASKED\}\}/g, cardMasked);
+      
+      // Extract AVS code
+      const avsCode = extractAVSCode(transaction.avsCode, transaction.avsResult);
+      result = result.replace(/\{\{AVS_CODE\}\}/g, avsCode || 'N/A');
+      
+      // Auth code
+      result = result.replace(/\{\{AUTH_CODE\}\}/g, transaction.authCode || 'N/A');
+    } else {
+      // Remove transaction-specific placeholders if no transaction
+      result = result.replace(/\{\{TRANSACTION_DATE\}\}/g, 'N/A');
+      result = result.replace(/\{\{TRANSACTION_AMOUNT\}\}/g, 'N/A');
+      result = result.replace(/\{\{CARD_MASKED\}\}/g, 'N/A');
+      result = result.replace(/\{\{AVS_CODE\}\}/g, 'N/A');
+      result = result.replace(/\{\{AUTH_CODE\}\}/g, 'N/A');
+    }
+    
+    // Processing parameters (for template 3)
+    result = result.replace(/\{\{APPROVED_VOLUME\}\}/g, 'N/A');
+    result = result.replace(/\{\{APPROVED_HIGH_TICKET\}\}/g, 'N/A');
+    result = result.replace(/\{\{APPROVED_SWIPE_RATE\}\}/g, 'N/A');
+    result = result.replace(/\{\{CURRENT_VOLUME\}\}/g, 'N/A');
+    result = result.replace(/\{\{CURRENT_HIGH_TICKET\}\}/g, 'N/A');
+    result = result.replace(/\{\{CURRENT_SWIPE_RATE\}\}/g, 'N/A');
+    result = result.replace(/\{\{DORMANT_PERIOD\}\}/g, 'N/A');
+    
+    return result;
+  };
+
+  // Get contact name (mock - in real app would come from API)
+  const contactName = React.useMemo(() => {
+    const owners = [
+      { name: 'John Smith', email: 'john.smith@example.com' },
+      { name: 'Jane Doe', email: 'jane.doe@example.com' },
+    ];
+    return owners[0]?.name || 'Contact';
+  }, []);
+
   // Email templates
   const emailTemplates = React.useMemo(() => {
+    const merchantName = merchantInfo?.merchant || 'Merchant';
+    const merchantId = merchantInfo?.mid || '';
+    
     return {
-      'Missing Documentation Request': {
-        subject: 'Missing Documentation Request - Action Required',
-        body: `Dear ${merchantInfo?.merchant || 'Merchant'},
+      'Duplicate Card Charges Investigation': {
+        subject: 'Action Required: Multiple Transactions on the Same Card – {{MERCHANT_NAME}}',
+        body: `Hello {{CONTACT_NAME}} at {{MERCHANT_NAME}},
 
-We are writing to request additional documentation for your account. This information is required to complete our review process.
+We noticed that multiple transactions were processed on the same credit card. Please see the details below:
 
-Please provide the following documents:
-- Business license
-- Bank statements (last 3 months)
-- Proof of address
+Transaction Date: {{TRANSACTION_DATE}}
+Transaction Amount: {{TRANSACTION_AMOUNT}}
+Card #: {{CARD_MASKED}}
 
-Please submit these documents within 7 business days.
+We would like to confirm the details of these transactions. When you have a moment, please provide a brief explanation as to why the same credit card was charged multiple times on the same day.
 
-If you have any questions, please contact our support team.
+If you were not aware of these transactions and they were processed in error, please notify us and ensure the correct amount is refunded to the cardholder. This will help avoid potential chargebacks.
 
-Best regards,
-Risk Management Team`,
+Please feel free to contact us if you have any questions.
+
+Thank you for your cooperation,
+
+Risk Management Department  
+Talus Payments`,
+        requiresTransaction: true,
       },
-      'Unusual Activity Notification': {
-        subject: 'Unusual Activity Notification - Account Review',
-        body: `Dear ${merchantInfo?.merchant || 'Merchant'},
+      'High Ticket / Large Transaction Verification': {
+        subject: 'Documentation Required: Large Transaction Review – {{MERCHANT_NAME}}',
+        body: `Dear {{CONTACT_NAME}} at {{MERCHANT_NAME}},
 
-We have detected unusual activity on your account that requires our attention. Our automated risk monitoring system has flagged certain transactions for review.
+This email is to collect documentation required to remove a temporary hold of funds. A recent transaction flagged our security system for verification.
 
-We are currently reviewing the following:
-- Transaction patterns
-- Volume changes
-- Risk indicators
+Please provide a copy of the signed credit card receipt and invoice that includes:
+- Cardholder name
+- Billing address
+- Description of products or services rendered
 
-This is a standard review process. We will contact you if any additional information is needed.
+Transaction Details:
+Transaction Date: {{TRANSACTION_DATE}}
+Transaction Amount: {{TRANSACTION_AMOUNT}}
+Card #: {{CARD_MASKED}}
+AVS: {{AVS_CODE}}
+Auth Code: {{AUTH_CODE}}
 
-Thank you for your understanding.
+Please do not release any product or service related to this transaction until our review is complete.
 
-Best regards,
-Risk Management Team`,
+Thank you for your cooperation,
+
+Risk Management Department  
+Talus Payments`,
+        requiresTransaction: true,
       },
-      'Follow-Up: Auto-Hold Review': {
-        subject: 'Follow-Up: Auto-Hold Review - Action Required',
-        body: `Dear ${merchantInfo?.merchant || 'Merchant'},
+      'Processing Outside Approved Parameters': {
+        subject: 'Action Required: Processing Outside Approved Parameters – {{MERCHANT_NAME}}',
+        body: `Hello {{CONTACT_NAME}} at {{MERCHANT_NAME}},
 
-This is a follow-up regarding the auto-hold review for your account. We need to discuss the current status and next steps.
+We are reaching out from the Risk Department regarding recent processing activity on your account.
 
-Please review the following:
-- Current account status
-- Pending transactions
-- Required actions
+Approved Parameters:
+- Average Monthly Volume: {{APPROVED_VOLUME}}
+- High Ticket: {{APPROVED_HIGH_TICKET}}
+- Swipe Rate: {{APPROVED_SWIPE_RATE}}
 
-We recommend scheduling a call to discuss this matter in detail. Please contact us at your earliest convenience.
+Current Activity:
+- Average Monthly Volume: {{CURRENT_VOLUME}}
+- High Ticket: {{CURRENT_HIGH_TICKET}}
+- Swipe Rate: {{CURRENT_SWIPE_RATE}}
 
-Best regards,
-Risk Management Team`,
+Due to this variance, please provide:
+1. Whether this increase is expected to continue
+2. Three most recent business bank statements
+
+Thank you for your cooperation,
+
+Risk Management Department  
+Talus Payments`,
+        requiresTransaction: false,
+      },
+      'Risk Best Practices for Keyed Transactions': {
+        subject: 'Best Practices for Keyed Transactions – {{MERCHANT_NAME}} – {{MERCHANT_ID}}',
+        body: `Dear {{CONTACT_NAME}} at {{MERCHANT_NAME}},
+
+We are reaching out to share best practices for manually entered (keyed) transactions.
+
+For large keyed transactions, we strongly recommend:
+- Obtaining a positive AVS match (Y)
+- Capturing a card imprint or copy (when applicable)
+- Shipping only to the billing address
+- Retaining signed receipts and invoices
+
+Below is a recent transaction for reference:
+Transaction Date: {{TRANSACTION_DATE}}
+Transaction Amount: {{TRANSACTION_AMOUNT}}
+Card #: {{CARD_MASKED}}
+AVS: {{AVS_CODE}}
+Auth Code: {{AUTH_CODE}}
+
+AVS Codes:
+Y = Address and ZIP match  
+A = Address match  
+Z = ZIP match  
+N = No match  
+
+Thank you for helping reduce risk on your account.
+
+Risk Management Department  
+Talus Payments`,
+        requiresTransaction: true,
+      },
+      'Refund Without Offsetting Sale': {
+        subject: 'Refund Verification Required – {{MERCHANT_NAME}}',
+        body: `Hello {{CONTACT_NAME}} at {{MERCHANT_NAME}},
+
+We are reaching out regarding the following refund transaction:
+
+Transaction Date: {{TRANSACTION_DATE}}
+Transaction Amount: {{TRANSACTION_AMOUNT}}
+Card #: {{CARD_MASKED}}
+AVS: {{AVS_CODE}}
+Auth Code: {{AUTH_CODE}}
+
+We are unable to locate an offsetting sale. Please clarify:
+- When the original sale occurred
+- Why the refund amount differs
+- Why the refund was issued to a different card
+
+As a reminder, refunds should always be processed to the original card used.
+
+Thank you,
+
+Risk Management Department  
+Talus Payments`,
+        requiresTransaction: true,
+      },
+      'Processing on Dormant Account': {
+        subject: 'Action Needed: Processing on Dormant Account – {{MERCHANT_NAME}} – {{MERCHANT_ID}}',
+        body: `Dear {{CONTACT_NAME}} at {{MERCHANT_NAME}},
+
+We are reaching out regarding recent activity on your account after a period of inactivity.
+
+Please provide documentation for the following transaction(s):
+Transaction Date: {{TRANSACTION_DATE}}
+Transaction Amount: {{TRANSACTION_AMOUNT}}
+Card #: {{CARD_MASKED}}
+AVS: {{AVS_CODE}}
+Auth Code: {{AUTH_CODE}}
+
+It appears there was no processing activity during:
+{{DORMANT_PERIOD}}
+
+Please clarify:
+- Reason for dormancy
+- Any ownership or business changes
+- Whether alternative processors were used
+- Whether dormancy is seasonal or expected
+
+Thank you for your cooperation,
+
+Risk Management Department  
+Talus Payments`,
+        requiresTransaction: true,
       },
     };
-  }, [merchantInfo?.merchant]);
+  }, [merchantInfo?.merchant, merchantInfo?.mid]);
   
+  // Get available templates based on whether a transaction is selected
+  const availableTemplates = React.useMemo(() => {
+    if (selectedTransaction) {
+      // When transaction is selected, show only templates that require transaction data
+      return Object.entries(emailTemplates)
+        .filter(([_, template]) => template.requiresTransaction)
+        .map(([key]) => ({ label: key, value: key }));
+    } else {
+      // When no transaction is selected, show all templates
+      return Object.keys(emailTemplates).map((key) => ({ label: key, value: key }));
+    }
+  }, [selectedTransaction, emailTemplates]);
+
   const templateCollection = React.useMemo(
-    () =>
-      createListCollection({
-        items: [
-          { label: 'Missing Documentation Request', value: 'Missing Documentation Request' },
-          { label: 'Unusual Activity Notification', value: 'Unusual Activity Notification' },
-          { label: 'Follow-Up: Auto-Hold Review', value: 'Follow-Up: Auto-Hold Review' },
-        ],
-      }),
-    []
+    () => createListCollection({ items: availableTemplates }),
+    [availableTemplates]
   );
   
   // Handle template selection
   React.useEffect(() => {
     if (selectedTemplate && emailTemplates[selectedTemplate as keyof typeof emailTemplates]) {
       const template = emailTemplates[selectedTemplate as keyof typeof emailTemplates];
-      setEmailSubject(template.subject);
-      setEmailBody(template.body);
+      const merchantName = merchantInfo?.merchant || 'Merchant';
+      const merchantId = merchantInfo?.mid || '';
+      
+      // Replace placeholders
+      const subject = replaceTemplatePlaceholders(
+        template.subject,
+        selectedTransaction,
+        merchantName,
+        contactName
+      );
+      const body = replaceTemplatePlaceholders(
+        template.body,
+        selectedTransaction,
+        merchantName,
+        contactName
+      );
+      
+      setEmailSubject(subject);
+      setEmailBody(body);
     }
-  }, [selectedTemplate, emailTemplates]);
+  }, [selectedTemplate, emailTemplates, selectedTransaction, merchantInfo, contactName]);
 
   const status = merchantInfo?.status || 'Unreviewed';
   
@@ -388,6 +618,8 @@ Risk Management Team`,
   };
 
   const handleOpenEmailDrawer = () => {
+    // Reset selected transaction when opening drawer without clicking a transaction
+    setSelectedTransaction(null);
     setIsEmailDrawerOpen(true);
     setSelectedTemplate('');
     setEmailSubject('');
@@ -475,21 +707,31 @@ Risk Management Team`,
 
   const handleTransactionClick = (transaction: MerchantTransaction) => {
     setSelectedTransaction(transaction);
-    // Pre-fill email with transaction details
-    const transactionDetails = `
-Transaction Details:
-- MID: ${transaction.mid}
-- Amount: ${transaction.amount}
-- Date: ${transaction.date}
-- Merchant: ${transaction.merchant || transaction.dbaName}
-- Status: ${transaction.status}
-
-Please review this transaction and take appropriate action.
-
-Best regards,
-Risk Management Team`;
-    setEmailSubject(`Transaction Review Required - ${transaction.mid}`);
-    setEmailBody(transactionDetails);
+    
+    // Pre-fill email with first transaction-based template (Duplicate Card Charges Investigation)
+    const templateKey = 'Duplicate Card Charges Investigation';
+    const template = emailTemplates[templateKey];
+    
+    if (template) {
+      const merchantName = merchantInfo?.merchant || transaction.merchant || transaction.dbaName || 'Merchant';
+      const subject = replaceTemplatePlaceholders(
+        template.subject,
+        transaction,
+        merchantName,
+        contactName
+      );
+      const body = replaceTemplatePlaceholders(
+        template.body,
+        transaction,
+        merchantName,
+        contactName
+      );
+      
+      setSelectedTemplate(templateKey);
+      setEmailSubject(subject);
+      setEmailBody(body);
+    }
+    
     setEmailRecipients([firstOwnerEmail]);
     setNewRecipient('');
     setIsEmailDrawerOpen(true);

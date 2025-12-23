@@ -132,7 +132,6 @@ export default function OverviewTab(): React.JSX.Element | null {
             <Table.Row>
               <Table.ColumnHeader>Rule</Table.ColumnHeader>
               <Table.ColumnHeader>Type</Table.ColumnHeader>
-              <Table.ColumnHeader>Severity</Table.ColumnHeader>
               <Table.ColumnHeader>Status</Table.ColumnHeader>
             </Table.Row>
           </Table.Header>
@@ -160,31 +159,6 @@ export default function OverviewTab(): React.JSX.Element | null {
                   <Table.Cell>
                     <Badge variant="subtle" colorPalette="gray">
                       {rule.type}
-                    </Badge>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <Badge
-                      variant="subtle"
-                      colorPalette={getSeverityColor(rule.severity)}
-                      px={3}
-                      py={1}
-                      borderRadius="md"
-                      bg={
-                        rule.severity === 'Critical'
-                          ? 'red.100'
-                          : rule.severity === 'Moderate'
-                            ? 'amber.100'
-                            : 'blue.100'
-                      }
-                      color={
-                        rule.severity === 'Critical'
-                          ? 'red.700'
-                          : rule.severity === 'Moderate'
-                            ? 'amber.700'
-                            : 'blue.700'
-                      }
-                    >
-                      {rule.severity}
                     </Badge>
                   </Table.Cell>
                   <Table.Cell>

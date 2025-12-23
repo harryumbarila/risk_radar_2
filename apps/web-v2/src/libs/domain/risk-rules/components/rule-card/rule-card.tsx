@@ -80,16 +80,20 @@ export default function RuleCard({ rule, onView, onToggle }: RuleCardProps): Rea
               {rule.description}
             </Text>
           </VStack>
-          <Badge
-            variant="subtle"
-            colorPalette={getSeverityColor(rule.severity)}
-            px={3}
-            py={1}
-            borderRadius="md"
-          >
-            {rule.severity}
-          </Badge>
         </HStack>
+
+        <Text
+          fontSize="xs"
+          color="gray.600"
+          style={{
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          }}
+        >
+          {rule.description || 'No description'}
+        </Text>
 
         <HStack gap={4} flexWrap="wrap" fontSize="xs" color="gray.600">
           <HStack gap={1}>

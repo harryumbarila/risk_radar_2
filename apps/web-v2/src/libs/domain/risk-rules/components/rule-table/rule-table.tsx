@@ -183,7 +183,7 @@ export default function RuleTable(): React.JSX.Element {
             <Table.ColumnHeader>Rule</Table.ColumnHeader>
             <Table.ColumnHeader>Type</Table.ColumnHeader>
             <Table.ColumnHeader>Source</Table.ColumnHeader>
-            <Table.ColumnHeader>Severity</Table.ColumnHeader>
+            <Table.ColumnHeader>Function</Table.ColumnHeader>
             <Table.ColumnHeader>Status</Table.ColumnHeader>
             <Table.ColumnHeader>Last Updated</Table.ColumnHeader>
             <Table.ColumnHeader>Actions</Table.ColumnHeader>
@@ -213,23 +213,9 @@ export default function RuleTable(): React.JSX.Element {
               }}
             >
               <Table.Cell>
-                <VStack align="start" gap={1}>
-                  <Text fontSize="sm" fontWeight="semibold" color="gray.900">
-                    {rule.name}
-                  </Text>
-                  <Text
-                    fontSize="xs"
-                    color="gray.500"
-                    style={{
-                      display: '-webkit-box',
-                      WebkitLineClamp: 1,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    {rule.description}
-                  </Text>
-                </VStack>
+                <Text fontSize="sm" fontWeight="semibold" color="gray.900">
+                  {rule.name}
+                </Text>
               </Table.Cell>
               <Table.Cell>
                 <Badge variant="subtle" colorPalette="gray">
@@ -242,15 +228,18 @@ export default function RuleTable(): React.JSX.Element {
                 </Text>
               </Table.Cell>
               <Table.Cell>
-                <Badge
-                  variant="subtle"
-                  colorPalette={getSeverityColor(rule.severity)}
-                  px={3}
-                  py={1}
-                  borderRadius="md"
+                <Text
+                  fontSize="sm"
+                  color="gray.600"
+                  style={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                  }}
                 >
-                  {rule.severity}
-                </Badge>
+                  {rule.description || 'No description'}
+                </Text>
               </Table.Cell>
               <Table.Cell>
                 <Box

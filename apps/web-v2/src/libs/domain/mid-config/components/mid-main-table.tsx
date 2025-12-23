@@ -85,8 +85,6 @@ export default function MIDMainTable({ midData, isLoading }: MIDMainTableProps):
           <Table.Row>
             <Table.ColumnHeader>MID</Table.ColumnHeader>
             <Table.ColumnHeader>Merchant</Table.ColumnHeader>
-            <Table.ColumnHeader>Processor</Table.ColumnHeader>
-            <Table.ColumnHeader>Risk Level</Table.ColumnHeader>
             <Table.ColumnHeader>Whitelisted Rules</Table.ColumnHeader>
             <Table.ColumnHeader>Last Updated</Table.ColumnHeader>
             <Table.ColumnHeader>Actions</Table.ColumnHeader>
@@ -111,36 +109,6 @@ export default function MIDMainTable({ midData, isLoading }: MIDMainTableProps):
                 <Text fontSize="sm" color="gray.700">
                   {mid.merchant}
                 </Text>
-              </Table.Cell>
-              <Table.Cell>
-                <Text fontSize="sm" color="gray.700">
-                  {mid.processor}
-                </Text>
-              </Table.Cell>
-              <Table.Cell>
-                <Badge
-                  variant="subtle"
-                  colorPalette={getRiskLevelColor(mid.risk_level)}
-                  px={3}
-                  py={1}
-                  borderRadius="md"
-                  bg={
-                    mid.risk_level === 'High'
-                      ? 'red.100'
-                      : mid.risk_level === 'Medium'
-                        ? 'amber.100'
-                        : 'emerald.100'
-                  }
-                  color={
-                    mid.risk_level === 'High'
-                      ? 'red.700'
-                      : mid.risk_level === 'Medium'
-                        ? 'amber.700'
-                        : 'emerald.700'
-                  }
-                >
-                  {mid.risk_level}
-                </Badge>
               </Table.Cell>
               <Table.Cell>
                 <Badge

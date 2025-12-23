@@ -143,15 +143,6 @@ export default function RuleDetailDrawer(): React.JSX.Element | null {
                     <Text fontSize="xl" fontWeight="bold" color="gray.900">
                       {selectedRule.name}
                     </Text>
-                    <Badge
-                      variant="subtle"
-                      colorPalette={getSeverityColor(selectedRule.severity)}
-                      px={3}
-                      py={1}
-                      borderRadius="md"
-                    >
-                      {selectedRule.severity}
-                    </Badge>
                     <Badge variant="subtle" colorPalette="gray">
                       {selectedRule.type}
                     </Badge>
@@ -286,20 +277,6 @@ export default function RuleDetailDrawer(): React.JSX.Element | null {
                           <Text fontSize="sm" color="gray.900">
                             {selectedRule.source}
                           </Text>
-                        </HStack>
-                        <HStack justify="space-between">
-                          <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                            Severity:
-                          </Text>
-                          <Badge
-                            variant="subtle"
-                            colorPalette={getSeverityColor(selectedRule.severity)}
-                            px={3}
-                            py={1}
-                            borderRadius="md"
-                          >
-                            {selectedRule.severity}
-                          </Badge>
                         </HStack>
                         <HStack justify="space-between">
                           <Text fontSize="sm" fontWeight="medium" color="gray.600">

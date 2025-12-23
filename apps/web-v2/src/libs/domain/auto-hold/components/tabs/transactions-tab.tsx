@@ -448,6 +448,46 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
     return [];
   }, [transactions, dataSource]);
 
+  // Helper function to enrich transaction with table data
+  const enrichTransaction = (transaction: MerchantTransaction, rowData: any): MerchantTransaction => {
+    // Extract AVS code from various formats
+    let avsCode = '';
+    let avsResult = '';
+    if (rowData?.avsResultCode) {
+      // Format: "Y - Match" -> extract "Y"
+      const match = rowData.avsResultCode.match(/^([YNZA])/);
+      avsCode = match ? match[1] : '';
+      avsResult = rowData.avsResultCode;
+    } else if (rowData?.avsCode) {
+      avsCode = rowData.avsCode;
+      avsResult = rowData.avsCode;
+    }
+
+    // Extract card number
+    let cardNumber = transaction.cardNumber;
+    let cardLastFour = transaction.cardLastFour;
+    let cardFirstSix = transaction.cardFirstSix;
+    
+    if (rowData?.cardF6 && rowData?.cardL4) {
+      cardNumber = `${rowData.cardF6} •••• ${rowData.cardL4}`;
+      cardLastFour = rowData.cardL4;
+      cardFirstSix = rowData.cardF6;
+    }
+
+    // Extract auth code
+    const authCode = rowData?.apprCode || rowData?.authCode || transaction.authCode;
+
+    return {
+      ...transaction,
+      cardNumber,
+      cardLastFour,
+      cardFirstSix,
+      authCode,
+      avsCode,
+      avsResult,
+    };
+  };
+
   const getTableTitle = () => {
     switch (dataSource) {
       case 'Auth':
@@ -543,8 +583,10 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
               key={index}
               onClick={() => {
                 const transaction = transactions[index];
+                const rowData = tableData[index];
                 if (transaction && onTransactionClick) {
-                  onTransactionClick(transaction);
+                  const enrichedTransaction = enrichTransaction(transaction, rowData);
+                  onTransactionClick(enrichedTransaction);
                 }
               }}
               cursor={onTransactionClick ? 'pointer' : 'default'}
@@ -680,8 +722,10 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
               key={index}
               onClick={() => {
                 const transaction = transactions[index];
+                const rowData = tableData[index];
                 if (transaction && onTransactionClick) {
-                  onTransactionClick(transaction);
+                  const enrichedTransaction = enrichTransaction(transaction, rowData);
+                  onTransactionClick(enrichedTransaction);
                 }
               }}
               cursor={onTransactionClick ? 'pointer' : 'default'}
@@ -781,8 +825,10 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
               key={index}
               onClick={() => {
                 const transaction = transactions[index];
+                const rowData = tableData[index];
                 if (transaction && onTransactionClick) {
-                  onTransactionClick(transaction);
+                  const enrichedTransaction = enrichTransaction(transaction, rowData);
+                  onTransactionClick(enrichedTransaction);
                 }
               }}
               cursor={onTransactionClick ? 'pointer' : 'default'}
@@ -853,8 +899,10 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
               key={index}
               onClick={() => {
                 const transaction = transactions[index];
+                const rowData = tableData[index];
                 if (transaction && onTransactionClick) {
-                  onTransactionClick(transaction);
+                  const enrichedTransaction = enrichTransaction(transaction, rowData);
+                  onTransactionClick(enrichedTransaction);
                 }
               }}
               cursor={onTransactionClick ? 'pointer' : 'default'}

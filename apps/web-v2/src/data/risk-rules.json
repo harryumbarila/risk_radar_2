@@ -1,489 +1,508 @@
 [
   {
     "id": "AH001",
-    "name": "Bank Change Rule",
+    "name": "Bank Account Change Risk",
     "type": "Auto Hold",
     "source": "TSYS DFT256 Capture",
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Detects bank change patterns that may indicate fraudulent activity.",
+    "description": "Flags merchants with a recent bank account change combined with high current-day CNP capture activity.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.8,
-      "window": "24h",
-      "min_transactions": 100
+      "cnp_amount_threshold": 0,
+      "bank_account_change_recency_window_days": 0,
+      "capture_transaction_type": ""
     }
   },
   {
     "id": "AH002",
-    "name": "Foreign Card Rule",
+    "name": "Foreign Card",
     "type": "Auto Hold",
     "source": "TSYS ADF Auth",
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Monitors transactions from foreign cards and flags suspicious patterns.",
+    "description": "Detects foreign-issued card transactions to mitigate cross-border fraud risk.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.6,
-      "country_list": ["MX", "BR"],
-      "max_daily_attempts": 5
+      "issuer_country_code_non_us": "",
+      "authorized_amount": 0
     }
   },
   {
     "id": "AH003",
-    "name": "High Trans Rule",
+    "name": "High Transaction Volume",
     "type": "Auto Hold",
     "source": "TSYS ADF Auth",
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Identifies high-value transactions that exceed normal thresholds.",
+    "description": "Flags merchants with unusually high transaction volume compared to historical averages.",
     "created_by": "System",
     "last_execution": "2025-01-15T16:45:00Z",
     "parameters": {
-      "threshold": 0.9,
-      "max_amount": 10000,
-      "currency": "USD"
+      "current_authorized_amount": 0,
+      "prior_2_month_average_volume": 0,
+      "daily_volume_multiplier_threshold": 0
     }
   },
   {
     "id": "AH004",
-    "name": "High $ Batch Rule",
+    "name": "High Dollar Batch",
     "type": "Auto Hold",
     "source": "TSYS ADF Auth",
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags batches with unusually high dollar amounts.",
+    "description": "Identifies batches where total authorized amount exceeds defined thresholds.",
     "created_by": "System",
     "last_execution": "2025-01-15T18:00:00Z",
     "parameters": {
-      "threshold": 0.85,
-      "max_batch_amount": 50000
+      "sum_authorized_amounts_per_batch": 0,
+      "batch_dollar_threshold": 0,
+      "processing_status": ""
     }
   },
   {
     "id": "AH005",
-    "name": "Dormant account for 90 days settled",
+    "name": "Dormant / Not Processing Large Transaction",
     "type": "Auto Hold",
     "source": "TSYS DFT256 Capture",
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Detects activity on accounts that have been dormant for 90 days or more.",
+    "description": "Flags large transactions on merchants that were dormant or not recently processing.",
     "created_by": "System",
     "last_execution": "2025-01-15T12:00:00Z",
     "parameters": {
-      "dormant_days": 90,
-      "threshold": 0.7
+      "single_transaction_amount_threshold": 0,
+      "lookback_window_prior_activity": 0,
+      "minimum_transaction_count": 0
     }
   },
   {
     "id": "AH006",
-    "name": "Prepaid Rule",
+    "name": "Prepaid Card",
     "type": "Auto Hold",
     "source": "TSYS ADF Auth",
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Monitors prepaid card transactions for suspicious patterns.",
+    "description": "Detects high-value prepaid card transactions to prevent misuse.",
     "created_by": "System",
     "last_execution": "2025-01-15T10:15:00Z",
     "parameters": {
-      "threshold": 0.6,
-      "max_prepaid_transactions": 10
+      "card_type_prepaid": "",
+      "authorized_amount_threshold": 0,
+      "funding_source_indicator": ""
     }
   },
   {
     "id": "AH007",
-    "name": "Risk thresholds",
+    "name": "Merchant Risk Thresholds",
     "type": "Auto Hold",
     "source": "TSYS ADF Auth",
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Applies risk thresholds to identify high-risk transactions.",
+    "description": "Compares merchant activity against custom risk thresholds for volume, ticket size, and declines.",
     "created_by": "System",
     "last_execution": "2025-01-15T08:20:00Z",
     "parameters": {
-      "threshold": 0.8,
-      "risk_score_max": 100
+      "max_transaction_count": 0,
+      "max_authorized_amount": 0,
+      "decline_rate_threshold": 0
     }
   },
   {
     "id": "AH008",
-    "name": "CNP High Ticket",
+    "name": "Net CNP High Ticket",
     "type": "Auto Hold",
     "source": "TSYS ADF Auth",
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags high-value Card Not Present transactions.",
+    "description": "Flags high-value card-not-present transactions exceeding historical norms.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.9,
-      "max_cnp_amount": 5000
+      "cnp_transaction_indicator": "",
+      "authorized_amount": 0,
+      "prior_month_cnp_average": 0,
+      "highest_historical_ticket": 0
     }
   },
   {
     "id": "AH009",
-    "name": "CP High Ticket",
+    "name": "Net CP High Ticket",
     "type": "Auto Hold",
     "source": "TSYS ADF Auth",
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags high-value Card Present transactions.",
+    "description": "Flags high-value card-present transactions exceeding historical norms.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.7,
-      "max_cp_amount": 10000
+      "cp_transaction_indicator": "",
+      "authorized_amount": 0,
+      "prior_month_cp_average": 0,
+      "highest_historical_ticket": 0
     }
   },
   {
     "id": "AH010",
-    "name": "Over tip",
+    "name": "Settlement Exceeds Authorization",
     "type": "Auto Hold",
     "source": "TSYS DFT256 Capture",
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Detects excessive tip amounts that may indicate fraud.",
+    "description": "Flags transactions where settlement materially exceeds authorization amount.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.6,
-      "max_tip_percentage": 30
+      "authorization_amount": 0,
+      "settlement_amount": 0,
+      "percent_delta_threshold": 0
     }
   },
   {
     "id": "AH011",
-    "name": "New account high keyed transaction amount",
+    "name": "New / Not Processing Keyed Volume",
     "type": "Auto Hold",
     "source": "TSYS DFT256 Capture",
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags high-value keyed transactions on new accounts.",
+    "description": "Flags keyed transactions exceeding threshold for new or inactive merchants.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.8,
-      "max_keyed_amount": 5000,
-      "account_age_days": 30
+      "keyed_entry_mode_indicator": "",
+      "keyed_amount_threshold": 0,
+      "new_not_processing_merchant_flag": false
     }
   },
   {
     "id": "AH012",
-    "name": "New account high batch amount",
+    "name": "New / Not Processing Net Deposit",
     "type": "Auto Hold",
     "source": "TSYS DFT256 Capture",
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags high-value batches on new accounts.",
+    "description": "Flags batches with high net deposit for merchants that are new or not processing.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.8,
-      "max_batch_amount": 20000,
-      "account_age_days": 30
+      "net_deposit_amount_per_batch": 0,
+      "new_inactive_merchant_status": ""
     }
   },
   {
     "id": "AH013",
-    "name": "Duplicate Card Usage by merchant in 30 days",
+    "name": "Duplicate Card Usage (30 Days)",
     "type": "Auto Hold",
     "source": "TSYS DFT256 Capture",
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Detects duplicate card usage by the same merchant within 30 days.",
+    "description": "Flags same card (first 6 / last 4) used with same amount across multiple days in a 30-day window.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.9,
-      "lookback_days": 30
+      "card_f6_l4_match": "",
+      "amount_match": 0,
+      "30_day_rolling_window": 0,
+      "recurring_indicator_exclusion": false
     }
   },
   {
     "id": "AH014",
-    "name": "Processing account high transaction amount",
+    "name": "Highest Single Transaction in Batch",
     "type": "Auto Hold",
     "source": "TSYS DFT256 Capture",
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags high-value transactions on processing accounts.",
+    "description": "Flags batches where the single highest transaction exceeds threshold.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.7,
-      "max_transaction_amount": 10000
+      "highest_transaction_amount_in_batch": 0,
+      "processing_status": ""
     }
   },
   {
     "id": "AH015",
-    "name": "Processing account high batch amount",
+    "name": "High Net Deposit in Batch",
     "type": "Auto Hold",
     "source": "TSYS DFT256 Capture",
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags high-value batches on processing accounts.",
+    "description": "Flags batches where net deposit exceeds configured threshold.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.7,
-      "max_batch_amount": 50000
+      "net_deposit_amount": 0,
+      "batch_deposit_threshold": 0
     }
   },
   {
     "id": "AH016",
-    "name": "Late Presentment",
+    "name": "Late Presentments",
     "type": "Auto Hold",
     "source": "TSYS DFT256 Capture",
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Detects transactions presented after the expected time window.",
+    "description": "Flags transactions presented significantly later than authorization date.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.6,
-      "max_hours_delay": 48
+      "days_between_auth_date_transmission_date": 0,
+      "late_presentment_threshold": 0
     }
   },
   {
     "id": "AH017",
-    "name": "New account CNP %",
+    "name": "New / Dormant Merchant Activity Spike",
     "type": "Auto Hold",
     "source": "TSYS ADF Auth",
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Monitors Card Not Present transaction percentage on new accounts.",
+    "description": "Detects activity spikes on new or dormant merchants.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.7,
-      "max_cnp_percentage": 80,
-      "account_age_days": 30
+      "total_transaction_count": 0,
+      "total_authorized_amount": 0,
+      "cnp_percentage": 0,
+      "prior_inactivity_period": 0
     }
   },
   {
     "id": "AH018",
-    "name": "High chargeback count and amount",
+    "name": "High Chargeback Count & Amount",
     "type": "Auto Hold",
     "source": "TSYS TDDF Settle",
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags merchants with high chargeback counts and amounts.",
+    "description": "Flags merchants with high chargeback volume or value.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.9,
-      "max_chargeback_count": 10,
-      "max_chargeback_amount": 5000
+      "chargeback_count": 0,
+      "chargeback_amount": 0,
+      "authorized_volume_baseline": 0
     }
   },
   {
     "id": "AH019",
-    "name": "Processing account high $ daily activity",
+    "name": "High Dollar Daily Activity",
     "type": "Auto Hold",
     "source": "TSYS ADF Auth",
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Monitors daily dollar activity on processing accounts.",
+    "description": "Flags merchants with unusually high authorized volume within a single day.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.7,
-      "max_daily_amount": 100000
+      "rolling_24_hour_authorized_amount": 0,
+      "daily_dollar_threshold": 0
     }
   },
   {
     "id": "AH020",
-    "name": "Monthly Volume- New accounts",
+    "name": "Monthly Volume (New / Dormant)",
     "type": "Auto Hold",
     "source": "TSYS ADF Auth",
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Monitors monthly transaction volume for new accounts.",
+    "description": "Detects new or dormant merchants exceeding expected monthly volume.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.7,
-      "max_monthly_volume": 50000,
-      "account_age_days": 30
+      "current_month_total_volume": 0,
+      "average_monthly_sales_baseline": 0,
+      "cnp_cp_mix": ""
     }
   },
   {
     "id": "AH021",
-    "name": "Monthly Volume- Processing accounts",
+    "name": "Monthly Volume (Processing)",
     "type": "Auto Hold",
     "source": "TSYS ADF Auth",
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Monitors monthly transaction volume for processing accounts.",
+    "description": "Flags processing merchants whose monthly volume exceeds historical averages.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.7,
-      "max_monthly_volume": 200000
+      "current_month_total_volume": 0,
+      "12_month_average_volume": 0,
+      "chargeback_threshold": 0
     }
   },
   {
     "id": "AH022",
-    "name": "Refunds without offsetting sales",
+    "name": "Refund Without Offsetting Sale",
     "type": "Auto Hold",
     "source": "TSYS DFT256 Capture",
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Detects refunds that are not offset by corresponding sales transactions.",
+    "description": "Flags excessive refunds without matching positive sales.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.9,
-      "max_unmatched_refunds": 5
+      "refund_count": 0,
+      "refund_amount": 0,
+      "30_90_day_lookback_window": 0,
+      "matching_sales_absence": false
     }
   },
   {
     "id": "AH023",
-    "name": "Negative Batch",
+    "name": "Negative Batch vs Recent Positives",
     "type": "Auto Hold",
     "source": "TSYS DFT256 Capture",
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags batches with negative net amounts.",
+    "description": "Flags negative net deposit batches inconsistent with recent positive capture activity.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 1.0
+      "net_batch_amount": 0,
+      "prior_capture_totals": 0,
+      "ratio_threshold": 0
     }
   },
   {
     "id": "AH024",
-    "name": "High dollar amount refund",
+    "name": "High-Dollar Refund",
     "type": "Auto Hold",
     "source": "TSYS DFT256 Capture",
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags refunds exceeding high dollar thresholds.",
+    "description": "Flags any single refund exceeding a high-dollar threshold.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.7,
-      "max_refund_amount": 5000
+      "refund_amount_threshold": 0
     }
   },
   {
     "id": "AH025",
-    "name": "Duplicate Card Usage by merchant in 24 hours",
+    "name": "Duplicate Card Usage (24 Hours)",
     "type": "Auto Hold",
     "source": "TSYS DFT256 Capture",
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Detects duplicate card usage by the same merchant within 24 hours.",
+    "description": "Flags same card charged repeatedly within 24 hours.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.9,
-      "lookback_hours": 24
+      "card_f6_l4_match": "",
+      "24_hour_window": 0,
+      "count_threshold": 0
     }
   },
   {
     "id": "AH026",
-    "name": "Duplicate BIN Usage by merchant",
+    "name": "Duplicate BIN Usage with Low History",
     "type": "Auto Hold",
     "source": "TSYS DFT256 Capture",
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Detects duplicate Bank Identification Number usage by the same merchant.",
+    "description": "Flags high usage of same BIN when merchant has low historical volume.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.7,
-      "lookback_days": 7
+      "bin_match_first_6": "",
+      "transaction_count": 0,
+      "prior_3_month_average_volume": 0
     }
   },
   {
     "id": "AH027",
-    "name": "Small amount trans",
+    "name": "Small Amount Transactions",
     "type": "Auto Hold",
     "source": "TSYS ADF Auth",
     "severity": "Info",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Monitors small amount transactions for testing patterns.",
+    "description": "Detects patterns of small transactions following large ones within short time window.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.5,
-      "max_small_amount": 1.00
+      "small_transaction_amount_threshold": 0,
+      "prior_large_transaction_trigger": 0,
+      "48_hour_window": 0
     }
   },
   {
     "id": "AH028",
-    "name": "Processing account CNP %",
+    "name": "Processing Accounts CNP% Anomaly",
     "type": "Auto Hold",
     "source": "TSYS ADF Auth",
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Monitors Card Not Present transaction percentage on processing accounts.",
+    "description": "Flags merchants with abnormal CNP percentage relative to history.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.7,
-      "max_cnp_percentage": 90
+      "cnp_percentage": 0,
+      "prior_cnp_baseline": 0,
+      "monthly_transaction_count": 0
     }
   },
   {
     "id": "AH029",
-    "name": "High dollar percentage refund",
+    "name": "High-Dollar % Refund vs Historic Volume",
     "type": "Auto Hold",
     "source": "TSYS DFT256 Capture",
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags refunds that represent a high percentage of total sales.",
+    "description": "Flags refunds exceeding a percentage of merchant's average monthly volume.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.7,
-      "max_refund_percentage": 50
+      "refund_amount": 0,
+      "percent_of_average_monthly_volume_threshold": 0
     }
   },
   {
     "id": "AH030",
-    "name": "ACH hold",
+    "name": "ACH Returns",
     "type": "Auto Hold",
     "source": "ACH Returns",
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Holds ACH transactions based on return patterns and risk indicators.",
+    "description": "Flags merchants with excessive ACH return activity.",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "threshold": 0.9,
-      "max_return_count": 3
+      "ach_return_count": 0,
+      "ach_return_amount": 0,
+      "time_window": 0
     }
   }
 ]

@@ -85,8 +85,6 @@ export default function MCCMainTable({ mccData, isLoading }: MCCMainTableProps):
           <Table.Row>
             <Table.ColumnHeader>MCC</Table.ColumnHeader>
             <Table.ColumnHeader>Description</Table.ColumnHeader>
-            <Table.ColumnHeader>Processor</Table.ColumnHeader>
-            <Table.ColumnHeader>Risk Level</Table.ColumnHeader>
             <Table.ColumnHeader>Whitelisted Rules</Table.ColumnHeader>
             <Table.ColumnHeader>Last Updated</Table.ColumnHeader>
             <Table.ColumnHeader>Actions</Table.ColumnHeader>
@@ -111,36 +109,6 @@ export default function MCCMainTable({ mccData, isLoading }: MCCMainTableProps):
                 <Text fontSize="sm" color="gray.700">
                   {mcc.description}
                 </Text>
-              </Table.Cell>
-              <Table.Cell>
-                <Text fontSize="sm" color="gray.700">
-                  {mcc.processor}
-                </Text>
-              </Table.Cell>
-              <Table.Cell>
-                <Badge
-                  variant="subtle"
-                  colorPalette={getRiskLevelColor(mcc.risk_level)}
-                  px={3}
-                  py={1}
-                  borderRadius="md"
-                  bg={
-                    mcc.risk_level === 'High'
-                      ? 'red.100'
-                      : mcc.risk_level === 'Medium'
-                        ? 'amber.100'
-                        : 'emerald.100'
-                  }
-                  color={
-                    mcc.risk_level === 'High'
-                      ? 'red.700'
-                      : mcc.risk_level === 'Medium'
-                        ? 'amber.700'
-                        : 'emerald.700'
-                  }
-                >
-                  {mcc.risk_level}
-                </Badge>
               </Table.Cell>
               <Table.Cell>
                 <Badge

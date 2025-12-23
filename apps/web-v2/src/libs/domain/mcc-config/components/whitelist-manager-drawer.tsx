@@ -101,35 +101,9 @@ export default function WhitelistManagerDrawer(): React.JSX.Element | null {
                       <Text fontSize="xl" fontWeight="bold" color="gray.900">
                         MCC: {currentMCC.mcc}
                       </Text>
-                      <Badge
-                        variant="subtle"
-                        colorPalette={getRiskLevelColor(currentMCC.risk_level)}
-                        px={3}
-                        py={1}
-                        borderRadius="md"
-                        bg={
-                          currentMCC.risk_level === 'High'
-                            ? 'red.100'
-                            : currentMCC.risk_level === 'Medium'
-                              ? 'amber.100'
-                              : 'emerald.100'
-                        }
-                        color={
-                          currentMCC.risk_level === 'High'
-                            ? 'red.700'
-                            : currentMCC.risk_level === 'Medium'
-                              ? 'amber.700'
-                              : 'emerald.700'
-                        }
-                      >
-                        {currentMCC.risk_level}
-                      </Badge>
                     </HStack>
                     <Text fontSize="sm" color="gray.600">
                       {currentMCC.description}
-                    </Text>
-                    <Text fontSize="xs" color="gray.500">
-                      Processor: {currentMCC.processor}
                     </Text>
                   </VStack>
                   <Button

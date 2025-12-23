@@ -20,46 +20,6 @@ export default function RuleFilterBar(): React.JSX.Element {
   const [searchValue, setSearchValue] = React.useState(filters.search);
 
   // Create collections for Select components
-  const typeCollection = React.useMemo(
-    () =>
-      createListCollection({
-        items: [
-          { label: 'All Types', value: 'all' },
-          { label: 'Auto Hold', value: 'Auto Hold' },
-          { label: 'Alert', value: 'Alert' },
-          { label: 'Monitoring', value: 'Monitoring' },
-        ],
-      }),
-    [],
-  );
-
-  const severityCollection = React.useMemo(
-    () =>
-      createListCollection({
-        items: [
-          { label: 'All Severities', value: 'all' },
-          { label: 'Critical', value: 'Critical' },
-          { label: 'Moderate', value: 'Moderate' },
-          { label: 'Info', value: 'Info' },
-        ],
-      }),
-    [],
-  );
-
-  const sourceCollection = React.useMemo(
-    () =>
-      createListCollection({
-        items: [
-          { label: 'All Sources', value: 'all' },
-          { label: 'TSYS', value: 'TSYS' },
-          { label: 'Fluidpay', value: 'Fluidpay' },
-          { label: 'Paya', value: 'Paya' },
-          { label: 'Internal', value: 'Internal' },
-        ],
-      }),
-    [],
-  );
-
   const statusCollection = React.useMemo(
     () =>
       createListCollection({
@@ -98,9 +58,6 @@ export default function RuleFilterBar(): React.JSX.Element {
   };
 
   const getFilterLabel = (key: keyof typeof filters, value: string): string => {
-    if (key === 'type') return `Type: ${value}`;
-    if (key === 'severity') return `Severity: ${value}`;
-    if (key === 'source') return `Source: ${value}`;
     if (key === 'status') return `Status: ${value === 'active' ? 'Active' : 'Inactive'}`;
     return '';
   };
@@ -109,23 +66,6 @@ export default function RuleFilterBar(): React.JSX.Element {
     const chips: Array<{ key: keyof typeof filters; value: string; label: string }> = [];
     if (filters.search) {
       chips.push({ key: 'search', value: filters.search, label: `Search: "${filters.search}"` });
-    }
-    if (filters.type !== 'all') {
-      chips.push({ key: 'type', value: filters.type, label: getFilterLabel('type', filters.type) });
-    }
-    if (filters.severity !== 'all') {
-      chips.push({
-        key: 'severity',
-        value: filters.severity,
-        label: getFilterLabel('severity', filters.severity),
-      });
-    }
-    if (filters.source !== 'all') {
-      chips.push({
-        key: 'source',
-        value: filters.source,
-        label: getFilterLabel('source', filters.source),
-      });
     }
     if (filters.status !== 'all') {
       chips.push({
@@ -173,84 +113,6 @@ export default function RuleFilterBar(): React.JSX.Element {
               suppressHydrationWarning
             />
           </Box>
-
-          {/* Type Filter */}
-          <Select.Root
-            collection={typeCollection}
-            value={[filters.type]}
-            onValueChange={(e) => setFilters({ type: e.value[0] || 'all' })}
-            size="md"
-            width={{ base: '100%', md: '150px' }}
-          >
-            <Select.HiddenSelect />
-            <Select.Trigger suppressHydrationWarning>
-              <Select.ValueText placeholder="Type" />
-            </Select.Trigger>
-            <Select.IndicatorGroup>
-              <Select.Indicator />
-            </Select.IndicatorGroup>
-            <Select.Positioner>
-              <Select.Content>
-                {typeCollection.items.map((item) => (
-                  <Select.Item key={item.value} item={item}>
-                    {item.label}
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Positioner>
-          </Select.Root>
-
-          {/* Severity Filter */}
-          <Select.Root
-            collection={severityCollection}
-            value={[filters.severity]}
-            onValueChange={(e) => setFilters({ severity: e.value[0] || 'all' })}
-            size="md"
-            width={{ base: '100%', md: '150px' }}
-          >
-            <Select.HiddenSelect />
-            <Select.Trigger suppressHydrationWarning>
-              <Select.ValueText placeholder="Severity" />
-            </Select.Trigger>
-            <Select.IndicatorGroup>
-              <Select.Indicator />
-            </Select.IndicatorGroup>
-            <Select.Positioner>
-              <Select.Content>
-                {severityCollection.items.map((item) => (
-                  <Select.Item key={item.value} item={item}>
-                    {item.label}
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Positioner>
-          </Select.Root>
-
-          {/* Source Filter */}
-          <Select.Root
-            collection={sourceCollection}
-            value={[filters.source]}
-            onValueChange={(e) => setFilters({ source: e.value[0] || 'all' })}
-            size="md"
-            width={{ base: '100%', md: '150px' }}
-          >
-            <Select.HiddenSelect />
-            <Select.Trigger suppressHydrationWarning>
-              <Select.ValueText placeholder="Source" />
-            </Select.Trigger>
-            <Select.IndicatorGroup>
-              <Select.Indicator />
-            </Select.IndicatorGroup>
-            <Select.Positioner>
-              <Select.Content>
-                {sourceCollection.items.map((item) => (
-                  <Select.Item key={item.value} item={item}>
-                    {item.label}
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Positioner>
-          </Select.Root>
 
           {/* Status Filter */}
           <Select.Root
