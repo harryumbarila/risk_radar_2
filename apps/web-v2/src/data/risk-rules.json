@@ -7,12 +7,13 @@
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags MIDs (Merchant IDs) with recent bank account changes AND high current-day Card-Not-Present (CNP) capture.",
+    "description": "Flags risky behavior after bank account change",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "cnp_amount_limit": 0,
-      "recency_window_for_bank_change": 0
+      "any_of_following_x_days_batches_from_bank_account_change": 10,
+      "total_keyed_volume_amount_greater_than": 500,
+      "batch_amount_greater_than": 100
     }
   },
   {
@@ -23,12 +24,11 @@
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Detects foreign-issued card transactions to mitigate cross-border fraud risk.",
+    "description": "Detects foreign-issued card risk",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "IssuerCountryCode": "",
-      "AuthorizedAmount": 0
+      "total_foreign_auth_amount_in_batch_greater_than": 500
     }
   },
   {
@@ -39,12 +39,12 @@
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags merchants with unusually high transaction volume compared to historical averages.",
+    "description": "Detects unusually large transactions",
     "created_by": "System",
     "last_execution": "2025-01-15T16:45:00Z",
     "parameters": {
-      "AuthorizedAmount": 0,
-      "prior_2_month_average_volume": 0
+      "auth_transaction_amount_greater_than": 1000,
+      "transaction_greater_than_x_percent_of_previous_2_months_avg_settlement_volume": 130
     }
   },
   {
@@ -55,12 +55,12 @@
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Identifies batches with total authorized amount exceeding predefined thresholds.",
+    "description": "Detects unusually large batches",
     "created_by": "System",
     "last_execution": "2025-01-15T18:00:00Z",
     "parameters": {
-      "sum_of_AuthorizedAmount_per_file": 0,
-      "pos_environment_indicator": ""
+      "batch_amount_greater_than": 1500,
+      "absolute_batch_value_greater_than_x_percent_of_previous_2_months_avg_settlement_volume": 200
     }
   },
   {
@@ -71,13 +71,11 @@
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags large transactions on merchants that were dormant or not processing recently.",
+    "description": "Detects large transactions on inactive merchants",
     "created_by": "System",
     "last_execution": "2025-01-15T12:00:00Z",
     "parameters": {
-      "amount_threshold": 0,
-      "dormancy_lookback_months": 0,
-      "minimum_transactions_in_lookback": 0
+      "transaction_amount_greater_than": 999
     }
   },
   {
@@ -88,12 +86,11 @@
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Detects high-value prepaid card transactions to prevent misuse.",
+    "description": "Detects risky prepaid card usage",
     "created_by": "System",
     "last_execution": "2025-01-15T10:15:00Z",
     "parameters": {
-      "AccountFundingSource": "",
-      "AuthorizedAmount": 0
+      "prepaid_transaction_amount_greater_than_in_batch": 500
     }
   },
   {
@@ -123,14 +120,12 @@
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags high-value card-not-present transactions exceeding historical norms.",
+    "description": "Detects high-ticket CNP transactions",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "cnp_calculation": "",
-      "AuthorizedAmount": 0,
-      "prior_month_cnp_scaled": 0,
-      "average_modified_highest_transaction_amount": 0
+      "auth_transaction_amount_greater_than": 1000,
+      "any_cnp_txn_in_batch_greater_than_x_percent_of_last_month_auth_volume": 20
     }
   },
   {
@@ -141,14 +136,12 @@
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags high-value card-present transactions exceeding historical norms.",
+    "description": "Detects high-ticket CP transactions",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "cp_calculation": "",
-      "AuthorizedAmount": 0,
-      "prior_month_cp_scaled": 0,
-      "average_modified_highest_transaction_amount": 0
+      "auth_transaction_amount_greater_than": 1500,
+      "any_cp_txn_in_batch_greater_than_x_percent_of_last_month_auth_volume": 15
     }
   },
   {
@@ -159,12 +152,12 @@
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags transactions where settlement amount materially exceeds authorization amount.",
+    "description": "Detects capture overruns",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "percent_delta_threshold": 0,
-      "amount_delta_threshold_between_transaction_and_authorization": 0
+      "capture_amount_greater_than_x_percent_of_authorized_amount": 30,
+      "capture_amount_greater_than_dollar_x_of_authorized_amount": 300
     }
   },
   {
@@ -175,12 +168,11 @@
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags keyed transactions above threshold for new or not-processing merchants.",
+    "description": "Detects risky keyed volume",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "keyed_amount_threshold": 0,
-      "new_not_processing_merchant_criteria": ""
+      "any_keyed_capture_transaction_over": 500
     }
   },
   {
@@ -191,12 +183,11 @@
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags batches with high net deposit for new or not-processing merchants.",
+    "description": "Detects abnormal net deposits",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "net_deposit_threshold_per_batch": 0,
-      "new_not_processing_determination": ""
+      "net_deposit_batch_amount_greater_than": 20000
     }
   },
   {
@@ -207,14 +198,13 @@
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags same card and amount used across multiple days in a 30-day window.",
+    "description": "Detects repeated card usage",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "count_threshold": 0,
-      "amount_match": 0,
-      "30_day_window": 0,
-      "exclude_recurring_indicators": false
+      "same_card_transaction_amount_sum_greater_than_in_last_30_days": 300,
+      "same_card_used_more_than_x_times_in_last_30_days": 10,
+      "avg_monthly_txn_count_last_3_months_less_than": 500
     }
   },
   {
@@ -225,12 +215,11 @@
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags batches where the highest transaction exceeds threshold when merchant is processing.",
+    "description": "Detects extreme transactions",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "highest_transaction_amount_threshold": 0,
-      "processing_status": ""
+      "capture_transaction_amount_greater_than": 25000
     }
   },
   {
@@ -241,11 +230,11 @@
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags batches with net deposit above configured threshold.",
+    "description": "Detects abnormal net deposits",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "net_deposit_threshold": 0
+      "net_deposit_batch_amount_greater_than": 50000
     }
   },
   {
@@ -256,12 +245,12 @@
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags transactions presented significantly later than authorization date.",
+    "description": "Detects delayed settlements",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "late_presentment_days_threshold": 0,
-      "compare_transaction_date_vs_transmission_date": ""
+      "transaction_in_batch_over_x_days_old": 30,
+      "minimum_batch_amount_greater_than": 500
     }
   },
   {
@@ -272,14 +261,13 @@
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Detects new or dormant merchants showing sudden spikes in activity.",
+    "description": "Detects spikes in activity",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "total_authorized_transaction_count": 0,
-      "cnp_percent": 0,
-      "total_authorized_amount": 0,
-      "keyed_percent": 0
+      "current_month_total_auth_count_greater_than": 9,
+      "current_month_auth_amount_sum_greater_than": 500,
+      "cnp_auth_percent_greater_than_approved_cnp_percent_by": 5
     }
   },
   {
@@ -290,10 +278,15 @@
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags merchants with high chargeback activity.",
+    "description": "Detects excessive chargebacks",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
-    "parameters": {}
+    "parameters": {
+      "chargeback_count_last_30_days_greater_than": 2,
+      "chargeback_volume_percent_greater_than_x_of_sales_30_days": 5,
+      "chargeback_count_percent_greater_than_x_of_sales_count_30_days": 0.7,
+      "total_chargeback_amount_30_days_greater_than": 500
+    }
   },
   {
     "id": "AH019",
@@ -303,13 +296,13 @@
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags merchants with high daily authorized amounts and chargebacks.",
+    "description": "Detects daily volume spikes",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "rolling_24_hour_total_authorized_amount": 0,
-      "chargeback_count": 0,
-      "average_monthly_volume": 0
+      "last_24h_auth_amount_sum_greater_than": 5000,
+      "chargeback_count_last_12_months_greater_than": 2,
+      "24h_auth_sum_greater_than_x_percent_of_3_month_avg_volume": 20
     }
   },
   {
@@ -320,13 +313,13 @@
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Detects new or dormant merchants with monthly volume exceeding expected limits.",
+    "description": "Detects abnormal monthly growth",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "current_month_total": 0,
-      "average_monthly_sales_volume": 0,
-      "cnp_cp_minimums": ""
+      "current_month_auth_sum_greater_than_x_percent_above_approved_volume": 25,
+      "current_month_cnp_auth_sum_greater_than_or_equal": 3000,
+      "current_month_cp_auth_sum_greater_than_or_equal": 5000
     }
   },
   {
@@ -337,13 +330,16 @@
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags processing merchants with monthly volume and chargebacks above historical averages.",
+    "description": "Detects abnormal growth",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "current_month_total": 0,
-      "12_month_average_volume": 0,
-      "chargeback_threshold": 0
+      "current_month_auth_sum_greater_than_x_percent_above_12_month_avg": 25,
+      "chargeback_count_12_months_greater_than": 2,
+      "monthly_cnp_auth_sum_less_than": 20000,
+      "avg_auth_amount_less_than": 150,
+      "monthly_cp_auth_sum_less_than": 25000,
+      "avg_auth_amount_less_than_2": 250
     }
   },
   {
@@ -354,14 +350,11 @@
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags refunds without matching positive sales or excessive refunds.",
+    "description": "Detects refund abuse",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "90_day_lookback_window": 0,
-      "30_day_lookback_window": 0,
-      "amount_match_logic": "",
-      "count_thresholds": 0
+      "credits_without_offset_sales_30_days_greater_than": 500
     }
   },
   {
@@ -372,13 +365,11 @@
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags negative net deposit batches compared against recent positive capture.",
+    "description": "Detects abnormal negative batches",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "negative_batch_indicator": "",
-      "lookback_aggregate_of_positive_amounts": 0,
-      "ratio_thresholds": 0
+      "negative_batch_greater_than_last_x_days_positive_processing": 4
     }
   },
   {
@@ -389,11 +380,11 @@
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags any single refund exceeding a high-dollar threshold.",
+    "description": "Detects large refunds",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "refund_amount_threshold_absolute_value": 0
+      "any_refund_in_batch_greater_than": 3000
     }
   },
   {
@@ -404,13 +395,12 @@
     "severity": "Critical",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags repeated same card and amount usage within 24 hours.",
+    "description": "Detects rapid reuse",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "1_day_window": 0,
-      "count_threshold": 0,
-      "amount_threshold": 0
+      "same_card_used_more_than_x_times_in_24h": 6,
+      "same_card_total_amount_24h_greater_than": 300
     }
   },
   {
@@ -421,13 +411,13 @@
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags high BIN concentration when merchant has low historical volume.",
+    "description": "Detects BIN abuse",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "bin_count_threshold": 0,
-      "per_transaction_amount_floor": 0,
-      "prior_average_transaction_count_threshold_3_month_average": 0
+      "same_bin_used_more_than_x_times_in_30_days": 10,
+      "transaction_amount_greater_than": 300,
+      "avg_monthly_txn_count_3_months_less_than": 600
     }
   },
   {
@@ -438,12 +428,12 @@
     "severity": "Info",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Detects patterns of small transactions following larger ones within 48 hours.",
+    "description": "Detects micro-txn abuse",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "card_identifier_bin_last_4": "",
-      "transaction_count_thresholds": 0
+      "any_auth_less_than_in_last_24h": 2,
+      "auth_count_24h_greater_than": 10
     }
   },
   {
@@ -454,14 +444,16 @@
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags merchants with anomalous CNP ratios, volume, and counts.",
+    "description": "Detects CNP drift",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "daily_transaction_count": 0,
-      "monthly_amount": 0,
-      "cnp_percent_above_average": 0,
-      "prior_month_counts": 0
+      "cnp_percent_greater_than_x_percent_of_3_month_avg": 10,
+      "each_of_last_3_months_auth_count_greater_than": 9,
+      "safe_harbor_cp_monthly_cp_auth_sum": 50000,
+      "safe_harbor_avg_ticket_avg_auth_amount_1": 250,
+      "safe_harbor_cnp_monthly_cnp_auth_sum": 20000,
+      "safe_harbor_avg_ticket_avg_auth_amount_2": 100
     }
   },
   {
@@ -472,12 +464,12 @@
     "severity": "Moderate",
     "status": true,
     "last_updated": "2025-01-15",
-    "description": "Flags large refunds relative to merchant's historical average volume.",
+    "description": "Detects refund abuse",
     "created_by": "System",
     "last_execution": "2025-01-15T14:30:00Z",
     "parameters": {
-      "percent_of_average_monthly_volume": 0,
-      "refund_amount_floor": 0
+      "minimum_refund_amount": 500,
+      "avg_monthly_auth_amount_less_than": 50
     }
   },
   {
