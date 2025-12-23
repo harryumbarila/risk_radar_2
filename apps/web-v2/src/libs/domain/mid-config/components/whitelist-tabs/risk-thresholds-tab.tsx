@@ -7,7 +7,6 @@ import {
   HStack,
   Text,
   Input,
-  Switch,
   Button,
   Portal,
   Dialog,
@@ -53,12 +52,10 @@ export default function RiskThresholdsTab(): React.JSX.Element | null {
   } = useWhitelistStore();
 
   const [isSaveConfirmOpen, setIsSaveConfirmOpen] = React.useState(false);
-  const [inheritFromMCC, setInheritFromMCC] = React.useState(currentMID?.inherit_from_mcc || false);
   const [fieldErrors, setFieldErrors] = React.useState<Record<string, string>>({});
 
   React.useEffect(() => {
     if (currentMID) {
-      setInheritFromMCC(currentMID.inherit_from_mcc || false);
       if (!tempThresholds && currentMID.thresholds) {
         setTempThresholds(currentMID.thresholds);
       }
@@ -174,37 +171,6 @@ export default function RiskThresholdsTab(): React.JSX.Element | null {
           </Text>
         </Box>
       )}
-
-      {/* Inherit from MCC Toggle */}
-      <Box
-        bg="white"
-        p={4}
-        borderRadius="xl"
-        borderWidth="1px"
-        borderColor="gray.200"
-        boxShadow="0 2px 8px rgba(0,0,0,0.05)"
-      >
-        <HStack justify="space-between" align="center">
-          <VStack align="start" gap={1}>
-            <Text fontSize="sm" fontWeight="semibold" color="gray.900">
-              Inherit defaults from MCC
-            </Text>
-            <Text fontSize="xs" color="gray.500">
-              Use default thresholds from the merchant's MCC category
-            </Text>
-          </VStack>
-          <Switch.Root
-            checked={inheritFromMCC}
-            onCheckedChange={(e) => setInheritFromMCC(e.checked)}
-            colorPalette="blue"
-          >
-            <Switch.HiddenInput />
-            <Switch.Control>
-              <Switch.Thumb />
-            </Switch.Control>
-          </Switch.Root>
-        </HStack>
-      </Box>
 
       {/* Thresholds Form */}
       <Box

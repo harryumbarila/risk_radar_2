@@ -22,19 +22,6 @@ import { toaster } from '@/ui/components/common/atoms/toaster/toaster';
 import riskRulesData from '@/data/risk-rules.json';
 import type { RiskRule } from '@/libs/domain/risk-rules/context/rules-context';
 
-function getSeverityColor(severity: string): string {
-  switch (severity) {
-    case 'Critical':
-      return 'red';
-    case 'Moderate':
-      return 'amber';
-    case 'Info':
-      return 'blue';
-    default:
-      return 'gray';
-  }
-}
-
 export default function ManageWhitelistTab(): React.JSX.Element | null {
   const {
     currentMID,
@@ -47,55 +34,11 @@ export default function ManageWhitelistTab(): React.JSX.Element | null {
   } = useWhitelistStore();
 
   const [searchValue, setSearchValue] = React.useState('');
-  const [typeFilter, setTypeFilter] = React.useState('all');
-  const [severityFilter, setSeverityFilter] = React.useState('all');
-  const [sourceFilter, setSourceFilter] = React.useState('all');
   const [isSaveConfirmOpen, setIsSaveConfirmOpen] = React.useState(false);
   const [isToggleConfirmOpen, setIsToggleConfirmOpen] = React.useState(false);
   const [ruleToToggle, setRuleToToggle] = React.useState<{ id: string; name: string; willExclude: boolean } | null>(null);
 
   const rules = riskRulesData as unknown as RiskRule[];
-
-  // Create collections for Select components
-  const typeCollection = React.useMemo(
-    () =>
-      createListCollection({
-        items: [
-          { label: 'All Types', value: 'all' },
-          { label: 'Auto Hold', value: 'Auto Hold' },
-          { label: 'Alert', value: 'Alert' },
-          { label: 'Monitoring', value: 'Monitoring' },
-        ],
-      }),
-    []
-  );
-
-  const severityCollection = React.useMemo(
-    () =>
-      createListCollection({
-        items: [
-          { label: 'All Severities', value: 'all' },
-          { label: 'Critical', value: 'Critical' },
-          { label: 'Moderate', value: 'Moderate' },
-          { label: 'Info', value: 'Info' },
-        ],
-      }),
-    []
-  );
-
-  const sourceCollection = React.useMemo(
-    () =>
-      createListCollection({
-        items: [
-          { label: 'All Sources', value: 'all' },
-          { label: 'TSYS', value: 'TSYS' },
-          { label: 'Fluidpay', value: 'Fluidpay' },
-          { label: 'Paya', value: 'Paya' },
-          { label: 'Internal', value: 'Internal' },
-        ],
-      }),
-    []
-  );
 
   // Debounce search
   const [debouncedSearch, setDebouncedSearch] = React.useState('');
@@ -119,18 +62,9 @@ export default function ManageWhitelistTab(): React.JSX.Element | null {
           return false;
         }
       }
-      if (typeFilter !== 'all' && rule.type !== typeFilter) {
-        return false;
-      }
-      if (severityFilter !== 'all' && rule.severity !== severityFilter) {
-        return false;
-      }
-      if (sourceFilter !== 'all' && rule.source !== sourceFilter) {
-        return false;
-      }
       return true;
     });
-  }, [rules, debouncedSearch, typeFilter, severityFilter, sourceFilter]);
+  }, [rules, debouncedSearch]);
 
   const handleSaveClick = () => {
     setIsSaveConfirmOpen(true);
@@ -187,12 +121,9 @@ export default function ManageWhitelistTab(): React.JSX.Element | null {
 
   const handleClearFilters = () => {
     setSearchValue('');
-    setTypeFilter('all');
-    setSeverityFilter('all');
-    setSourceFilter('all');
   };
 
-  const hasActiveFilters = searchValue || typeFilter !== 'all' || severityFilter !== 'all' || sourceFilter !== 'all';
+  const hasActiveFilters = searchValue;
 
   if (!currentMID) return null;
 
@@ -237,84 +168,6 @@ export default function ManageWhitelistTab(): React.JSX.Element | null {
               suppressHydrationWarning
             />
           </Box>
-
-          {/* Type Filter */}
-          <Select.Root
-            collection={typeCollection}
-            value={[typeFilter]}
-            onValueChange={(e) => setTypeFilter(e.value[0] || 'all')}
-            size="md"
-            width={{ base: '100%', md: '150px' }}
-          >
-            <Select.HiddenSelect />
-            <Select.Trigger suppressHydrationWarning>
-              <Select.ValueText placeholder="Type" />
-            </Select.Trigger>
-            <Select.IndicatorGroup>
-              <Select.Indicator />
-            </Select.IndicatorGroup>
-            <Select.Positioner>
-              <Select.Content>
-                {typeCollection.items.map((item) => (
-                  <Select.Item item={item} key={item.value}>
-                    {item.label}
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Positioner>
-          </Select.Root>
-
-          {/* Severity Filter */}
-          <Select.Root
-            collection={severityCollection}
-            value={[severityFilter]}
-            onValueChange={(e) => setSeverityFilter(e.value[0] || 'all')}
-            size="md"
-            width={{ base: '100%', md: '150px' }}
-          >
-            <Select.HiddenSelect />
-            <Select.Trigger suppressHydrationWarning>
-              <Select.ValueText placeholder="Severity" />
-            </Select.Trigger>
-            <Select.IndicatorGroup>
-              <Select.Indicator />
-            </Select.IndicatorGroup>
-            <Select.Positioner>
-              <Select.Content>
-                {severityCollection.items.map((item) => (
-                  <Select.Item item={item} key={item.value}>
-                    {item.label}
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Positioner>
-          </Select.Root>
-
-          {/* Source Filter */}
-          <Select.Root
-            collection={sourceCollection}
-            value={[sourceFilter]}
-            onValueChange={(e) => setSourceFilter(e.value[0] || 'all')}
-            size="md"
-            width={{ base: '100%', md: '150px' }}
-          >
-            <Select.HiddenSelect />
-            <Select.Trigger suppressHydrationWarning>
-              <Select.ValueText placeholder="Source" />
-            </Select.Trigger>
-            <Select.IndicatorGroup>
-              <Select.Indicator />
-            </Select.IndicatorGroup>
-            <Select.Positioner>
-              <Select.Content>
-                {sourceCollection.items.map((item) => (
-                  <Select.Item item={item} key={item.value}>
-                    {item.label}
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Positioner>
-          </Select.Root>
 
           {hasActiveFilters && (
             <Button
@@ -410,27 +263,6 @@ export default function ManageWhitelistTab(): React.JSX.Element | null {
                         <HStack gap={2} flexWrap="wrap">
                           <Badge variant="subtle" colorPalette="gray" fontSize="xs">
                             {rule.type}
-                          </Badge>
-                          <Badge
-                            variant="subtle"
-                            colorPalette={getSeverityColor(rule.severity)}
-                            fontSize="xs"
-                            bg={
-                              rule.severity === 'Critical'
-                                ? 'red.100'
-                                : rule.severity === 'Moderate'
-                                  ? 'amber.100'
-                                  : 'blue.100'
-                            }
-                            color={
-                              rule.severity === 'Critical'
-                                ? 'red.700'
-                                : rule.severity === 'Moderate'
-                                  ? 'amber.700'
-                                  : 'blue.700'
-                            }
-                          >
-                            {rule.severity}
                           </Badge>
                           <Text fontSize="xs" color="gray.500">
                             {rule.source}

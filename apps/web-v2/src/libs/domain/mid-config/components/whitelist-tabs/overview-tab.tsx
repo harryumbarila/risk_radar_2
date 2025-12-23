@@ -21,19 +21,6 @@ import { toaster } from '@/ui/components/common/atoms/toaster/toaster';
 import riskRulesData from '@/data/risk-rules.json';
 import type { RiskRule } from '@/libs/domain/risk-rules/context/rules-context';
 
-function getSeverityColor(severity: string): string {
-  switch (severity) {
-    case 'Critical':
-      return 'red';
-    case 'Moderate':
-      return 'amber';
-    case 'Info':
-      return 'blue';
-    default:
-      return 'gray';
-  }
-}
-
 function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString('en-US', {
     year: 'numeric',
