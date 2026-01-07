@@ -18,13 +18,17 @@ import {
 import { X, ChevronDown } from 'lucide-react';
 import { getRuleName } from '../../utils/ruleNames';
 import RuleLabel from '../rule-label/rule-label';
+import { getUsersByGroup, getGroups, getGroupByUserId, type User } from '../../utils/userData';
 
 export interface FilterState {
   dateRange: 'today' | '7' | '14' | '30' | 'custom';
   customStartDate?: string;
   customEndDate?: string;
   processor: 'all' | 'TSYS' | 'FSP';
-  source: 'all' | 'Talus Pay' | 'Global365' | 'SIT' | 'SC Flow';
+  group: 'all' | 'Partner' | 'Direct' | 'F1 - City National' | 'Inside Sales';
+  user: 'all' | string;
+  product: 'all' | 'Talus Pay' | 'Global365 LLC' | 'SIT';
+  mpaType: 'all' | 'Digital' | 'Paper application' | 'E-Sign';
   ruleId: 'all' | string[];
   paymentStage?: ('Authorization' | 'Capture' | 'Settlement' | 'ACH Returns')[];
   week?: number; // For week filter from chart click
@@ -61,15 +65,78 @@ export default function FilterBar({
     ],
   });
 
-  const sourceCollection = createListCollection({
+  const groupCollection = createListCollection({
     items: [
-      { label: 'All Sources', value: 'all' },
-      { label: 'Talus Pay', value: 'Talus Pay' },
-      { label: 'Global365', value: 'Global365' },
-      { label: 'SIT', value: 'SIT' },
-      { label: 'SC Flow', value: 'SC Flow' },
+      { label: 'All Groups', value: 'all' },
+      { label: 'Partner', value: 'Partner' },
+      { label: 'Direct', value: 'Direct' },
+      { label: 'F1 - City National', value: 'F1 - City National' },
+      { label: 'Inside Sales', value: 'Inside Sales' },
     ],
   });
+
+  const productCollection = createListCollection({
+    items: [
+      { label: 'All Products', value: 'all' },
+      { label: 'Talus Pay', value: 'Talus Pay' },
+      { label: 'Global365 LLC', value: 'Global365 LLC' },
+      { label: 'SIT', value: 'SIT' },
+    ],
+  });
+
+  const mpaTypeCollection = createListCollection({
+    items: [
+      { label: 'All MPA Types', value: 'all' },
+      { label: 'Digital', value: 'Digital' },
+      { label: 'Paper application', value: 'Paper application' },
+      { label: 'E-Sign', value: 'E-Sign' },
+    ],
+  });
+
+  // Get users based on selected group
+  // If a user is selected but group is 'all', show users from that user's group
+  const effectiveGroup = React.useMemo(() => {
+    if (filters.group && filters.group !== 'all') {
+      return filters.group;
+    }
+    // If group is 'all' but user is selected, get the user's group
+    if (filters.user && filters.user !== 'all') {
+      const userGroup = getGroupByUserId(filters.user);
+      return userGroup || 'all';
+    }
+    return 'all';
+  }, [filters.group, filters.user]);
+
+  // Group users by user class
+  const groupedUsers = React.useMemo(() => {
+    const users = getUsersByGroup(effectiveGroup);
+    const grouped: Record<string, User[]> = {};
+    
+    users.forEach((user: User) => {
+      if (!grouped[user.userClass]) {
+        grouped[user.userClass] = [];
+      }
+      const userClassArray = grouped[user.userClass];
+      if (userClassArray) {
+        userClassArray.push(user);
+      }
+    });
+    
+    return grouped;
+  }, [effectiveGroup]);
+
+  const availableUsers = React.useMemo(() => {
+    const users = getUsersByGroup(effectiveGroup);
+    return createListCollection({
+      items: [
+        { label: 'All Users', value: 'all' },
+        ...users.map((user: User) => ({
+          label: user.name,
+          value: user.id,
+        })),
+      ],
+    });
+  }, [effectiveGroup]);
 
   const paymentStageCollection = createListCollection({
     items: [
@@ -111,8 +178,15 @@ export default function FilterBar({
       delete newFilters.customEndDate;
     } else if (key === 'processor') {
       newFilters.processor = 'all';
-    } else if (key === 'source') {
-      newFilters.source = 'all';
+    } else if (key === 'group') {
+      newFilters.group = 'all';
+      newFilters.user = 'all'; // Reset user when group changes
+    } else if (key === 'user') {
+      newFilters.user = 'all';
+    } else if (key === 'product') {
+      newFilters.product = 'all';
+    } else if (key === 'mpaType') {
+      newFilters.mpaType = 'all';
     } else if (key === 'ruleId') {
       newFilters.ruleId = 'all';
     } else if (key === 'paymentStage') {
@@ -127,7 +201,10 @@ export default function FilterBar({
     onFiltersChange({
       dateRange: '7',
       processor: 'all',
-      source: 'all',
+      group: 'all',
+      user: 'all',
+      product: 'all',
+      mpaType: 'all',
       ruleId: 'all',
       paymentStage: undefined,
     });
@@ -138,7 +215,10 @@ export default function FilterBar({
   const hasActiveFilters =
     filters.dateRange !== 'today' ||
     filters.processor !== 'all' ||
-    filters.source !== 'all' ||
+    filters.group !== 'all' ||
+    filters.user !== 'all' ||
+    filters.product !== 'all' ||
+    filters.mpaType !== 'all' ||
     (Array.isArray(filters.ruleId) ? filters.ruleId.length > 0 : filters.ruleId !== 'all') ||
     (filters.paymentStage !== undefined && filters.paymentStage.length > 0) ||
     filters.week !== undefined ||
@@ -148,7 +228,10 @@ export default function FilterBar({
   const activeFilterCount = [
     filters.dateRange !== 'today',
     filters.processor !== 'all',
-    filters.source !== 'all',
+    filters.group !== 'all',
+    filters.user !== 'all',
+    filters.product !== 'all',
+    filters.mpaType !== 'all',
     (Array.isArray(filters.ruleId) ? filters.ruleId.length > 0 : filters.ruleId !== 'all'),
     (filters.paymentStage !== undefined && filters.paymentStage.length > 0),
     filters.week !== undefined,
@@ -304,16 +387,177 @@ export default function FilterBar({
             </Select.Root>
           </VStack>
 
-          {/* Source */}
+          {/* Group */}
           <VStack align="start" gap={1}>
             <Text fontSize="xs" color="gray.600">
-              Source
+              Group
             </Text>
             <Select.Root
-              collection={sourceCollection}
-              value={[filters.source || 'all']}
+              collection={groupCollection}
+              value={[filters.group || 'all']}
+              onValueChange={(e) => {
+                const newGroup = (e.value[0] || 'all') as FilterState['group'];
+                const previousGroup = filters.group || 'all';
+                
+                // If user is selected, check if it belongs to the new group
+                let updatedUser = filters.user || 'all';
+                if (newGroup !== 'all' && filters.user && filters.user !== 'all') {
+                  const userGroup = getGroupByUserId(filters.user);
+                  // If selected user doesn't belong to new group, reset user
+                  if (userGroup !== newGroup) {
+                    updatedUser = 'all';
+                  }
+                } else if (newGroup !== previousGroup) {
+                  // If group changed, reset user
+                  updatedUser = 'all';
+                }
+                
+                // Update both group and user in a single update
+                onFiltersChange({
+                  ...filters,
+                  group: newGroup,
+                  user: updatedUser,
+                });
+              }}
+              size="sm"
+              width="180px"
+            >
+              <Select.HiddenSelect />
+              <Select.Control>
+                <Select.Trigger>
+                  <Select.ValueText />
+                </Select.Trigger>
+                <Select.IndicatorGroup>
+                  <Select.Indicator />
+                </Select.IndicatorGroup>
+              </Select.Control>
+              <Portal>
+                <Select.Positioner>
+                  <Select.Content>
+                    {groupCollection.items.map((item) => (
+                      <Select.Item item={item} key={item.value}>
+                        {item.label}
+                        <Select.ItemIndicator />
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select.Positioner>
+              </Portal>
+            </Select.Root>
+          </VStack>
+
+          {/* User */}
+          <VStack align="start" gap={1}>
+            <Text fontSize="xs" color="gray.600">
+              User
+            </Text>
+            <Select.Root
+              collection={availableUsers}
+              value={[filters.user || 'all']}
+              onValueChange={(e) => {
+                const selectedUserId = e.value[0] || 'all';
+                if (selectedUserId === 'all') {
+                  updateFilter('user', 'all');
+                } else {
+                  // Get the group for the selected user
+                  const userGroup = getGroupByUserId(selectedUserId);
+                  if (userGroup) {
+                    // Update both user and group in a single update
+                    onFiltersChange({
+                      ...filters,
+                      user: selectedUserId,
+                      group: userGroup as FilterState['group'],
+                    });
+                  } else {
+                    updateFilter('user', selectedUserId);
+                  }
+                }
+              }}
+              size="sm"
+              width="220px"
+              disabled={effectiveGroup === 'all'}
+            >
+              <Select.HiddenSelect />
+              <Select.Control>
+                <Select.Trigger>
+                  <Select.ValueText />
+                </Select.Trigger>
+                <Select.IndicatorGroup>
+                  <Select.Indicator />
+                </Select.IndicatorGroup>
+              </Select.Control>
+              <Portal>
+                <Select.Positioner>
+                  <Select.Content>
+                    {/* All Users option */}
+                    {availableUsers.items[0] && (
+                      <Select.Item item={availableUsers.items[0]} key="all">
+                        {availableUsers.items[0].label}
+                        <Select.ItemIndicator />
+                      </Select.Item>
+                    )}
+                    
+                    {/* Grouped users by user class */}
+                    {Object.entries(groupedUsers).map(([userClass, users]) => (
+                      <React.Fragment key={userClass}>
+                        {/* User Class Header (not selectable) */}
+                        <Box
+                          px={4}
+                          py={2}
+                          bg="blue.50"
+                          borderLeftWidth="3px"
+                          borderLeftColor="blue.500"
+                          borderTopWidth="1px"
+                          borderBottomWidth="1px"
+                          borderColor="gray.200"
+                          cursor="default"
+                          userSelect="none"
+                          pointerEvents="none"
+                          mt={Object.keys(groupedUsers).indexOf(userClass) > 0 ? 1 : 0}
+                        >
+                          <Text 
+                            fontSize="xs" 
+                            fontWeight="bold" 
+                            color="blue.700"
+                            letterSpacing="0.025em"
+                            textTransform="uppercase"
+                          >
+                            {userClass}
+                          </Text>
+                        </Box>
+                        {/* Users in this class */}
+                        {users.map((user: User) => {
+                          const item = availableUsers.items.find(i => i.value === user.id);
+                          if (!item) return null;
+                          return (
+                            <Select.Item item={item} key={user.id}>
+                              <Box pl={4}>
+                                <Text fontSize="sm" fontWeight="normal" color="gray.900">
+                                  {user.name}
+                                </Text>
+                              </Box>
+                              <Select.ItemIndicator />
+                            </Select.Item>
+                          );
+                        })}
+                      </React.Fragment>
+                    ))}
+                  </Select.Content>
+                </Select.Positioner>
+              </Portal>
+            </Select.Root>
+          </VStack>
+
+          {/* Product */}
+          <VStack align="start" gap={1}>
+            <Text fontSize="xs" color="gray.600">
+              Product
+            </Text>
+            <Select.Root
+              collection={productCollection}
+              value={[filters.product || 'all']}
               onValueChange={(e) =>
-                updateFilter('source', (e.value[0] || 'all') as FilterState['source'])
+                updateFilter('product', (e.value[0] || 'all') as FilterState['product'])
               }
               size="sm"
               width="150px"
@@ -330,7 +574,45 @@ export default function FilterBar({
               <Portal>
                 <Select.Positioner>
                   <Select.Content>
-                    {sourceCollection.items.map((item) => (
+                    {productCollection.items.map((item) => (
+                      <Select.Item item={item} key={item.value}>
+                        {item.label}
+                        <Select.ItemIndicator />
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select.Positioner>
+              </Portal>
+            </Select.Root>
+          </VStack>
+
+          {/* MPA Type */}
+          <VStack align="start" gap={1}>
+            <Text fontSize="xs" color="gray.600">
+              MPA Type
+            </Text>
+            <Select.Root
+              collection={mpaTypeCollection}
+              value={[filters.mpaType || 'all']}
+              onValueChange={(e) =>
+                updateFilter('mpaType', (e.value[0] || 'all') as FilterState['mpaType'])
+              }
+              size="sm"
+              width="180px"
+            >
+              <Select.HiddenSelect />
+              <Select.Control>
+                <Select.Trigger>
+                  <Select.ValueText />
+                </Select.Trigger>
+                <Select.IndicatorGroup>
+                  <Select.Indicator />
+                </Select.IndicatorGroup>
+              </Select.Control>
+              <Portal>
+                <Select.Positioner>
+                  <Select.Content>
+                    {mpaTypeCollection.items.map((item) => (
                       <Select.Item item={item} key={item.value}>
                         {item.label}
                         <Select.ItemIndicator />
@@ -588,7 +870,7 @@ export default function FilterBar({
                 </Button>
               </Badge>
             )}
-            {filters.source !== 'all' && (
+            {filters.group !== 'all' && (
               <Badge
                 colorPalette="purple"
                 variant="subtle"
@@ -596,13 +878,80 @@ export default function FilterBar({
                 py={1}
                 borderRadius="md"
               >
-                Source: {filters.source}
+                Group: {filters.group}
                 <Button
                   size="xs"
                   variant="ghost"
                   ml={2}
-                  onClick={() => clearFilter('source')}
-                  aria-label="Remove source filter"
+                  onClick={() => clearFilter('group')}
+                  aria-label="Remove group filter"
+                >
+                  <X size={12} />
+                </Button>
+              </Badge>
+            )}
+            {filters.user !== 'all' && (
+              <Badge
+                colorPalette="purple"
+                variant="subtle"
+                px={2}
+                py={1}
+                borderRadius="md"
+              >
+                User: {(() => {
+                  const userItem = availableUsers.items.find(u => u.value === filters.user);
+                  if (userItem) {
+                    const user = getUsersByGroup(effectiveGroup).find((u: User) => u.id === filters.user);
+                    return user ? user.name : userItem.label;
+                  }
+                  return filters.user;
+                })()}
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  ml={2}
+                  onClick={() => clearFilter('user')}
+                  aria-label="Remove user filter"
+                >
+                  <X size={12} />
+                </Button>
+              </Badge>
+            )}
+            {filters.product !== 'all' && (
+              <Badge
+                colorPalette="purple"
+                variant="subtle"
+                px={2}
+                py={1}
+                borderRadius="md"
+              >
+                Product: {filters.product}
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  ml={2}
+                  onClick={() => clearFilter('product')}
+                  aria-label="Remove product filter"
+                >
+                  <X size={12} />
+                </Button>
+              </Badge>
+            )}
+            {filters.mpaType !== 'all' && (
+              <Badge
+                colorPalette="purple"
+                variant="subtle"
+                px={2}
+                py={1}
+                borderRadius="md"
+              >
+                MPA Type: {filters.mpaType}
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  ml={2}
+                  onClick={() => clearFilter('mpaType')}
+                  aria-label="Remove MPA type filter"
                 >
                   <X size={12} />
                 </Button>

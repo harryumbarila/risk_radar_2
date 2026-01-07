@@ -52,7 +52,10 @@ export default function Home() {
     return {
       dateRange: 'today',
       processor: 'all',
-      source: 'all',
+      group: 'all',
+      user: 'all',
+      product: 'all',
+      mpaType: 'all',
       ruleId: allRuleIds, // All 30 rules selected by default
     };
   });
@@ -225,7 +228,10 @@ export default function Home() {
     // Build query params from filters
     const params = new URLSearchParams();
     if (filters.processor !== 'all') params.set('processor', filters.processor);
-    if (filters.source !== 'all') params.set('source', filters.source);
+    if (filters.group !== 'all') params.set('group', filters.group);
+    if (filters.user !== 'all') params.set('user', filters.user);
+    if (filters.product !== 'all') params.set('product', filters.product);
+    if (filters.mpaType !== 'all') params.set('mpaType', filters.mpaType);
     if (filters.ruleId !== 'all') {
       const ruleIds = Array.isArray(filters.ruleId) ? filters.ruleId : [filters.ruleId];
       params.set('rule', ruleIds.join(','));

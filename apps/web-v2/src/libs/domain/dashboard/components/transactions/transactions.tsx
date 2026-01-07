@@ -1187,11 +1187,6 @@ export default function CustomTable({ filters }: CustomTableProps) {
       filtered = filtered.filter((tx) => tx.processor === filters.processor);
     }
 
-    // Filter by source
-    if (filters.source && filters.source !== 'all') {
-      filtered = filtered.filter((tx) => tx.source === filters.source);
-    }
-
     // Filter by data source
     if (filters.dataSource && filters.dataSource !== 'all') {
       filtered = filtered.filter((tx) => tx.source === filters.dataSource);
