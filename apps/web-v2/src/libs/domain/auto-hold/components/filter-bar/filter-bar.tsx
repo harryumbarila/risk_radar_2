@@ -18,7 +18,7 @@ import {
 import { X, Search, ChevronDown } from 'lucide-react';
 import { getRuleName } from '@/libs/domain/dashboard/utils/ruleNames';
 import RuleLabel from '@/libs/domain/dashboard/components/rule-label/rule-label';
-import { getUsersByGroup, getGroupByUserId, type User } from '@/libs/domain/dashboard/utils/userData';
+import { getUsersByGroup, getGroupByUserId, getUserById, type User } from '@/libs/domain/dashboard/utils/userData';
 
 // Helper functions to format dates between YYYY-MM-DD (internal) and MM/DD/YYYY (display)
 const formatDateForDisplay = (dateString: string | undefined): string => {
@@ -137,25 +137,31 @@ export default function AutoHoldFilterBar({
   });
 
   // Get users based on selected group
-  // If a user is selected but group is 'all', show users from that user's group
+  // If group is 'all', show all users (not filtered by group)
   const effectiveGroup = React.useMemo(() => {
     if (filters.group && filters.group !== 'all') {
       return filters.group;
     }
-    // If group is 'all' but user is selected, get the user's group
-    if (filters.user && filters.user !== 'all') {
-      const userGroup = getGroupByUserId(filters.user);
-      return userGroup || 'all';
-    }
     return 'all';
-  }, [filters.group, filters.user]);
+  }, [filters.group]);
 
-  // Group users by user class
+  // State for user search query
+  const [userSearchQuery, setUserSearchQuery] = React.useState('');
+
+  // Group users by user class, filtered by search query
   const groupedUsers = React.useMemo(() => {
     const users = getUsersByGroup(effectiveGroup);
+    
+    // Filter by search query if present
+    const filteredUsers = userSearchQuery.trim()
+      ? users.filter((user: User) =>
+          user.name.toLowerCase().includes(userSearchQuery.toLowerCase())
+        )
+      : users;
+    
     const grouped: Record<string, User[]> = {};
     
-    users.forEach((user: User) => {
+    filteredUsers.forEach((user: User) => {
       if (!grouped[user.userClass]) {
         grouped[user.userClass] = [];
       }
@@ -166,20 +172,28 @@ export default function AutoHoldFilterBar({
     });
     
     return grouped;
-  }, [effectiveGroup]);
+  }, [effectiveGroup, userSearchQuery]);
 
   const availableUsers = React.useMemo(() => {
     const users = getUsersByGroup(effectiveGroup);
+    
+    // Filter by search query if present
+    const filteredUsers = userSearchQuery.trim()
+      ? users.filter((user: User) =>
+          user.name.toLowerCase().includes(userSearchQuery.toLowerCase())
+        )
+      : users;
+    
     return createListCollection({
       items: [
         { label: 'All Users', value: 'all' },
-        ...users.map((user: User) => ({
+        ...filteredUsers.map((user: User) => ({
           label: user.name,
           value: user.id,
         })),
       ],
     });
-  }, [effectiveGroup]);
+  }, [effectiveGroup, userSearchQuery]);
 
   const dataSourceCollection = createListCollection({
     items: [
@@ -568,10 +582,11 @@ export default function AutoHoldFilterBar({
                     updateFilter('user', selectedUserId);
                   }
                 }
+                // Clear search query when user is selected
+                setUserSearchQuery('');
               }}
               size="sm"
               width="220px"
-              disabled={effectiveGroup === 'all'}
             >
               <Select.HiddenSelect />
               <Select.Control>
@@ -585,6 +600,36 @@ export default function AutoHoldFilterBar({
               <Portal>
                 <Select.Positioner>
                   <Select.Content>
+                    {/* Search Input */}
+                    <Box px={2} py={2} borderBottomWidth="1px" borderColor="gray.200">
+                      <Box position="relative">
+                        <Box
+                          position="absolute"
+                          left={3}
+                          top="50%"
+                          transform="translateY(-50%)"
+                          zIndex={1}
+                          pointerEvents="none"
+                          color="gray.400"
+                        >
+                          <Search size={16} />
+                        </Box>
+                        <Input
+                          size="sm"
+                          placeholder="Search user..."
+                          value={userSearchQuery}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            setUserSearchQuery(e.target.value);
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          onKeyDown={(e) => e.stopPropagation()}
+                          pl={10}
+                          suppressHydrationWarning
+                        />
+                      </Box>
+                    </Box>
+                    
                     {/* All Users option */}
                     {availableUsers.items[0] && (
                       <Select.Item item={availableUsers.items[0]} key="all">
@@ -594,50 +639,58 @@ export default function AutoHoldFilterBar({
                     )}
                     
                     {/* Grouped users by user class */}
-                    {Object.entries(groupedUsers).map(([userClass, users]) => (
-                      <React.Fragment key={userClass}>
-                        {/* User Class Header (not selectable) */}
-                        <Box
-                          px={4}
-                          py={2}
-                          bg="blue.50"
-                          borderLeftWidth="3px"
-                          borderLeftColor="blue.500"
-                          borderTopWidth="1px"
-                          borderBottomWidth="1px"
-                          borderColor="gray.200"
-                          cursor="default"
-                          userSelect="none"
-                          pointerEvents="none"
-                          mt={Object.keys(groupedUsers).indexOf(userClass) > 0 ? 1 : 0}
-                        >
-                          <Text 
-                            fontSize="xs" 
-                            fontWeight="bold" 
-                            color="blue.700"
-                            letterSpacing="0.025em"
-                            textTransform="uppercase"
+                    {Object.keys(groupedUsers).length > 0 ? (
+                      Object.entries(groupedUsers).map(([userClass, users]) => (
+                        <React.Fragment key={userClass}>
+                          {/* User Class Header (not selectable) */}
+                          <Box
+                            px={4}
+                            py={2}
+                            bg="blue.50"
+                            borderLeftWidth="3px"
+                            borderLeftColor="blue.500"
+                            borderTopWidth="1px"
+                            borderBottomWidth="1px"
+                            borderColor="gray.200"
+                            cursor="default"
+                            userSelect="none"
+                            pointerEvents="none"
+                            mt={Object.keys(groupedUsers).indexOf(userClass) > 0 ? 1 : 0}
                           >
-                            {userClass}
-                          </Text>
-                        </Box>
-                        {/* Users in this class */}
-                        {users.map((user: User) => {
-                          const item = availableUsers.items.find(i => i.value === user.id);
-                          if (!item) return null;
-                          return (
-                            <Select.Item item={item} key={user.id}>
-                              <Box pl={4}>
-                                <Text fontSize="sm" fontWeight="normal" color="gray.900">
-                                  {user.name}
-                                </Text>
-                              </Box>
-                              <Select.ItemIndicator />
-                            </Select.Item>
-                          );
-                        })}
-                      </React.Fragment>
-                    ))}
+                            <Text 
+                              fontSize="xs" 
+                              fontWeight="bold" 
+                              color="blue.700"
+                              letterSpacing="0.025em"
+                              textTransform="uppercase"
+                            >
+                              {userClass}
+                            </Text>
+                          </Box>
+                          {/* Users in this class */}
+                          {users.map((user: User) => {
+                            const item = availableUsers.items.find(i => i.value === user.id);
+                            if (!item) return null;
+                            return (
+                              <Select.Item item={item} key={user.id}>
+                                <Box pl={4}>
+                                  <Text fontSize="sm" fontWeight="normal" color="gray.900">
+                                    {user.name}
+                                  </Text>
+                                </Box>
+                                <Select.ItemIndicator />
+                              </Select.Item>
+                            );
+                          })}
+                        </React.Fragment>
+                      ))
+                    ) : userSearchQuery.trim() ? (
+                      <Box px={4} py={3}>
+                        <Text fontSize="sm" color="gray.500">
+                          No users found
+                        </Text>
+                      </Box>
+                    ) : null}
                   </Select.Content>
                 </Select.Positioner>
               </Portal>
@@ -1058,12 +1111,8 @@ export default function AutoHoldFilterBar({
                 gap={1}
               >
                 User: {(() => {
-                  const userItem = availableUsers.items.find(u => u.value === filters.user);
-                  if (userItem) {
-                    const user = getUsersByGroup(effectiveGroup).find((u: User) => u.id === filters.user);
-                    return user ? user.name : userItem.label;
-                  }
-                  return filters.user;
+                  const user = getUserById(filters.user);
+                  return user ? user.name : filters.user;
                 })()}
                 <Button
                   size="xs"
