@@ -2,7 +2,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, VStack, Text, HStack, Tooltip, Portal, Select, createListCollection, Button, Drawer, Badge, Table, CloseButton, SimpleGrid } from '@chakra-ui/react';
-import { Info, X, TrendingUp, TrendingDown, Minus, FileText, Check, Copy } from 'lucide-react';
+import { Info, X, FileText, Check, Copy } from 'lucide-react';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
 import {
   AreaChart,
@@ -1441,19 +1441,6 @@ function HeatmapCellDrawer({ isOpen, onClose, selectedCell, paymentStage, onTran
     }
   }, [selectedCell?.ruleId, selectedCell?.dateIndex, isOpen]);
 
-  // Calculate trend vs previous day (mock)
-  const previousDayValue = selectedCell ? Math.floor(selectedCell.value * (0.7 + Math.random() * 0.6)) : 0;
-  const trend = selectedCell 
-    ? selectedCell.value > previousDayValue 
-      ? 'up' 
-      : selectedCell.value < previousDayValue 
-        ? 'down' 
-        : 'neutral'
-    : 'neutral';
-  const trendPercentage = selectedCell && previousDayValue > 0
-    ? Math.abs(((selectedCell.value - previousDayValue) / previousDayValue) * 100).toFixed(1)
-    : '0';
-
   // Handle ESC key
   React.useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -1513,7 +1500,7 @@ function HeatmapCellDrawer({ isOpen, onClose, selectedCell, paymentStage, onTran
                       {stages.join(', ') || activePaymentStage}
                     </Text>
                   </HStack>
-                  <SimpleGrid columns={4} gap={3} w="full" mt={2}>
+                  <SimpleGrid columns={3} gap={3} w="full" mt={2}>
                     <VStack align="start" gap={0}>
                       <Text fontSize="xs" color="gray.500">Total</Text>
                       <Text fontSize="sm" fontWeight="bold">{selectedCell.value.toLocaleString()}</Text>
@@ -1521,17 +1508,6 @@ function HeatmapCellDrawer({ isOpen, onClose, selectedCell, paymentStage, onTran
                     <VStack align="start" gap={0}>
                       <Text fontSize="xs" color="gray.500">Share</Text>
                       <Text fontSize="sm" fontWeight="bold">{selectedCell.percentage.toFixed(1)}%</Text>
-                    </VStack>
-                    <VStack align="start" gap={0}>
-                      <Text fontSize="xs" color="gray.500">Trend</Text>
-                      <HStack gap={1} align="center">
-                        {trend === 'up' && <TrendingUp size={12} color="#10b981" />}
-                        {trend === 'down' && <TrendingDown size={12} color="#ef4444" />}
-                        {trend === 'neutral' && <Minus size={12} color="#6b7280" />}
-                        <Text fontSize="xs" fontWeight="semibold" color={trend === 'up' ? 'green.600' : trend === 'down' ? 'red.600' : 'gray.600'}>
-                          {trend === 'up' ? '+' : trend === 'down' ? '-' : ''}{trendPercentage}%
-                        </Text>
-                      </HStack>
                     </VStack>
                     <VStack align="start" gap={0}>
                       <Text fontSize="xs" color="gray.500">Intensity</Text>

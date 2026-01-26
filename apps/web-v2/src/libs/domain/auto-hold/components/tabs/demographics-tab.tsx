@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { Box, VStack, Text, HStack, Badge, SimpleGrid, Tooltip, Portal } from '@chakra-ui/react';
-import { MapPin, Building2, DollarSign, Calendar, CreditCard, TrendingUp, TrendingDown, Info } from 'lucide-react';
+import { MapPin, Building2, DollarSign, Calendar, CreditCard, Info } from 'lucide-react';
 
 interface DemographicsTabProps {
   merchantId: string;
@@ -118,17 +118,31 @@ export default function DemographicsTab({ merchantId, merchantName }: Demographi
     },
     activatedDate: '2024-01-15',
     netBalance: '$125,450.00',
-    netBalanceChange: 12.5, // percentage change
     ownership: 'LLC',
     mcc: '5655',
     merchantType: 'E-commerce',
-    cardPresent: 45.8,
     // Financial Snapshot additional fields
-    approvedVolume: '$98,750.00',
-    highTicket: '$2,500.00',
-    swipeRate: 65.2, // percentage
+    approvedVolume: {
+      approved: '$98,750.00',
+      real: '$95,200.00',
+    },
+    highTicketPercent: {
+      approved: 12.5, // percentage
+      real: 11.8, // percentage
+    },
+    avgTicket: {
+      approved: '$125.50',
+      real: '$121.30',
+    },
+    swipeRate: {
+      approved: 65.2, // percentage
+      real: 63.5, // percentage
+    },
+    cardPresent: {
+      approved: 45.8, // percentage
+      real: 44.2, // percentage
+    },
     ndf: 'Yes', // Next Day Funding
-    avgTicket: '$125.50',
     transCountDailyApproved: 785,
   };
 
@@ -139,8 +153,6 @@ export default function DemographicsTab({ merchantId, merchantName }: Demographi
       year: 'numeric' 
     });
   };
-
-  const isPositiveTrend = demographicsData.netBalanceChange > 0;
 
   return (
     <VStack align="stretch" gap={0}>
@@ -251,19 +263,6 @@ export default function DemographicsTab({ merchantId, merchantName }: Demographi
                   </HStack>
                   <HStack gap={3} flexWrap="wrap">
                     <VStack align="start" gap={0.5}>
-                      <HStack gap={1} align="center">
-                        <Box color="#6B7280">
-                          <CreditCard size={12} />
-                        </Box>
-                        <Text fontSize="xs" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
-                          Card Present
-                        </Text>
-                      </HStack>
-                      <Text fontSize="sm" fontWeight="semibold" color="#111827">
-                        {demographicsData.cardPresent}%
-                      </Text>
-                    </VStack>
-                    <VStack align="start" gap={0.5}>
                       <Text fontSize="xs" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
                         MCC
                       </Text>
@@ -327,29 +326,9 @@ export default function DemographicsTab({ merchantId, merchantName }: Demographi
                     Net Balance
                   </Text>
                 </HStack>
-                <HStack gap={2} align="baseline" flexWrap="wrap">
-                  <Text fontSize="lg" fontWeight="semibold" color="#111827">
-                    {demographicsData.netBalance}
-                  </Text>
-                  <HStack gap={0.5} align="center">
-                    {isPositiveTrend ? (
-                      <Box color="green.600">
-                        <TrendingUp size={14} />
-                      </Box>
-                    ) : (
-                      <Box color="red.600">
-                        <TrendingDown size={14} />
-                      </Box>
-                    )}
-                    <Text 
-                      fontSize="xs" 
-                      fontWeight="semibold" 
-                      color={isPositiveTrend ? 'green.600' : 'red.600'}
-                    >
-                      {Math.abs(demographicsData.netBalanceChange)}%
-                    </Text>
-                  </HStack>
-                </HStack>
+                <Text fontSize="lg" fontWeight="semibold" color="#111827">
+                  {demographicsData.netBalance}
+                </Text>
               </VStack>
               
               {/* Approved Volume */}
@@ -359,27 +338,57 @@ export default function DemographicsTab({ merchantId, merchantName }: Demographi
                     <DollarSign size={12} />
                   </Box>
                   <Text fontSize="xs" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
-                    Approved Volume
+                    Volume
                   </Text>
                 </HStack>
-                <Text fontSize="sm" fontWeight="semibold" color="#111827">
-                  {demographicsData.approvedVolume}
-                </Text>
+                <VStack align="start" gap={0.5}>
+                  <HStack gap={2} align="baseline">
+                    <Text fontSize="xs" color="#9CA3AF" fontWeight="medium">
+                      Approved:
+                    </Text>
+                    <Text fontSize="sm" fontWeight="semibold" color="#111827">
+                      {demographicsData.approvedVolume.approved}
+                    </Text>
+                  </HStack>
+                  <HStack gap={2} align="baseline">
+                    <Text fontSize="xs" color="#9CA3AF" fontWeight="medium">
+                      Real:
+                    </Text>
+                    <Text fontSize="sm" fontWeight="semibold" color="#111827">
+                      {demographicsData.approvedVolume.real}
+                    </Text>
+                  </HStack>
+                </VStack>
               </VStack>
               
-              {/* High Ticket */}
+              {/* % High Ticket */}
               <VStack align="start" gap={0.5}>
                 <HStack gap={1} align="center">
                   <Box color="#6B7280">
                     <DollarSign size={12} />
                   </Box>
                   <Text fontSize="xs" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
-                    High Ticket
+                    % High Ticket
                   </Text>
                 </HStack>
-                <Text fontSize="sm" fontWeight="semibold" color="#111827">
-                  {demographicsData.highTicket}
-                </Text>
+                <VStack align="start" gap={0.5}>
+                  <HStack gap={2} align="baseline">
+                    <Text fontSize="xs" color="#9CA3AF" fontWeight="medium">
+                      Approved:
+                    </Text>
+                    <Text fontSize="sm" fontWeight="semibold" color="#111827">
+                      {demographicsData.highTicketPercent.approved}%
+                    </Text>
+                  </HStack>
+                  <HStack gap={2} align="baseline">
+                    <Text fontSize="xs" color="#9CA3AF" fontWeight="medium">
+                      Real:
+                    </Text>
+                    <Text fontSize="sm" fontWeight="semibold" color="#111827">
+                      {demographicsData.highTicketPercent.real}%
+                    </Text>
+                  </HStack>
+                </VStack>
               </VStack>
               
               {/* Avg Ticket */}
@@ -389,27 +398,57 @@ export default function DemographicsTab({ merchantId, merchantName }: Demographi
                     <DollarSign size={12} />
                   </Box>
                   <Text fontSize="xs" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
-                    Avg Ticket
+                    AVG Ticket
                   </Text>
                 </HStack>
-                <Text fontSize="sm" fontWeight="semibold" color="#111827">
-                  {demographicsData.avgTicket}
-                </Text>
+                <VStack align="start" gap={0.5}>
+                  <HStack gap={2} align="baseline">
+                    <Text fontSize="xs" color="#9CA3AF" fontWeight="medium">
+                      Approved:
+                    </Text>
+                    <Text fontSize="sm" fontWeight="semibold" color="#111827">
+                      {demographicsData.avgTicket.approved}
+                    </Text>
+                  </HStack>
+                  <HStack gap={2} align="baseline">
+                    <Text fontSize="xs" color="#9CA3AF" fontWeight="medium">
+                      Real:
+                    </Text>
+                    <Text fontSize="sm" fontWeight="semibold" color="#111827">
+                      {demographicsData.avgTicket.real}
+                    </Text>
+                  </HStack>
+                </VStack>
               </VStack>
               
-              {/* Swipe Rate */}
+              {/* Card Present */}
               <VStack align="start" gap={0.5}>
                 <HStack gap={1} align="center">
                   <Box color="#6B7280">
                     <CreditCard size={12} />
                   </Box>
                   <Text fontSize="xs" color="#6B7280" textTransform="uppercase" letterSpacing="wider">
-                    Swipe Rate
+                    Card Present
                   </Text>
                 </HStack>
-                <Text fontSize="sm" fontWeight="semibold" color="#111827">
-                  {demographicsData.swipeRate}%
-                </Text>
+                <VStack align="start" gap={0.5}>
+                  <HStack gap={2} align="baseline">
+                    <Text fontSize="xs" color="#9CA3AF" fontWeight="medium">
+                      Approved:
+                    </Text>
+                    <Text fontSize="sm" fontWeight="semibold" color="#111827">
+                      {demographicsData.cardPresent.approved}%
+                    </Text>
+                  </HStack>
+                  <HStack gap={2} align="baseline">
+                    <Text fontSize="xs" color="#9CA3AF" fontWeight="medium">
+                      Real:
+                    </Text>
+                    <Text fontSize="sm" fontWeight="semibold" color="#111827">
+                      {demographicsData.cardPresent.real}%
+                    </Text>
+                  </HStack>
+                </VStack>
               </VStack>
               
               {/* NDF */}

@@ -16,7 +16,7 @@ import {
   Tooltip,
   SimpleGrid,
 } from '@chakra-ui/react';
-import { X, Save, Trash2, Info } from 'lucide-react';
+import { X, Save, Info } from 'lucide-react';
 import { useRules } from '../../context/rules-context';
 import RuleEditForm from '../rule-edit-form/rule-edit-form';
 import RuleAuditLog from '../rule-audit-log/rule-audit-log';
@@ -46,11 +46,10 @@ function formatDate(dateString: string): string {
 }
 
 export default function RuleDetailDrawer(): React.JSX.Element | null {
-  const { selectedRule, isDrawerOpen, closeDrawer, updateRule, deleteRule, isLoading } = useRules();
+  const { selectedRule, isDrawerOpen, closeDrawer, updateRule, isLoading } = useRules();
   const [activeTab, setActiveTab] = React.useState('overview');
   const [formData, setFormData] = React.useState<Record<string, any> | null>(null);
   const [isSaveConfirmOpen, setIsSaveConfirmOpen] = React.useState(false);
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (selectedRule) {
@@ -90,35 +89,6 @@ export default function RuleDetailDrawer(): React.JSX.Element | null {
 
   const handleSaveCancel = () => {
     setIsSaveConfirmOpen(false);
-  };
-
-  const handleDeleteClick = () => {
-    setIsDeleteConfirmOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!selectedRule) return;
-
-    try {
-      await deleteRule(selectedRule.id);
-      toaster.success({
-        title: 'Rule deleted',
-        description: `${selectedRule.name} has been deleted.`,
-        duration: 3000,
-      });
-      setIsDeleteConfirmOpen(false);
-      closeDrawer();
-    } catch (error) {
-      toaster.error({
-        title: 'Error deleting rule',
-        description: 'Failed to delete the rule. Please try again.',
-      });
-      setIsDeleteConfirmOpen(false);
-    }
-  };
-
-  const handleDeleteCancel = () => {
-    setIsDeleteConfirmOpen(false);
   };
 
   if (!selectedRule) return null;
@@ -405,35 +375,21 @@ export default function RuleDetailDrawer(): React.JSX.Element | null {
               borderTopWidth="1px"
               borderColor="gray.200"
             >
-              <HStack justify="space-between" w="full">
+              <HStack justify="flex-end" w="full" gap={3}>
+                <Button variant="outline" onClick={closeDrawer} disabled={isLoading}>
+                  Cancel
+                </Button>
                 <Button
-                  variant="outline"
-                  colorPalette="red"
-                  onClick={handleDeleteClick}
+                  colorPalette="blue"
+                  onClick={handleSaveClick}
                   disabled={isLoading}
-                  aria-label="Delete rule"
+                  aria-label="Save changes"
                 >
                   <HStack gap={1}>
-                    <Trash2 size={16} />
-                    <Text>Delete</Text>
+                    <Save size={16} />
+                    <Text>{isLoading ? 'Saving...' : 'Save'}</Text>
                   </HStack>
                 </Button>
-                <HStack gap={3}>
-                  <Button variant="outline" onClick={closeDrawer} disabled={isLoading}>
-                    Cancel
-                  </Button>
-                  <Button
-                    colorPalette="blue"
-                    onClick={handleSaveClick}
-                    disabled={isLoading}
-                    aria-label="Save changes"
-                  >
-                    <HStack gap={1}>
-                      <Save size={16} />
-                      <Text>{isLoading ? 'Saving...' : 'Save'}</Text>
-                    </HStack>
-                  </Button>
-                </HStack>
               </HStack>
             </Drawer.Footer>
           </Drawer.Content>
@@ -467,40 +423,6 @@ export default function RuleDetailDrawer(): React.JSX.Element | null {
                   loadingText="Saving..."
                 >
                   Save Changes
-                </Button>
-              </Dialog.Footer>
-            </Dialog.Content>
-          </Dialog.Positioner>
-        </Portal>
-      </Dialog.Root>
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog.Root open={isDeleteConfirmOpen} onOpenChange={(e) => {
-        if (!e.open) {
-          handleDeleteCancel();
-        }
-      }}>
-        <Portal>
-          <Dialog.Backdrop />
-          <Dialog.Positioner>
-            <Dialog.Content p={6}>
-              <Dialog.Header pb={4}>
-                <Dialog.Title>Delete Rule</Dialog.Title>
-                <Dialog.Description mt={2}>
-                  Are you sure you want to delete <strong>{selectedRule?.name}</strong>? This action cannot be undone and will permanently remove the rule from the system.
-                </Dialog.Description>
-              </Dialog.Header>
-              <Dialog.Footer pt={4} gap={3}>
-                <Button variant="outline" onClick={handleDeleteCancel}>
-                  Cancel
-                </Button>
-                <Button
-                  colorPalette="red"
-                  onClick={handleDeleteConfirm}
-                  loading={isLoading}
-                  loadingText="Deleting..."
-                >
-                  Delete
                 </Button>
               </Dialog.Footer>
             </Dialog.Content>
