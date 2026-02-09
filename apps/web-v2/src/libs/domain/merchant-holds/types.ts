@@ -45,4 +45,3 @@ export interface ActivityEntry {
   cardNotPresent: 'Yes' | 'No';
   timestamp: Date; // For sorting and filtering
 }
-

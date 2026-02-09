@@ -10,9 +10,57 @@ import {
   Field,
   Tooltip,
   Portal,
+  Badge,
 } from '@chakra-ui/react';
 import { Info } from 'lucide-react';
 import type { RiskRule } from '../../context/rules-context';
+import { getReleaseCriteria } from '../../data/release-criteria';
+
+function ReleaseCriteriaDisplay({ ruleId }: { ruleId: string }): React.JSX.Element | null {
+  const criteria = getReleaseCriteria(ruleId);
+  if (!criteria) return null;
+  return (
+    <VStack align="stretch" gap={3}>
+      <HStack gap={2} align="center">
+        <Text fontSize="sm" fontWeight="medium" color="gray.600">
+          Release Type:
+        </Text>
+        <Badge variant="subtle" colorPalette="blue" size="sm">
+          {criteria.releaseType}
+        </Badge>
+      </HStack>
+      {criteria.releaseType !== 'Never' && (
+        <>
+          <Text fontSize="sm" fontWeight="medium" color="gray.600">
+            Auto-Release Allowed When:
+          </Text>
+          <Box as="ul" listStyleType="disc" pl={5} m={0}>
+            {criteria.conditions.map((line, i) => (
+              <Text key={i} as="li" fontSize="sm" color="gray.800" mb={1}>
+                {line}
+              </Text>
+            ))}
+          </Box>
+        </>
+      )}
+      {criteria.releaseType === 'Never' && (
+        <Text fontSize="sm" color="gray.800">
+          Auto-Release: {criteria.conditions[0]}
+        </Text>
+      )}
+      {criteria.ifNotMet && (
+        <Box pt={2} borderTopWidth="1px" borderColor="gray.200">
+          <Text fontSize="sm" fontWeight="medium" color="gray.600" mb={1}>
+            If Not Met:
+          </Text>
+          <Text fontSize="sm" color="gray.800">
+            {criteria.ifNotMet}
+          </Text>
+        </Box>
+      )}
+    </VStack>
+  );
+}
 
 interface RuleEditFormProps {
   rule: RiskRule;
@@ -21,7 +69,7 @@ interface RuleEditFormProps {
 }
 
 export default function RuleEditForm({
-  rule: _rule,
+  rule,
   formData,
   onFormDataChange,
 }: RuleEditFormProps): React.JSX.Element | null {
@@ -208,6 +256,22 @@ export default function RuleEditForm({
               );
             })}
           </VStack>
+        </Box>
+      )}
+
+      {/* Release Criterias (read-only) */}
+      {getReleaseCriteria(rule.id) && (
+        <Box
+          borderWidth="1px"
+          borderColor="gray.200"
+          borderRadius="md"
+          p={4}
+          bg="gray.50"
+        >
+          <Text fontSize="xs" fontWeight="bold" color="gray.500" mb={4} textTransform="uppercase">
+            Release Criterias
+          </Text>
+          <ReleaseCriteriaDisplay ruleId={rule.id} />
         </Box>
       )}
 
