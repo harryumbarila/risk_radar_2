@@ -19,8 +19,9 @@ import { getReleaseCriteria } from '../../data/release-criteria';
 function ReleaseCriteriaDisplay({ ruleId }: { ruleId: string }): React.JSX.Element | null {
   const criteria = getReleaseCriteria(ruleId);
   if (!criteria) return null;
+  const isNever = criteria.releaseType === 'Never';
   return (
-    <VStack align="stretch" gap={3}>
+    <VStack align="stretch" gap={4}>
       <HStack gap={2} align="center">
         <Text fontSize="sm" fontWeight="medium" color="gray.600">
           Release Type:
@@ -29,35 +30,36 @@ function ReleaseCriteriaDisplay({ ruleId }: { ruleId: string }): React.JSX.Eleme
           {criteria.releaseType}
         </Badge>
       </HStack>
-      {criteria.releaseType !== 'Never' && (
-        <>
-          <Text fontSize="sm" fontWeight="medium" color="gray.600">
-            Auto-Release Allowed When:
+      <Box>
+        <Text fontSize="sm" fontWeight="medium" color="gray.600" mb={2}>
+          Auto Release Triggers
+        </Text>
+        <Box as="ul" listStyleType="disc" pl={5} m={0}>
+          {criteria.triggers.map((line, i) => (
+            <Text key={i} as="li" fontSize="sm" color="gray.800" mb={1}>
+              {line}
+            </Text>
+          ))}
+        </Box>
+      </Box>
+      <Box>
+        <Text fontSize="sm" fontWeight="medium" color="gray.600" mb={2}>
+          Auto Release Parameters
+        </Text>
+        {isNever && criteria.parameters[0] === 'N/A' ? (
+          <Text fontSize="sm" color="gray.800">
+            N/A
           </Text>
+        ) : (
           <Box as="ul" listStyleType="disc" pl={5} m={0}>
-            {criteria.conditions.map((line, i) => (
+            {criteria.parameters.map((line, i) => (
               <Text key={i} as="li" fontSize="sm" color="gray.800" mb={1}>
                 {line}
               </Text>
             ))}
           </Box>
-        </>
-      )}
-      {criteria.releaseType === 'Never' && (
-        <Text fontSize="sm" color="gray.800">
-          Auto-Release: {criteria.conditions[0]}
-        </Text>
-      )}
-      {criteria.ifNotMet && (
-        <Box pt={2} borderTopWidth="1px" borderColor="gray.200">
-          <Text fontSize="sm" fontWeight="medium" color="gray.600" mb={1}>
-            If Not Met:
-          </Text>
-          <Text fontSize="sm" color="gray.800">
-            {criteria.ifNotMet}
-          </Text>
-        </Box>
-      )}
+        )}
+      </Box>
     </VStack>
   );
 }
