@@ -116,16 +116,17 @@ export default function RoutingBankingTab(): React.JSX.Element | null {
                     </Badge>
                   </Table.Cell>
                   <Table.Cell textAlign="center">
-                    <Box
-                      as="button"
+                    <button
                       type="button"
                       onClick={() => handleWhitelistClick(index, isWhitelisted)}
-                      cursor="pointer"
-                      transition="transform 0.2s ease-in-out"
-                      _hover={{ transform: 'scale(1.05)' }}
-                      _active={{ transform: 'scale(0.95)' }}
+                      style={{
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        background: 'none',
+                        border: 'none',
+                        padding: 0,
+                      }}
                       aria-label={isWhitelisted ? 'Remove from whitelist' : 'Add to whitelist'}
-                      display="inline-flex"
                     >
                       <Checkbox.Root
                         checked={isWhitelisted}
@@ -135,7 +136,7 @@ export default function RoutingBankingTab(): React.JSX.Element | null {
                         <Checkbox.HiddenInput />
                         <Checkbox.Control />
                       </Checkbox.Root>
-                    </Box>
+                    </button>
                   </Table.Cell>
                 </Table.Row>
               );
