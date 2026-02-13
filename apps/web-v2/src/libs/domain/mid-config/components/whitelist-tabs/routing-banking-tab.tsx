@@ -49,10 +49,12 @@ export default function RoutingBankingTab(): React.JSX.Element | null {
       : DEFAULT_BANK_ACCOUNTS;
 
   const handleWhitelistClick = (index: number, currentlyWhitelisted: boolean) => {
+    const account = accounts[index];
+    if (!account) return;
     setAccountToToggle({
       index,
-      routing_number: accounts[index].routing_number,
-      account_type: accounts[index].account_type,
+      routing_number: account.routing_number,
+      account_type: account.account_type,
       willWhitelist: !currentlyWhitelisted,
     });
     setIsConfirmOpen(true);
