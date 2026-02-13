@@ -26,9 +26,10 @@ interface NotesTabProps {
   merchantId: string;
   onAddNote?: (note: Omit<Note, 'id'>) => void;
   externalNotes?: Note[];
+  onExternalNotePushToIrisChange?: (noteId: string, pushToIris: boolean) => void;
 }
 
-export default function NotesTab({ merchantId, onAddNote, externalNotes }: NotesTabProps) {
+export default function NotesTab({ merchantId, onAddNote, externalNotes, onExternalNotePushToIrisChange }: NotesTabProps) {
   const [notes, setNotes] = React.useState<Note[]>([
     {
       id: '1',
@@ -105,7 +106,14 @@ export default function NotesTab({ merchantId, onAddNote, externalNotes }: Notes
     setCurrentPage(1);
   };
 
+  const isExternalNote = (noteId: string) => (externalNotes || []).some((n) => n.id === noteId);
+
   const handleTogglePushToIris = (noteId: string) => {
+    if (isExternalNote(noteId) && onExternalNotePushToIrisChange) {
+      const note = (externalNotes || []).find((n) => n.id === noteId);
+      if (note) onExternalNotePushToIrisChange(noteId, !note.pushToIris);
+      return;
+    }
     setNotes(
       notes.map((note) =>
         note.id === noteId

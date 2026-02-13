@@ -75,7 +75,24 @@ export default function BatchDetailPage({ batch }: BatchDetailPageProps) {
     createdBy: string;
     pushToIris: boolean;
     pinned: boolean;
-  }>>([]);
+  }>>(() => [
+    {
+      id: 'auto-release-1',
+      note: 'AH001 auto-release criteria met: CNP rate below 3-mo avg +10%, CNP $ in batch < $2,000. Day 1 release.',
+      dateCreated: new Date().toISOString().substring(0, 10),
+      createdBy: 'System',
+      pushToIris: true,
+      pinned: false,
+    },
+    {
+      id: 'auto-release-2',
+      note: 'Batch released automatically per AH004: billing file present, no break in history, <3 chargebacks in 12 mo.',
+      dateCreated: new Date(Date.now() - 86400000).toISOString().substring(0, 10),
+      createdBy: 'System',
+      pushToIris: true,
+      pinned: false,
+    },
+  ]);
   
   // Check if we came from Manager Queue
   const sourceParam = searchParams?.get('source');
@@ -485,8 +502,8 @@ Talus Payments`,
   const merchantSource = merchantInfo?.source || 'Talus Pay';
   const riskWatch = merchantInfo?.riskWatch || false;
 
-  // Mock notes count
-  const notesCount = 3;
+  // Notes count: local (3) + auto-release notes
+  const notesCount = 3 + autoNotes.length;
 
   // Mock shared attachments count
   const sharedAttachmentsCount = 5;
@@ -1062,6 +1079,11 @@ Talus Payments`,
                 <NotesTab 
                   merchantId={merchantInfo?.mid || ''} 
                   externalNotes={autoNotes}
+                  onExternalNotePushToIrisChange={(noteId, pushToIris) => {
+                    setAutoNotes((prev) =>
+                      prev.map((n) => (n.id === noteId ? { ...n, pushToIris } : n))
+                    );
+                  }}
                 />
               </Tabs.Content>
 

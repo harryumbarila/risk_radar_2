@@ -20,6 +20,14 @@ export interface MIDWhitelistData {
   inherit_from_mcc?: boolean;
   last_updated: string;
   last_updated_by?: string;
+  /** Banking Whitelist: accounts associated with the merchant; whitelist is per account */
+  bank_accounts?: Array<{
+    routing_number: string;
+    account_number: string;
+    account_type: 'Credit' | 'Debit';
+    /** Per-account whitelist so AH001 does not repeatedly trigger for this account */
+    bank_change_white_label?: boolean;
+  }>;
 }
 
 export interface AuditLogEntry {
@@ -56,6 +64,9 @@ interface WhitelistContextType {
 
   // Save whitelist
   saveWhitelist: (mid: string, excludedRules: string[]) => Promise<void>;
+
+  // Banking Whitelist: set whitelist per account (audit logged, impacts AH001)
+  setBankAccounts: (mid: string, accounts: MIDWhitelistData['bank_accounts']) => void;
 
   // Thresholds state
   tempThresholds: RiskThresholds | null;
@@ -228,6 +239,27 @@ export function WhitelistProvider({ children }: { children: React.ReactNode }): 
     [currentMID, addAuditLog]
   );
 
+  const setBankAccounts = useCallback(
+    (mid: string, accounts: MIDWhitelistData['bank_accounts']) => {
+      if (currentMID && currentMID.mid === mid) {
+        setCurrentMID({
+          ...currentMID,
+          bank_accounts: accounts ?? [],
+          last_updated: new Date().toISOString().substring(0, 10),
+          last_updated_by: 'Current User',
+        });
+        addAuditLog(mid, {
+          id: `bank-accounts-${Date.now()}`,
+          action: 'Banking whitelist updated (per-account)',
+          rule: 'AH001',
+          modified_by: 'Current User',
+          date: new Date().toISOString(),
+        });
+      }
+    },
+    [currentMID, addAuditLog]
+  );
+
   const value = useMemo(
     () => ({
       currentMID,
@@ -244,6 +276,7 @@ export function WhitelistProvider({ children }: { children: React.ReactNode }): 
       auditLogs,
       addAuditLog,
       saveWhitelist,
+      setBankAccounts,
       tempThresholds,
       setTempThresholds,
       resetTempThresholds,
@@ -262,6 +295,7 @@ export function WhitelistProvider({ children }: { children: React.ReactNode }): 
       auditLogs,
       addAuditLog,
       saveWhitelist,
+      setBankAccounts,
       tempThresholds,
       resetTempThresholds,
       hasThresholdChanges,

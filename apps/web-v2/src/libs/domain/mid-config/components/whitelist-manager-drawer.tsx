@@ -19,6 +19,7 @@ import { useWhitelistStore } from './useWhitelistStore';
 import OverviewTab from './whitelist-tabs/overview-tab';
 import ManageWhitelistTab from './whitelist-tabs/manage-whitelist-tab';
 import RiskThresholdsTab from './whitelist-tabs/risk-thresholds-tab';
+import RoutingBankingTab from './whitelist-tabs/routing-banking-tab';
 import AuditLogTab from './whitelist-tabs/audit-log-tab';
 
 function getRiskLevelColor(riskLevel: string): string {
@@ -42,7 +43,7 @@ export default function WhitelistManagerDrawer(): React.JSX.Element | null {
     if (currentMID) {
       setActiveTab('overview');
     }
-  }, [currentMID]);
+  }, [currentMID?.mid]);
 
   if (!currentMID) return null;
 
@@ -162,6 +163,16 @@ export default function WhitelistManagerDrawer(): React.JSX.Element | null {
                     Risk Thresholds
                   </Tabs.Trigger>
                   <Tabs.Trigger
+                    value="routing-banking"
+                    _focusVisible={{
+                      outline: '2px solid',
+                      outlineColor: 'blue.500',
+                      outlineOffset: '2px',
+                    }}
+                  >
+                    Banking Whitelist
+                  </Tabs.Trigger>
+                  <Tabs.Trigger
                     value="audit"
                     _focusVisible={{
                       outline: '2px solid',
@@ -184,6 +195,10 @@ export default function WhitelistManagerDrawer(): React.JSX.Element | null {
 
                 <Tabs.Content value="thresholds" pt={4}>
                   <RiskThresholdsTab />
+                </Tabs.Content>
+
+                <Tabs.Content value="routing-banking" pt={4}>
+                  <RoutingBankingTab />
                 </Tabs.Content>
 
                 <Tabs.Content value="audit" pt={4}>
