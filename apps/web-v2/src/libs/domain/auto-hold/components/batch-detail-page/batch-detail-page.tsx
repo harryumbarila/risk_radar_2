@@ -18,7 +18,7 @@ import {
   CloseButton,
   Table,
 } from '@chakra-ui/react';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, Eye } from 'lucide-react';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
 import { toaster } from '@/ui/components/common/atoms/toaster/toaster';
 import { Check, ArrowLeft, TrendingUp, Pause, Mail, Play } from 'lucide-react';
@@ -67,6 +67,14 @@ export default function BatchDetailPage({ batch }: BatchDetailPageProps) {
     body: string;
     transactionId?: string;
   }>>([]);
+  const [viewingSentEmail, setViewingSentEmail] = React.useState<{
+    id: string;
+    timestamp: Date;
+    recipients: string[];
+    subject: string;
+    body: string;
+    transactionId?: string;
+  } | null>(null);
   const [selectedTransaction, setSelectedTransaction] = React.useState<MerchantTransaction | null>(null);
   const [autoNotes, setAutoNotes] = React.useState<Array<{
     id: string;
@@ -1113,7 +1121,7 @@ Talus Payments`,
                             <Table.ColumnHeader>Sent Date</Table.ColumnHeader>
                             <Table.ColumnHeader>Recipients</Table.ColumnHeader>
                             <Table.ColumnHeader>Subject</Table.ColumnHeader>
-                            <Table.ColumnHeader>Transaction</Table.ColumnHeader>
+                            <Table.ColumnHeader textAlign="right">Actions</Table.ColumnHeader>
                           </Table.Row>
                         </Table.Header>
                         <Table.Body>
@@ -1138,16 +1146,27 @@ Talus Payments`,
                                   {email.subject}
                                 </Text>
                               </Table.Cell>
-                              <Table.Cell>
-                                {email.transactionId ? (
-                                  <Badge colorPalette="blue" variant="subtle">
-                                    {email.transactionId.substring(0, 8)}...
-                                  </Badge>
-                                ) : (
-                                  <Text fontSize="sm" color="gray.400">
-                                    N/A
-                                  </Text>
-                                )}
+                              <Table.Cell textAlign="right">
+                                <Tooltip.Root openDelay={300}>
+                                  <Tooltip.Trigger asChild>
+                                    <Button
+                                      size="xs"
+                                      variant="ghost"
+                                      aria-label="View sent email"
+                                      onClick={() => setViewingSentEmail(email)}
+                                    >
+                                      <Eye />
+                                    </Button>
+                                  </Tooltip.Trigger>
+                                  <Portal>
+                                    <Tooltip.Positioner>
+                                      <Tooltip.Content maxW="200px" zIndex={2000}>
+                                        <Tooltip.Arrow />
+                                        View email (read-only)
+                                      </Tooltip.Content>
+                                    </Tooltip.Positioner>
+                                  </Portal>
+                                </Tooltip.Root>
                               </Table.Cell>
                             </Table.Row>
                           ))}
@@ -1589,6 +1608,88 @@ Talus Payments`,
                     Confirm Send
                   </Button>
                 </HStack>
+              </Dialog.Footer>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
+
+      {/* View Sent Email (read-only) Dialog */}
+      <Dialog.Root
+        open={!!viewingSentEmail}
+        onOpenChange={(e) => {
+          if (!e.open) setViewingSentEmail(null);
+        }}
+      >
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content maxW="560px" maxH="90vh">
+              <Dialog.Header>
+                <Dialog.Title>Sent Email</Dialog.Title>
+                <Dialog.Description>
+                  Read-only view of the email that was sent
+                </Dialog.Description>
+                <Dialog.CloseTrigger />
+              </Dialog.Header>
+              {viewingSentEmail && (
+                <Dialog.Body overflowY="auto">
+                  <VStack align="stretch" gap={4}>
+                    <Box>
+                      <Text fontSize="xs" fontWeight="semibold" color="gray.500" mb={1}>
+                        Sent
+                      </Text>
+                      <Text fontSize="sm">
+                        {format(viewingSentEmail.timestamp, 'MMM dd, yyyy HH:mm')}
+                      </Text>
+                    </Box>
+                    <Box>
+                      <Text fontSize="xs" fontWeight="semibold" color="gray.500" mb={1}>
+                        To
+                      </Text>
+                      <Text fontSize="sm">{viewingSentEmail.recipients.join(', ')}</Text>
+                    </Box>
+                    <Box>
+                      <Text fontSize="xs" fontWeight="semibold" color="gray.500" mb={1}>
+                        Subject
+                      </Text>
+                      <Text fontSize="sm" fontWeight="medium">
+                        {viewingSentEmail.subject}
+                      </Text>
+                    </Box>
+                    {viewingSentEmail.transactionId && (
+                      <Box>
+                        <Text fontSize="xs" fontWeight="semibold" color="gray.500" mb={1}>
+                          Transaction
+                        </Text>
+                        <Badge colorPalette="blue" variant="subtle">
+                          {viewingSentEmail.transactionId}
+                        </Badge>
+                      </Box>
+                    )}
+                    <Box>
+                      <Text fontSize="xs" fontWeight="semibold" color="gray.500" mb={1}>
+                        Body
+                      </Text>
+                      <Box
+                        p={3}
+                        borderRadius="md"
+                        bg="gray.50"
+                        borderWidth="1px"
+                        borderColor="gray.200"
+                        whiteSpace="pre-wrap"
+                        fontSize="sm"
+                        maxH="320px"
+                        overflowY="auto"
+                      >
+                        {viewingSentEmail.body || <Text color="gray.400">No body</Text>}
+                      </Box>
+                    </Box>
+                  </VStack>
+                </Dialog.Body>
+              )}
+              <Dialog.Footer>
+                <Button onClick={() => setViewingSentEmail(null)}>Close</Button>
               </Dialog.Footer>
             </Dialog.Content>
           </Dialog.Positioner>
