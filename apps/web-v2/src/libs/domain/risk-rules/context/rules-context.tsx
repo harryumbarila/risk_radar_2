@@ -90,7 +90,7 @@ export function RulesProvider({ children }: { children: ReactNode }): React.JSX.
       const next = { ...prev };
       for (const rule of rules) {
         if (next[rule.id] !== undefined) continue;
-        const normalizedParams = {
+        const normalizedParams: Record<string, any> = {
           ...rule.parameters,
           [EFFECTIVE_DATE_PARAM_KEY]: rule.parameters[EFFECTIVE_DATE_PARAM_KEY] ?? rule.last_updated,
         };
