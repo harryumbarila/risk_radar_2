@@ -3,6 +3,9 @@
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
 
+/** Stored in `parameters` for every rule; ISO date string (YYYY-MM-DD). */
+export const EFFECTIVE_DATE_PARAM_KEY = 'effective_date';
+
 export interface RiskRule {
   id: string;
   name: string;

@@ -14,6 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { Info } from 'lucide-react';
 import type { RiskRule } from '../../context/rules-context';
+import { EFFECTIVE_DATE_PARAM_KEY } from '../../context/rules-context';
 import { getReleaseCriteria } from '../../data/release-criteria';
 
 function ReleaseCriteriaDisplay({ ruleId }: { ruleId: string }): React.JSX.Element | null {
@@ -88,11 +89,11 @@ export default function RuleEditForm({
   const renderField = (
     key: string,
     label: string,
-    type: 'text' | 'number' | 'json' = 'text',
+    type: 'text' | 'number' | 'json' | 'date' = 'text',
     tooltip?: string
   ) => {
     const value = formData[key];
-    const displayValue = typeof value === 'object' ? JSON.stringify(value) : String(value || '');
+    const displayValue = typeof value === 'object' ? JSON.stringify(value) : String(value ?? '');
 
     return (
       <Field.Root key={key}>
@@ -151,6 +152,17 @@ export default function RuleEditForm({
             fontFamily="mono"
             fontSize="sm"
           />
+        ) : type === 'date' ? (
+          <Input
+            type="date"
+            value={
+              typeof value === 'string' && value.includes('T')
+                ? value.slice(0, 10)
+                : displayValue.slice(0, 10)
+            }
+            onChange={(e) => handleChange(key, e.target.value)}
+            fontSize="sm"
+          />
         ) : (
           <Input
             type={type}
@@ -182,8 +194,8 @@ export default function RuleEditForm({
       .replace(/\b\w/g, (l) => l.toUpperCase());
   };
 
-  // Get all parameter keys
-  const parameterKeys = Object.keys(formData || {});
+  // Rule-specific parameters only (effective date is shown separately for all rules)
+  const parameterKeys = Object.keys(formData || {}).filter((k) => k !== EFFECTIVE_DATE_PARAM_KEY);
 
   // Group parameters by category (optional - can be customized)
   const thresholdKeys = parameterKeys.filter(key => 
@@ -198,6 +210,20 @@ export default function RuleEditForm({
 
   return (
     <VStack align="stretch" gap={6}>
+      <Box>
+        <Text fontSize="xs" fontWeight="bold" color="gray.500" mb={4} textTransform="uppercase">
+          General
+        </Text>
+        <VStack align="stretch" gap={4}>
+          {renderField(
+            EFFECTIVE_DATE_PARAM_KEY,
+            'Effective Date',
+            'date',
+            'Date from which this rule configuration is effective.'
+          )}
+        </VStack>
+      </Box>
+
       {/* Threshold Settings */}
       {thresholdKeys.length > 0 && (
         <Box>
@@ -277,7 +303,7 @@ export default function RuleEditForm({
         </Box>
       )}
 
-      {/* If no parameters exist */}
+      {/* If no rule-specific parameters exist (beyond Effective Date) */}
       {parameterKeys.length === 0 && (
         <Box
           bg="gray.50"
@@ -288,7 +314,7 @@ export default function RuleEditForm({
           textAlign="center"
         >
           <Text fontSize="sm" color="gray.500">
-            No parameters configured for this rule.
+            No additional parameters configured for this rule.
           </Text>
         </Box>
       )}

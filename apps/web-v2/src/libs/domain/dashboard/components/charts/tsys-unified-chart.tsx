@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, VStack, Text, HStack, Tooltip, Portal, Select, createListCollection, Button, Drawer, Badge, Table, CloseButton, SimpleGrid } from '@chakra-ui/react';
+import { Box, VStack, Text, HStack, Tooltip, Portal, Select, createListCollection, Button, Drawer, Badge, Table, CloseButton } from '@chakra-ui/react';
 import { Info, X, FileText, Check, Copy } from 'lucide-react';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
 import {
@@ -1500,32 +1500,10 @@ function HeatmapCellDrawer({ isOpen, onClose, selectedCell, paymentStage, onTran
                       {stages.join(', ') || activePaymentStage}
                     </Text>
                   </HStack>
-                  <SimpleGrid columns={3} gap={3} w="full" mt={2}>
-                    <VStack align="start" gap={0}>
-                      <Text fontSize="xs" color="gray.500">Total</Text>
-                      <Text fontSize="sm" fontWeight="bold">{selectedCell.value.toLocaleString()}</Text>
-                    </VStack>
-                    <VStack align="start" gap={0}>
-                      <Text fontSize="xs" color="gray.500">Share</Text>
-                      <Text fontSize="sm" fontWeight="bold">{selectedCell.percentage.toFixed(1)}%</Text>
-                    </VStack>
-                    <VStack align="start" gap={0}>
-                      <Text fontSize="xs" color="gray.500">Intensity</Text>
-                      <HStack gap={1} align="center">
-                        <Box
-                          w="24px"
-                          h="12px"
-                          bg={selectedCell.bgColor}
-                          borderWidth="1px"
-                          borderColor="gray.300"
-                          borderRadius="sm"
-                        />
-                        <Text fontSize="xs" color="gray.600">
-                          {((selectedCell.value / selectedCell.maxValue) * 100).toFixed(0)}%
-                        </Text>
-                      </HStack>
-                    </VStack>
-                  </SimpleGrid>
+                  <VStack align="start" gap={0} w="full" mt={2}>
+                    <Text fontSize="xs" color="gray.500">Total</Text>
+                    <Text fontSize="sm" fontWeight="bold">{selectedCell.value.toLocaleString()}</Text>
+                  </VStack>
                 </VStack>
                 <CloseButton onClick={onClose} aria-label="Close drawer" size="sm" />
               </HStack>

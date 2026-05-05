@@ -17,7 +17,7 @@ import {
   SimpleGrid,
 } from '@chakra-ui/react';
 import { X, Save, Info } from 'lucide-react';
-import { useRules } from '../../context/rules-context';
+import { useRules, EFFECTIVE_DATE_PARAM_KEY } from '../../context/rules-context';
 import RuleEditForm from '../rule-edit-form/rule-edit-form';
 import RuleAuditLog from '../rule-audit-log/rule-audit-log';
 import { toaster } from '@/ui/components/common/atoms/toaster/toaster';
@@ -53,7 +53,11 @@ export default function RuleDetailDrawer(): React.JSX.Element | null {
 
   React.useEffect(() => {
     if (selectedRule) {
-      setFormData(selectedRule.parameters);
+      setFormData({
+        ...selectedRule.parameters,
+        [EFFECTIVE_DATE_PARAM_KEY]:
+          selectedRule.parameters[EFFECTIVE_DATE_PARAM_KEY] ?? '',
+      });
       setActiveTab('overview');
     }
   }, [selectedRule]);
@@ -309,8 +313,18 @@ export default function RuleDetailDrawer(): React.JSX.Element | null {
                         borderWidth="1px"
                         borderColor="gray.200"
                       >
+                        <HStack justify="space-between" mb={3} px={1}>
+                          <Text fontSize="sm" fontWeight="medium" color="gray.600">
+                            Effective Date
+                          </Text>
+                          <Text fontSize="sm" color="gray.900">
+                            {selectedRule.parameters[EFFECTIVE_DATE_PARAM_KEY] || '—'}
+                          </Text>
+                        </HStack>
                         <SimpleGrid columns={{ base: 1, md: 2 }} gap={3}>
-                          {Object.entries(selectedRule.parameters).map(([key, value]) => {
+                          {Object.entries(selectedRule.parameters)
+                            .filter(([key]) => key !== EFFECTIVE_DATE_PARAM_KEY)
+                            .map(([key, value]) => {
                             const displayValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
                             const isThreshold = key.toLowerCase().includes('threshold') || key.toLowerCase().includes('window');
                             
