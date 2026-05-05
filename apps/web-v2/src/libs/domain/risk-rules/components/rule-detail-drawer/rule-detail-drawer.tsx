@@ -46,7 +46,13 @@ function formatDate(dateString: string): string {
 }
 
 export default function RuleDetailDrawer(): React.JSX.Element | null {
-  const { selectedRule, isDrawerOpen, closeDrawer, updateRule, isLoading } = useRules();
+  const {
+    selectedRule,
+    isDrawerOpen,
+    closeDrawer,
+    updateRule,
+    isLoading,
+  } = useRules();
   const [activeTab, setActiveTab] = React.useState('overview');
   const [formData, setFormData] = React.useState<Record<string, any> | null>(null);
   const [isSaveConfirmOpen, setIsSaveConfirmOpen] = React.useState(false);
@@ -56,7 +62,7 @@ export default function RuleDetailDrawer(): React.JSX.Element | null {
       setFormData({
         ...selectedRule.parameters,
         [EFFECTIVE_DATE_PARAM_KEY]:
-          selectedRule.parameters[EFFECTIVE_DATE_PARAM_KEY] ?? '',
+          selectedRule.parameters[EFFECTIVE_DATE_PARAM_KEY] ?? selectedRule.last_updated,
       });
       setActiveTab('overview');
     }
@@ -75,6 +81,7 @@ export default function RuleDetailDrawer(): React.JSX.Element | null {
         parameters: formData,
         last_updated: new Date().toISOString().substring(0, 10),
       });
+
       toaster.success({
         title: 'Rule updated successfully',
         description: `${selectedRule.name} has been updated.`,

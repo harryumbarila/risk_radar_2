@@ -13,13 +13,7 @@ import {
   Avatar,
 } from '@chakra-ui/react';
 import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
-
-interface AuditLogEntry {
-  id: string;
-  change: string;
-  modifiedBy: string;
-  date: string;
-}
+import { useRules } from '../../context/rules-context';
 
 interface RuleAuditLogProps {
   ruleId: string;
@@ -27,44 +21,6 @@ interface RuleAuditLogProps {
 
 type SortField = 'modifiedBy' | 'date' | null;
 type SortDirection = 'asc' | 'desc';
-
-// Mock audit log data
-const mockAuditLogs: Record<string, AuditLogEntry[]> = {
-  R001: [
-    {
-      id: '1',
-      change: 'Threshold changed from 0.7 → 0.8',
-      modifiedBy: 'Harry',
-      date: '2025-11-10T14:30:00Z',
-    },
-    {
-      id: '2',
-      change: 'Time window updated from "12h" → "24h"',
-      modifiedBy: 'Admin',
-      date: '2025-11-08T10:15:00Z',
-    },
-    {
-      id: '3',
-      change: 'Rule activated',
-      modifiedBy: 'System',
-      date: '2025-11-05T09:00:00Z',
-    },
-  ],
-  R002: [
-    {
-      id: '1',
-      change: 'Country list updated: ["MX"] → ["MX", "BR"]',
-      modifiedBy: 'Harry',
-      date: '2025-11-07T16:20:00Z',
-    },
-    {
-      id: '2',
-      change: 'Rule deactivated',
-      modifiedBy: 'Admin',
-      date: '2025-11-06T11:45:00Z',
-    },
-  ],
-};
 
 function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -96,7 +52,8 @@ export default function RuleAuditLog({ ruleId }: RuleAuditLogProps): React.JSX.E
   const [isLoading] = React.useState(false);
   const [sortField, setSortField] = React.useState<SortField>(null);
   const [sortDirection, setSortDirection] = React.useState<SortDirection>('desc');
-  const auditLogsRaw = mockAuditLogs[ruleId] || [];
+  const { ruleAuditLogs } = useRules();
+  const auditLogsRaw = ruleAuditLogs[ruleId] || [];
 
   // Sort audit logs
   const auditLogs = React.useMemo(() => {
@@ -171,7 +128,9 @@ export default function RuleAuditLog({ ruleId }: RuleAuditLogProps): React.JSX.E
       <Table.Root>
         <Table.Header position="sticky" top={0} zIndex={5} bg="white" boxShadow="sm">
           <Table.Row>
-            <Table.ColumnHeader>Change</Table.ColumnHeader>
+            <Table.ColumnHeader>Parameter</Table.ColumnHeader>
+            <Table.ColumnHeader>Previous</Table.ColumnHeader>
+            <Table.ColumnHeader>New</Table.ColumnHeader>
             <Table.ColumnHeader>
               <Button
                 variant="ghost"
@@ -227,7 +186,17 @@ export default function RuleAuditLog({ ruleId }: RuleAuditLogProps): React.JSX.E
             <Table.Row key={entry.id}>
               <Table.Cell>
                 <Text fontSize="sm" color="gray.900">
-                  {entry.change}
+                  {entry.parameterLabel}
+                </Text>
+              </Table.Cell>
+              <Table.Cell>
+                <Text fontSize="sm" color="gray.700" fontFamily="mono">
+                  {entry.previousValue}
+                </Text>
+              </Table.Cell>
+              <Table.Cell>
+                <Text fontSize="sm" color="gray.700" fontFamily="mono">
+                  {entry.newValue}
                 </Text>
               </Table.Cell>
               <Table.Cell>

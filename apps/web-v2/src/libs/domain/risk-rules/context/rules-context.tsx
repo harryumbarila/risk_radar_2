@@ -1,10 +1,27 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
 import type { ReactNode } from 'react';
+import {
+  diffParametersForAudit,
+  formatParameterLabel,
+  normalizeParametersForCompare,
+  serializeParameterValueForAudit,
+} from '../utils/parameter-audit';
 
 /** Stored in `parameters` for every rule; ISO date string (YYYY-MM-DD). */
 export const EFFECTIVE_DATE_PARAM_KEY = 'effective_date';
+
+export interface RuleAuditLogEntry {
+  id: string;
+  parameterKey: string;
+  parameterLabel: string;
+  previousValue: string;
+  newValue: string;
+  modifiedBy: string;
+  /** ISO 8601 timestamp */
+  date: string;
+}
 
 export interface RiskRule {
   id: string;
@@ -43,6 +60,8 @@ interface RulesContextType {
   toggleRuleStatus: (ruleId: string) => Promise<void>;
   updateRule: (ruleId: string, updates: Partial<RiskRule>) => Promise<void>;
   deleteRule: (ruleId: string) => Promise<void>;
+  ruleAuditLogs: Record<string, RuleAuditLogEntry[]>;
+  appendRuleAuditLogEntries: (ruleId: string, entries: RuleAuditLogEntry[]) => void;
   filteredRules: RiskRule[];
   activeFiltersCount: number;
 }
@@ -63,6 +82,78 @@ export function RulesProvider({ children }: { children: ReactNode }): React.JSX.
   const [selectedRule, setSelectedRule] = useState<RiskRule | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [ruleAuditLogs, setRuleAuditLogs] = useState<Record<string, RuleAuditLogEntry[]>>({});
+
+  useEffect(() => {
+    if (rules.length === 0) return;
+    setRuleAuditLogs((prev) => {
+      const next = { ...prev };
+      for (const rule of rules) {
+        if (next[rule.id] !== undefined) continue;
+        const normalizedParams = {
+          ...rule.parameters,
+          [EFFECTIVE_DATE_PARAM_KEY]: rule.parameters[EFFECTIVE_DATE_PARAM_KEY] ?? rule.last_updated,
+        };
+        const modifiedBy = rule.created_by || 'System';
+        const date = `${rule.last_updated}T12:00:00.000Z`;
+        const baselineEntries: RuleAuditLogEntry[] = Object.keys(normalizedParams)
+          .sort()
+          .map((key) => ({
+            id: `baseline-${rule.id}-${key}`,
+            parameterKey: key,
+            parameterLabel: formatParameterLabel(key),
+            previousValue:
+              key === EFFECTIVE_DATE_PARAM_KEY
+                ? serializeParameterValueForAudit(normalizedParams[key])
+                : '—',
+            newValue: serializeParameterValueForAudit(normalizedParams[key]),
+            modifiedBy,
+            date,
+          }));
+
+        // Seed a few logical user changes for one concrete rule so the UI shows real history.
+        // This is mock data until API-backed audit logs exist.
+        const seededChanges: RuleAuditLogEntry[] = [];
+        if (rule.id === 'AH001') {
+          const effectiveDate0 = String(normalizedParams[EFFECTIVE_DATE_PARAM_KEY] ?? rule.last_updated);
+          seededChanges.push(
+            {
+              id: `seed-${rule.id}-${EFFECTIVE_DATE_PARAM_KEY}-1`,
+              parameterKey: EFFECTIVE_DATE_PARAM_KEY,
+              parameterLabel: formatParameterLabel(EFFECTIVE_DATE_PARAM_KEY),
+              previousValue: effectiveDate0,
+              newValue: '2025-02-01',
+              modifiedBy: 'Richard Parrot',
+              date: '2025-02-01T14:12:00.000Z',
+            },
+            {
+              id: `seed-${rule.id}-batch_amount_greater_than-1`,
+              parameterKey: 'batch_amount_greater_than',
+              parameterLabel: formatParameterLabel('batch_amount_greater_than'),
+              previousValue: serializeParameterValueForAudit(normalizedParams.batch_amount_greater_than),
+              newValue: '150',
+              modifiedBy: 'Richard Parrot',
+              date: '2025-02-01T14:12:00.000Z',
+            },
+            {
+              id: `seed-${rule.id}-total_keyed_volume_amount_greater_than-1`,
+              parameterKey: 'total_keyed_volume_amount_greater_than',
+              parameterLabel: formatParameterLabel('total_keyed_volume_amount_greater_than'),
+              previousValue: serializeParameterValueForAudit(
+                normalizedParams.total_keyed_volume_amount_greater_than
+              ),
+              newValue: '600',
+              modifiedBy: 'Richard Parrot',
+              date: '2025-02-03T09:45:00.000Z',
+            }
+          );
+        }
+
+        next[rule.id] = [...seededChanges, ...baselineEntries];
+      }
+      return next;
+    });
+  }, [rules]);
 
   const setFilters = useCallback((newFilters: Partial<RuleFilters>) => {
     setFiltersState((prev) => ({ ...prev, ...newFilters }));
@@ -95,11 +186,57 @@ export function RulesProvider({ children }: { children: ReactNode }): React.JSX.
     }
   }, []);
 
+  const appendRuleAuditLogEntries = useCallback((ruleId: string, entries: RuleAuditLogEntry[]) => {
+    if (entries.length === 0) return;
+    setRuleAuditLogs((prev) => ({
+      ...prev,
+      [ruleId]: [...entries, ...(prev[ruleId] ?? [])],
+    }));
+  }, []);
+
   const updateRule = useCallback(async (ruleId: string, updates: Partial<RiskRule>) => {
     setIsLoading(true);
     try {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Audit parameter changes centrally so updates from any UI path are logged.
+      if (updates.parameters) {
+        const current = rules.find((r) => r.id === ruleId);
+        if (current) {
+          const previousParams = normalizeParametersForCompare(
+            current.parameters,
+            EFFECTIVE_DATE_PARAM_KEY,
+            current.last_updated
+          );
+          const nextParams = normalizeParametersForCompare(
+            updates.parameters,
+            EFFECTIVE_DATE_PARAM_KEY,
+            current.last_updated
+          );
+          const changedRows = diffParametersForAudit(previousParams, nextParams);
+          if (changedRows.length > 0) {
+            const nowIso = new Date().toISOString();
+            const modifiedBy =
+              // Mock: generate some entries as Richard Parrot
+              Date.now() % 2 === 0
+                ? 'Richard Parrot'
+                : 'Current User'; // TODO: replace with auth user
+            appendRuleAuditLogEntries(
+              ruleId,
+              changedRows.map((row) => ({
+                id: `audit-${ruleId}-${row.parameterKey}-${Date.now()}-${Math.random()
+                  .toString(36)
+                  .slice(2, 8)}`,
+                ...row,
+                modifiedBy,
+                date: nowIso,
+              }))
+            );
+          }
+        }
+      }
+
       setRules((prev) =>
         prev.map((rule) => (rule.id === ruleId ? { ...rule, ...updates } : rule))
       );
@@ -109,7 +246,7 @@ export function RulesProvider({ children }: { children: ReactNode }): React.JSX.
     } finally {
       setIsLoading(false);
     }
-  }, [selectedRule]);
+  }, [appendRuleAuditLogEntries, rules, selectedRule]);
 
   const deleteRule = useCallback(async (ruleId: string) => {
     setIsLoading(true);
@@ -181,6 +318,8 @@ export function RulesProvider({ children }: { children: ReactNode }): React.JSX.
     toggleRuleStatus,
     updateRule,
     deleteRule,
+    ruleAuditLogs,
+    appendRuleAuditLogEntries,
     filteredRules,
     activeFiltersCount,
   };
