@@ -190,6 +190,15 @@ export default function BatchDetailPage({ batch }: BatchDetailPageProps) {
     return owners[0]?.email || 'contact@example.com';
   }, []);
 
+  const defaultEmailRecipient = React.useMemo(() => {
+    if (merchantInfo?.isv === 'Global365 LLC') {
+      return 'global365@example.com';
+    }
+    return firstOwnerEmail;
+  }, [merchantInfo?.isv, firstOwnerEmail]);
+
+  const defaultRecipientLabel = merchantInfo?.isv === 'Global365 LLC' ? 'ISV Contact' : 'First Owner';
+
   // Mock merchant email (fallback)
   const merchantEmail = React.useMemo(() => {
     return firstOwnerEmail;
@@ -649,7 +658,7 @@ Talus Payments`,
     setSelectedTemplate('');
     setEmailSubject('');
     setEmailBody('');
-    setEmailRecipients([firstOwnerEmail]);
+    setEmailRecipients([defaultEmailRecipient]);
     setNewRecipient('');
   };
 
@@ -757,7 +766,7 @@ Talus Payments`,
       setEmailBody(body);
     }
     
-    setEmailRecipients([firstOwnerEmail]);
+    setEmailRecipients([defaultEmailRecipient]);
     setNewRecipient('');
     setIsEmailDrawerOpen(true);
   };
@@ -872,6 +881,14 @@ Talus Payments`,
               </Text>
               <Text fontSize="sm" fontWeight="semibold" color="gray.900">
                 {merchantInfo?.processor || 'N/A'}
+              </Text>
+            </HStack>
+            <HStack gap={2}>
+              <Text fontSize="xs" color="gray.600" textTransform="uppercase">
+                ISV:
+              </Text>
+              <Text fontSize="sm" fontWeight="semibold" color="gray.900">
+                {merchantInfo?.isv || 'N/A'}
               </Text>
             </HStack>
             <HStack gap={2}>
@@ -1385,10 +1402,10 @@ Talus Payments`,
                       Email Merchant
                     </Text>
                     <Text fontSize="sm" color="gray.600">
-                      {firstOwnerEmail}
+                      {defaultEmailRecipient}
                     </Text>
                     <Text fontSize="xs" color="gray.500" fontStyle="italic">
-                      (First Owner)
+                      ({defaultRecipientLabel})
                     </Text>
                   </VStack>
                   <CloseButton onClick={handleCloseEmailDrawer} />

@@ -23,6 +23,8 @@ export interface MerchantTransaction extends BaseModel {
   netDivertBalance?: string;
   source?: string;
   dataSourceIdentifier?: string;
+  product?: string;
+  isv?: string;
   ahRuleApplied?: string[];
   autoHoldRuleApplied?: string[];
   createdBatchTrigger?: string;

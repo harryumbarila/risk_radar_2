@@ -505,6 +505,9 @@ export function generateDataSourceIdentifier(source: string, date: Date): string
   return identifiers[randomIndex] || identifiers[0] || 'TSYS ADF Auth 11252025_20251125_061057';
 }
 
+// Product / ISV catalog values (shared with auto-hold filters)
+export const PRODUCT_ISV_OPTIONS = ['Talus Pay', 'Global365 LLC', 'SIT'] as const;
+
 // Generate transactions with new fields
 const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] => {
   const baseDate = new Date();
@@ -1135,7 +1138,11 @@ const generateTransactions = (): (MerchantTransaction & { ruleId?: string })[] =
       createdBatchTrigger: 'Daily Batch',
       createdBatchDate: new Date(baseDate.getTime() - 0.25 * 24 * 60 * 60 * 1000).toISOString(),
     } as MerchantTransaction & { ruleId?: string },
-  ];
+  ].map((tx, index) => ({
+    ...tx,
+    product: PRODUCT_ISV_OPTIONS[index % PRODUCT_ISV_OPTIONS.length],
+    isv: PRODUCT_ISV_OPTIONS[index % PRODUCT_ISV_OPTIONS.length],
+  }));
 };
 
 const ALL_TRANSACTIONS: (MerchantTransaction & { ruleId?: string })[] = generateTransactions();
@@ -1185,6 +1192,11 @@ export default function CustomTable({ filters }: CustomTableProps) {
     // Filter by processor
     if (filters.processor && filters.processor !== 'all') {
       filtered = filtered.filter((tx) => tx.processor === filters.processor);
+    }
+
+    // Filter by product
+    if (filters.product && filters.product !== 'all') {
+      filtered = filtered.filter((tx) => tx.product === filters.product);
     }
 
     // Filter by data source
@@ -1312,6 +1324,20 @@ export default function CustomTable({ filters }: CustomTableProps) {
       header: () => (
         <Text fontSize="xs" fontWeight="semibold" color="gray.600">
           UW Date
+        </Text>
+      ),
+      cell: (info) => (
+        <Text fontSize="sm" py={0.5}>
+          {info.getValue() || '—'}
+        </Text>
+      ),
+      enableSorting: true,
+      meta: { align: 'left' },
+    }),
+    columnHelper.accessor('isv', {
+      header: () => (
+        <Text fontSize="xs" fontWeight="semibold" color="gray.600">
+          ISV
         </Text>
       ),
       cell: (info) => (
