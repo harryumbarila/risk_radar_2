@@ -4,6 +4,7 @@ import { Box, VStack, Text, Table, Badge, HStack, Tooltip, Portal, Dialog, Butto
 import { CreditCard, Info, AlertCircle, Copy, Check, Download, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
+import { RuleChips } from '@/libs/domain/dashboard/components/transactions/transactions';
 
 interface TransactionsTabProps {
   transactions: MerchantTransaction[];
@@ -266,16 +267,23 @@ const generateCaptureData = (tx: MerchantTransaction, index: number) => {
   const posEntryMode: string = posEntryModes[index % posEntryModes.length] || posEntryModes[0] || '';
   const calcEntryType = posEntryMode.includes('Manual') ? 'Keyed' : posEntryMode.includes('Chip') ? 'Chip' : 'Contactless';
   const cardNotPresent = posEntryMode.includes('Manual') ? 'Yes' : 'No';
+  const avsCodes = ['Y - Street and 5-digit postal match', 'Z - Postal matches, street does not', 'N - No match'];
+  const avsResultCode = avsCodes[index % avsCodes.length] || avsCodes[0];
+  const authAmt = index % 3 === 0 ? '$0.00' : tx.amount;
   const authCode = String(Math.floor(seededRandom(seed3) * 900000) + 100000);
   
-  // Use transaction date for both transmission and transaction date (deterministic based on index)
   const txDate = new Date();
   txDate.setDate(txDate.getDate() - (index % 3));
+  txDate.setHours(9 + (index % 12), (15 + index * 5) % 60, 0, 0);
+  const datePart = txDate.toLocaleDateString('en-US');
+  const timePart = txDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  const dateTime = `${datePart} ${timePart}`;
   
   return {
-    transmissionDate: txDate.toLocaleDateString('en-US'),
-    transactionDate: txDate.toLocaleDateString('en-US'),
+    transmissionDate: dateTime,
+    transactionDate: dateTime,
     transactionAmt: tx.amount,
+    authAmt,
     authCode,
     cardF6,
     cardL4,
@@ -283,6 +291,7 @@ const generateCaptureData = (tx: MerchantTransaction, index: number) => {
     posEntryMode,
     posEntryModeCalculated: calcEntryType,
     cardNotPresent,
+    avsResultCode,
   };
 };
 
@@ -418,6 +427,57 @@ const generateCardHistory = (cardF6: string, cardL4: string, baseMid: string): C
   return transactions;
 };
 
+function parseMoney(value: string | undefined): number {
+  const parsed = Number(String(value ?? '').replace(/[^0-9.-]/g, ''));
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function AhRuleAppliedHeader() {
+  return (
+    <Table.ColumnHeader>
+      <Text fontSize="xs" fontWeight="semibold" color="gray.600">
+        AH Rule Applied
+      </Text>
+    </Table.ColumnHeader>
+  );
+}
+
+function AhRuleAppliedCell({ rules }: { rules?: string[] }) {
+  return (
+    <Box py={0.5} display="flex" alignItems="center">
+      <RuleChips rules={rules} maxVisible={3} />
+    </Box>
+  );
+}
+
+function AvsCell({ code }: { code?: string }) {
+  if (!code) {
+    return <Text fontSize="xs" color="gray.500">—</Text>;
+  }
+
+  const palette = code.includes('Y') ? 'green' : code.includes('Z') ? 'yellow' : 'red';
+
+  return (
+    <Tooltip.Root openDelay={300}>
+      <Tooltip.Trigger asChild>
+        <Box as="span" cursor="help">
+          <Badge colorPalette={palette} variant="subtle" fontSize="xs">
+            {code.split(' - ')[0]}
+          </Badge>
+        </Box>
+      </Tooltip.Trigger>
+      <Portal>
+        <Tooltip.Positioner>
+          <Tooltip.Content maxW="300px" zIndex={2000} bg="gray.900" color="white" px={2} py={1} borderRadius="md" fontSize="xs">
+            <Tooltip.Arrow />
+            {code}
+          </Tooltip.Content>
+        </Tooltip.Positioner>
+      </Portal>
+    </Tooltip.Root>
+  );
+}
+
 export default function TransactionsTab({ transactions, onTransactionClick }: TransactionsTabProps) {
   // Determine data source from first transaction (all transactions in a batch should have same source)
   const dataSource = transactions[0]?.source || 'Auth';
@@ -432,6 +492,7 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
   const [cardHistoryMidFilter, setCardHistoryMidFilter] = React.useState<string>('');
   const [cardHistorySortColumn, setCardHistorySortColumn] = React.useState<'mid' | 'transactionDate' | 'transmissionDate' | null>(null);
   const [cardHistorySortDirection, setCardHistorySortDirection] = React.useState<'asc' | 'desc'>('desc');
+  const [transactionAmountSort, setTransactionAmountSort] = React.useState<'desc' | 'asc' | null>(null);
   const itemsPerPage = 10;
   
   // Generate appropriate data based on data source
@@ -515,6 +576,26 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
             <Table.ColumnHeader>Card F6 / L4</Table.ColumnHeader>
             <Table.ColumnHeader>
               <HStack gap={1} align="center">
+                <Text fontSize="xs">AVS</Text>
+                <Tooltip.Root openDelay={300}>
+                  <Tooltip.Trigger asChild>
+                    <Box as="span" display="inline-flex" alignItems="center" cursor="help">
+                      <Info size={12} color="gray.400" />
+                    </Box>
+                  </Tooltip.Trigger>
+                  <Portal>
+                    <Tooltip.Positioner>
+                      <Tooltip.Content maxW="250px" zIndex={2000} bg="gray.900" color="white" px={2} py={1} borderRadius="md" fontSize="xs">
+                        <Tooltip.Arrow />
+                        Address Verification System result
+                      </Tooltip.Content>
+                    </Tooltip.Positioner>
+                  </Portal>
+                </Tooltip.Root>
+              </HStack>
+            </Table.ColumnHeader>
+            <Table.ColumnHeader>
+              <HStack gap={1} align="center">
                 <Text>Card Type</Text>
                 <Tooltip.Root openDelay={300}>
                   <Tooltip.Trigger asChild>
@@ -553,28 +634,8 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
                 </Tooltip.Root>
               </HStack>
             </Table.ColumnHeader>
-            <Table.ColumnHeader fontSize="xs">CNP</Table.ColumnHeader>
-            <Table.ColumnHeader>
-              <HStack gap={1} align="center">
-                <Text fontSize="xs">AVS</Text>
-                <Tooltip.Root openDelay={300}>
-                  <Tooltip.Trigger asChild>
-                    <Box as="span" display="inline-flex" alignItems="center" cursor="help">
-                      <Info size={12} color="gray.400" />
-                    </Box>
-                  </Tooltip.Trigger>
-                  <Portal>
-                    <Tooltip.Positioner>
-                      <Tooltip.Content maxW="250px" zIndex={2000} bg="gray.900" color="white" px={2} py={1} borderRadius="md" fontSize="xs">
-                        <Tooltip.Arrow />
-                        Address Verification System result
-                      </Tooltip.Content>
-                    </Tooltip.Positioner>
-                  </Portal>
-                </Tooltip.Root>
-              </HStack>
-            </Table.ColumnHeader>
             <Table.ColumnHeader fontSize="xs">Response</Table.ColumnHeader>
+            <AhRuleAppliedHeader />
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -641,6 +702,9 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
                 </Tooltip.Root>
               </Table.Cell>
               <Table.Cell>
+                <AvsCell code={row.avsResultCode} />
+              </Table.Cell>
+              <Table.Cell>
                 <Text fontSize="xs">{row.cardType}</Text>
               </Table.Cell>
               <Table.Cell>
@@ -648,30 +712,6 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
                   <Text fontSize="xs">{row.posEntryMode1}</Text>
                   <Text fontSize="xs" color="gray.500">{row.calcEntryType}</Text>
                 </VStack>
-              </Table.Cell>
-              <Table.Cell>
-                <Badge colorPalette={row.calcCNP === 'Yes' ? 'orange' : 'green'} variant="subtle" fontSize="xs">
-                  {row.calcCNP}
-                </Badge>
-              </Table.Cell>
-              <Table.Cell>
-                <Tooltip.Root openDelay={300}>
-                  <Tooltip.Trigger asChild>
-                    <Box as="span" cursor="help">
-                      <Badge colorPalette={row.avsResultCode.includes('Y') ? 'green' : row.avsResultCode.includes('Z') ? 'yellow' : 'red'} variant="subtle" fontSize="xs">
-                        {row.avsResultCode.split(' - ')[0]}
-                      </Badge>
-                    </Box>
-                  </Tooltip.Trigger>
-                  <Portal>
-                    <Tooltip.Positioner>
-                      <Tooltip.Content maxW="300px" zIndex={2000} bg="gray.900" color="white" px={2} py={1} borderRadius="md" fontSize="xs">
-                        <Tooltip.Arrow />
-                        {row.avsResultCode}
-                      </Tooltip.Content>
-                    </Tooltip.Positioner>
-                  </Portal>
-                </Tooltip.Root>
               </Table.Cell>
               <Table.Cell>
                 <Tooltip.Root openDelay={300}>
@@ -692,6 +732,9 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
                   </Portal>
                 </Tooltip.Root>
               </Table.Cell>
+              <Table.Cell>
+                <AhRuleAppliedCell rules={transactions[index]?.ahRuleApplied} />
+              </Table.Cell>
             </Table.Row>
           ))}
         </Table.Body>
@@ -707,25 +750,49 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
           <Table.Row bg="gray.50">
             <Table.ColumnHeader>Transmission date</Table.ColumnHeader>
             <Table.ColumnHeader>Transaction date</Table.ColumnHeader>
-            <Table.ColumnHeader textAlign="right">Transaction Amt</Table.ColumnHeader>
+            <Table.ColumnHeader
+              textAlign="right"
+              cursor="pointer"
+              onClick={() => {
+                setTransactionAmountSort((current) => (current === 'desc' ? 'asc' : 'desc'));
+              }}
+              _hover={{ bg: 'gray.100' }}
+            >
+              <HStack gap={1} justify="flex-end">
+                <Text>Transaction Amt</Text>
+                {transactionAmountSort === 'asc' ? (
+                  <ArrowUp size={14} />
+                ) : transactionAmountSort === 'desc' ? (
+                  <ArrowDown size={14} />
+                ) : (
+                  <ArrowUpDown size={14} />
+                )}
+              </HStack>
+            </Table.ColumnHeader>
+            <Table.ColumnHeader textAlign="right">Auth amt</Table.ColumnHeader>
             <Table.ColumnHeader>Auth code</Table.ColumnHeader>
             <Table.ColumnHeader>Card # F6 / L4</Table.ColumnHeader>
+            <Table.ColumnHeader>AVS</Table.ColumnHeader>
             <Table.ColumnHeader>Card type</Table.ColumnHeader>
             <Table.ColumnHeader>POS entry mode</Table.ColumnHeader>
             <Table.ColumnHeader>POS entry mode Calculated</Table.ColumnHeader>
-            <Table.ColumnHeader>Card Not Present</Table.ColumnHeader>
+            <AhRuleAppliedHeader />
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {tableData.map((row: any, index) => (
+          {[...tableData]
+            .map((row: any, index) => ({ row, transaction: transactions[index] }))
+            .sort((a, b) => {
+              if (!transactionAmountSort) return 0;
+              const diff = parseMoney(a.row.transactionAmt) - parseMoney(b.row.transactionAmt);
+              return transactionAmountSort === 'asc' ? diff : -diff;
+            })
+            .map(({ row, transaction }) => (
             <Table.Row 
-              key={index}
+              key={transaction?.id ?? row.authCode}
               onClick={() => {
-                const transaction = transactions[index];
-                const rowData = tableData[index];
                 if (transaction && onTransactionClick) {
-                  const enrichedTransaction = enrichTransaction(transaction, rowData);
-                  onTransactionClick(enrichedTransaction);
+                  onTransactionClick(enrichTransaction(transaction, row));
                 }
               }}
               cursor={onTransactionClick ? 'pointer' : 'default'}
@@ -739,6 +806,9 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
               </Table.Cell>
               <Table.Cell textAlign="right">
                 <Text fontSize="sm" fontWeight="semibold">{row.transactionAmt}</Text>
+              </Table.Cell>
+              <Table.Cell textAlign="right">
+                <Text fontSize="sm" fontWeight="semibold">{row.authAmt}</Text>
               </Table.Cell>
               <Table.Cell>
                 <Text fontSize="sm" fontFamily="mono">{row.authCode}</Text>
@@ -783,6 +853,9 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
                 </Tooltip.Root>
               </Table.Cell>
               <Table.Cell>
+                <AvsCell code={row.avsResultCode} />
+              </Table.Cell>
+              <Table.Cell>
                 <Text fontSize="sm">{row.cardType}</Text>
               </Table.Cell>
               <Table.Cell>
@@ -792,9 +865,7 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
                 <Text fontSize="sm">{row.posEntryModeCalculated}</Text>
               </Table.Cell>
               <Table.Cell>
-                <Badge colorPalette={row.cardNotPresent === 'Yes' ? 'orange' : 'green'} variant="subtle">
-                  {row.cardNotPresent}
-                </Badge>
+                <AhRuleAppliedCell rules={transaction?.ahRuleApplied} />
               </Table.Cell>
             </Table.Row>
           ))}
@@ -817,6 +888,7 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
             <Table.ColumnHeader textAlign="right">Sales vol last 30 days</Table.ColumnHeader>
             <Table.ColumnHeader textAlign="right">Percentage vol</Table.ColumnHeader>
             <Table.ColumnHeader textAlign="right">Percentage count</Table.ColumnHeader>
+            <AhRuleAppliedHeader />
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -873,6 +945,9 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
               <Table.Cell textAlign="right">
                 <Text fontSize="sm">{row.percentageCount}%</Text>
               </Table.Cell>
+              <Table.Cell>
+                <AhRuleAppliedCell rules={transactions[index]?.ahRuleApplied} />
+              </Table.Cell>
             </Table.Row>
           ))}
         </Table.Body>
@@ -891,6 +966,7 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
             <Table.ColumnHeader textAlign="right">ACH return Amt</Table.ColumnHeader>
             <Table.ColumnHeader>ACH return code</Table.ColumnHeader>
             <Table.ColumnHeader>Cr/Db</Table.ColumnHeader>
+            <AhRuleAppliedHeader />
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -927,6 +1003,9 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
                   {row.crDb}
                 </Badge>
               </Table.Cell>
+              <Table.Cell>
+                <AhRuleAppliedCell rules={transactions[index]?.ahRuleApplied} />
+              </Table.Cell>
             </Table.Row>
           ))}
         </Table.Body>
@@ -955,7 +1034,7 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
     let rows: string[][] = [];
     
     if (dataSource === 'Auth') {
-      headers = ['MID', 'Transaction Date', 'Amount', 'Approval Code', 'Card F6', 'Card L4', 'Card Type', 'POS Entry Mode', 'Entry Type', 'Card Not Present', 'POS Condition Code', 'AVS Result', 'Funding Source'];
+      headers = ['MID', 'Transaction Date', 'Amount', 'Approval Code', 'Card F6', 'Card L4', 'AVS Result', 'Card Type', 'POS Entry Mode', 'Entry Type', 'POS Condition Code', 'Funding Source', 'AH Rule Applied'];
       rows = tableData.map((tx: any) => [
         transactions[tableData.indexOf(tx)]?.mid || '',
         tx.transDate || '',
@@ -963,31 +1042,33 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
         tx.apprCode || '',
         tx.cardF6 || '',
         tx.cardL4 || '',
+        tx.avsResultCode || '',
         tx.cardType || '',
         tx.posEntryMode1 || '',
         tx.calcEntryType || '',
-        tx.calcCNP || '',
         tx.posConditionCode || '',
-        tx.avsResultCode || '',
         tx.acctFundingSource || '',
+        (transactions[tableData.indexOf(tx)]?.ahRuleApplied || []).join(', '),
       ]);
     } else if (dataSource === 'Capture') {
-      headers = ['MID', 'Transmission Date', 'Transaction Date', 'Amount', 'Auth Code', 'Card F6', 'Card L4', 'Card Type', 'POS Entry Mode', 'POS Entry Mode Calculated', 'Card Not Present'];
+      headers = ['MID', 'Transmission Date', 'Transaction Date', 'Amount', 'Auth Amt', 'Auth Code', 'Card F6', 'Card L4', 'AVS Result', 'Card Type', 'POS Entry Mode', 'POS Entry Mode Calculated', 'AH Rule Applied'];
       rows = tableData.map((tx: any) => [
         transactions[tableData.indexOf(tx)]?.mid || '',
         tx.transmissionDate || '',
         tx.transactionDate || '',
         tx.transactionAmt || '',
+        tx.authAmt || '',
         tx.authCode || '',
         tx.cardF6 || '',
         tx.cardL4 || '',
+        tx.avsResultCode || '',
         tx.cardType || '',
         tx.posEntryMode || '',
         tx.posEntryModeCalculated || '',
-        tx.cardNotPresent || '',
+        (transactions[tableData.indexOf(tx)]?.ahRuleApplied || []).join(', '),
       ]);
     } else if (dataSource === 'Settled') {
-      headers = ['MID', 'MCC', 'Chargeback Count (30d)', 'Chargeback Volume (30d)', 'Sales Count (30d)', 'Sales Volume (30d)', 'Chargeback % Volume', 'Chargeback % Count'];
+      headers = ['MID', 'MCC', 'Chargeback Count (30d)', 'Chargeback Volume (30d)', 'Sales Count (30d)', 'Sales Volume (30d)', 'Chargeback % Volume', 'Chargeback % Count', 'AH Rule Applied'];
       rows = tableData.map((tx: any) => [
         tx.mid || '',
         tx.mcc || '',
@@ -997,15 +1078,17 @@ export default function TransactionsTab({ transactions, onTransactionClick }: Tr
         tx.salesVolLast30Days || '',
         tx.percentageVol || '',
         tx.percentageCount || '',
+        (transactions[tableData.indexOf(tx)]?.ahRuleApplied || []).join(', '),
       ]);
     } else if (dataSource === 'Returns') {
-      headers = ['MID', 'ACH Return Date', 'ACH Return Amount', 'ACH Return Code', 'CR/DB'];
+      headers = ['MID', 'ACH Return Date', 'ACH Return Amount', 'ACH Return Code', 'CR/DB', 'AH Rule Applied'];
       rows = tableData.map((tx: any) => [
         tx.mid || '',
         tx.achReturnDate || '',
         tx.achReturnAmt || '',
         tx.achReturnCode || '',
         tx.crDb || '',
+        (transactions[tableData.indexOf(tx)]?.ahRuleApplied || []).join(', '),
       ]);
     }
 

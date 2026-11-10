@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { Text, Tooltip, Portal } from '@chakra-ui/react';
-import { getRuleName, getRuleAbbreviation } from '../../utils/ruleNames';
+import { getRuleName, getRuleAbbreviation } from '../../utils/rule-names';
 
 interface RuleLabelProps {
   ruleId: string;

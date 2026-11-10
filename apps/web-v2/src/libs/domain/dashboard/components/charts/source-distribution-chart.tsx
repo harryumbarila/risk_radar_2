@@ -13,7 +13,7 @@ import {
   Legend,
   Cell,
 } from 'recharts';
-import type { MockAlert, Source } from '../../utils/mockData';
+import type { MockAlert, Source } from '../../utils/mock-data';
 import EmptyState from '../empty-state/empty-state';
 
 interface SourceDistributionChartProps {

@@ -16,9 +16,9 @@ import {
   createListCollection,
 } from '@chakra-ui/react';
 import { X, ChevronDown, Search } from 'lucide-react';
-import { getRuleName } from '../../utils/ruleNames';
+import { getRuleName } from '../../utils/rule-names';
 import RuleLabel from '../rule-label/rule-label';
-import { getUsersByGroup, getGroups, getGroupByUserId, getUserById, type User } from '../../utils/userData';
+import { getUsersByGroup, getGroups, getGroupByUserId, getUserById, type User } from '../../utils/user-data';
 
 export interface FilterState {
   dateRange: 'today' | '7' | '14' | '30' | 'custom';

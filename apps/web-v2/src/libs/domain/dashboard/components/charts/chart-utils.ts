@@ -1,6 +1,6 @@
 // Utility functions for TSYS charts
 import type { FilterState } from '../filter-bar/filter-bar';
-import { RULE_DEFINITIONS } from '../../utils/ruleNames';
+import { RULE_DEFINITIONS } from '../../utils/rule-names';
 
 // Use only the 30 defined rules (AH001-AH030)
 export const RULE_IDS = Object.keys(RULE_DEFINITIONS).sort();

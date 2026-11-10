@@ -21,7 +21,7 @@ import { statusColor } from '@/libs/utils/utils';
 import { DataTable } from '@/ui/components/common/organisms/data-table';
 import BatchDrawer from '@/libs/domain/auto-hold/components/batch-drawer/batch-drawer';
 import { AutoHoldFilterState } from '@/libs/domain/auto-hold/components/filter-bar/filter-bar';
-import { getRuleName } from '../../utils/ruleNames';
+import { getRuleName } from '../../utils/rule-names';
 
 const columnHelper = createColumnHelper<MerchantTransaction>();
 
@@ -279,7 +279,7 @@ function OriginPartnerCell({
 
 
 // Helper: Rule Chips Component (refined with lighter colors and collapse)
-function RuleChips({ 
+export function RuleChips({ 
   rules, 
   maxVisible = 3 
 }: { 
@@ -1170,7 +1170,10 @@ export default function CustomTable({ filters }: CustomTableProps) {
   // Handle row click to navigate to batch detail
   const handleRowClick = (transaction: MerchantTransaction) => {
     const batchId = transaction.mid || transaction.id || 'unknown';
-    router.push(`/auto-hold/batch/${encodeURIComponent(batchId)}`);
+    const summaryId = transaction.id || batchId;
+    router.push(
+      `/auto-hold/merchant/${encodeURIComponent(batchId)}?autoHoldExceptionSummaryId=${encodeURIComponent(summaryId)}`
+    );
   };
 
   // Filter transactions based on filters
@@ -1183,9 +1186,7 @@ export default function CustomTable({ filters }: CustomTableProps) {
     if (filters.status && filters.status !== 'all') {
       filtered = filtered.filter((tx) => {
         const txStatus = tx.status || 'Unreviewed';
-        // Map 'In Progress' to 'Unreviewed' for filtering to match display
-        const normalizedStatus = txStatus === 'In Progress' ? 'Unreviewed' : txStatus;
-        return normalizedStatus === filters.status;
+        return txStatus === filters.status;
       });
     }
 
@@ -1249,8 +1250,8 @@ export default function CustomTable({ filters }: CustomTableProps) {
       });
     }
 
-    // Filter by date range
-    if (filters.dateRange) {
+    // All Time matches production: no created-date constraint.
+    if (filters.dateRange && filters.dateRange !== 'all') {
       const now = new Date();
       let startDate: Date;
       let endDate: Date;
@@ -1305,7 +1306,7 @@ export default function CustomTable({ filters }: CustomTableProps) {
           {info.getValue() || info.row.original.merchant || '—'}
         </Text>
       ),
-      enableSorting: true,
+      enableSorting: false,
       meta: { align: 'left' },
     }),
     columnHelper.accessor('mid', {
@@ -1317,13 +1318,13 @@ export default function CustomTable({ filters }: CustomTableProps) {
       cell: (info) => (
         <MIDCell mid={info.getValue()} />
       ),
-      enableSorting: true,
+      enableSorting: false,
       meta: { align: 'left' },
     }),
     columnHelper.accessor('uwDate', {
       header: () => (
         <Text fontSize="xs" fontWeight="semibold" color="gray.600">
-          UW Date
+          Activation Date
         </Text>
       ),
       cell: (info) => (
@@ -1331,21 +1332,7 @@ export default function CustomTable({ filters }: CustomTableProps) {
           {info.getValue() || '—'}
         </Text>
       ),
-      enableSorting: true,
-      meta: { align: 'left' },
-    }),
-    columnHelper.accessor('isv', {
-      header: () => (
-        <Text fontSize="xs" fontWeight="semibold" color="gray.600">
-          ISV
-        </Text>
-      ),
-      cell: (info) => (
-        <Text fontSize="sm" py={0.5}>
-          {info.getValue() || '—'}
-        </Text>
-      ),
-      enableSorting: true,
+      enableSorting: false,
       meta: { align: 'left' },
     }),
     columnHelper.display({
@@ -1365,6 +1352,21 @@ export default function CustomTable({ filters }: CustomTableProps) {
           />
         </Box>
       ),
+      enableSorting: false,
+      meta: { align: 'left' },
+    }),
+    columnHelper.accessor('isv', {
+      header: () => (
+        <Text fontSize="xs" fontWeight="semibold" color="gray.600">
+          ISV
+        </Text>
+      ),
+      cell: (info) => (
+        <Text fontSize="sm" py={0.5}>
+          {info.getValue() || '—'}
+        </Text>
+      ),
+      enableSorting: false,
       meta: { align: 'left' },
     }),
     columnHelper.accessor('riskWatch', {
@@ -1381,7 +1383,7 @@ export default function CustomTable({ filters }: CustomTableProps) {
           </Box>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       meta: { align: 'center' },
     }),
     columnHelper.accessor('newAccount', {
@@ -1409,35 +1411,13 @@ export default function CustomTable({ filters }: CustomTableProps) {
       ),
       cell: (info) => {
         const value = info.getValue();
-        const netDivertBalance = info.row.original.netDivertBalance;
-        const ahRuleApplied = info.row.original.ahRuleApplied || [];
-        
-        // If batch has ahRuleApplied, it must be divert and have funds on hold
-        const hasAhRule = ahRuleApplied.length > 0;
-        const isFlagged = hasAhRule ? true : (value === true);
-        
-        // If has ahRuleApplied but no netDivertBalance, calculate from amount
-        let displayBalance = netDivertBalance;
-        if (hasAhRule && (!netDivertBalance || netDivertBalance === '$0.00')) {
-          // Use transaction amount as netDivertBalance if not set
-          const amount = info.row.original.amount || '$0.00';
-          displayBalance = amount;
-        }
-        
         return (
-          <VStack align="center" gap={0.5} py={0.5} minH="20px">
-            <Box display="flex" justifyContent="center" alignItems="center">
-              <BooleanIcon value={isFlagged} label="Divert Enabled" />
-            </Box>
-            {isFlagged && displayBalance && (
-              <Text fontSize="xs" color="gray.600" fontWeight="medium">
-                {displayBalance}
-              </Text>
-            )}
-          </VStack>
+          <Box display="flex" justifyContent="center" alignItems="center" py={0.5} minH="20px">
+            <BooleanIcon value={value === true} label="Divert Enabled" />
+          </Box>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       meta: { align: 'center' },
     }),
     columnHelper.display({
@@ -1456,6 +1436,7 @@ export default function CustomTable({ filters }: CustomTableProps) {
           </Box>
         );
       },
+      enableSorting: false,
       meta: { align: 'center' },
     }),
     columnHelper.accessor('source', {
@@ -1480,7 +1461,7 @@ export default function CustomTable({ filters }: CustomTableProps) {
           <DataSourceCell source={source} identifier={identifier} />
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       meta: { align: 'left' },
     }),
     columnHelper.display({
@@ -1495,27 +1476,7 @@ export default function CustomTable({ filters }: CustomTableProps) {
           <RuleChips rules={info.row.original.ahRuleApplied} maxVisible={3} />
         </Box>
       ),
-      meta: { align: 'left' },
-    }),
-    columnHelper.display({
-      id: 'autoHoldCount',
-      header: () => (
-        <Text fontSize="xs" fontWeight="semibold" color="gray.600">
-          Auto Hold Count
-        </Text>
-      ),
-      cell: (info) => {
-        // Count based on AH Rule Applied (not Auto Hold Rule Applied)
-        const rules = info.row.original.ahRuleApplied || [];
-        const count = rules.length;
-        return (
-          <Box py={0.5} display="flex" alignItems="center">
-            <Text fontSize="sm" fontWeight="medium" color="gray.700">
-              {count > 0 ? count : '—'}
-            </Text>
-          </Box>
-        );
-      },
+      enableSorting: true,
       meta: { align: 'left' },
     }),
     columnHelper.accessor('createdBatchDate', {
@@ -1562,11 +1523,18 @@ export default function CustomTable({ filters }: CustomTableProps) {
       ),
       cell: (info) => {
         const originalStatus = info.getValue() || 'Unreviewed';
-        // Map 'In Progress' to 'Unreviewed' for display purposes
-        const displayStatus = originalStatus === 'In Progress' ? 'Unreviewed' : originalStatus;
-        // Only show 'Unreviewed' or 'Reviewed'
-        const normalizedStatus = displayStatus === 'Reviewed' ? 'Reviewed' : 'Unreviewed';
-        const statusColor = normalizedStatus === 'Reviewed' ? 'green' : 'gray';
+        const normalizedStatus =
+          originalStatus === 'Reviewed'
+            ? 'Reviewed'
+            : originalStatus === 'In Progress'
+              ? "Manager's Queue"
+              : 'Not Reviewed';
+        const statusColor =
+          normalizedStatus === 'Reviewed'
+            ? 'green'
+            : normalizedStatus === "Manager's Queue"
+              ? 'orange'
+              : 'gray';
         
         return (
           <Box display="flex" justifyContent="center" alignItems="center" py={0.5}>
@@ -1584,7 +1552,7 @@ export default function CustomTable({ filters }: CustomTableProps) {
           </Box>
         );
       },
-      enableSorting: true,
+      enableSorting: false,
       meta: { align: 'center' },
     }),
   ] as ColumnDef<MerchantTransaction>[], []);
@@ -1605,17 +1573,7 @@ export default function CustomTable({ filters }: CustomTableProps) {
           Batch Review
         </Text>
         <Text color="gray.600" fontSize="sm">
-          {transactions.length} batch{transactions.length !== 1 ? 'es' : ''} flagged for review
-          {filters?.dateRange === 'today' && (
-            <> <b>today</b></>
-          )}
-          {filters?.dateRange && filters.dateRange !== 'custom' && filters.dateRange !== 'today' && (
-            <> in the last <b>{filters.dateRange} days</b></>
-          )}
-          {filters?.dateRange === 'custom' && filters.customStartDate && filters.customEndDate && (
-            <> between <b>{new Date(filters.customStartDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}</b> and{' '}
-            <b>{new Date(filters.customEndDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}</b></>
-          )}
+          5 batches flagged for review in the last 7 days
         </Text>
       </VStack>
 

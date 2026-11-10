@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react';
 import Link from 'next/link';
 import { X } from 'lucide-react';
-import { useWhitelistStore } from './useWhitelistStore';
+import { useWhitelistStore } from './use-whitelist-store';
 import OverviewTab from './whitelist-tabs/overview-tab';
 import ManageWhitelistTab from './whitelist-tabs/manage-whitelist-tab';
 import RiskThresholdsTab from './whitelist-tabs/risk-thresholds-tab';

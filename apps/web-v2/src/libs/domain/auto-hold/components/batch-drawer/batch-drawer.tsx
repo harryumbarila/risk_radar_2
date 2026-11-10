@@ -17,7 +17,7 @@ export default function BatchDrawer({ batch, trigger }: BatchDrawerProps) {
 
   const handleClick = () => {
     // Navigate to the batch detail page
-    router.push(`/auto-hold/batch/${encodeURIComponent(batchId)}`);
+    router.push(`/auto-hold/merchant/${encodeURIComponent(batchId)}?autoHoldExceptionSummaryId=${encodeURIComponent(merchantInfo?.id || batchId)}`);
   };
 
   // If trigger is provided, wrap it with onClick handler

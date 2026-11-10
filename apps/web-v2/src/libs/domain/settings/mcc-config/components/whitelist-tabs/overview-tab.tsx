@@ -12,7 +12,7 @@ import {
   Portal,
 } from '@chakra-ui/react';
 import { Info } from 'lucide-react';
-import { useWhitelistStore } from '../useWhitelistStore';
+import { useWhitelistStore } from '../use-whitelist-store';
 import riskRulesData from '@/data/risk-rules.json';
 import type { RiskRule } from '@/libs/domain/risk-rules/context/rules-context';
 

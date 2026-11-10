@@ -45,7 +45,7 @@ export default function BatchDetailPage({ batch }: BatchDetailPageProps) {
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState('transactions');
-  const [isOnHold, setIsOnHold] = React.useState(true);
+  const [isOnHold, setIsOnHold] = React.useState(false);
   const [isHoldModalOpen, setIsHoldModalOpen] = React.useState(false);
   const [holdNote, setHoldNote] = React.useState('');
   const [isConfirmingHold, setIsConfirmingHold] = React.useState(false);
@@ -149,7 +149,7 @@ export default function BatchDetailPage({ batch }: BatchDetailPageProps) {
   // Mock Amex program status based on MID
   // In real app, this would come from API
   // Using deterministic logic based on MID hash to ensure consistency
-  const getAmexProgram = React.useCallback((mid: string | undefined): 'Opt Blue' | 'EASI' | null => {
+  const getAmexProgram = React.useCallback((mid: string | undefined): 'ESA' | 'OptBlue' | null => {
     if (!mid) return null;
     // Mock: Use MID hash to deterministically assign programs
     // This ensures the same MID always gets the same program
@@ -157,9 +157,8 @@ export default function BatchDetailPage({ batch }: BatchDetailPageProps) {
     const programIndex = midHash % 10;
     
     // Assign Opt Blue to ~30% of MIDs
-    if (programIndex < 3) return 'Opt Blue';
-    // Assign EASI to ~20% of MIDs
-    if (programIndex >= 3 && programIndex < 5) return 'EASI';
+    if (programIndex < 3) return 'ESA';
+    if (programIndex >= 3 && programIndex < 5) return 'OptBlue';
     // Rest have no Amex program
     return null;
   }, []);
@@ -513,8 +512,6 @@ Talus Payments`,
     }
   }, [selectedTemplate, emailTemplates, selectedTransaction, merchantInfo, contactName]);
 
-  const status = merchantInfo?.status || 'Unreviewed';
-  
   // Mock data for demographics
   const merchantSource = merchantInfo?.source || 'Talus Pay';
   const riskWatch = merchantInfo?.riskWatch || false;
@@ -802,7 +799,7 @@ Talus Payments`,
                   <Tooltip.Root>
                     <Tooltip.Trigger asChild>
                       <Badge
-                        colorPalette="amber"
+                        colorPalette="red"
                         variant="solid"
                         px={3}
                         py={1}
@@ -858,13 +855,13 @@ Talus Payments`,
                 {accountStatus}
               </Badge>
             </HStack>
-            {amexProgram && (
-              <HStack gap={2}>
-                <Text fontSize="xs" color="gray.600" textTransform="uppercase">
-                  Amex Program:
-                </Text>
+            <HStack gap={2}>
+              <Text fontSize="xs" color="gray.600" textTransform="uppercase">
+                Amex Program:
+              </Text>
+              {amexProgram ? (
                 <Badge
-                  colorPalette="blue"
+                  colorPalette={amexProgram === 'ESA' ? 'purple' : 'blue'}
                   variant="subtle"
                   px={2}
                   py={0.5}
@@ -873,22 +870,24 @@ Talus Payments`,
                 >
                   {amexProgram}
                 </Badge>
-              </HStack>
-            )}
-            <HStack gap={2}>
-              <Text fontSize="xs" color="gray.600" textTransform="uppercase">
-                Processor:
-              </Text>
-              <Text fontSize="sm" fontWeight="semibold" color="gray.900">
-                {merchantInfo?.processor || 'N/A'}
-              </Text>
+              ) : (
+                <Text fontSize="sm" fontWeight="semibold" color="gray.900">—</Text>
+              )}
             </HStack>
             <HStack gap={2}>
               <Text fontSize="xs" color="gray.600" textTransform="uppercase">
                 ISV:
               </Text>
               <Text fontSize="sm" fontWeight="semibold" color="gray.900">
-                {merchantInfo?.isv || 'N/A'}
+                {merchantInfo?.isv || '—'}
+              </Text>
+            </HStack>
+            <HStack gap={2}>
+              <Text fontSize="xs" color="gray.600" textTransform="uppercase">
+                Processor:
+              </Text>
+              <Text fontSize="sm" fontWeight="semibold" color="gray.900">
+                TSYS
               </Text>
             </HStack>
             <HStack gap={2}>
@@ -896,18 +895,14 @@ Talus Payments`,
                 Status:
               </Text>
               <Badge
-                colorPalette={
-                  status === 'Reviewed'
-                    ? 'green'
-                    : status === 'In Progress'
-                    ? 'yellow'
-                    : 'gray'
-                }
+                colorPalette={accountStatus === 'Open' ? 'green' : 'red'}
                 variant="subtle"
-                px={3}
-                py={1}
+                px={2}
+                py={0.5}
+                fontSize="xs"
+                fontWeight="medium"
               >
-                {status}
+                {accountStatus}
               </Badge>
             </HStack>
             <HStack gap={2}>
@@ -1233,10 +1228,9 @@ Talus Payments`,
             suppressHydrationWarning
             onClick={() => {
               if (isFromManagerQueue) {
-                // Navigate back to Auto Hold with manager tab active
-                router.push('/auto-hold?tab=manager');
+                router.push('/auto-hold/hold-module?tab=manager');
               } else {
-                router.back();
+                router.push('/auto-hold/hold-module?tab=analyst');
               }
             }}
           >

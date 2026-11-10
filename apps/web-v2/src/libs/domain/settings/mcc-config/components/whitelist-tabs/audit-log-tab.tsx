@@ -10,7 +10,7 @@ import {
   Badge,
   Avatar,
 } from '@chakra-ui/react';
-import { useWhitelistStore } from '../useWhitelistStore';
+import { useWhitelistStore } from '../use-whitelist-store';
 
 function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString('en-US', {

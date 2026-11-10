@@ -34,7 +34,7 @@ import {
   formatWeeklyDate,
   getTopRules,
 } from './chart-utils';
-import { RULE_DEFINITIONS } from '../../utils/ruleNames';
+import { RULE_DEFINITIONS } from '../../utils/rule-names';
 
 export type PaymentStage = 'Authorization' | 'Capture' | 'Settlement' | 'ACH Returns';
 export type TopContributorsFilter = 'all' | 'top5' | 'top10';
@@ -1690,7 +1690,7 @@ function HeatmapCellDrawerWrapper(props: Omit<HeatmapCellDrawerProps, 'onTransac
   
   const handleTransactionClick = React.useCallback((tx: MerchantTransaction) => {
     const batchId = tx.mid || tx.id || 'unknown';
-    router.push(`/auto-hold/batch/${encodeURIComponent(batchId)}`);
+    router.push(`/auto-hold/merchant/${encodeURIComponent(batchId)}?autoHoldExceptionSummaryId=${encodeURIComponent(tx.id)}`);
   }, [router]);
   
   return (

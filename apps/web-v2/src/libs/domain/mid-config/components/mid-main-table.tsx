@@ -12,7 +12,7 @@ import {
   Skeleton,
 } from '@chakra-ui/react';
 import { Settings } from 'lucide-react';
-import { useWhitelistStore, type MIDWhitelistData } from './useWhitelistStore';
+import { useWhitelistStore, type MIDWhitelistData } from './use-whitelist-store';
 
 interface MIDMainTableProps {
   midData: MIDWhitelistData[];

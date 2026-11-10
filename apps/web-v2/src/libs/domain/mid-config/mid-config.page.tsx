@@ -7,7 +7,7 @@ import { Search } from 'lucide-react';
 import MIDMainTable from './components/mid-main-table';
 import WhitelistManagerDrawer from './components/whitelist-manager-drawer';
 import midWhitelistData from '@/data/mid-whitelist.json';
-import type { MIDWhitelistData } from './components/useWhitelistStore';
+import type { MIDWhitelistData } from './components/use-whitelist-store';
 
 export default function MIDConfigPage(): React.JSX.Element {
   const [isLoading, setIsLoading] = React.useState(true);

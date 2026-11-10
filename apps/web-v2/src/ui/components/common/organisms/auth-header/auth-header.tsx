@@ -90,11 +90,11 @@ export default function AuthHeader(): React.JSX.Element {
   // Build breadcrumb paths (skip Dashboard for root path since it's already shown in content)
   const fullPaths = segments.length === 0 
     ? [] // Don't show breadcrumb on root path
-    : pathname === '/auto-hold'
+    : pathname === '/auto-hold' || pathname?.startsWith('/auto-hold/hold-module')
     ? [
         {
           label: '360 Hold Module',
-          href: '/auto-hold',
+          href: '/auto-hold/hold-module',
           menu: [],
           isCurrent: true,
         },
@@ -138,7 +138,7 @@ export default function AuthHeader(): React.JSX.Element {
           <Heading size="xl" fontWeight="bold" color="gray.900">
             Risk Dashboard
           </Heading>
-        ) : pathname === '/auto-hold' ? (
+        ) : pathname === '/auto-hold' || pathname?.startsWith('/auto-hold/hold-module') ? (
           <Heading size="xl" fontWeight="bold" color="gray.900">
             360 Hold Module
           </Heading>

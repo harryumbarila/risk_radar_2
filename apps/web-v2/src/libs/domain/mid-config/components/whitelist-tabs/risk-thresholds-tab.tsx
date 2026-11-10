@@ -15,7 +15,7 @@ import {
   SimpleGrid,
 } from '@chakra-ui/react';
 import { Info } from 'lucide-react';
-import { useWhitelistStore, type RiskThresholds } from '../useWhitelistStore';
+import { useWhitelistStore, type RiskThresholds } from '../use-whitelist-store';
 import { toaster } from '@/ui/components/common/atoms/toaster/toaster';
 
 function formatDate(dateString: string): string {

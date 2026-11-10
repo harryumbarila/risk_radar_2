@@ -12,8 +12,8 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
-import type { MockAlert } from '../../utils/mockData';
-import { getRuleName } from '../../utils/ruleNames';
+import type { MockAlert } from '../../utils/mock-data';
+import { getRuleName } from '../../utils/rule-names';
 import EmptyState from '../empty-state/empty-state';
 
 interface TopRulesChartProps {

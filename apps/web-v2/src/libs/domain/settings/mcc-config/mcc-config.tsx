@@ -5,11 +5,11 @@ import { Box, VStack, HStack, Text, Breadcrumb, Button, Input } from '@chakra-ui
 import Link from 'next/link';
 import { Search } from 'lucide-react';
 
-import { WhitelistProvider } from './components/useWhitelistStore';
+import { WhitelistProvider } from './components/use-whitelist-store';
 import MCCMainTable from './components/mcc-main-table';
 import WhitelistManagerDrawer from './components/whitelist-manager-drawer';
 import mccWhitelistData from '@/data/mcc-whitelist.json';
-import type { MCCWhitelistData } from './components/useWhitelistStore';
+import type { MCCWhitelistData } from './components/use-whitelist-store';
 
 export default function SettingsMCCConfig(): React.JSX.Element {
   const [searchTerm, setSearchTerm] = React.useState('');

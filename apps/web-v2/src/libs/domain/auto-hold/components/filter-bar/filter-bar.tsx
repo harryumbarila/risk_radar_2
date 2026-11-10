@@ -16,9 +16,9 @@ import {
   createListCollection,
 } from '@chakra-ui/react';
 import { X, Search, ChevronDown } from 'lucide-react';
-import { getRuleName } from '@/libs/domain/dashboard/utils/ruleNames';
+import { getRuleName } from '@/libs/domain/dashboard/utils/rule-names';
 import RuleLabel from '@/libs/domain/dashboard/components/rule-label/rule-label';
-import { getUsersByGroup, getGroupByUserId, getUserById, type User } from '@/libs/domain/dashboard/utils/userData';
+import { getUsersByGroup, getGroupByUserId, getUserById, type User } from '@/libs/domain/dashboard/utils/user-data';
 
 // Helper functions to format dates between YYYY-MM-DD (internal) and MM/DD/YYYY (display)
 const formatDateForDisplay = (dateString: string | undefined): string => {
@@ -52,7 +52,7 @@ const formatDateForStorage = (dateString: string): string => {
 };
 
 export interface AutoHoldFilterState {
-  dateRange: 'today' | '7' | '14' | '30' | 'custom';
+  dateRange: 'today' | 'all' | '7' | '14' | '30' | 'custom';
   customStartDate?: string;
   customEndDate?: string;
   status: 'all' | 'Unreviewed' | 'Reviewed';
@@ -85,6 +85,7 @@ export default function AutoHoldFilterBar({
   const dateRangeCollection = createListCollection({
     items: [
       { label: 'Today', value: 'today' },
+      { label: 'All Time', value: 'all' },
       { label: 'Last 7 days', value: '7' },
       { label: 'Last 14 days', value: '14' },
       { label: 'Last 30 days', value: '30' },
@@ -223,11 +224,11 @@ export default function AutoHoldFilterBar({
   const clearFilter = (key: keyof AutoHoldFilterState) => {
     const newFilters = { ...filters };
     if (key === 'dateRange') {
-      newFilters.dateRange = 'today';
+      newFilters.dateRange = 'all';
       delete newFilters.customStartDate;
       delete newFilters.customEndDate;
     } else if (key === 'status') {
-      newFilters.status = 'Unreviewed';
+      newFilters.status = 'all';
     } else if (key === 'processor') {
       newFilters.processor = 'all';
     } else if (key === 'group') {
@@ -999,9 +1000,9 @@ export default function AutoHoldFilterBar({
         </HStack>
 
         {/* Active Filter Chips */}
-        {hasActiveFilters && (
+        {(hasActiveFilters || filters.dateRange !== 'all' || filters.status !== 'all') && (
           <HStack gap={2} mt={2} flexWrap="wrap" align="center">
-            {filters.dateRange !== 'today' && (
+            {filters.dateRange !== 'all' && (
               <Badge
                 colorPalette="blue"
                 variant="subtle"
@@ -1012,7 +1013,9 @@ export default function AutoHoldFilterBar({
                 alignItems="center"
                 gap={1}
               >
-                Date: {filters.dateRange === 'custom'
+                {filters.dateRange === 'today'
+                  ? 'Today'
+                  : filters.dateRange === 'custom'
                   ? `${filters.customStartDate ? new Date(filters.customStartDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : ''} - ${filters.customEndDate ? new Date(filters.customEndDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : ''}`
                   : `Last ${filters.dateRange} days`}
                 <Button

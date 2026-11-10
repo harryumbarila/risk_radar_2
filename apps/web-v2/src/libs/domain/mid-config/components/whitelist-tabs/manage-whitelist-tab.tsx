@@ -17,7 +17,7 @@ import {
   createListCollection,
 } from '@chakra-ui/react';
 import { Search, X as XIcon } from 'lucide-react';
-import { useWhitelistStore } from '../useWhitelistStore';
+import { useWhitelistStore } from '../use-whitelist-store';
 import { toaster } from '@/ui/components/common/atoms/toaster/toaster';
 import riskRulesData from '@/data/risk-rules.json';
 import type { RiskRule } from '@/libs/domain/risk-rules/context/rules-context';

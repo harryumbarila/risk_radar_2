@@ -21,7 +21,7 @@ import { useRouter } from 'next/navigation';
 import { ManagerQueueItem } from '../types';
 import ManagerQueueDetailDrawer from './manager-queue-detail-drawer';
 import { toaster } from '@/ui/components/common/atoms/toaster/toaster';
-import { getRuleName } from '@/libs/domain/dashboard/utils/ruleNames';
+import { getRuleName } from '@/libs/domain/dashboard/utils/rule-names';
 
 interface ManagerQueueTableProps {
   items: ManagerQueueItem[];
@@ -58,13 +58,13 @@ export default function ManagerQueueTable({ items }: ManagerQueueTableProps) {
 
   const handleRowClick = (item: ManagerQueueItem) => {
     // Navigate to batch detail page using MID, with source parameter to return to Manager Queue
-    router.push(`/auto-hold/batch/${encodeURIComponent(item.mid)}?source=manager-queue`);
+    router.push(`/auto-hold/merchant/${encodeURIComponent(item.mid)}?autoHoldExceptionSummaryId=${encodeURIComponent(item.id)}&source=manager-queue`);
   };
 
   const handleViewBatch = (item: ManagerQueueItem, e: React.MouseEvent) => {
     e.stopPropagation();
     // Navigate to batch detail page using MID, with source parameter to return to Manager Queue
-    router.push(`/auto-hold/batch/${encodeURIComponent(item.mid)}?source=manager-queue`);
+    router.push(`/auto-hold/merchant/${encodeURIComponent(item.mid)}?autoHoldExceptionSummaryId=${encodeURIComponent(item.id)}&source=manager-queue`);
   };
 
   const handleReassignClick = (item: ManagerQueueItem, e: React.MouseEvent) => {

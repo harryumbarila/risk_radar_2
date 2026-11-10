@@ -2,7 +2,7 @@
 import React from 'react';
 import { Box, VStack, Text, HStack, Tooltip, Portal } from '@chakra-ui/react';
 import { Info } from 'lucide-react';
-import type { MockAlert } from '../../utils/mockData';
+import type { MockAlert } from '../../utils/mock-data';
 import EmptyState from '../empty-state/empty-state';
 
 interface HeatmapChartProps {

@@ -12,7 +12,7 @@ import {
   Portal,
   Dialog,
 } from '@chakra-ui/react';
-import { useWhitelistStore } from '../useWhitelistStore';
+import { useWhitelistStore } from '../use-whitelist-store';
 import { toaster } from '@/ui/components/common/atoms/toaster/toaster';
 
 type BankAccount = {

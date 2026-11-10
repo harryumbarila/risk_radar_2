@@ -20,8 +20,8 @@ const SourceDistributionChart = React.lazy(() => import('../charts/source-distri
 const MerchantRanking = React.lazy(() => import('../charts/merchant-ranking').then(m => ({ default: m.default })));
 const ChargebackRateChart = React.lazy(() => import('../charts/chargeback-rate-chart').then(m => ({ default: m.default })));
 const ChargebackReasonCodeChart = React.lazy(() => import('../charts/chargeback-reason-code-chart').then(m => ({ default: m.default })));
-import { generateMockAlerts, calculateKpis, type MockAlert, type Source } from '../../utils/mockData';
-import { RULE_DEFINITIONS } from '../../utils/ruleNames';
+import { generateMockAlerts, calculateKpis, type MockAlert, type Source } from '../../utils/mock-data';
+import { RULE_DEFINITIONS } from '../../utils/rule-names';
 
 export default function Home() {
   const router = useRouter();

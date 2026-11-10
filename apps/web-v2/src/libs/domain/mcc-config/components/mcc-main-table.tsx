@@ -12,7 +12,7 @@ import {
   Skeleton,
 } from '@chakra-ui/react';
 import { Settings } from 'lucide-react';
-import { useWhitelistStore, type MCCWhitelistData } from './useWhitelistStore';
+import { useWhitelistStore, type MCCWhitelistData } from './use-whitelist-store';
 
 interface MCCMainTableProps {
   mccData: MCCWhitelistData[];

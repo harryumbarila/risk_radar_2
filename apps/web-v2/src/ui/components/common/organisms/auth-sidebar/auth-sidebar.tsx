@@ -39,7 +39,7 @@ export default function AuthSidebar(): React.JSX.Element {
 
   const menuItems: AuthSidebarMenuItem[] = [
     { name: 'Dashboard', icon: MdHome, path: '/' },
-    { name: '360 Hold Module', icon: MdAutorenew, path: '/auto-hold' },
+    { name: '360 Hold Module', icon: MdAutorenew, path: '/auto-hold/hold-module' },
     { name: 'Risk Rules', icon: ShieldAlert as any, path: '/risk-rules' },
     { name: 'MCC Configuration', icon: Settings2 as any, path: '/mcc-config' },
     { name: 'MID Configuration', icon: Building2 as any, path: '/mid-config' },
@@ -53,6 +53,9 @@ export default function AuthSidebar(): React.JSX.Element {
     if (typeof href === 'string') {
       if (href === '/') {
         return currentPath === '/';
+      }
+      if (href === '/auto-hold/hold-module') {
+        return currentPath?.startsWith('/auto-hold') ?? false;
       }
       return currentPath?.startsWith(href);
     }

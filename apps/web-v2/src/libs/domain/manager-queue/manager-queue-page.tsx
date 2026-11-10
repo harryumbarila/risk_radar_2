@@ -13,7 +13,7 @@ import ManagerQueueFilters from './components/manager-queue-filters';
 import AnalystWorkloadTable from './components/analyst-workload-table';
 import ManagerQueueTable from './components/manager-queue-table';
 import { ManagerQueueItem, ManagerQueueFilters as FilterState, AnalystWorkload } from './types';
-import { RULE_DEFINITIONS } from '@/libs/domain/dashboard/utils/ruleNames';
+import { RULE_DEFINITIONS } from '@/libs/domain/dashboard/utils/rule-names';
 import { generateMID, ALL_TRANSACTIONS } from '@/libs/domain/dashboard/components/transactions/transactions';
 
 export default function ManagerQueuePage() {

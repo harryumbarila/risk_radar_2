@@ -7,7 +7,7 @@ import { Search } from 'lucide-react';
 import MCCMainTable from './components/mcc-main-table';
 import WhitelistManagerDrawer from './components/whitelist-manager-drawer';
 import mccWhitelistData from '@/data/mcc-whitelist.json';
-import type { MCCWhitelistData } from './components/useWhitelistStore';
+import type { MCCWhitelistData } from './components/use-whitelist-store';
 
 export default function MCCConfigPage(): React.JSX.Element {
   const [isLoading, setIsLoading] = React.useState(true);

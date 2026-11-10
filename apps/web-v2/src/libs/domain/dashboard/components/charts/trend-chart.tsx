@@ -12,7 +12,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import type { MockAlert } from '../../utils/mockData';
+import type { MockAlert } from '../../utils/mock-data';
 
 interface TrendChartProps {
   alerts: MockAlert[];

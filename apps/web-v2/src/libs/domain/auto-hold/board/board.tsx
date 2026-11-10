@@ -8,7 +8,7 @@ import ManagerQueuePage from '@/libs/domain/manager-queue/manager-queue-page';
 import MerchantHoldsPage from '@/libs/domain/merchant-holds/merchant-holds-page';
 import AutoHoldFilterBar, { AutoHoldFilterState } from '../components/filter-bar/filter-bar';
 import { MerchantTransaction } from '@/data/interfaces/transaction';
-import { RULE_DEFINITIONS } from '@/libs/domain/dashboard/utils/ruleNames';
+import { RULE_DEFINITIONS } from '@/libs/domain/dashboard/utils/rule-names';
 import { generateDataSourceIdentifier, generateMID } from '../../dashboard/components/transactions/transactions';
 
 export default function AutoHoldBoardPage() {
