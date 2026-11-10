@@ -42,6 +42,10 @@ jobs:
   release:
     name: Create Github release & release notes
     needs: [versioning, deploy-api]
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
     uses: ./.github/workflows/_release.yaml
     with:
       build-number: ${{ needs.versioning.outputs.build-number }}
